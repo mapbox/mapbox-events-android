@@ -1,1 +1,1 @@
-include ':app', ':libtelemetry'
+include ':app', ':libtelemetry', ':libcore'
