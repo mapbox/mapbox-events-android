@@ -31,3 +31,5 @@ dependencies {
     testCompile rootProject.ext.dep.junit
     androidTestCompile rootProject.ext.dep.testEspressoCore
 }
+
+apply from: '../gradle-checkstyle.gradle'

@@ -1,5 +1,7 @@
 apply plugin: 'com.android.library'
 
+version = VERSION_NAME
+
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -8,7 +10,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "0.1.0"
+        versionName version
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -29,3 +31,7 @@ dependencies {
     testCompile rootProject.ext.dep.junit
     androidTestCompile rootProject.ext.dep.testEspressoCore
 }
+
+apply from: 'gradle-javadoc.gradle'
+apply from: '../gradle-mvn-push-android.gradle'
+apply from: '../gradle-checkstyle.gradle'
