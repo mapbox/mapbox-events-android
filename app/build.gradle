@@ -22,6 +22,8 @@ android {
 }
 
 dependencies {
+    compile project(':libtelemetry')
+
     compile rootProject.ext.dep.supportAppcompatV7
     compile rootProject.ext.dep.constraint
 

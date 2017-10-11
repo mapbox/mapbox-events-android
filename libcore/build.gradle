@@ -21,6 +21,8 @@ android {
 }
 
 dependencies {
+    compile project(':liblocation')
+
     compile rootProject.ext.dep.supportAppcompatV7
 
     // Testing
