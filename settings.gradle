@@ -1,0 +1,1 @@
+include ':app', ':libtelemetry', ':libcore', ':liblocation'
