@@ -20,10 +20,18 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    sourceSets {
+        main {
+            java.srcDirs = ['src/main/java', '../liblocation/src/main/java']
+        }
+    }
 }
 
 dependencies {
-    compile project(':liblocation')
+    provided 'com.mapbox.mapboxsdk:mapbox-java-services:2.2.6'
+    provided 'com.mapzen.android:lost:3.0.4'
+    provided 'com.google.android.gms:play-services-location:11.0.4'
 
     compile rootProject.ext.dep.supportAppcompatV7
 
