@@ -1,12 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdkVersion androidVersions.compileSdkVersion
+    buildToolsVersion androidVersions.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
+        minSdkVersion androidVersions.minSdkVersion
+        targetSdkVersion androidVersions.targetSdkVersion
         versionCode 1
         versionName "0.1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -21,11 +21,17 @@ android {
 }
 
 dependencies {
-    compile rootProject.ext.dep.supportAppcompatV7
+    provided dependenciesList.mapboxServices
+    provided dependenciesList.lost
+    provided dependenciesList.gmsLocation
 
-    // Testing
-    testCompile rootProject.ext.dep.junit
-    androidTestCompile rootProject.ext.dep.testEspressoCore
+    compile dependenciesList.supportAppcompatV7
+
+    testCompile dependenciesList.junit
+    testCompile dependenciesList.mockito
+    androidTestCompile(dependenciesList.testEspressoCore, {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
 }
 
-apply from: '../gradle-checkstyle.gradle'
+apply from: "${rootDir}/gradle/checkstyle.gradle"

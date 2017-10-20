@@ -3,12 +3,12 @@ apply plugin: 'com.android.library'
 version = VERSION_NAME
 
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdkVersion androidVersions.compileSdkVersion
+    buildToolsVersion androidVersions.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
+        minSdkVersion androidVersions.minSdkVersion
+        targetSdkVersion androidVersions.targetSdkVersion
         versionCode 1
         versionName version
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -20,18 +20,28 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    sourceSets {
+        main {
+            java.srcDirs = ['src/main/java', '../liblocation/src/main/java']
+        }
+    }
 }
 
 dependencies {
-    compile project(':liblocation')
+    provided dependenciesList.mapboxServices
+    provided dependenciesList.lost
+    provided dependenciesList.gmsLocation
 
-    compile rootProject.ext.dep.supportAppcompatV7
+    compile dependenciesList.supportAppcompatV7
 
-    // Testing
-    testCompile rootProject.ext.dep.junit
-    androidTestCompile rootProject.ext.dep.testEspressoCore
+    testCompile dependenciesList.junit
+    testCompile dependenciesList.mockito
+    androidTestCompile(dependenciesList.testEspressoCore, {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
 }
 
-apply from: 'gradle-javadoc.gradle'
-apply from: '../gradle-mvn-push-android.gradle'
-apply from: '../gradle-checkstyle.gradle'
+apply from: 'javadoc.gradle'
+apply from: "${rootDir}/gradle/mvn-push-android.gradle"
+apply from: "${rootDir}/gradle/checkstyle.gradle"
