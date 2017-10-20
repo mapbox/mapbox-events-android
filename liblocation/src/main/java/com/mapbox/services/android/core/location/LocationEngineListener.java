@@ -6,7 +6,7 @@ import android.location.Location;
  * Callback used in LocationEngine
  */
 
-interface LocationEngineListener {
+public interface LocationEngineListener {
 
   void onConnected();
 
