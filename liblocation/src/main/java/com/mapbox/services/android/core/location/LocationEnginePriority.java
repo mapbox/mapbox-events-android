@@ -6,10 +6,9 @@ package com.mapbox.services.android.core.location;
  * https://developers.google.com/android/reference/com/google/android/gms/location/LocationRequest
  * https://github.com/mapzen/lost/blob/master/lost/src/main/java/com/mapzen/android/lost/api/LocationRequest.java
  */
-class LocationEnginePriority {
-
-  static final int NO_POWER = 0;
-  static final int LOW_POWER = 1;
-  static final int BALANCED_POWER_ACCURACY = 2;
-  static final int HIGH_ACCURACY = 3;
+public class LocationEnginePriority {
+  public static final int NO_POWER = 0;
+  public static final int LOW_POWER = 1;
+  public static final int BALANCED_POWER_ACCURACY = 2;
+  public static final int HIGH_ACCURACY = 3;
 }
