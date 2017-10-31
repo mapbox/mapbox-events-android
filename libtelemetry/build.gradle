@@ -12,6 +12,16 @@ android {
         versionCode 1
         versionName version
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
     }
 
     buildTypes {
@@ -20,18 +30,29 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
 }
 
 dependencies {
     compile project(':libcore')
-
+    compile dependenciesList.okhttp3
+    compile dependenciesList.gson
     compile dependenciesList.supportAppcompatV7
 
     testCompile dependenciesList.junit
     testCompile dependenciesList.mockito
-    androidTestCompile(dependenciesList.testEspressoCore, {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
+    testCompile dependenciesList.okhttp3Mockwebserver
+    testCompile dependenciesList.commonsIO
+
+    androidTestCompile dependenciesList.mockitoAndroid
+    androidTestCompile dependenciesList.supportAnnotation
+    androidTestCompile dependenciesList.testRunner
+    androidTestCompile dependenciesList.testRules
+    androidTestCompile dependenciesList.gmsLocation
+    androidTestCompile dependenciesList.lost
 }
 
 apply from: 'javadoc.gradle'
