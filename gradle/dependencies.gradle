@@ -14,13 +14,15 @@ ext {
             junit            : '4.12',
             supportLibVersion: '25.4.0',
             constraintLayout : '1.0.2',
-            mockito          : '2.10.0',
+            mockito          : '2.11.0',
             testRunnerVersion: '1.0.1',
+            okhttp3          : '3.9.0',
+            gson             : '2.8.2',
             espressoVersion  : '3.0.1'
     ]
 
     pluginVersion = [
-            checkstyle: '8.2',
+            checkstyle: '8.4',
             gradle    : '2.3.3'
     ]
 
@@ -33,6 +35,16 @@ ext {
 
             // play services
             gmsLocation            : "com.google.android.gms:play-services-location:${version.gmsLocation}",
+
+            // okhttp
+            okhttp3                : "com.squareup.okhttp3:okhttp:${version.okhttp3}",
+            okhttp3Mockwebserver   : "com.squareup.okhttp3:mockwebserver:${version.okhttp3}",
+
+            // gson
+            gson                   : "com.google.code.gson:gson:${version.gson}",
+
+            // commons-io
+            commonsIO              : 'commons-io:commons-io:2.5',
 
             // support
             supportAnnotation      : "com.android.support:support-annotations:${version.supportLibVersion}",
@@ -51,7 +63,8 @@ ext {
 
             // unit test
             junit                  : "junit:junit:${version.junit}",
-            mockito                : "org.mockito:mockito-core:${version.mockito}"
+            mockito                : "org.mockito:mockito-core:${version.mockito}",
+            mockitoAndroid         : "org.mockito:mockito-android:${version.mockito}",
 
     ]
 
