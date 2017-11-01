@@ -18,17 +18,17 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @since 2.0.0
  */
 public abstract class LocationEngine {
-  enum Type {
+  public enum Type {
     GOOGLE_PLAY_SERVICES, LOST, ANDROID, MOCK
   }
 
   private static final int TWO_MINUTES = 1000 * 60 * 2;
 
-  int priority;
-  Integer interval = 1000;
-  Integer fastestInterval = 1000;
-  Float smallestDisplacement = 3.0f;
-  CopyOnWriteArrayList<LocationEngineListener> locationListeners;
+  protected int priority;
+  protected Integer interval = 1000;
+  protected Integer fastestInterval = 1000;
+  protected Float smallestDisplacement = 3.0f;
+  protected CopyOnWriteArrayList<LocationEngineListener> locationListeners;
 
   /**
    * Construct a location engine.
