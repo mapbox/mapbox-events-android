@@ -1,0 +1,28 @@
+package com.mapbox.services.android.telemetry;
+
+import android.content.Context;
+import android.os.Handler;
+
+import com.mapbox.services.android.core.permissions.PermissionsManager;
+
+class PermissionCheckRunnable implements Runnable {
+  private final Context context;
+  private final Handler handler = new Handler();
+  private final ExponentialBackoff counter = new ExponentialBackoff();
+  private MapboxTelemetry mapboxTelemetry;
+
+  PermissionCheckRunnable(Context context, MapboxTelemetry mapboxTelemetry) {
+    this.context = context;
+    this.mapboxTelemetry = mapboxTelemetry;
+  }
+
+  @Override
+  public void run() {
+    if (PermissionsManager.areLocationPermissionsGranted(context)) {
+      mapboxTelemetry.optIn();
+    } else {
+      long nextWaitTime = counter.nextBackOffMillis();
+      handler.postDelayed(this, nextWaitTime);
+    }
+  }
+}
