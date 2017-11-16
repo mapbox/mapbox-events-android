@@ -89,11 +89,17 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     return optLocationOut();
   }
 
+  public void updateSessionIdRotationInterval(int hour) {
+    if (serviceBound) {
+      SessionIdentifier sessionIdentifier = new SessionIdentifier(hour);
+      telemetryService.updateSessionIdentifier(sessionIdentifier);
+    }
+  }
+
   // Package private (no modifier) for testing purposes
   Intent obtainLocationServiceIntent() {
     if (locationServiceIntent == null) {
       locationServiceIntent = new Intent(context, TelemetryService.class);
-      context.bindService(locationServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
     return locationServiceIntent;
@@ -122,6 +128,10 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
       telemetryClient = createTelemetryClient(accessToken, userAgent);
       queue.setTelemetryInitialized(true);
     }
+  }
+
+  private boolean isTelemetryClientInitialized() {
+    return accessToken != null && !accessToken.isEmpty();
   }
 
   private TelemetryClient createTelemetryClient(String accessToken, String userAgent) {
@@ -173,10 +183,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     }
   }
 
-  private boolean isTelemetryClientInitialized() {
-    return accessToken != null && !accessToken.isEmpty();
-  }
-
   private boolean startTelemetry() {
     if (!isTelemetryEnabled) {
       isTelemetryEnabled = true;
@@ -190,11 +196,16 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
 
   private boolean optLocationIn() {
     if (isTelemetryEnabled && !isOpted) {
-      context.startService(obtainLocationServiceIntent());
+      startLocation();
       registerEventReceiver();
       isOpted = true;
     }
     return isOpted;
+  }
+
+  private void startLocation() {
+    context.startService(obtainLocationServiceIntent());
+    context.bindService(obtainLocationServiceIntent(), serviceConnection, Context.BIND_AUTO_CREATE);
   }
 
   private void registerEventReceiver() {
@@ -202,6 +213,22 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     EventReceiver eventReceiver = obtainEventReceiver();
     IntentFilter eventReceiverIntentFilter = obtainEventReceiverIntentFilter();
     localBroadcastManager.registerReceiver(eventReceiver, eventReceiverIntentFilter);
+  }
+
+  private LocalBroadcastManager obtainLocalBroadcastManager() {
+    if (localBroadcastManager == null) {
+      localBroadcastManager = LocalBroadcastManager.getInstance(context);
+    }
+
+    return localBroadcastManager;
+  }
+
+  private Clock obtainClock() {
+    if (clock == null) {
+      clock = new Clock();
+    }
+
+    return clock;
   }
 
   private boolean stopTelemetry() {
@@ -215,40 +242,25 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
 
   private boolean optLocationOut() {
     if (isTelemetryEnabled && isOpted) {
-      context.stopService(obtainLocationServiceIntent());
+      stopLocation();
       unregisterEventReceiver();
       isOpted = false;
     }
     return isOpted;
   }
 
+  private void stopLocation() {
+    if (serviceBound) {
+      context.unbindService(serviceConnection);
+      serviceBound = false;
+    }
+    context.stopService(obtainLocationServiceIntent());
+  }
+
   private void unregisterEventReceiver() {
     LocalBroadcastManager localBroadcastManager = obtainLocalBroadcastManager();
     EventReceiver eventReceiver = obtainEventReceiver();
     localBroadcastManager.unregisterReceiver(eventReceiver);
-  }
-
-  private Clock obtainClock() {
-    if (clock == null) {
-      clock = new Clock();
-    }
-
-    return clock;
-  }
-
-  private LocalBroadcastManager obtainLocalBroadcastManager() {
-    if (localBroadcastManager == null) {
-      localBroadcastManager = LocalBroadcastManager.getInstance(context);
-    }
-
-    return localBroadcastManager;
-  }
-
-  public void updateSessionIdRotationInterval(int hour) {
-    if (serviceBound) {
-      SessionIdentifier sessionIdentifier = new SessionIdentifier(hour);
-      telemetryService.updateSessionIdentifier(sessionIdentifier);
-    }
   }
 
   private ServiceConnection serviceConnection = new ServiceConnection() {
