@@ -12,6 +12,9 @@ import android.net.NetworkInfo;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 
+import com.mapbox.services.android.telemetry.audio.AudioTypeChain;
+import com.mapbox.services.android.telemetry.audio.AudioTypeResolver;
+
 import java.util.List;
 
 import okhttp3.Callback;
@@ -277,4 +280,11 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
       serviceBound = false;
     }
   };
+
+  public String obtainAudioType() {
+    AudioTypeChain audioTypeChain = new AudioTypeChain();
+    AudioTypeResolver setupChain = audioTypeChain.setup();
+
+    return setupChain.obtainAudioType(context);
+  }
 }
