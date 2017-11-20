@@ -1,8 +1,8 @@
-package com.mapbox.services.android.telemetry.audio;
+package com.mapbox.services.android.telemetry;
 
 import android.content.Context;
 
-public interface AudioTypeResolver {
+interface AudioTypeResolver {
   void nextChain(AudioTypeResolver chain);
 
   String obtainAudioType(Context context);

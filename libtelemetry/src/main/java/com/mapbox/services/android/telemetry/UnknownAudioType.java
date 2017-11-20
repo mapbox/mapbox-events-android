@@ -1,8 +1,8 @@
-package com.mapbox.services.android.telemetry.audio;
+package com.mapbox.services.android.telemetry;
 
 import android.content.Context;
 
-public class UnknownAudioType implements AudioTypeResolver {
+class UnknownAudioType implements AudioTypeResolver {
   private static final String UNKNOWN = "unknown";
 
   @Override

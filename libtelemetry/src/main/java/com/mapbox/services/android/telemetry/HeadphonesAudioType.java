@@ -1,9 +1,9 @@
-package com.mapbox.services.android.telemetry.audio;
+package com.mapbox.services.android.telemetry;
 
 import android.content.Context;
 import android.media.AudioManager;
 
-public class HeadphonesAudioType implements AudioTypeResolver {
+class HeadphonesAudioType implements AudioTypeResolver {
   private static final String HEADPHONES = "headphones";
   private AudioTypeResolver chain;
 

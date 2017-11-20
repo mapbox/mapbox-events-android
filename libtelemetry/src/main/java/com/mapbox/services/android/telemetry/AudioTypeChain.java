@@ -1,8 +1,8 @@
-package com.mapbox.services.android.telemetry.audio;
+package com.mapbox.services.android.telemetry;
 
-public class AudioTypeChain {
+class AudioTypeChain {
 
-  public AudioTypeResolver setup() {
+  AudioTypeResolver setup() {
     AudioTypeResolver unknown = new UnknownAudioType();
     AudioTypeResolver speaker = new SpeakerAudioType();
     speaker.nextChain(unknown);
