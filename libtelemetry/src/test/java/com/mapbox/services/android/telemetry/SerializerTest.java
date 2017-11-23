@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 public class SerializerTest {
+
   @Test
   public void checkArriveSerializing() throws Exception {
     Date testDate = new Date();
@@ -29,9 +30,9 @@ public class SerializerTest {
     gsonBuilder.registerTypeAdapter(NavigationArriveEvent.class, serializer);
 
     Gson customGson = gsonBuilder.create();
-    String payload =  customGson.toJson(navigationArriveEvent);
+    String payload = customGson.toJson(navigationArriveEvent);
 
-    String expectedJson = "{\"absoluteDistanceToDestination\":50,\"startTimestamp\":\""
+    String expectedJson = "{\"event\":\"navigation.arrive\",\"absoluteDistanceToDestination\":50,\"startTimestamp\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"distanceCompleted\":13,\"distanceRemaining\":22,"
       + "\"durationRemaining\":180,\"operatingSystem\":\"Android - null\",\"eventVersion\":3,"
       + "\"sdKIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
@@ -66,7 +67,7 @@ public class SerializerTest {
       + "\"sdKIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
-      + "\"device\":\"device\",\"locationEngine\":\"LostLocationEngine\"}";
+      + "\"device\":\"device\",\"locationEngine\":\"LostLocationEngine\",\"event\":\"navigation.depart\"}";
 
     assertEquals(expectedJson, payload);
   }
@@ -92,13 +93,13 @@ public class SerializerTest {
     NavigationCancelEvent navigationCancelEvent = new NavigationCancelEvent(navigationState);
     GsonBuilder gsonBuilder = new GsonBuilder();
 
-    JsonSerializer<NavigationCancelEvent> serializer = new CancelSerializer();
+    JsonSerializer<NavigationCancelEvent> serializer = new CancelEventSerializer();
     gsonBuilder.registerTypeAdapter(NavigationCancelEvent.class, serializer);
 
     Gson customGson = gsonBuilder.create();
-    String payload =  customGson.toJson(navigationCancelEvent);
+    String payload = customGson.toJson(navigationCancelEvent);
 
-    String expectedJson = "{\"arrivalTimestamp\":\""
+    String expectedJson = "{\"event\":\"navigation.cancel\",\"arrivalTimestamp\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"rating\":75,\"comment\":\"Test\","
       + "\"absoluteDistanceToDestination\":50,\"startTimestamp\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"distanceCompleted\":13,\"distanceRemaining\":22,"
@@ -143,9 +144,10 @@ public class SerializerTest {
     Gson customGson = gsonBuilder.create();
     String payload = customGson.toJson(navigationFeedbackEvent);
 
-    String expectedJson = "{\"absoluteDistanceToDestination\":50,\"startTimestamp\":\""
-      + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"distanceCompleted\":13,\"distanceRemaining\":22,"
-      + "\"durationRemaining\":180,\"operatingSystem\":\"Android - null\",\"eventVersion\":3,"
+    String expectedJson = "{\"event\":\"navigation.feedback\",\"absoluteDistanceToDestination\":50,"
+      + "\"startTimestamp\":\"" + TelemetryUtils.generateCreateDateFormatted(testDate)
+      + "\",\"distanceCompleted\":13,\"distanceRemaining\":22,\"durationRemaining\":180,"
+      + "\"operatingSystem\":\"Android - null\",\"eventVersion\":3,"
       + "\"sdKIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
@@ -160,14 +162,14 @@ public class SerializerTest {
   public void checkRerouteSerializing() throws Exception {
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22,
-      180, "sdkIdent","sdkversion", "sessionID", 10.5,
+      180, "sdkIdent", "sdkversion", "sessionID", 10.5,
       15.67, "geometry", "profile", true, "device",
       "MockLocationEngine", 1300);
     metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
 
     NavigationNewData navigationNewData = new NavigationNewData(100, 750,
       "mewGeometry");
-    NavigationRerouteData navigationRerouteData = new NavigationRerouteData(navigationNewData,12000);
+    NavigationRerouteData navigationRerouteData = new NavigationRerouteData(navigationNewData, 12000);
     NavigationVoiceData navigationVoiceData = new NavigationVoiceData("voiceInstruction",
       TelemetryUtils.generateCreateDateFormatted(testDate));
     FeedbackData feedbackData = new FeedbackData("feedbackId");
@@ -205,10 +207,11 @@ public class SerializerTest {
     gsonBuilder.registerTypeAdapter(NavigationRerouteEvent.class, serializer);
 
     Gson customGson = gsonBuilder.create();
-    String payload =  customGson.toJson(navigationRerouteEvent);
+    String payload = customGson.toJson(navigationRerouteEvent);
 
-    String expectedJson = "{\"absoluteDistanceToDestination\":1300,\"startTimestamp\":\""
-      + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"distanceCompleted\":13,\"distanceRemaining\":22,"
+    String expectedJson = "{\"event\":\"navigation.reroute\",\"absoluteDistanceToDestination\":1300,"
+      + "\"startTimestamp\":\"" + TelemetryUtils.generateCreateDateFormatted(testDate)
+      + "\",\"distanceCompleted\":13,\"distanceRemaining\":22,"
       + "\"durationRemaining\":180,\"operatingSystem\":\"Android - null\",\"eventVersion\":3,"
       + "\"sdKIdentifier\":\"sdkIdent\",\"sdkVersion\":\"sdkversion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
@@ -232,13 +235,13 @@ public class SerializerTest {
   public void checkFasterRouteSerializing() throws Exception {
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22,
-      180, "sdkIdent","sdkversion", "sessionID", 10.5,
+      180, "sdkIdent", "sdkversion", "sessionID", 10.5,
       15.67, "geometry", "profile", true, "device",
       "MockLocationEngine", 1300);
     metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
     NavigationNewData navigationNewData = new NavigationNewData(100, 750,
       "mewGeometry");
-    NavigationRerouteData navigationRerouteData = new NavigationRerouteData(navigationNewData,12000);
+    NavigationRerouteData navigationRerouteData = new NavigationRerouteData(navigationNewData, 12000);
 
     NavigationStepMetadata navigationStepMetadata = new NavigationStepMetadata();
     navigationStepMetadata.setUpcomingInstruction("upcomingInstruction");
@@ -265,10 +268,11 @@ public class SerializerTest {
     gsonBuilder.registerTypeAdapter(NavigationFasterRouteEvent.class, serializer);
 
     Gson customGson = gsonBuilder.create();
-    String payload =  customGson.toJson(navigationFasterRouteEvent);
+    String payload = customGson.toJson(navigationFasterRouteEvent);
 
-    String expectedJson = "{\"absoluteDistanceToDestination\":1300,\"startTimestamp\":\""
-      + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"distanceCompleted\":13,\"distanceRemaining\":22,"
+    String expectedJson = "{\"event\":\"navigation.fasterRoute\",\"absoluteDistanceToDestination\":1300,"
+      + "\"startTimestamp\":\"" + TelemetryUtils.generateCreateDateFormatted(testDate)
+      + "\",\"distanceCompleted\":13,\"distanceRemaining\":22,"
       + "\"durationRemaining\":180,\"operatingSystem\":\"Android - null\",\"eventVersion\":3,"
       + "\"sdKIdentifier\":\"sdkIdent\",\"sdkVersion\":\"sdkversion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""

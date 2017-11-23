@@ -2,6 +2,8 @@ package com.mapbox.services.android.telemetry;
 
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSerializer;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,8 +16,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
-// TODO Access can be package-private, remove public modifier after removing instances from the test app
-public class TelemetryClient {
+class TelemetryClient {
   private static final String LOG_TAG = "TelemetryClient";
   private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
   private static final String EVENTS_ENDPOINT = "/events/v2";
@@ -27,8 +28,7 @@ public class TelemetryClient {
   private final TelemetryClientSettings setting;
   private final Logger logger;
 
-  // TODO Access can be package-private, remove public modifier after removing instances from the test app
-  public TelemetryClient(String accessToken, String userAgent, TelemetryClientSettings setting, Logger logger) {
+  TelemetryClient(String accessToken, String userAgent, TelemetryClientSettings setting, Logger logger) {
     this.accessToken = accessToken;
     this.userAgent = userAgent;
     this.setting = setting;
@@ -41,15 +41,16 @@ public class TelemetryClient {
     sendBatch(batch, callback);
   }
 
-  // TODO Access can be package-private, remove public modifier after removing instances from the test app
-  public void sendEvent(Event event, Callback callback) throws IOException {
+  void sendEvent(Event event, Callback callback) throws IOException {
     ArrayList<Event> oneEvent = new ArrayList<>();
     oneEvent.add(event);
     sendBatch(oneEvent, callback);
   }
 
   private void sendBatch(List<Event> batch, Callback callback) {
-    String payload = new Gson().toJson(batch);
+    GsonBuilder gsonBuilder = configureGsonBuilder();
+    Gson gson = gsonBuilder.create();
+    String payload = gson.toJson(batch);
     RequestBody body = RequestBody.create(JSON, payload);
     HttpUrl baseUrl = setting.getBaseUrl();
 
@@ -70,5 +71,22 @@ public class TelemetryClient {
 
     OkHttpClient client = setting.getClient();
     client.newCall(request).enqueue(callback);
+  }
+
+  private GsonBuilder configureGsonBuilder() {
+    GsonBuilder gsonBuilder = new GsonBuilder();
+    JsonSerializer<NavigationArriveEvent> arriveSerializer = new ArriveEventSerializer();
+    gsonBuilder.registerTypeAdapter(NavigationArriveEvent.class, arriveSerializer);
+    JsonSerializer<NavigationDepartEvent> departSerializer = new DepartEventSerializer();
+    gsonBuilder.registerTypeAdapter(NavigationDepartEvent.class, departSerializer);
+    JsonSerializer<NavigationCancelEvent> cancelSerializer = new CancelEventSerializer();
+    gsonBuilder.registerTypeAdapter(NavigationCancelEvent.class, cancelSerializer);
+    JsonSerializer<NavigationFeedbackEvent> feedbackSerializer = new FeedbackEventSerializer();
+    gsonBuilder.registerTypeAdapter(NavigationFeedbackEvent.class, feedbackSerializer);
+    JsonSerializer<NavigationRerouteEvent> rerouteSerializer = new RerouteEventSerializer();
+    gsonBuilder.registerTypeAdapter(NavigationRerouteEvent.class, rerouteSerializer);
+    JsonSerializer<NavigationFasterRouteEvent> fasterRouteSerializer = new FasterRouteEventSerializer();
+    gsonBuilder.registerTypeAdapter(NavigationFasterRouteEvent.class, fasterRouteSerializer);
+    return gsonBuilder;
   }
 }

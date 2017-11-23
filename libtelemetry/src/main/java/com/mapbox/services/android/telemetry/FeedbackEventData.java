@@ -3,14 +3,14 @@ package com.mapbox.services.android.telemetry;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-class FeedbackEventData implements Parcelable {
+public class FeedbackEventData implements Parcelable {
   private String userId;
   private String feedbackType;
   private String source;
   private String audio;
   private String description = null;
 
-  FeedbackEventData(String userId, String feedbackType, String source, String audio) {
+  public FeedbackEventData(String userId, String feedbackType, String source, String audio) {
     this.userId = userId;
     this.feedbackType = feedbackType;
     this.source = source;

@@ -6,7 +6,7 @@ import android.os.Parcelable;
 
 import java.util.Date;
 
-class NavigationMetadata implements Parcelable {
+public class NavigationMetadata implements Parcelable {
   private static final String OPERATING_SYSTEM = "Android - " + Build.VERSION.RELEASE;
   private static final int EVENT_VERSION = 3;
   private int absoluteDistanceToDestination;

@@ -3,12 +3,12 @@ package com.mapbox.services.android.telemetry;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-class NavigationCancelData implements Parcelable {
+public class NavigationCancelData implements Parcelable {
   private String arrivalTimestamp;
   private Integer rating = null;
   private String comment = null;
 
-  NavigationCancelData(String arrivalTimestamp) {
+  public NavigationCancelData(String arrivalTimestamp) {
     this.arrivalTimestamp = arrivalTimestamp;
   }
 

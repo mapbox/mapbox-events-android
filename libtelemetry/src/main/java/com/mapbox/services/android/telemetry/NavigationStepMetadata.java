@@ -3,7 +3,7 @@ package com.mapbox.services.android.telemetry;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-class NavigationStepMetadata implements Parcelable {
+public class NavigationStepMetadata implements Parcelable {
   private String upcomingInstruction = null;
   private String upcomingType = null;
   private String upcomingModifier = null;
@@ -17,7 +17,7 @@ class NavigationStepMetadata implements Parcelable {
   private Integer distanceRemaining = null;
   private Integer durationRemaining = null;
 
-  NavigationStepMetadata() {
+  public NavigationStepMetadata() {
   }
 
   void setUpcomingInstruction(String upcomingInstruction) {

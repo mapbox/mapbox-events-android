@@ -3,11 +3,11 @@ package com.mapbox.services.android.telemetry;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-class NavigationVoiceData implements Parcelable {
+public class NavigationVoiceData implements Parcelable {
   private String voiceInstruction;
   private String voiceInstructionTimestamp;
 
-  NavigationVoiceData(String voiceInstruction, String voiceInstructionTimestamp) {
+  public NavigationVoiceData(String voiceInstruction, String voiceInstructionTimestamp) {
     this.voiceInstruction = voiceInstruction;
     this.voiceInstructionTimestamp = voiceInstructionTimestamp;
   }

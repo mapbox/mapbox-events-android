@@ -6,6 +6,8 @@ import android.os.Parcelable;
 import com.google.gson.annotations.JsonAdapter;
 
 class NavigationRerouteEvent extends Event implements Parcelable {
+  private static final String NAVIGATION_REROUTE = "navigation.reroute";
+  private final String event;
   @JsonAdapter(NavigationMetadataSerializer.class)
   private NavigationMetadata navigationMetadata;
   @JsonAdapter(RerouteDataSerializer.class)
@@ -19,6 +21,7 @@ class NavigationRerouteEvent extends Event implements Parcelable {
   private NavigationStepMetadata step = null;
 
   NavigationRerouteEvent(NavigationState navigationState) {
+    this.event = NAVIGATION_REROUTE;
     this.feedbackData = navigationState.getFeedbackData();
     this.voiceData = navigationState.getNavigationVoiceData();
     this.navigationMetadata = navigationState.getNavigationMetadata();
@@ -30,6 +33,10 @@ class NavigationRerouteEvent extends Event implements Parcelable {
   @Override
   Type obtainType() {
     return Type.NAV_REROUTE;
+  }
+
+  String getEvent() {
+    return event;
   }
 
   NavigationLocationData getNavigationLocationData() {
@@ -57,6 +64,7 @@ class NavigationRerouteEvent extends Event implements Parcelable {
   }
 
   private NavigationRerouteEvent(Parcel in) {
+    event = in.readString();
     navigationMetadata = in.readParcelable(NavigationMetadata.class.getClassLoader());
     navigationLocationData = in.readParcelable(NavigationLocationData.class.getClassLoader());
     feedbackData = in.readParcelable(FeedbackData.class.getClassLoader());
@@ -66,6 +74,7 @@ class NavigationRerouteEvent extends Event implements Parcelable {
 
   @Override
   public void writeToParcel(Parcel dest, int flags) {
+    dest.writeString(event);
     dest.writeParcelable(navigationMetadata, flags);
     dest.writeParcelable(navigationLocationData, flags);
     dest.writeParcelable(feedbackData, flags);

@@ -4,11 +4,11 @@ package com.mapbox.services.android.telemetry;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-class FeedbackData implements Parcelable {
+public class FeedbackData implements Parcelable {
   private String feedbackId;
   private String screenshot = null;
 
-  FeedbackData(String feedbackId) {
+  public FeedbackData(String feedbackId) {
     this.feedbackId = feedbackId;
   }
 
