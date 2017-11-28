@@ -25,6 +25,7 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   private boolean isLocationReceiverRegistered = false;
   private boolean isTelemetryReceiverRegistered = false;
   private LocationEngine locationEngine = null;
+  private @LocationEnginePriority.PowerMode int locationPriority = LocationEnginePriority.HIGH_ACCURACY;
 
   @Nullable
   @Override
@@ -111,8 +112,7 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   }
 
   private void setupLocationEngine() {
-    // TODO Expose a way to change the priority
-    locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
+    locationEngine.setPriority(locationPriority);
     locationEngine.addLocationEngineListener(this);
   }
 
@@ -165,6 +165,16 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   class TelemetryBinder extends Binder {
     TelemetryService obtainService() {
       return TelemetryService.this;
+    }
+  }
+
+  public void updateLocationPriority(@LocationEnginePriority.PowerMode int priority) {
+    locationPriority = priority;
+
+    if (locationEngine != null) {
+      disconnectLocationEngine();
+      locationEngine.setPriority(locationPriority);
+      locationEngine.activate();
     }
   }
 }
