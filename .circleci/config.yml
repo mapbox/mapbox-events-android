@@ -10,7 +10,7 @@ jobs:
   build:
     working_directory: ~/code
     docker:
-      - image: mbgl/de3c86c2ff:android-ndk-r16
+      - image: mbgl/ci@sha256:c34e221294d81da80918d3e9a9df5de795b067e88f86d7c9a5e262763332536e
     environment:
       JVM_OPTS: -Xmx3200m
       BUILDTYPE: Debug
@@ -59,7 +59,7 @@ jobs:
           no_output_timeout: 1200
           shell: /bin/bash -euo pipefail
           command: |
-            gcloud firebase test android run --type instrumentation --app app/build/outputs/apk/debug/app-debug.apk --test app/build/outputs/apk/debug/app-debug.apk --device model=Nexus5,version=23,locale=en,orientation=portrait --timeout 10m
+            gcloud firebase test android run --type instrumentation --app app/build/outputs/apk/app-debug.apk --test libtelemetry/build/outputs/apk/libtelemetry-debug-androidTest.apk --device model=Nexus5,version=23,locale=en,orientation=portrait --timeout 10m
       - store_artifacts:
           path: app/build/reports
           destination: reports
@@ -72,7 +72,7 @@ jobs:
       only:
       - master
     docker:
-      - image: mbgl/de3c86c2ff:android-ndk-r16
+      - image: mbgl/ci@sha256:c34e221294d81da80918d3e9a9df5de795b067e88f86d7c9a5e262763332536e
     working_directory: ~/code
     environment:
       BUILDTYPE: Release
