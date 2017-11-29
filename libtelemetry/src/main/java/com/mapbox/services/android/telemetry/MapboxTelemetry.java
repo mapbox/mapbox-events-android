@@ -11,7 +11,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.Callback;
@@ -34,6 +36,16 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   private boolean isTelemetryEnabled = false;
   private boolean isOpted = false;
   private boolean serviceBound = false;
+
+  private static final List<String> VALID_USER_AGENTS = new ArrayList<String>() {
+    {
+      add("MapboxEventsAndroid/");
+      add("MapboxTelemetryAndroid/");
+      add("MapboxEventsUnityAndroid/");
+      add("mapbox-navigation-android/");
+      add("mapbox-navigation-ui-android/");
+    }
+  };
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent, Callback httpCallback) {
     this.context = context;
@@ -277,4 +289,21 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
       serviceBound = false;
     }
   };
+
+  public void newUserAgent(String userAgent) {
+    if (isUserAgentValid(userAgent)) {
+      telemetryClient.setUserAgent(userAgent);
+    }
+  }
+
+  private boolean isUserAgentValid(String userAgent) {
+    if (!TextUtils.isEmpty(userAgent)) {
+      for (String userAgentPrefix : VALID_USER_AGENTS) {
+        if (userAgent.startsWith(userAgentPrefix)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 }
