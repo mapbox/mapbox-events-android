@@ -1,5 +1,6 @@
 package com.mapbox.services.android.core.location;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
@@ -75,6 +76,7 @@ class GoogleLocationEngine extends LocationEngine implements
   public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
   }
 
+  @SuppressLint("MissingPermission")
   @Override
   public Location getLastLocation() {
     if (googleApiClient.isConnected()) {

@@ -1,5 +1,6 @@
 package com.mapbox.services.android.core.connectivity;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -48,6 +49,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
    * @param context Android context
    * @return the connectivity state as reported by the Android system
    */
+  @SuppressLint("MissingPermission")
   private static boolean getSystemConnectivity(Context context) {
     ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     NetworkInfo activeNetwork = cm.getActiveNetworkInfo();

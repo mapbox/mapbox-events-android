@@ -1,5 +1,6 @@
 package com.mapbox.services.android.core.location;
 
+import android.annotation.SuppressLint;
 import android.location.Location;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -125,6 +126,7 @@ class MockLocationEngine extends LocationEngine {
    * @return a {@link Location} which represents the last mock location.
    * @since 2.2.0
    */
+  @SuppressLint("MissingPermission")
   @Override
   @Nullable
   public Location getLastLocation() {

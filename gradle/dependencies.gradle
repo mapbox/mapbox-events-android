@@ -4,7 +4,7 @@ ext {
             minSdkVersion    : 14,
             targetSdkVersion : 25,
             compileSdkVersion: 25,
-            buildToolsVersion: '25.0.2'
+            buildToolsVersion: '26.0.2'
     ]
 
     version = [
@@ -23,7 +23,7 @@ ext {
 
     pluginVersion = [
             checkstyle: '8.4',
-            gradle    : '2.3.3'
+            gradle    : '3.0.1'
     ]
 
     dependenciesList = [

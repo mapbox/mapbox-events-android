@@ -1,5 +1,6 @@
 package com.mapbox.services.android.core.location;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Location;
 import android.support.annotation.Nullable;
@@ -96,6 +97,7 @@ class LostLocationEngine extends LocationEngine implements
    *
    * @return the last known location
    */
+  @SuppressLint("MissingPermission")
   @Override
   @Nullable
   public Location getLastLocation() {
