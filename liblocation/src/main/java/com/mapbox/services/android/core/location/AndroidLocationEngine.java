@@ -1,5 +1,6 @@
 package com.mapbox.services.android.core.location;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
@@ -62,6 +63,7 @@ class AndroidLocationEngine extends LocationEngine implements LocationListener {
     return true;
   }
 
+  @SuppressLint("MissingPermission")
   @Override
   public Location getLastLocation() {
     if (!TextUtils.isEmpty(currentProvider)) {
