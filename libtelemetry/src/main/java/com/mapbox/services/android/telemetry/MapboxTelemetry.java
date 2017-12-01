@@ -136,6 +136,12 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   }
 
   private void initializeTelemetryClient(String accessToken, String userAgent) {
+    if (TextUtils.isEmpty(accessToken) || TextUtils.isEmpty(userAgent)) {
+      throw new TelemetryException(
+        "Please, make sure you provide a valid access token and user agent."
+          + "For more information, please visit https://www.mapbox.com/android-sdk.");
+    }
+
     if (isTelemetryClientInitialized()) {
       telemetryClient = createTelemetryClient(accessToken, userAgent);
       queue.setTelemetryInitialized(true);
@@ -150,7 +156,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder()
       .environment(Environment.STAGING)
       .build();
-    telemetryClient = new TelemetryClient(accessToken, userAgent, telemetryClientSettings, new Logger());
+    telemetryClient = new TelemetryClient(accessToken, userAgent, telemetryClientSettings, new Logger(), context);
 
     return telemetryClient;
   }
@@ -290,9 +296,9 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     }
   };
 
-  public void newUserAgent(String userAgent) {
+  public void updateUserAgent(String userAgent) {
     if (isUserAgentValid(userAgent)) {
-      telemetryClient.setUserAgent(userAgent);
+      telemetryClient.updateUserAgent(userAgent);
     }
   }
 

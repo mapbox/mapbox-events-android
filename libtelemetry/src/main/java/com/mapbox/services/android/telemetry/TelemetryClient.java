@@ -1,6 +1,9 @@
 package com.mapbox.services.android.telemetry;
 
 
+import android.content.Context;
+import android.text.TextUtils;
+
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -13,6 +16,7 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.internal.Util;
 
 // TODO Access can be package-private, remove public modifier after removing instances from the test app
 public class TelemetryClient {
@@ -26,17 +30,20 @@ public class TelemetryClient {
   private String userAgent = null;
   private final TelemetryClientSettings setting;
   private final Logger logger;
+  private Context context;
 
   // TODO Access can be package-private, remove public modifier after removing instances from the test app
-  public TelemetryClient(String accessToken, String userAgent, TelemetryClientSettings setting, Logger logger) {
+  public TelemetryClient(String accessToken, String userAgent, TelemetryClientSettings setting, Logger logger,
+                         Context context) {
     this.accessToken = accessToken;
-    this.userAgent = userAgent;
+    this.userAgent = createFullUserAgent(userAgent);
     this.setting = setting;
     this.logger = logger;
+    this.context = context;
   }
 
-  void setUserAgent(String userAgent) {
-    this.userAgent = userAgent;
+  void updateUserAgent(String userAgent) {
+    this.userAgent = createFullUserAgent(userAgent);
   }
 
   void sendEvents(List<Event> events, Callback callback) {
@@ -74,5 +81,13 @@ public class TelemetryClient {
 
     OkHttpClient client = setting.getClient();
     client.newCall(request).enqueue(callback);
+  }
+
+  private String createFullUserAgent(String userAgent) {
+    String appIdentifier = TelemetryUtils.getApplicationIdentifier(context);
+    String fullUserAgent = TextUtils.isEmpty(appIdentifier) ? userAgent : Util.toHumanReadableAscii(
+      String.format(TelemetryUtils.DEFAULT_LOCALE, "%s %s", appIdentifier, userAgent));
+
+    return fullUserAgent;
   }
 }
