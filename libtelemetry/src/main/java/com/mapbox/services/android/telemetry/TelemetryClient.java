@@ -41,6 +41,7 @@ class TelemetryClient {
     sendBatch(batch, callback);
   }
 
+  // TODO Remove send a single event method. Use sendEvents instead
   void sendEvent(Event event, Callback callback) throws IOException {
     ArrayList<Event> oneEvent = new ArrayList<>();
     oneEvent.add(event);

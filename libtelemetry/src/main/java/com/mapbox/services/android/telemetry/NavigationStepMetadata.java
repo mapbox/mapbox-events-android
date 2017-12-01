@@ -20,55 +20,55 @@ public class NavigationStepMetadata implements Parcelable {
   public NavigationStepMetadata() {
   }
 
-  void setUpcomingInstruction(String upcomingInstruction) {
+  public void setUpcomingInstruction(String upcomingInstruction) {
     this.upcomingInstruction = upcomingInstruction;
   }
 
-  void setUpcomingType(String upcomingType) {
+  public void setUpcomingType(String upcomingType) {
     this.upcomingType = upcomingType;
   }
 
-  void setUpcomingModifier(String upcomingModifier) {
+  public void setUpcomingModifier(String upcomingModifier) {
     this.upcomingModifier = upcomingModifier;
   }
 
-  void setUpcomingName(String upcomingName) {
+  public void setUpcomingName(String upcomingName) {
     this.upcomingName = upcomingName;
   }
 
-  void setPreviousInstruction(String previousInstruction) {
+  public void setPreviousInstruction(String previousInstruction) {
     this.previousInstruction = previousInstruction;
   }
 
-  void setPreviousType(String previousType) {
+  public void setPreviousType(String previousType) {
     this.previousType = previousType;
   }
 
-  void setPreviousModifier(String previousModifier) {
+  public void setPreviousModifier(String previousModifier) {
     this.previousModifier = previousModifier;
   }
 
-  void setPreviousName(String previousName) {
+  public void setPreviousName(String previousName) {
     this.previousName = previousName;
   }
 
-  void setDistance(Integer distance) {
+  public void setDistance(Integer distance) {
     this.distance = distance;
   }
 
-  void setDuration(Integer duration) {
+  public void setDuration(Integer duration) {
     this.duration = duration;
   }
 
-  void setDistanceRemaining(Integer distanceRemaining) {
+  public void setDistanceRemaining(Integer distanceRemaining) {
     this.distanceRemaining = distanceRemaining;
   }
 
-  void setDurationRemaining(Integer durationRemaining) {
+  public void setDurationRemaining(Integer durationRemaining) {
     this.durationRemaining = durationRemaining;
   }
 
-  NavigationStepMetadata(Parcel in) {
+  private NavigationStepMetadata(Parcel in) {
     upcomingInstruction = in.readString();
     upcomingType = in.readString();
     upcomingModifier = in.readString();

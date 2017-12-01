@@ -49,10 +49,6 @@ class MapLoadEvent extends Event implements Parcelable {
     return Type.MAP_LOAD;
   }
 
-  String getEvent() {
-    return event;
-  }
-
   void setUserId(String userId) {
     this.userId = userId;
   }
@@ -63,10 +59,6 @@ class MapLoadEvent extends Event implements Parcelable {
 
   void setAccessibilityFontScale(float accessibilityFontScale) {
     this.accessibilityFontScale = accessibilityFontScale;
-  }
-
-  String getOrientation() {
-    return orientation;
   }
 
   void setOrientation(String orientation) {

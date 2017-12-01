@@ -3,27 +3,23 @@ package com.mapbox.services.android.telemetry;
 
 import android.location.Location;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSerializer;
 
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import okhttp3.Callback;
-import okhttp3.HttpUrl;
-import okhttp3.internal.tls.SslClient;
 
 import static org.mockito.Mockito.mock;
 
-public class TelemetryClientEventsTest extends MockWebServerTest {
+public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
-  private final Map<Event.Type, ObtainNavEvent> OBTAIN_NAV_EVENT = new HashMap<Event.Type, ObtainNavEvent>() {
+  private final Map<Event.Type, ObtainNavEvent> OBTAIN_NAVIGATION_EVENT = new HashMap<Event.Type, ObtainNavEvent>() {
     {
       put(Event.Type.NAV_ARRIVE, new ObtainNavEvent() {
         @Override
@@ -228,19 +224,6 @@ public class TelemetryClientEventsTest extends MockWebServerTest {
     assertRequestBodyEquals(expectedRequestBody);
   }
 
-  private TelemetryClient obtainDefaultTelemetryClient() {
-    HttpUrl localUrl = getBaseEndpointUrl();
-    SslClient sslClient = SslClient.localhost();
-    TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder()
-      .baseUrl(localUrl)
-      .sslSocketFactory(sslClient.socketFactory)
-      .x509TrustManager(sslClient.trustManager)
-      .build();
-    Logger mockedLogger = mock(Logger.class);
-    return new TelemetryClient("anyAccessToken", "anyUserAgent", telemetryClientSettings,
-      mockedLogger);
-  }
-
   private NavigationState obtainDefaultNavigationState(Date date) {
     NavigationMetadata metadata = new NavigationMetadata(date, 13, 22, 180, "sdkIdentifier", "sdkVersion",
       "sessionID", 10.5, 15.67, "geometry", "profile", false, "device", "LostLocationEngine", 50);
@@ -248,7 +231,7 @@ public class TelemetryClientEventsTest extends MockWebServerTest {
   }
 
   private Event obtainNavigationEvent(Event.Type type) {
-    return OBTAIN_NAV_EVENT.get(type).obtain();
+    return OBTAIN_NAVIGATION_EVENT.get(type).obtain();
   }
 
   private Event obtainArriveEvent() {
@@ -381,18 +364,6 @@ public class TelemetryClientEventsTest extends MockWebServerTest {
     JsonSerializer<NavigationFasterRouteEvent> serializer = new FasterRouteEventSerializer();
     GsonBuilder fasterRouteGsonBuilder = gsonBuilder.registerTypeAdapter(NavigationFasterRouteEvent.class, serializer);
     return fasterRouteGsonBuilder;
-  }
-
-  private String obtainExpectedRequestBody(GsonBuilder gsonBuilder, Event... theEvents) {
-    List<Event> events = Arrays.asList(theEvents);
-    Gson gson = gsonBuilder.create();
-    String requestBody = gson.toJson(events);
-
-    return requestBody;
-  }
-
-  private List<Event> addEvents(Event... theEvents) {
-    return Arrays.asList(theEvents);
   }
 
   interface ObtainNavEvent {

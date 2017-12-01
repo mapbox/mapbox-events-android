@@ -136,7 +136,7 @@ public class NavigationMetadata implements Parcelable {
     return estimatedDistance;
   }
 
-  void setEstimatedDistance(Integer estimatedDistance) {
+  public void setEstimatedDistance(Integer estimatedDistance) {
     this.estimatedDistance = estimatedDistance;
   }
 
@@ -144,7 +144,7 @@ public class NavigationMetadata implements Parcelable {
     return estimatedDuration;
   }
 
-  void setEstimatedDuration(Integer estimatedDuration) {
+  public void setEstimatedDuration(Integer estimatedDuration) {
     this.estimatedDuration = estimatedDuration;
   }
 
@@ -152,7 +152,7 @@ public class NavigationMetadata implements Parcelable {
     return rerouteCount;
   }
 
-  void setRerouteCount(Integer rerouteCount) {
+  public void setRerouteCount(Integer rerouteCount) {
     this.rerouteCount = rerouteCount;
   }
 
@@ -164,7 +164,7 @@ public class NavigationMetadata implements Parcelable {
     return originalRequestIdentifier;
   }
 
-  void setOriginalRequestIdentifier(String originalRequestIdentifier) {
+  public void setOriginalRequestIdentifier(String originalRequestIdentifier) {
     this.originalRequestIdentifier = originalRequestIdentifier;
   }
 
@@ -172,7 +172,7 @@ public class NavigationMetadata implements Parcelable {
     return requestIdentifier;
   }
 
-  void setRequestIdentifier(String requestIdentifier) {
+  public void setRequestIdentifier(String requestIdentifier) {
     this.requestIdentifier = requestIdentifier;
   }
 
@@ -180,7 +180,7 @@ public class NavigationMetadata implements Parcelable {
     return originalGeometry;
   }
 
-  void setOriginalGeometry(String originalGeometry) {
+  public void setOriginalGeometry(String originalGeometry) {
     this.originalGeometry = originalGeometry;
   }
 
@@ -188,7 +188,7 @@ public class NavigationMetadata implements Parcelable {
     return originalEstimatedDistance;
   }
 
-  void setOriginalEstimatedDistance(Integer originalEstimatedDistance) {
+  public void setOriginalEstimatedDistance(Integer originalEstimatedDistance) {
     this.originalEstimatedDistance = originalEstimatedDistance;
   }
 
@@ -196,7 +196,7 @@ public class NavigationMetadata implements Parcelable {
     return originalEstimatedDuration;
   }
 
-  void setOriginalEstimatedDuration(Integer originalEstimatedDuration) {
+  public void setOriginalEstimatedDuration(Integer originalEstimatedDuration) {
     this.originalEstimatedDuration = originalEstimatedDuration;
   }
 
@@ -204,7 +204,7 @@ public class NavigationMetadata implements Parcelable {
     return audioType;
   }
 
-  void setAudioType(String audioType) {
+  public void setAudioType(String audioType) {
     this.audioType = audioType;
   }
 
@@ -212,7 +212,7 @@ public class NavigationMetadata implements Parcelable {
     return stepCount;
   }
 
-  void setStepCount(Integer stepCount) {
+  public void setStepCount(Integer stepCount) {
     this.stepCount = stepCount;
   }
 
@@ -220,7 +220,7 @@ public class NavigationMetadata implements Parcelable {
     return originalStepCount;
   }
 
-  void setOriginalStepCount(Integer originalStepCount) {
+  public void setOriginalStepCount(Integer originalStepCount) {
     this.originalStepCount = originalStepCount;
   }
 
@@ -236,7 +236,7 @@ public class NavigationMetadata implements Parcelable {
     return volumeLevel;
   }
 
-  void setVolumeLevel(Integer volumeLevel) {
+  public void setVolumeLevel(Integer volumeLevel) {
     this.volumeLevel = volumeLevel;
   }
 
@@ -244,7 +244,7 @@ public class NavigationMetadata implements Parcelable {
     return screenBrightness;
   }
 
-  void setScreenBrightness(Integer screenBrightness) {
+  public void setScreenBrightness(Integer screenBrightness) {
     this.screenBrightness = screenBrightness;
   }
 
@@ -252,7 +252,7 @@ public class NavigationMetadata implements Parcelable {
     return applicationState;
   }
 
-  void setApplicationState(String applicationState) {
+  public void setApplicationState(String applicationState) {
     this.applicationState = applicationState;
   }
 
@@ -260,7 +260,7 @@ public class NavigationMetadata implements Parcelable {
     return batteryPluggedIn;
   }
 
-  void setBatteryPluggedIn(Boolean batteryPluggedIn) {
+  public void setBatteryPluggedIn(Boolean batteryPluggedIn) {
     this.batteryPluggedIn = batteryPluggedIn;
   }
 
@@ -268,7 +268,7 @@ public class NavigationMetadata implements Parcelable {
     return batteryLevel;
   }
 
-  void setBatteryLevel(Integer batteryLevel) {
+  public void setBatteryLevel(Integer batteryLevel) {
     this.batteryLevel = batteryLevel;
   }
 
@@ -276,7 +276,7 @@ public class NavigationMetadata implements Parcelable {
     return connectivity;
   }
 
-  void setConnectivity(String connectivity) {
+  public void setConnectivity(String connectivity) {
     this.connectivity = connectivity;
   }
 
@@ -288,7 +288,7 @@ public class NavigationMetadata implements Parcelable {
     return percentTimeInPortrait;
   }
 
-  void setPercentTimeInPortrait(Integer percentTimeInPortrait) {
+  public void setPercentTimeInPortrait(Integer percentTimeInPortrait) {
     this.percentTimeInPortrait = percentTimeInPortrait;
   }
 
@@ -296,7 +296,7 @@ public class NavigationMetadata implements Parcelable {
     return percentTimeInForeground;
   }
 
-  void setPercentTimeInForeground(Integer percentTimeInForeground) {
+  public void setPercentTimeInForeground(Integer percentTimeInForeground) {
     this.percentTimeInForeground = percentTimeInForeground;
   }
 

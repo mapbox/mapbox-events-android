@@ -20,7 +20,7 @@ public class NavigationCancelData implements Parcelable {
     return rating;
   }
 
-  void setRating(Integer rating) {
+  public void setRating(Integer rating) {
     this.rating = rating;
   }
 
@@ -28,7 +28,7 @@ public class NavigationCancelData implements Parcelable {
     return comment;
   }
 
-  void setComment(String comment) {
+  public void setComment(String comment) {
     this.comment = comment;
   }
 

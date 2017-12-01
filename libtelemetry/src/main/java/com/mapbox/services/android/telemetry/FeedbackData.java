@@ -20,7 +20,7 @@ public class FeedbackData implements Parcelable {
     return screenshot;
   }
 
-  void setScreenshot(String screenshot) {
+  public void setScreenshot(String screenshot) {
     this.screenshot = screenshot;
   }
 
