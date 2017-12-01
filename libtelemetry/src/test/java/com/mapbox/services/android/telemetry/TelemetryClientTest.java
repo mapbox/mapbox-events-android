@@ -1,5 +1,7 @@
 package com.mapbox.services.android.telemetry;
 
+import android.content.Context;
+
 import com.google.gson.Gson;
 
 import org.junit.Test;
@@ -35,8 +37,9 @@ public class TelemetryClientTest extends MockWebServerTest {
       .x509TrustManager(sslClient.trustManager)
       .build();
     Logger mockedLogger = mock(Logger.class);
+    Context mockedContext = mock(Context.class);
     TelemetryClient telemetryClient = new TelemetryClient("anyAccessToken", "anyUserAgent", telemetryClientSettings,
-      mockedLogger);
+      mockedLogger, mockedContext);
     boolean indifferentTelemetryEnabled = false;
     Event mockedAppUserTurnstile =
       new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier", "anySdkVersion");
@@ -58,8 +61,9 @@ public class TelemetryClientTest extends MockWebServerTest {
       .x509TrustManager(sslClient.trustManager)
       .build();
     Logger mockedLogger = mock(Logger.class);
+    Context mockedContext = mock(Context.class);
     TelemetryClient telemetryClient = new TelemetryClient("anyAccessToken", "anyUserAgent", telemetryClientSettings,
-      mockedLogger);
+      mockedLogger, mockedContext);
     boolean indifferentTelemetryEnabled = false;
     Event mockedAppUserTurnstile =
       new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier", "anySdkVersion");
@@ -81,8 +85,9 @@ public class TelemetryClientTest extends MockWebServerTest {
       .x509TrustManager(sslClient.trustManager)
       .build();
     Logger mockedLogger = mock(Logger.class);
+    Context mockedContext = mock(Context.class);
     TelemetryClient telemetryClient = new TelemetryClient("theAccessToken", "anyUserAgent", telemetryClientSettings,
-      mockedLogger);
+      mockedLogger, mockedContext);
     boolean indifferentTelemetryEnabled = false;
     Event mockedAppUserTurnstile =
       new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier", "anySdkVersion");
@@ -104,8 +109,9 @@ public class TelemetryClientTest extends MockWebServerTest {
       .x509TrustManager(sslClient.trustManager)
       .build();
     Logger mockedLogger = mock(Logger.class);
+    Context mockedContext = mock(Context.class);
     TelemetryClient telemetryClient = new TelemetryClient("anyAccessToken", "theUserAgent", telemetryClientSettings,
-      mockedLogger);
+      mockedLogger, mockedContext);
     boolean indifferentTelemetryEnabled = false;
     Event mockedAppUserTurnstile =
       new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier", "anySdkVersion");
@@ -127,8 +133,9 @@ public class TelemetryClientTest extends MockWebServerTest {
       .x509TrustManager(sslClient.trustManager)
       .build();
     Logger mockedLogger = mock(Logger.class);
+    Context mockedContext = mock(Context.class);
     TelemetryClient telemetryClient = new TelemetryClient("anyAccessToken", "anyUserAgent", telemetryClientSettings,
-      mockedLogger);
+      mockedLogger, mockedContext);
     boolean indifferentTelemetryEnabled = false;
     Event mockedAppUserTurnstile =
       new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier", "anySdkVersion");
@@ -150,8 +157,9 @@ public class TelemetryClientTest extends MockWebServerTest {
       .x509TrustManager(sslClient.trustManager)
       .build();
     Logger mockedLogger = mock(Logger.class);
+    Context mockedContext = mock(Context.class);
     TelemetryClient telemetryClient = new TelemetryClient("anyAccessToken", "anyUserAgent", telemetryClientSettings,
-      mockedLogger);
+      mockedLogger, mockedContext);
     boolean indifferentTelemetryEnabled = false;
     Event theAppUserTurnstile = new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier", "anySdkVersion");
     Callback mockedCallback = mock(Callback.class);
@@ -174,8 +182,9 @@ public class TelemetryClientTest extends MockWebServerTest {
       .x509TrustManager(sslClient.trustManager)
       .build();
     Logger mockedLogger = mock(Logger.class);
+    Context mockedContext = mock(Context.class);
     TelemetryClient telemetryClient = new TelemetryClient("anyAccessToken", "anyUserAgent", telemetryClientSettings,
-      mockedLogger);
+      mockedLogger, mockedContext);
     boolean indifferentTelemetryEnabled = false;
     Event theAppUserTurnstile = new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier", "anySdkVersion");
     Callback mockedCallback = mock(Callback.class);
@@ -196,8 +205,9 @@ public class TelemetryClientTest extends MockWebServerTest {
       .x509TrustManager(sslClient.trustManager)
       .build();
     Logger mockedLogger = mock(Logger.class);
+    Context mockedContext = mock(Context.class);
     TelemetryClient telemetryClient = new TelemetryClient("anyAccessToken", "anyUserAgent", telemetryClientSettings,
-      mockedLogger);
+      mockedLogger, mockedContext);
     boolean indifferentTelemetryEnabled = false;
     Event theAppUserTurnstile = new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier", "anySdkVersion");
     final CountDownLatch latch = new CountDownLatch(1);
@@ -224,8 +234,9 @@ public class TelemetryClientTest extends MockWebServerTest {
       .x509TrustManager(sslClient.trustManager)
       .build();
     Logger mockedLogger = mock(Logger.class);
+    Context mockedContext = mock(Context.class);
     TelemetryClient telemetryClient = new TelemetryClient("anyAccessToken", "anyUserAgent", telemetryClientSettings,
-      mockedLogger);
+      mockedLogger, mockedContext);
     boolean indifferentTelemetryEnabled = false;
     Event theAppUserTurnstile = new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier", "anySdkVersion");
     final CountDownLatch latch = new CountDownLatch(1);
@@ -256,8 +267,9 @@ public class TelemetryClientTest extends MockWebServerTest {
       .x509TrustManager(sslClient.trustManager)
       .build();
     Logger mockedLogger = mock(Logger.class);
+    Context mockedContext = mock(Context.class);
     TelemetryClient telemetryClient = new TelemetryClient("anyAccessToken", "anyUserAgent", telemetryClientSettings,
-      mockedLogger);
+      mockedLogger, mockedContext);
     boolean indifferentTelemetryEnabled = false;
     Event theAppUserTurnstile = new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier", "anySdkVersion");
     final CountDownLatch latch = new CountDownLatch(1);
