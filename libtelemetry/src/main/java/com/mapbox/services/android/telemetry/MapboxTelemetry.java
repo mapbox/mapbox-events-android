@@ -26,6 +26,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
 
   private final Context context;
   private String accessToken;
+  private String userAgent;
   private final EventsQueue queue;
   private TelemetryClient telemetryClient;
   private TelemetryService telemetryService;
@@ -53,8 +54,9 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   public MapboxTelemetry(Context context, String accessToken, String userAgent, Callback httpCallback) {
     this.context = context;
     this.accessToken = accessToken;
+    this.userAgent = userAgent;
     this.queue = new EventsQueue(new FullQueueFlusher(this));
-    initializeTelemetryClient(accessToken, userAgent);
+    initializeTelemetryClient();
     this.httpCallback = httpCallback;
     AlarmReceiver alarmReceiver = obtainAlarmReceiver(httpCallback);
     this.schedulerFlusher = new SchedulerFlusherFactory(context, alarmReceiver).supply();
@@ -138,19 +140,17 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     return eventReceiverIntentFilter;
   }
 
-  private void initializeTelemetryClient(String accessToken, String userAgent) {
-    if (TextUtils.isEmpty(accessToken) || TextUtils.isEmpty(userAgent)) {
-      throw new TelemetryException(ACCESS_TOKEN_USER_AGENT_EXCEPTION);
-    }
-
+  private void initializeTelemetryClient() {
     if (isTelemetryClientInitialized()) {
       telemetryClient = createTelemetryClient(accessToken, userAgent);
       queue.setTelemetryInitialized(true);
+    } else {
+      throw new TelemetryException(ACCESS_TOKEN_USER_AGENT_EXCEPTION);
     }
   }
 
   private boolean isTelemetryClientInitialized() {
-    return accessToken != null && !accessToken.isEmpty();
+    return accessToken != null && !accessToken.isEmpty() && !userAgent.isEmpty() && userAgent != null;
   }
 
   private TelemetryClient createTelemetryClient(String accessToken, String userAgent) {
