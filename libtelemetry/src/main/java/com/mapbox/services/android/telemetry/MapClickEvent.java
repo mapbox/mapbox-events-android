@@ -47,14 +47,6 @@ class MapClickEvent extends Event implements Parcelable {
     return Type.MAP_CLICK;
   }
 
-  String getEvent() {
-    return event;
-  }
-
-  String getOrientation() {
-    return orientation;
-  }
-
   void setOrientation(String orientation) {
     this.orientation = orientation;
   }

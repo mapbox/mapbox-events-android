@@ -8,10 +8,12 @@ import com.google.gson.JsonSerializer;
 import java.lang.reflect.Type;
 import java.util.Map;
 
-class CancelSerializer implements JsonSerializer<NavigationCancelEvent> {
+class CancelEventSerializer implements JsonSerializer<NavigationCancelEvent> {
+  private static final String EVENT = "event";
 
   public JsonElement serialize(NavigationCancelEvent src, Type typeOfSrc, JsonSerializationContext context) {
     JsonObject cancelEvent = new JsonObject();
+    cancelEvent.addProperty(EVENT, src.getEvent());
     serializeCancelData(src, context, cancelEvent);
     serializeMetadata(src, context, cancelEvent);
     return cancelEvent;

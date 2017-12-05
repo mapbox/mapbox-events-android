@@ -33,7 +33,7 @@ class LocationEvent extends Event implements Parcelable {
   @SerializedName("horizontalAccuracy")
   private Float accuracy = null;
 
-  LocationEvent(String sessionId, double latitude, double longitude) {
+  public LocationEvent(String sessionId, double latitude, double longitude) {
     this.event = LOCATION;
     this.created = TelemetryUtils.obtainCurrentDate();
     this.source = SOURCE_MAPBOX;
@@ -68,7 +68,7 @@ class LocationEvent extends Event implements Parcelable {
     return altitude;
   }
 
-  void setAltitude(Double altitude) {
+  public void setAltitude(Double altitude) {
     this.altitude = altitude;
   }
 
@@ -76,11 +76,11 @@ class LocationEvent extends Event implements Parcelable {
     return operatingSystem;
   }
 
-  void setOperatingSystem(String operatingSystem) {
+  public void setOperatingSystem(String operatingSystem) {
     this.operatingSystem = operatingSystem;
   }
 
-  void setApplicationState(String applicationState) {
+  public void setApplicationState(String applicationState) {
     this.applicationState = applicationState;
   }
 
@@ -88,7 +88,7 @@ class LocationEvent extends Event implements Parcelable {
     return accuracy;
   }
 
-  void setAccuracy(Float accuracy) {
+  public void setAccuracy(Float accuracy) {
     this.accuracy = accuracy;
   }
 
