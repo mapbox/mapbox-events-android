@@ -9,11 +9,13 @@ import java.lang.reflect.Type;
 import java.util.Map;
 
 class RerouteEventSerializer implements JsonSerializer<NavigationRerouteEvent> {
+  private static final String EVENT = "event";
   private static final String STEP = "step";
 
   @Override
   public JsonElement serialize(NavigationRerouteEvent src, Type typeOfSrc, JsonSerializationContext context) {
     JsonObject rerouteEvent = new JsonObject();
+    rerouteEvent.addProperty(EVENT, src.getEvent());
     serializeMetadata(src, context, rerouteEvent);
     serializeRerouteData(src, context, rerouteEvent);
     serializeLocationData(src, context, rerouteEvent);

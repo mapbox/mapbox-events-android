@@ -1,6 +1,9 @@
 package com.mapbox.services.android.telemetry;
 
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -8,6 +11,7 @@ import org.junit.Before;
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.util.Arrays;
 import java.util.List;
 
 import okhttp3.HttpUrl;
@@ -20,6 +24,7 @@ import okio.Buffer;
 import okio.GzipSource;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 class MockWebServerTest {
   private static final String FILE_ENCODING = "UTF-8";
@@ -117,6 +122,31 @@ class MockWebServerTest {
       stringBuilder.append(line);
     }
     return stringBuilder.toString();
+  }
+
+  TelemetryClient obtainDefaultTelemetryClient() {
+    HttpUrl localUrl = getBaseEndpointUrl();
+    SslClient sslClient = SslClient.localhost();
+    TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder()
+      .baseUrl(localUrl)
+      .sslSocketFactory(sslClient.socketFactory)
+      .x509TrustManager(sslClient.trustManager)
+      .build();
+    Logger mockedLogger = mock(Logger.class);
+    return new TelemetryClient("anyAccessToken", "anyUserAgent", telemetryClientSettings,
+      mockedLogger);
+  }
+
+  String obtainExpectedRequestBody(GsonBuilder gsonBuilder, Event... theEvents) {
+    List<Event> events = Arrays.asList(theEvents);
+    Gson gson = gsonBuilder.create();
+    String requestBody = gson.toJson(events);
+
+    return requestBody;
+  }
+
+  List<Event> addEvents(Event... theEvents) {
+    return Arrays.asList(theEvents);
   }
 
   private RecordedRequest getRecordedRequestAtIndex(int requestIndex) throws InterruptedException {

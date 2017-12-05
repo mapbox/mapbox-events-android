@@ -9,10 +9,12 @@ import java.lang.reflect.Type;
 import java.util.Map;
 
 class ArriveEventSerializer implements JsonSerializer<NavigationArriveEvent> {
+  private static final String EVENT = "event";
 
   @Override
   public JsonElement serialize(NavigationArriveEvent src, Type typeOfSrc, JsonSerializationContext context) {
     JsonObject arriveEvent = new JsonObject();
+    arriveEvent.addProperty(EVENT, src.getEvent());
     serializeMetadata(src, context, arriveEvent);
     return arriveEvent;
   }

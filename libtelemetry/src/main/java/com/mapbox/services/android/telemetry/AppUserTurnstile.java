@@ -44,7 +44,7 @@ public class AppUserTurnstile extends Event implements Parcelable {
     return Type.TURNSTILE;
   }
 
-  AppUserTurnstile(Parcel in) {
+  private AppUserTurnstile(Parcel in) {
     event = in.readString();
     created = in.readString();
     userId = in.readString();
