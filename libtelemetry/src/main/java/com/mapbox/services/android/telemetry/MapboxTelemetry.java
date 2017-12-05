@@ -63,11 +63,12 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   }
 
   // For testing only
-  MapboxTelemetry(Context context, String accessToken, EventsQueue queue, TelemetryClient telemetryClient,
+  MapboxTelemetry(Context context, String accessToken, String userAgent, EventsQueue queue, TelemetryClient telemetryClient,
                   Callback httpCallback, SchedulerFlusher schedulerFlusher, Clock clock,
                   LocalBroadcastManager localBroadcastManager) {
     this.context = context;
     this.accessToken = accessToken;
+    this.userAgent = userAgent;
     this.queue = queue;
     this.telemetryClient = telemetryClient;
     this.httpCallback = httpCallback;
