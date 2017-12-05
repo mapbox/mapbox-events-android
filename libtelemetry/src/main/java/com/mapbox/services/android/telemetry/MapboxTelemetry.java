@@ -21,6 +21,9 @@ import okhttp3.Callback;
 import static com.mapbox.services.android.telemetry.EventReceiver.EVENT_RECEIVER_INTENT;
 
 public class MapboxTelemetry implements FullQueueCallback, EventCallback {
+  private final String ACCESS_TOKEN_USER_AGENT_EXCEPTION = "Please, make sure you provide a valid access token and user"
+    + "agent. For more information, please visit https://www.mapbox.com/android-sdk.";
+
   private final Context context;
   private String accessToken;
   private final EventsQueue queue;
@@ -137,9 +140,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
 
   private void initializeTelemetryClient(String accessToken, String userAgent) {
     if (TextUtils.isEmpty(accessToken) || TextUtils.isEmpty(userAgent)) {
-      throw new TelemetryException(
-        "Please, make sure you provide a valid access token and user agent."
-          + "For more information, please visit https://www.mapbox.com/android-sdk.");
+      throw new TelemetryException(ACCESS_TOKEN_USER_AGENT_EXCEPTION);
     }
 
     if (isTelemetryClientInitialized()) {
@@ -156,7 +157,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder()
       .environment(Environment.STAGING)
       .build();
-    telemetryClient = new TelemetryClient(accessToken, userAgent, telemetryClientSettings, new Logger(), context);
+    telemetryClient = new TelemetryClient(accessToken, userAgent, telemetryClientSettings, new Logger());
 
     return telemetryClient;
   }
@@ -298,7 +299,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
 
   public void updateUserAgent(String userAgent) {
     if (isUserAgentValid(userAgent)) {
-      telemetryClient.updateUserAgent(userAgent);
+      TelemetryUtils.createFullUserAgent(userAgent, context);
     }
   }
 

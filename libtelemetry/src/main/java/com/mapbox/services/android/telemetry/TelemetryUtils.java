@@ -2,11 +2,14 @@ package com.mapbox.services.android.telemetry;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
+import android.text.TextUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.UUID;
+
+import okhttp3.internal.Util;
 
 class TelemetryUtils {
   private static final String DATE_AND_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
@@ -26,13 +29,24 @@ class TelemetryUtils {
     return universalUniqueIdentifier;
   }
 
-  public static String getApplicationIdentifier(Context context) {
+  private static String obtainApplicationIdentifier(Context context) {
     try {
-      PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-      return String.format(DEFAULT_LOCALE, "%s/%s/%s", context.getPackageName(),
+      String packageName = context.getPackageName();
+      PackageInfo packageInfo = context.getPackageManager().getPackageInfo(packageName, 0);
+      String appIdentifier = String.format(DEFAULT_LOCALE, "%s/%s/%s", packageName,
         packageInfo.versionName, packageInfo.versionCode);
+
+      return appIdentifier;
     } catch (Exception exception) {
       return "";
     }
+  }
+
+  public static String createFullUserAgent(String userAgent, Context context) {
+    String appIdentifier = TelemetryUtils.obtainApplicationIdentifier(context);
+    String newUserAgent = Util.toHumanReadableAscii(String.format(DEFAULT_LOCALE, "%s %s", appIdentifier, userAgent));
+    String fullUserAgent = TextUtils.isEmpty(appIdentifier) ? userAgent : newUserAgent;
+
+    return fullUserAgent;
   }
 }
