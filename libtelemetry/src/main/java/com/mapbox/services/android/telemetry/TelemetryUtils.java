@@ -13,8 +13,11 @@ import okhttp3.internal.Util;
 
 class TelemetryUtils {
   private static final String DATE_AND_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+  private static final String EMPTY_STRING = "";
+  private static final String TWO_STRING_FORMAT = "%s %s";
+  private static final String THREE_STRING_FORMAT = "%s/%s/%s";
   private static final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_AND_TIME_PATTERN, Locale.US);
-  public static final Locale DEFAULT_LOCALE = Locale.US;
+  private static final Locale DEFAULT_LOCALE = Locale.US;
 
   static String obtainCurrentDate() {
     return dateFormat.format(new Date());
@@ -33,18 +36,19 @@ class TelemetryUtils {
     try {
       String packageName = context.getPackageName();
       PackageInfo packageInfo = context.getPackageManager().getPackageInfo(packageName, 0);
-      String appIdentifier = String.format(DEFAULT_LOCALE, "%s/%s/%s", packageName,
+      String appIdentifier = String.format(DEFAULT_LOCALE, THREE_STRING_FORMAT, packageName,
         packageInfo.versionName, packageInfo.versionCode);
 
       return appIdentifier;
     } catch (Exception exception) {
-      return "";
+      return EMPTY_STRING;
     }
   }
 
-  public static String createFullUserAgent(String userAgent, Context context) {
+  static String createFullUserAgent(String userAgent, Context context) {
     String appIdentifier = TelemetryUtils.obtainApplicationIdentifier(context);
-    String newUserAgent = Util.toHumanReadableAscii(String.format(DEFAULT_LOCALE, "%s %s", appIdentifier, userAgent));
+    String newUserAgent = Util.toHumanReadableAscii(String.format(DEFAULT_LOCALE, TWO_STRING_FORMAT, appIdentifier,
+      userAgent));
     String fullUserAgent = TextUtils.isEmpty(appIdentifier) ? userAgent : newUserAgent;
 
     return fullUserAgent;
