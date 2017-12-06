@@ -81,7 +81,7 @@ class AndroidLocationEngine extends LocationEngine implements LocationListener {
   }
 
   @Override
-  public void setPriority(int priority) {
+  public void setPriority(@LocationEnginePriority.PowerMode int priority) {
     super.setPriority(priority);
     updateCurrentProvider();
   }

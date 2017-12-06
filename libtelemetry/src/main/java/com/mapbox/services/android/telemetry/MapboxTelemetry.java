@@ -12,6 +12,8 @@ import android.net.NetworkInfo;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 
+import com.mapbox.services.android.core.location.LocationEnginePriority;
+
 import java.util.List;
 
 import okhttp3.Callback;
@@ -93,6 +95,12 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     if (serviceBound) {
       SessionIdentifier sessionIdentifier = new SessionIdentifier(hour);
       telemetryService.updateSessionIdentifier(sessionIdentifier);
+    }
+  }
+
+  public void updateLocationPriority(@LocationEnginePriority.PowerMode int locationPriority) {
+    if (serviceBound) {
+      telemetryService.updateLocationPriority(locationPriority);
     }
   }
 
