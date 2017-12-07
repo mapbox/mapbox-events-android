@@ -323,6 +323,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   }
 
   private boolean isAccessTokenValid(String accessToken) {
-    return !TextUtils.isEmpty(accessToken);
+    return accessToken != null && !TextUtils.isEmpty(accessToken);
   }
 }

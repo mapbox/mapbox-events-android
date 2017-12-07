@@ -484,7 +484,7 @@ public class MapboxTelemetryTest {
     assertTrue(theMapboxTelemetry.checkAccessTokenAndUserAgentValid(aValidAccessToken, aValidUserAgent));
   }
 
-  @Test(expected = TelemetryException.class)
+  @Test
   public void checkInvalidUserAgent() throws Exception {
     Context mockedContext = mock(Context.class);
     String aValidAccessToken = "validAccessToken";
@@ -500,10 +500,10 @@ public class MapboxTelemetryTest {
       mockedLocalBroadcastManager);
     theMapboxTelemetry.enable();
 
-    theMapboxTelemetry.checkAccessTokenAndUserAgentValid(aValidAccessToken, aInvalidUserAgent);
+    assertFalse(theMapboxTelemetry.checkAccessTokenAndUserAgentValid(aValidAccessToken, aInvalidUserAgent));
   }
 
-  @Test(expected = TelemetryException.class)
+  @Test
   public void checkInvalidAccessToken() throws Exception {
     Context mockedContext = mock(Context.class);
     String aInvalidAccessToken = null;
@@ -519,7 +519,7 @@ public class MapboxTelemetryTest {
       mockedLocalBroadcastManager);
     theMapboxTelemetry.enable();
 
-    theMapboxTelemetry.checkAccessTokenAndUserAgentValid(aInvalidAccessToken, aValidUserAgent);
+    assertFalse(theMapboxTelemetry.checkAccessTokenAndUserAgentValid(aInvalidAccessToken, aValidUserAgent));
   }
 
   @Test
