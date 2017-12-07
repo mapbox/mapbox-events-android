@@ -34,7 +34,7 @@ public class TelemetryClient {
     this.logger = logger;
   }
 
-  public void setUserAgent(String userAgent) {
+  void updateUserAgent(String userAgent) {
     this.userAgent = userAgent;
   }
 

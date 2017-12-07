@@ -32,6 +32,15 @@ class TelemetryUtils {
     return universalUniqueIdentifier;
   }
 
+  static String createFullUserAgent(String userAgent, Context context) {
+    String appIdentifier = TelemetryUtils.obtainApplicationIdentifier(context);
+    String newUserAgent = Util.toHumanReadableAscii(String.format(DEFAULT_LOCALE, TWO_STRING_FORMAT, appIdentifier,
+      userAgent));
+    String fullUserAgent = TextUtils.isEmpty(appIdentifier) ? userAgent : newUserAgent;
+
+    return fullUserAgent;
+  }
+
   private static String obtainApplicationIdentifier(Context context) {
     try {
       String packageName = context.getPackageName();
@@ -43,14 +52,5 @@ class TelemetryUtils {
     } catch (Exception exception) {
       return EMPTY_STRING;
     }
-  }
-
-  static String createFullUserAgent(String userAgent, Context context) {
-    String appIdentifier = TelemetryUtils.obtainApplicationIdentifier(context);
-    String newUserAgent = Util.toHumanReadableAscii(String.format(DEFAULT_LOCALE, TWO_STRING_FORMAT, appIdentifier,
-      userAgent));
-    String fullUserAgent = TextUtils.isEmpty(appIdentifier) ? userAgent : newUserAgent;
-
-    return fullUserAgent;
   }
 }

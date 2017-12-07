@@ -52,11 +52,9 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   };
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent, Callback httpCallback) {
-    isAccessTokenAndUserAgentValid(accessToken, userAgent);
+    checkAccessTokenAndUserAgentValid(accessToken, userAgent);
 
     this.context = context;
-    this.accessToken = accessToken;
-    this.userAgent = TelemetryUtils.createFullUserAgent(userAgent, context);
     this.queue = new EventsQueue(new FullQueueFlusher(this));
     initializeTelemetryClient();
     this.httpCallback = httpCallback;
@@ -68,11 +66,9 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   MapboxTelemetry(Context context, String accessToken, String userAgent, EventsQueue queue,
                   TelemetryClient telemetryClient, Callback httpCallback, SchedulerFlusher schedulerFlusher,
                   Clock clock, LocalBroadcastManager localBroadcastManager) {
-    isAccessTokenAndUserAgentValid(accessToken, userAgent);
+    checkAccessTokenAndUserAgentValid(accessToken, userAgent);
 
     this.context = context;
-    this.accessToken = accessToken;
-    this.userAgent = userAgent;
     this.queue = queue;
     this.telemetryClient = telemetryClient;
     this.httpCallback = httpCallback;
@@ -118,6 +114,12 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     }
   }
 
+  public void updateUserAgent(String userAgent) {
+    if (isUserAgentValid(userAgent)) {
+      telemetryClient.updateUserAgent(TelemetryUtils.createFullUserAgent(userAgent, context));
+    }
+  }
+
   // Package private (no modifier) for testing purposes
   Intent obtainLocationServiceIntent() {
     if (locationServiceIntent == null) {
@@ -145,19 +147,24 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     return eventReceiverIntentFilter;
   }
 
-  private void initializeTelemetryClient() {
-    isAccessTokenAndUserAgentValid(accessToken, userAgent);
+  boolean checkAccessTokenAndUserAgentValid(String accessToken, String userAgent) {
+    if (isAccessTokenValid(accessToken) && isUserAgentValid(userAgent)) {
+      this.accessToken = accessToken;
+      this.userAgent = userAgent;
 
-    telemetryClient = createTelemetryClient(accessToken, userAgent);
-    queue.setTelemetryInitialized(true);
-  }
-
-  boolean isAccessTokenAndUserAgentValid(String accessToken, String userAgent) throws TelemetryException {
-    if (isAccessToeknValid(accessToken) && isUserAgentValid(userAgent)) {
       return true;
     }
 
-    throw new TelemetryException(ACCESS_TOKEN_USER_AGENT_EXCEPTION);
+    return false;
+  }
+
+  private void initializeTelemetryClient() {
+    if (!checkAccessTokenAndUserAgentValid(accessToken, userAgent)) {
+      throw new TelemetryException(ACCESS_TOKEN_USER_AGENT_EXCEPTION);
+    }
+
+    telemetryClient = createTelemetryClient(accessToken, userAgent);
+    queue.setTelemetryInitialized(true);
   }
 
   private TelemetryClient createTelemetryClient(String accessToken, String userAgent) {
@@ -204,7 +211,9 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   }
 
   private void sendEvents(List<Event> events, Callback httpCallback) {
-    telemetryClient.sendEvents(events, httpCallback);
+    if (checkAccessTokenAndUserAgentValid(accessToken, userAgent)) {
+      telemetryClient.sendEvents(events, httpCallback);
+    }
   }
 
   private boolean startTelemetry() {
@@ -302,12 +311,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     }
   };
 
-  public void updateUserAgent(String userAgent) {
-    if (isUserAgentValid(userAgent)) {
-      telemetryClient.setUserAgent(TelemetryUtils.createFullUserAgent(userAgent, context));
-    }
-  }
-
   private boolean isUserAgentValid(String userAgent) {
     if (userAgent != null && !TextUtils.isEmpty(userAgent)) {
       for (String userAgentPrefix : VALID_USER_AGENTS) {
@@ -319,7 +322,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     return false;
   }
 
-  private boolean isAccessToeknValid(String accessToken) {
-    return accessToken != null && !TextUtils.isEmpty(accessToken);
+  private boolean isAccessTokenValid(String accessToken) {
+    return !TextUtils.isEmpty(accessToken);
   }
 }
