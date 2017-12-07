@@ -23,7 +23,8 @@ public abstract class LocationEngine {
 
   private static final int TWO_MINUTES = 1000 * 60 * 2;
 
-  protected @LocationEnginePriority.PowerMode int priority;
+  @LocationEnginePriority.PowerMode
+  protected int priority;
   protected Integer interval = 1000;
   protected Integer fastestInterval = 1000;
   protected Float smallestDisplacement = 3.0f;
@@ -102,7 +103,8 @@ public abstract class LocationEngine {
    * @return Integer representing one of the priorities listed inside the {@link LocationEnginePriority} file.
    * @since 2.0.0
    */
-  public @LocationEnginePriority.PowerMode int getPriority() {
+  @LocationEnginePriority.PowerMode
+  public int getPriority() {
     return priority;
   }
 
