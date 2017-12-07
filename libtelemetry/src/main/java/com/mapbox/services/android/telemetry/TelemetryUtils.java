@@ -14,7 +14,7 @@ import okhttp3.internal.Util;
 class TelemetryUtils {
   private static final String DATE_AND_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
   private static final String EMPTY_STRING = "";
-  private static final String TWO_STRING_FORMAT = "%s %s";
+  private static final String TWO_STRING_FORMAT = "%s%s";
   private static final String THREE_STRING_FORMAT = "%s/%s/%s";
   private static final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_AND_TIME_PATTERN, Locale.US);
   private static final Locale DEFAULT_LOCALE = Locale.US;

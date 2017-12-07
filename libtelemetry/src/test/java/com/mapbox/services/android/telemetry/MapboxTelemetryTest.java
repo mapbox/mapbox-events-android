@@ -12,6 +12,7 @@ import java.util.List;
 
 import okhttp3.Callback;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -480,7 +481,7 @@ public class MapboxTelemetryTest {
       mockedLocalBroadcastManager);
     theMapboxTelemetry.enable();
 
-    assertTrue(theMapboxTelemetry.isAccessTokenAndUserAgentValid(aValidAccessToken, aValidUserAgent));
+    assertTrue(theMapboxTelemetry.checkAccessTokenAndUserAgentValid(aValidAccessToken, aValidUserAgent));
   }
 
   @Test(expected = TelemetryException.class)
@@ -499,7 +500,7 @@ public class MapboxTelemetryTest {
       mockedLocalBroadcastManager);
     theMapboxTelemetry.enable();
 
-    theMapboxTelemetry.isAccessTokenAndUserAgentValid(aValidAccessToken, aInvalidUserAgent);
+    theMapboxTelemetry.checkAccessTokenAndUserAgentValid(aValidAccessToken, aInvalidUserAgent);
   }
 
   @Test(expected = TelemetryException.class)
@@ -518,6 +519,29 @@ public class MapboxTelemetryTest {
       mockedLocalBroadcastManager);
     theMapboxTelemetry.enable();
 
-    theMapboxTelemetry.isAccessTokenAndUserAgentValid(aInvalidAccessToken, aValidUserAgent);
+    theMapboxTelemetry.checkAccessTokenAndUserAgentValid(aInvalidAccessToken, aValidUserAgent);
+  }
+
+  @Test
+  public void checkUpdateUserAgent() throws Exception {
+    Context mockedContext = mock(Context.class);
+    String aValidAccessToken = "validAccessToken";
+    String aValidUserAgent = "MapboxTelemetryAndroid/";
+    EventsQueue mockedEventsQueue = mock(EventsQueue.class);
+
+    TelemetryClient telemetryClient = new TelemetryClient(aValidAccessToken, aValidUserAgent, null, null);
+
+    Callback mockedHttpCallback = mock(Callback.class);
+    SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
+    Clock mockedClock = mock(Clock.class);
+    LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
+      mockedEventsQueue, telemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
+      mockedLocalBroadcastManager);
+    theMapboxTelemetry.enable();
+
+    assertEquals("MapboxTelemetryAndroid/", telemetryClient.getUserAgent());
+    theMapboxTelemetry.updateUserAgent("MapboxEventsAndroid/");
+    assertEquals("MapboxEventsAndroid/", telemetryClient.getUserAgent());
   }
 }
