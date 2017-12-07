@@ -26,6 +26,7 @@ public class TelemetryClient {
   private String userAgent = null;
   private final TelemetryClientSettings setting;
   private final Logger logger;
+  private boolean debugLoggingEnabled = false;
 
   // TODO Access can be package-private, remove public modifier after removing instances from the test app
   public TelemetryClient(String accessToken, String userAgent, TelemetryClientSettings setting, Logger logger) {
@@ -48,6 +49,14 @@ public class TelemetryClient {
     sendBatch(oneEvent, callback);
   }
 
+  void setDebugLoggingEnabled(boolean debugLoggingEnabled) {
+    this.debugLoggingEnabled = debugLoggingEnabled;
+  }
+
+  private boolean isDebugLoggingEnabled() {
+    return debugLoggingEnabled;
+  }
+
   private void sendBatch(List<Event> batch, Callback callback) {
     String payload = new Gson().toJson(batch);
     RequestBody body = RequestBody.create(JSON, payload);
@@ -56,8 +65,8 @@ public class TelemetryClient {
     HttpUrl url = baseUrl.newBuilder(EVENTS_ENDPOINT)
       .addQueryParameter(ACCESS_TOKEN_QUERY_PARAMETER, accessToken).build();
 
-    // Extra debug in staging mode
-    if (setting.getEnvironment().equals(Environment.STAGING)) {
+    // Extra debug in staging mode or debug mode
+    if (isDebugLoggingEnabled() || setting.getEnvironment().equals(Environment.STAGING)) {
       logger.debug(LOG_TAG, String.format("Sending POST to %s with %d event(s) (user agent: %s) with "
         + "payload: %s", url, batch.size(), userAgent, payload));
     }

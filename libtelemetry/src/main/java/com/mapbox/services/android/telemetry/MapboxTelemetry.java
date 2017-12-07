@@ -34,6 +34,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   private boolean isTelemetryEnabled = false;
   private boolean isOpted = false;
   private boolean serviceBound = false;
+  private boolean debugLoggingEnabled = false;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent, Callback httpCallback) {
     this.context = context;
@@ -93,6 +94,18 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     if (serviceBound) {
       SessionIdentifier sessionIdentifier = new SessionIdentifier(hour);
       telemetryService.updateSessionIdentifier(sessionIdentifier);
+    }
+  }
+
+  public boolean isDebugLoggingEnabled() {
+    return debugLoggingEnabled;
+  }
+
+  public void setDebugLoggingEnabled(boolean debugLoggingEnabled) {
+    this.debugLoggingEnabled = debugLoggingEnabled;
+
+    if (telemetryClient != null) {
+      telemetryClient.setDebugLoggingEnabled(debugLoggingEnabled);
     }
   }
 
