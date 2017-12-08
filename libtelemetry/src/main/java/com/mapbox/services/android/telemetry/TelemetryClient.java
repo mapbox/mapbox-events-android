@@ -38,7 +38,7 @@ public class TelemetryClient {
     this.userAgent = userAgent;
   }
 
-  String getUserAgent() {
+  String obtainUserAgent() {
     return userAgent;
   }
 

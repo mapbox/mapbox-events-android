@@ -12,7 +12,6 @@ import java.util.List;
 
 import okhttp3.Callback;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -335,6 +334,58 @@ public class MapboxTelemetryTest {
   }
 
   @Test
+  public void checksOnFullQueueSendEventsNotCalledWhenNullTelemetryClient() throws Exception {
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    String nullAccessToken = null;
+    String aValidUserAgent = null;
+    ConnectivityManager mockedConnectivityManager = mock(ConnectivityManager.class);
+    when(mockedContext.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE))
+      .thenReturn(mockedConnectivityManager);
+    NetworkInfo mockedNetworkInfo = mock(NetworkInfo.class);
+    when(mockedConnectivityManager.getActiveNetworkInfo()).thenReturn(mockedNetworkInfo);
+    when(mockedNetworkInfo.isConnected()).thenReturn(true);
+    EventsQueue mockedEventsQueue = mock(EventsQueue.class);
+    TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
+    Callback mockedHttpCallback = mock(Callback.class);
+    SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
+    Clock mockedClock = mock(Clock.class);
+    LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, nullAccessToken, aValidUserAgent,
+      mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
+      mockedLocalBroadcastManager);
+    List<Event> mockedList = mock(List.class);
+
+    theMapboxTelemetry.onFullQueue(mockedList);
+    verify(mockedTelemetryClient, never()).sendEvents(eq(mockedList), eq(mockedHttpCallback));
+  }
+
+  @Test
+  public void checksOnFullQueueSendEventsNotCalledWhenEmptyTelemetryClient() throws Exception {
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    String emptyValidAccessToken = "";
+    String aValidUserAgent = "";
+    ConnectivityManager mockedConnectivityManager = mock(ConnectivityManager.class);
+    when(mockedContext.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE))
+      .thenReturn(mockedConnectivityManager);
+    NetworkInfo mockedNetworkInfo = mock(NetworkInfo.class);
+    when(mockedConnectivityManager.getActiveNetworkInfo()).thenReturn(mockedNetworkInfo);
+    when(mockedNetworkInfo.isConnected()).thenReturn(true);
+    EventsQueue mockedEventsQueue = mock(EventsQueue.class);
+    TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
+    Callback mockedHttpCallback = mock(Callback.class);
+    SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
+    Clock mockedClock = mock(Clock.class);
+    LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, emptyValidAccessToken, aValidUserAgent,
+      mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
+      mockedLocalBroadcastManager);
+    List<Event> mockedList = mock(List.class);
+
+    theMapboxTelemetry.onFullQueue(mockedList);
+    verify(mockedTelemetryClient, never()).sendEvents(eq(mockedList), eq(mockedHttpCallback));
+  }
+
+  @Test
   public void checksOptedIn() throws Exception {
     Context mockedContext = mock(Context.class);
     String aValidAccessToken = "validAccessToken";
@@ -466,7 +517,7 @@ public class MapboxTelemetryTest {
   }
 
   @Test
-  public void checkValidAccessTokenValidUserAgent() throws Exception {
+  public void checksValidAccessTokenValidUserAgent() throws Exception {
     Context mockedContext = mock(Context.class);
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
@@ -481,67 +532,185 @@ public class MapboxTelemetryTest {
       mockedLocalBroadcastManager);
     theMapboxTelemetry.enable();
 
-    assertTrue(theMapboxTelemetry.checkAccessTokenAndUserAgentValid(aValidAccessToken, aValidUserAgent));
+    String testAccessToken = "testAccessToken";
+    boolean accessTokentBool = theMapboxTelemetry.checkRequiredParameters(testAccessToken, aValidUserAgent);
+
+    assertTrue(accessTokentBool);
   }
 
   @Test
-  public void checkInvalidUserAgent() throws Exception {
+  public void checksNullAccessToken() throws Exception {
     Context mockedContext = mock(Context.class);
     String aValidAccessToken = "validAccessToken";
+    String aValidUserAgent = "MapboxTelemetryAndroid/";
+    EventsQueue mockedEventsQueue = mock(EventsQueue.class);
+    TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
+    Callback mockedHttpCallback = mock(Callback.class);
+    SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
+    Clock mockedClock = mock(Clock.class);
+    LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
+      mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
+      mockedLocalBroadcastManager);
+    theMapboxTelemetry.enable();
+
+    String nullAccessToken = null;
+    boolean accessTokentBool = theMapboxTelemetry.checkRequiredParameters(nullAccessToken, aValidUserAgent);
+
+    assertFalse(accessTokentBool);
+  }
+
+  @Test
+  public void checksUserAgentTelemetryAndroid() throws Exception {
+    Context mockedContext = mock(Context.class);
+    String aValidAccessToken = "validAccessToken";
+    String aValidUserAgent = "MapboxTelemetryAndroid/";
+    EventsQueue mockedEventsQueue = mock(EventsQueue.class);
+    TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
+    Callback mockedHttpCallback = mock(Callback.class);
+    SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
+    Clock mockedClock = mock(Clock.class);
+    LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
+      mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
+      mockedLocalBroadcastManager);
+    theMapboxTelemetry.enable();
+
+    String testUserAgent = "MapboxTelemetryAndroid/";
+    boolean userAgentBool = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, testUserAgent);
+
+    assertTrue(userAgentBool);
+  }
+
+  @Test
+  public void checksUserAgentUnity() throws Exception {
+    Context mockedContext = mock(Context.class);
+    String aValidAccessToken = "validAccessToken";
+    String aValidUserAgent = "MapboxTelemetryAndroid/";
+    EventsQueue mockedEventsQueue = mock(EventsQueue.class);
+    TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
+    Callback mockedHttpCallback = mock(Callback.class);
+    SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
+    Clock mockedClock = mock(Clock.class);
+    LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
+      mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
+      mockedLocalBroadcastManager);
+    theMapboxTelemetry.enable();
+
+    String testUserAgent = "MapboxEventsUnityAndroid/";
+    boolean userAgentBool = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, testUserAgent);
+
+    assertTrue(userAgentBool);
+  }
+
+  @Test
+  public void checksUserAgentNavigation() throws Exception {
+    Context mockedContext = mock(Context.class);
+    String aValidAccessToken = "validAccessToken";
+    String aValidUserAgent = "MapboxEventsAndroid/";
+    EventsQueue mockedEventsQueue = mock(EventsQueue.class);
+    TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
+    Callback mockedHttpCallback = mock(Callback.class);
+    SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
+    Clock mockedClock = mock(Clock.class);
+    LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
+      mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
+      mockedLocalBroadcastManager);
+    theMapboxTelemetry.enable();
+
+    String testUserAgent = "mapbox-navigation-android/";
+    boolean userAgentBool = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, testUserAgent);
+
+    assertTrue(userAgentBool);
+  }
+
+  @Test
+  public void checksUserAgentNavigationUi() throws Exception {
+    Context mockedContext = mock(Context.class);
+    String aValidAccessToken = "validAccessToken";
+    String aValidUserAgent = "MapboxEventsAndroid/";
+    EventsQueue mockedEventsQueue = mock(EventsQueue.class);
+    TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
+    Callback mockedHttpCallback = mock(Callback.class);
+    SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
+    Clock mockedClock = mock(Clock.class);
+    LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
+      mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
+      mockedLocalBroadcastManager);
+    theMapboxTelemetry.enable();
+
+    String testUserAgent = "mapbox-navigation-ui-android/";
+    boolean userAgentBool = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, testUserAgent);
+
+    assertTrue(userAgentBool);
+  }
+
+  @Test
+  public void checksUserAgentEvents() throws Exception {
+    Context mockedContext = mock(Context.class);
+    String aValidAccessToken = "validAccessToken";
+    String aValidUserAgent = "MapboxEventsAndroid/";
+    EventsQueue mockedEventsQueue = mock(EventsQueue.class);
+    TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
+    Callback mockedHttpCallback = mock(Callback.class);
+    SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
+    Clock mockedClock = mock(Clock.class);
+    LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
+      mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
+      mockedLocalBroadcastManager);
+    theMapboxTelemetry.enable();
+
+    String testUserAgent = "MapboxEventsAndroid/";
+    boolean userAgentBool = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, testUserAgent);
+
+    assertTrue(userAgentBool);
+  }
+
+  @Test
+  public void checksInvalidUserAgent() throws Exception {
+    Context mockedContext = mock(Context.class);
+    String aValidAccessToken = "validAccessToken";
+    String aValidUserAgent = "MapboxEventsAndroid/";
+    EventsQueue mockedEventsQueue = mock(EventsQueue.class);
+    TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
+    Callback mockedHttpCallback = mock(Callback.class);
+    SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
+    Clock mockedClock = mock(Clock.class);
+    LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
+      mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
+      mockedLocalBroadcastManager);
+    theMapboxTelemetry.enable();
+
     String aInvalidUserAgent = "invalidUserAgent";
-    EventsQueue mockedEventsQueue = mock(EventsQueue.class);
-    TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
-    Callback mockedHttpCallback = mock(Callback.class);
-    SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
-    Clock mockedClock = mock(Clock.class);
-    LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
-    MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aInvalidUserAgent,
-      mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
-    theMapboxTelemetry.enable();
+    boolean userAgentBool = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aInvalidUserAgent);
 
-    assertFalse(theMapboxTelemetry.checkAccessTokenAndUserAgentValid(aValidAccessToken, aInvalidUserAgent));
+    assertFalse(userAgentBool);
   }
 
   @Test
-  public void checkInvalidAccessToken() throws Exception {
-    Context mockedContext = mock(Context.class);
-    String aInvalidAccessToken = null;
-    String aValidUserAgent = "MapboxTelemetryAndroid/";
-    EventsQueue mockedEventsQueue = mock(EventsQueue.class);
-    TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
-    Callback mockedHttpCallback = mock(Callback.class);
-    SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
-    Clock mockedClock = mock(Clock.class);
-    LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
-    MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aInvalidAccessToken, aValidUserAgent,
-      mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
-    theMapboxTelemetry.enable();
-
-    assertFalse(theMapboxTelemetry.checkAccessTokenAndUserAgentValid(aInvalidAccessToken, aValidUserAgent));
-  }
-
-  @Test
-  public void checkUpdateUserAgent() throws Exception {
+  public void checksNullUserAgent() throws Exception {
     Context mockedContext = mock(Context.class);
     String aValidAccessToken = "validAccessToken";
-    String aValidUserAgent = "MapboxTelemetryAndroid/";
+    String aValidUserAgent = "MapboxEventsAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
-
-    TelemetryClient telemetryClient = new TelemetryClient(aValidAccessToken, aValidUserAgent, null, null);
-
+    TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
     Callback mockedHttpCallback = mock(Callback.class);
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
-      mockedEventsQueue, telemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
+      mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
       mockedLocalBroadcastManager);
     theMapboxTelemetry.enable();
 
-    assertEquals("MapboxTelemetryAndroid/", telemetryClient.getUserAgent());
-    theMapboxTelemetry.updateUserAgent("MapboxEventsAndroid/");
-    assertEquals("MapboxEventsAndroid/", telemetryClient.getUserAgent());
+    String aNullUserAgent = null;
+    boolean userAgentBool = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aNullUserAgent);
+
+    assertFalse(userAgentBool);
   }
 }
