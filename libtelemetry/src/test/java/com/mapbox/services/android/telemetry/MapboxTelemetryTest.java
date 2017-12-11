@@ -337,7 +337,7 @@ public class MapboxTelemetryTest {
   public void checksOnFullQueueSendEventsNotCalledWhenNullTelemetryClient() throws Exception {
     Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     String nullAccessToken = null;
-    String aValidUserAgent = null;
+    String nullUserAgent = null;
     ConnectivityManager mockedConnectivityManager = mock(ConnectivityManager.class);
     when(mockedContext.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE))
       .thenReturn(mockedConnectivityManager);
@@ -350,7 +350,7 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
-    MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, nullAccessToken, aValidUserAgent,
+    MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, nullAccessToken, nullUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
       mockedLocalBroadcastManager);
     List<Event> mockedList = mock(List.class);
@@ -363,7 +363,7 @@ public class MapboxTelemetryTest {
   public void checksOnFullQueueSendEventsNotCalledWhenEmptyTelemetryClient() throws Exception {
     Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     String emptyValidAccessToken = "";
-    String aValidUserAgent = "";
+    String emptyUserAgent = "";
     ConnectivityManager mockedConnectivityManager = mock(ConnectivityManager.class);
     when(mockedContext.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE))
       .thenReturn(mockedConnectivityManager);
@@ -376,7 +376,7 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
-    MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, emptyValidAccessToken, aValidUserAgent,
+    MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, emptyValidAccessToken, emptyUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
       mockedLocalBroadcastManager);
     List<Event> mockedList = mock(List.class);
@@ -532,8 +532,7 @@ public class MapboxTelemetryTest {
       mockedLocalBroadcastManager);
     theMapboxTelemetry.enable();
 
-    String testAccessToken = "testAccessToken";
-    boolean accessTokentBool = theMapboxTelemetry.checkRequiredParameters(testAccessToken, aValidUserAgent);
+    boolean accessTokentBool = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aValidUserAgent);
 
     assertTrue(accessTokentBool);
   }
@@ -555,9 +554,9 @@ public class MapboxTelemetryTest {
     theMapboxTelemetry.enable();
 
     String nullAccessToken = null;
-    boolean accessTokentBool = theMapboxTelemetry.checkRequiredParameters(nullAccessToken, aValidUserAgent);
+    boolean checkRequiredParameters = theMapboxTelemetry.checkRequiredParameters(nullAccessToken, aValidUserAgent);
 
-    assertFalse(accessTokentBool);
+    assertFalse(checkRequiredParameters);
   }
 
   @Test
@@ -576,17 +575,16 @@ public class MapboxTelemetryTest {
       mockedLocalBroadcastManager);
     theMapboxTelemetry.enable();
 
-    String testUserAgent = "MapboxTelemetryAndroid/";
-    boolean userAgentBool = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, testUserAgent);
+    boolean checkRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aValidUserAgent);
 
-    assertTrue(userAgentBool);
+    assertTrue(checkRequiredParameters);
   }
 
   @Test
   public void checksUserAgentUnity() throws Exception {
     Context mockedContext = mock(Context.class);
     String aValidAccessToken = "validAccessToken";
-    String aValidUserAgent = "MapboxTelemetryAndroid/";
+    String aValidUserAgent = "MapboxEventsUnityAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
     TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
     Callback mockedHttpCallback = mock(Callback.class);
@@ -598,17 +596,16 @@ public class MapboxTelemetryTest {
       mockedLocalBroadcastManager);
     theMapboxTelemetry.enable();
 
-    String testUserAgent = "MapboxEventsUnityAndroid/";
-    boolean userAgentBool = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, testUserAgent);
+    boolean checkRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aValidUserAgent);
 
-    assertTrue(userAgentBool);
+    assertTrue(checkRequiredParameters);
   }
 
   @Test
   public void checksUserAgentNavigation() throws Exception {
     Context mockedContext = mock(Context.class);
     String aValidAccessToken = "validAccessToken";
-    String aValidUserAgent = "MapboxEventsAndroid/";
+    String aValidUserAgent = "mapbox-navigation-android/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
     TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
     Callback mockedHttpCallback = mock(Callback.class);
@@ -620,17 +617,16 @@ public class MapboxTelemetryTest {
       mockedLocalBroadcastManager);
     theMapboxTelemetry.enable();
 
-    String testUserAgent = "mapbox-navigation-android/";
-    boolean userAgentBool = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, testUserAgent);
+    boolean checkRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aValidUserAgent);
 
-    assertTrue(userAgentBool);
+    assertTrue(checkRequiredParameters);
   }
 
   @Test
   public void checksUserAgentNavigationUi() throws Exception {
     Context mockedContext = mock(Context.class);
     String aValidAccessToken = "validAccessToken";
-    String aValidUserAgent = "MapboxEventsAndroid/";
+    String aValidUserAgent = "mapbox-navigation-ui-android/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
     TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
     Callback mockedHttpCallback = mock(Callback.class);
@@ -642,10 +638,9 @@ public class MapboxTelemetryTest {
       mockedLocalBroadcastManager);
     theMapboxTelemetry.enable();
 
-    String testUserAgent = "mapbox-navigation-ui-android/";
-    boolean userAgentBool = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, testUserAgent);
+    boolean checkRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aValidUserAgent);
 
-    assertTrue(userAgentBool);
+    assertTrue(checkRequiredParameters);
   }
 
   @Test
@@ -664,10 +659,9 @@ public class MapboxTelemetryTest {
       mockedLocalBroadcastManager);
     theMapboxTelemetry.enable();
 
-    String testUserAgent = "MapboxEventsAndroid/";
-    boolean userAgentBool = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, testUserAgent);
+    boolean checkRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aValidUserAgent);
 
-    assertTrue(userAgentBool);
+    assertTrue(checkRequiredParameters);
   }
 
   @Test
@@ -687,9 +681,9 @@ public class MapboxTelemetryTest {
     theMapboxTelemetry.enable();
 
     String aInvalidUserAgent = "invalidUserAgent";
-    boolean userAgentBool = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aInvalidUserAgent);
+    boolean checkRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aInvalidUserAgent);
 
-    assertFalse(userAgentBool);
+    assertFalse(checkRequiredParameters);
   }
 
   @Test
@@ -709,8 +703,8 @@ public class MapboxTelemetryTest {
     theMapboxTelemetry.enable();
 
     String aNullUserAgent = null;
-    boolean userAgentBool = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aNullUserAgent);
+    boolean checkRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aNullUserAgent);
 
-    assertFalse(userAgentBool);
+    assertFalse(checkRequiredParameters);
   }
 }

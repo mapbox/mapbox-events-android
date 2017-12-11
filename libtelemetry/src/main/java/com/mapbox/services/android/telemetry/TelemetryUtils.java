@@ -53,4 +53,12 @@ class TelemetryUtils {
       return EMPTY_STRING;
     }
   }
+
+  static boolean isEmpty(String string) {
+    if (string == null || string.length() == 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }

@@ -11,7 +11,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.TextUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -157,6 +156,10 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   }
 
   private TelemetryClient createTelemetryClient(String accessToken, String userAgent) {
+    if (!checkRequiredParameters(accessToken, userAgent)) {
+      return null;
+    }
+
     TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder()
       .environment(Environment.STAGING)
       .build();
@@ -301,7 +304,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   };
 
   private boolean isUserAgentValid(String userAgent) {
-    if (userAgent != null && !TextUtils.isEmpty(userAgent)) {
+    if (!TelemetryUtils.isEmpty(userAgent)) {
       for (String userAgentPrefix : VALID_USER_AGENTS) {
         if (userAgent.startsWith(userAgentPrefix)) {
           this.userAgent = userAgent;
@@ -313,7 +316,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   }
 
   private boolean isAccessTokenValid(String accessToken) {
-    if (accessToken != null && !TextUtils.isEmpty(accessToken)) {
+    if (!TelemetryUtils.isEmpty(accessToken)) {
       this.accessToken = accessToken;
       return true;
     }
