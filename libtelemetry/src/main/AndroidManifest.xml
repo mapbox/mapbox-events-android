@@ -8,8 +8,7 @@
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <application>
-        <service android:name="com.mapbox.services.android.telemetry.TelemetryService"
-            android:process="com.mapbox.services.android.telemetry.TelemetryService.thread"/>
+        <service android:name="com.mapbox.services.android.telemetry.TelemetryService"/>
     </application>
     <!--TODO Remove comment after analyzing the impact on the performance when adding SchedulerFlusherJobService-->
     <!--<application>-->
