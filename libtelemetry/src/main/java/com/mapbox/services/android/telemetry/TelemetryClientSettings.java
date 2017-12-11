@@ -29,6 +29,7 @@ public class TelemetryClientSettings {
   private final HttpUrl baseUrl;
   private final SSLSocketFactory sslSocketFactory;
   private final X509TrustManager x509TrustManager;
+  private boolean debugLoggingEnabled = false;
 
   private TelemetryClientSettings(Builder builder) {
     this.environment = builder.environment;
@@ -120,5 +121,13 @@ public class TelemetryClientSettings {
       builder.host(eventsHost);
       return builder.build();
     }
+  }
+
+  void updateDebugLoggingEnabled(boolean debugLoggingEnabled) {
+    this.debugLoggingEnabled = debugLoggingEnabled;
+  }
+
+  boolean isDebugLoggingEnabled() {
+    return debugLoggingEnabled;
   }
 }

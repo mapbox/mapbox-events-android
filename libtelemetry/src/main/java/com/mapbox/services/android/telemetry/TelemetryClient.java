@@ -49,12 +49,8 @@ public class TelemetryClient {
     sendBatch(oneEvent, callback);
   }
 
-  void setDebugLoggingEnabled(boolean debugLoggingEnabled) {
-    this.debugLoggingEnabled = debugLoggingEnabled;
-  }
-
-  private boolean isDebugLoggingEnabled() {
-    return debugLoggingEnabled;
+  void updateDebugLoggingEnabled(boolean debugLoggingEnabled) {
+    setting.updateDebugLoggingEnabled(debugLoggingEnabled);
   }
 
   private void sendBatch(List<Event> batch, Callback callback) {
@@ -66,7 +62,7 @@ public class TelemetryClient {
       .addQueryParameter(ACCESS_TOKEN_QUERY_PARAMETER, accessToken).build();
 
     // Extra debug in staging mode or debug mode
-    if (isDebugLoggingEnabled() || setting.getEnvironment().equals(Environment.STAGING)) {
+    if (isExtraDebuggingNeeded()) {
       logger.debug(LOG_TAG, String.format("Sending POST to %s with %d event(s) (user agent: %s) with "
         + "payload: %s", url, batch.size(), userAgent, payload));
     }
@@ -79,5 +75,9 @@ public class TelemetryClient {
 
     OkHttpClient client = setting.getClient();
     client.newCall(request).enqueue(callback);
+  }
+
+  private boolean isExtraDebuggingNeeded() {
+    return setting.isDebugLoggingEnabled() || setting.getEnvironment().equals(Environment.STAGING);
   }
 }
