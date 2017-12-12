@@ -24,9 +24,8 @@ public class TelemetryClient {
 
   private String accessToken = null;
   private String userAgent = null;
-  private final TelemetryClientSettings setting;
+  private TelemetryClientSettings setting;
   private final Logger logger;
-  private boolean debugLoggingEnabled = false;
 
   // TODO Access can be package-private, remove public modifier after removing instances from the test app
   public TelemetryClient(String accessToken, String userAgent, TelemetryClientSettings setting, Logger logger) {
@@ -50,7 +49,7 @@ public class TelemetryClient {
   }
 
   void updateDebugLoggingEnabled(boolean debugLoggingEnabled) {
-    setting.updateDebugLoggingEnabled(debugLoggingEnabled);
+    setting = setting.toBuilder().debugLoggingEnabled(debugLoggingEnabled).build();
   }
 
   private void sendBatch(List<Event> batch, Callback callback) {

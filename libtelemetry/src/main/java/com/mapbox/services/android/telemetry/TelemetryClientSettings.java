@@ -56,10 +56,6 @@ public class TelemetryClientSettings {
     return debugLoggingEnabled;
   }
 
-  void updateDebugLoggingEnabled(boolean debugLoggingEnabled) {
-    this.debugLoggingEnabled = debugLoggingEnabled;
-  }
-
   private OkHttpClient configureHttpClient() {
     CertificatePinnerFactory factory = new CertificatePinnerFactory();
     OkHttpClient.Builder builder = client.newBuilder()
@@ -78,13 +74,17 @@ public class TelemetryClientSettings {
     return sslSocketFactory != null && x509TrustManager != null;
   }
 
+  Builder toBuilder() {
+    return toBuilder();
+  }
+
   public static final class Builder {
     Environment environment = Environment.COM;
     OkHttpClient client = new OkHttpClient();
     HttpUrl baseUrl = null;
     SSLSocketFactory sslSocketFactory = null;
     X509TrustManager x509TrustManager = null;
-    boolean debugLoggingEnabled;
+    boolean debugLoggingEnabled = false;
 
     public Builder() {
     }
