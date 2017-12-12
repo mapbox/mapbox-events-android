@@ -24,7 +24,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   private final Context context;
   private String accessToken;
   private String userAgent;
-  private final EventsQueue queue;
+  private EventsQueue queue;
   private TelemetryClient telemetryClient;
   private TelemetryService telemetryService;
   private final Callback httpCallback;
@@ -38,13 +38,19 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   private boolean isOpted = false;
   private boolean serviceBound = false;
 
+  private static final String EVENTS_USERAGENT = "MapboxEventsAndroid/";
+  private static final String TELEMETRY_USERAGENT = "MapboxTelemetryAndroid/";
+  private static final String UNITY_USERAGENT = "MapboxEventsUnityAndroid/";
+  private static final String NAVIGATION_USERAGENT = "mapbox-navigation-android/";
+  private static final String NAVIGATION_UI_USERAGENT = "mapbox-navigation-ui-android/";
+
   private static final List<String> VALID_USER_AGENTS = new ArrayList<String>() {
     {
-      add("MapboxEventsAndroid/");
-      add("MapboxTelemetryAndroid/");
-      add("MapboxEventsUnityAndroid/");
-      add("mapbox-navigation-android/");
-      add("mapbox-navigation-ui-android/");
+      add(EVENTS_USERAGENT);
+      add(TELEMETRY_USERAGENT);
+      add(UNITY_USERAGENT);
+      add(NAVIGATION_USERAGENT);
+      add(NAVIGATION_UI_USERAGENT);
     }
   };
 
@@ -54,11 +60,10 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     }
 
     this.context = context;
-    this.queue = new EventsQueue(new FullQueueFlusher(this));
     this.httpCallback = httpCallback;
     AlarmReceiver alarmReceiver = obtainAlarmReceiver(httpCallback);
     this.schedulerFlusher = new SchedulerFlusherFactory(context, alarmReceiver).supply();
-    queue.setTelemetryInitialized(true);
+    initializeQueue();
   }
 
   // For testing only
@@ -317,5 +322,10 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     }
 
     return false;
+  }
+
+  private void initializeQueue() {
+    queue = new EventsQueue(new FullQueueFlusher(this));
+    queue.setTelemetryInitialized(true);
   }
 }

@@ -38,10 +38,6 @@ public class TelemetryClient {
     this.userAgent = userAgent;
   }
 
-  String obtainUserAgent() {
-    return userAgent;
-  }
-
   void sendEvents(List<Event> events, Callback callback) {
     ArrayList<Event> batch = new ArrayList<>();
     batch.addAll(events);
