@@ -61,7 +61,6 @@ public class TelemetryClient {
     HttpUrl url = baseUrl.newBuilder(EVENTS_ENDPOINT)
       .addQueryParameter(ACCESS_TOKEN_QUERY_PARAMETER, accessToken).build();
 
-    // Extra debug in staging mode or debug mode
     if (isExtraDebuggingNeeded()) {
       logger.debug(LOG_TAG, String.format("Sending POST to %s with %d event(s) (user agent: %s) with "
         + "payload: %s", url, batch.size(), userAgent, payload));

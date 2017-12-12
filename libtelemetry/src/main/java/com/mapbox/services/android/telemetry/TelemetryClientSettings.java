@@ -29,7 +29,7 @@ public class TelemetryClientSettings {
   private final HttpUrl baseUrl;
   private final SSLSocketFactory sslSocketFactory;
   private final X509TrustManager x509TrustManager;
-  private boolean debugLoggingEnabled = false;
+  private boolean debugLoggingEnabled;
 
   private TelemetryClientSettings(Builder builder) {
     this.environment = builder.environment;
@@ -37,6 +37,7 @@ public class TelemetryClientSettings {
     this.baseUrl = builder.baseUrl;
     this.sslSocketFactory = builder.sslSocketFactory;
     this.x509TrustManager = builder.x509TrustManager;
+    this.debugLoggingEnabled = builder.debugLoggingEnabled;
   }
 
   Environment getEnvironment() {
@@ -49,6 +50,14 @@ public class TelemetryClientSettings {
 
   HttpUrl getBaseUrl() {
     return baseUrl;
+  }
+
+  boolean isDebugLoggingEnabled() {
+    return debugLoggingEnabled;
+  }
+
+  void updateDebugLoggingEnabled(boolean debugLoggingEnabled) {
+    this.debugLoggingEnabled = debugLoggingEnabled;
   }
 
   private OkHttpClient configureHttpClient() {
@@ -75,6 +84,7 @@ public class TelemetryClientSettings {
     HttpUrl baseUrl = null;
     SSLSocketFactory sslSocketFactory = null;
     X509TrustManager x509TrustManager = null;
+    boolean debugLoggingEnabled;
 
     public Builder() {
     }
@@ -108,6 +118,11 @@ public class TelemetryClientSettings {
       return this;
     }
 
+    public Builder debugLoggingEnabled(Boolean debugLoggingEnabled) {
+      this.debugLoggingEnabled = debugLoggingEnabled;
+      return this;
+    }
+
     public TelemetryClientSettings build() {
       if (baseUrl == null) {
         this.baseUrl = configureUrlHostname();
@@ -121,13 +136,5 @@ public class TelemetryClientSettings {
       builder.host(eventsHost);
       return builder.build();
     }
-  }
-
-  void updateDebugLoggingEnabled(boolean debugLoggingEnabled) {
-    this.debugLoggingEnabled = debugLoggingEnabled;
-  }
-
-  boolean isDebugLoggingEnabled() {
-    return debugLoggingEnabled;
   }
 }

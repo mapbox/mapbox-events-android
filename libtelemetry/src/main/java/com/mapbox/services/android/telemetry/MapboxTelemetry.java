@@ -143,6 +143,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   private TelemetryClient createTelemetryClient(String accessToken, String userAgent) {
     TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder()
       .environment(Environment.STAGING)
+      .debugLoggingEnabled(false)
       .build();
     telemetryClient = new TelemetryClient(accessToken, userAgent, telemetryClientSettings, new Logger());
 
