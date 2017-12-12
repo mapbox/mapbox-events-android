@@ -20,8 +20,6 @@ import okhttp3.Callback;
 import static com.mapbox.services.android.telemetry.EventReceiver.EVENT_RECEIVER_INTENT;
 
 public class MapboxTelemetry implements FullQueueCallback, EventCallback {
-  private static final String ACCESS_TOKEN_USER_AGENT_EXCEPTION = "Please, make sure you provide a valid access token"
-    + " and user agent. For more information, please visit https://www.mapbox.com/android-sdk.";
 
   private final Context context;
   private String accessToken;
@@ -51,14 +49,16 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   };
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent, Callback httpCallback) {
-    checkRequiredParameters(accessToken, userAgent);
+    if (checkRequiredParameters(accessToken, userAgent)) {
+      initializeTelemetryClient();
+    }
 
     this.context = context;
     this.queue = new EventsQueue(new FullQueueFlusher(this));
-    initializeTelemetryClient();
     this.httpCallback = httpCallback;
     AlarmReceiver alarmReceiver = obtainAlarmReceiver(httpCallback);
     this.schedulerFlusher = new SchedulerFlusherFactory(context, alarmReceiver).supply();
+    queue.setTelemetryInitialized(true);
   }
 
   // For testing only
@@ -152,14 +152,9 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
 
   private void initializeTelemetryClient() {
     telemetryClient = createTelemetryClient(accessToken, userAgent);
-    queue.setTelemetryInitialized(true);
   }
 
   private TelemetryClient createTelemetryClient(String accessToken, String userAgent) {
-    if (!checkRequiredParameters(accessToken, userAgent)) {
-      return null;
-    }
-
     TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder()
       .environment(Environment.STAGING)
       .build();

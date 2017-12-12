@@ -532,9 +532,9 @@ public class MapboxTelemetryTest {
       mockedLocalBroadcastManager);
     theMapboxTelemetry.enable();
 
-    boolean accessTokentBool = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aValidUserAgent);
+    boolean validRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aValidUserAgent);
 
-    assertTrue(accessTokentBool);
+    assertTrue(validRequiredParameters);
   }
 
   @Test
@@ -553,10 +553,11 @@ public class MapboxTelemetryTest {
       mockedLocalBroadcastManager);
     theMapboxTelemetry.enable();
 
-    String nullAccessToken = null;
-    boolean checkRequiredParameters = theMapboxTelemetry.checkRequiredParameters(nullAccessToken, aValidUserAgent);
+    String invalidAccessTokenNull = null;
+    boolean validRequiredParameters = theMapboxTelemetry.checkRequiredParameters(invalidAccessTokenNull,
+      aValidUserAgent);
 
-    assertFalse(checkRequiredParameters);
+    assertFalse(validRequiredParameters);
   }
 
   @Test
@@ -575,9 +576,9 @@ public class MapboxTelemetryTest {
       mockedLocalBroadcastManager);
     theMapboxTelemetry.enable();
 
-    boolean checkRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aValidUserAgent);
+    boolean validRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aValidUserAgent);
 
-    assertTrue(checkRequiredParameters);
+    assertTrue(validRequiredParameters);
   }
 
   @Test
@@ -596,9 +597,9 @@ public class MapboxTelemetryTest {
       mockedLocalBroadcastManager);
     theMapboxTelemetry.enable();
 
-    boolean checkRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aValidUserAgent);
+    boolean validRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aValidUserAgent);
 
-    assertTrue(checkRequiredParameters);
+    assertTrue(validRequiredParameters);
   }
 
   @Test
@@ -617,9 +618,9 @@ public class MapboxTelemetryTest {
       mockedLocalBroadcastManager);
     theMapboxTelemetry.enable();
 
-    boolean checkRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aValidUserAgent);
+    boolean validRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aValidUserAgent);
 
-    assertTrue(checkRequiredParameters);
+    assertTrue(validRequiredParameters);
   }
 
   @Test
@@ -638,9 +639,9 @@ public class MapboxTelemetryTest {
       mockedLocalBroadcastManager);
     theMapboxTelemetry.enable();
 
-    boolean checkRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aValidUserAgent);
+    boolean validRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aValidUserAgent);
 
-    assertTrue(checkRequiredParameters);
+    assertTrue(validRequiredParameters);
   }
 
   @Test
@@ -659,52 +660,51 @@ public class MapboxTelemetryTest {
       mockedLocalBroadcastManager);
     theMapboxTelemetry.enable();
 
-    boolean checkRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aValidUserAgent);
+    boolean validRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aValidUserAgent);
 
-    assertTrue(checkRequiredParameters);
+    assertTrue(validRequiredParameters);
   }
 
   @Test
   public void checksInvalidUserAgent() throws Exception {
     Context mockedContext = mock(Context.class);
     String aValidAccessToken = "validAccessToken";
-    String aValidUserAgent = "MapboxEventsAndroid/";
+    String aInvalidUserAgent = "invalidUserAgent";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
     TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
     Callback mockedHttpCallback = mock(Callback.class);
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
-    MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
+    MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aInvalidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
       mockedLocalBroadcastManager);
     theMapboxTelemetry.enable();
 
-    String aInvalidUserAgent = "invalidUserAgent";
-    boolean checkRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aInvalidUserAgent);
+    boolean validRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aInvalidUserAgent);
 
-    assertFalse(checkRequiredParameters);
+    assertFalse(validRequiredParameters);
   }
 
   @Test
   public void checksNullUserAgent() throws Exception {
     Context mockedContext = mock(Context.class);
     String aValidAccessToken = "validAccessToken";
-    String aValidUserAgent = "MapboxEventsAndroid/";
+    String aNullUserAgent = null;
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
     TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
     Callback mockedHttpCallback = mock(Callback.class);
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
-    MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
+    MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aNullUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
       mockedLocalBroadcastManager);
     theMapboxTelemetry.enable();
 
-    String aNullUserAgent = null;
-    boolean checkRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aNullUserAgent);
 
-    assertFalse(checkRequiredParameters);
+    boolean validRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aNullUserAgent);
+
+    assertFalse(validRequiredParameters);
   }
 }
