@@ -1,6 +1,5 @@
 package com.mapbox.services.android.telemetry;
 
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSerializer;
@@ -33,6 +32,10 @@ class TelemetryClient {
     this.userAgent = userAgent;
     this.setting = setting;
     this.logger = logger;
+  }
+
+  void updateUserAgent(String userAgent) {
+    this.userAgent = userAgent;
   }
 
   void sendEvents(List<Event> events, Callback callback) {
