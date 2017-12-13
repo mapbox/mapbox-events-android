@@ -96,9 +96,9 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     }
   }
 
-  public void updateDebugLoggingEnabled(boolean debugLoggingEnabled) {
+  public void updateDebugLoggingEnabled(boolean isDebugLoggingEnabled) {
     if (telemetryClient != null) {
-      telemetryClient.updateDebugLoggingEnabled(debugLoggingEnabled);
+      telemetryClient.updateDebugLoggingEnabled(isDebugLoggingEnabled);
     }
   }
 

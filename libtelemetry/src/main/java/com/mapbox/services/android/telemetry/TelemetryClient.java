@@ -21,6 +21,8 @@ public class TelemetryClient {
   private static final String EVENTS_ENDPOINT = "/events/v2";
   private static final String USER_AGENT_REQUEST_HEADER = "User-Agent";
   private static final String ACCESS_TOKEN_QUERY_PARAMETER = "access_token";
+  private static final String EXTRA_DEBUGGING_LOG = "Sending POST to %s with %d event(s) (user agent: %s) "
+    + "with payload: %s";
 
   private String accessToken = null;
   private String userAgent = null;
@@ -61,8 +63,7 @@ public class TelemetryClient {
       .addQueryParameter(ACCESS_TOKEN_QUERY_PARAMETER, accessToken).build();
 
     if (isExtraDebuggingNeeded()) {
-      logger.debug(LOG_TAG, String.format("Sending POST to %s with %d event(s) (user agent: %s) with "
-        + "payload: %s", url, batch.size(), userAgent, payload));
+      logger.debug(LOG_TAG, String.format(EXTRA_DEBUGGING_LOG, url, batch.size(), userAgent, payload));
     }
 
     Request request = new Request.Builder()

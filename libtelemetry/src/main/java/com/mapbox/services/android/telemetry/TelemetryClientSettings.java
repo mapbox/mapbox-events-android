@@ -12,7 +12,7 @@ import okhttp3.ConnectionSpec;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 
-public class TelemetryClientSettings {
+public abstract class TelemetryClientSettings {
   private static final String STAGING_EVENTS_HOST = "api-events-staging.tilestream.net";
   private static final String COM_EVENTS_HOST = "events.mapbox.com";
   private static final String CHINA_EVENTS_HOST = "events.mapbox.cn";
@@ -74,9 +74,7 @@ public class TelemetryClientSettings {
     return sslSocketFactory != null && x509TrustManager != null;
   }
 
-  Builder toBuilder() {
-    return toBuilder();
-  }
+  abstract Builder toBuilder();
 
   public static final class Builder {
     Environment environment = Environment.COM;
@@ -118,7 +116,7 @@ public class TelemetryClientSettings {
       return this;
     }
 
-    public Builder debugLoggingEnabled(Boolean debugLoggingEnabled) {
+    public Builder debugLoggingEnabled(boolean debugLoggingEnabled) {
       this.debugLoggingEnabled = debugLoggingEnabled;
       return this;
     }
@@ -127,7 +125,12 @@ public class TelemetryClientSettings {
       if (baseUrl == null) {
         this.baseUrl = configureUrlHostname();
       }
-      return new TelemetryClientSettings(this);
+      return new TelemetryClientSettings(this) {
+        @Override
+        Builder toBuilder() {
+          return null;
+        }
+      };
     }
 
     private HttpUrl configureUrlHostname() {
