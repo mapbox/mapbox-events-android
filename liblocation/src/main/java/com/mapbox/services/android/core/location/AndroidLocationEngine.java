@@ -33,7 +33,6 @@ class AndroidLocationEngine extends LocationEngine implements LocationListener {
     this.context = new WeakReference<>(context);
     locationManager = (LocationManager) this.context.get().getSystemService(Context.LOCATION_SERVICE);
     currentProvider = DEFAULT_PROVIDER;
-
   }
 
   static synchronized LocationEngine getLocationEngine(Context context) {

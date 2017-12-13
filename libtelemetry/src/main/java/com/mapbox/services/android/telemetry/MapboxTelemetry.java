@@ -14,6 +14,8 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import com.mapbox.services.android.core.location.LocationEnginePriority;
 
+import com.mapbox.services.android.core.permissions.PermissionsManager;
+
 import java.util.List;
 
 import okhttp3.Callback;
@@ -36,6 +38,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   private boolean isTelemetryEnabled = false;
   private boolean isOpted = false;
   private boolean serviceBound = false;
+  private PermissionCheckRunnable permissionCheckRunnable = null;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent, Callback httpCallback) {
     this.context = context;
@@ -203,7 +206,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   }
 
   private boolean optLocationIn() {
-    if (isTelemetryEnabled && !isOpted) {
+    if (isTelemetryEnabled && !isOpted && checkLocationPermission()) {
       startLocation();
       registerEventReceiver();
       isOpted = true;
@@ -285,4 +288,26 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
       serviceBound = false;
     }
   };
+
+  boolean checkLocationPermission() {
+    if (PermissionsManager.areLocationPermissionsGranted(context)) {
+      return true;
+    } else {
+      permissionBackoff();
+      return false;
+    }
+  }
+
+  private void permissionBackoff() {
+    PermissionCheckRunnable permissionCheckRunnable = obtainPermissionCheckRunnable();
+    permissionCheckRunnable.run();
+  }
+
+  private PermissionCheckRunnable obtainPermissionCheckRunnable() {
+    if (permissionCheckRunnable == null) {
+      permissionCheckRunnable = new PermissionCheckRunnable(context, this);
+    }
+
+    return permissionCheckRunnable;
+  }
 }
