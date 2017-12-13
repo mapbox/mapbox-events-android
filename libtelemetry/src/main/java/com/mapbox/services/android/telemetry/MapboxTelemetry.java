@@ -124,13 +124,12 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     }
   }
 
-
   public void updateUserAgent(String userAgent) {
     if (isUserAgentValid(userAgent)) {
       telemetryClient.updateUserAgent(TelemetryUtils.createFullUserAgent(userAgent, context));
     }
   }
-  
+
   public void updateLocationPriority(@LocationEnginePriority.PowerMode int locationPriority) {
     if (serviceBound) {
       telemetryService.updateLocationPriority(locationPriority);
@@ -315,7 +314,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
       serviceBound = false;
     }
   };
-  
+
   private boolean isUserAgentValid(String userAgent) {
     if (!TelemetryUtils.isEmpty(userAgent)) {
       for (String userAgentPrefix : VALID_USER_AGENTS) {
