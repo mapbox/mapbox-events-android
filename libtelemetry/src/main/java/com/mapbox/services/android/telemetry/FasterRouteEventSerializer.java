@@ -9,11 +9,13 @@ import java.lang.reflect.Type;
 import java.util.Map;
 
 class FasterRouteEventSerializer implements JsonSerializer<NavigationFasterRouteEvent> {
+  private static final String EVENT = "event";
   private static final String STEP = "step";
 
   @Override
   public JsonElement serialize(NavigationFasterRouteEvent src, Type typeOfSrc, JsonSerializationContext context) {
     JsonObject fasterRoute = new JsonObject();
+    fasterRoute.addProperty(EVENT, src.getEvent());
     serializeMetadata(src, context, fasterRoute);
     serializeNewData(src, context, fasterRoute);
     serializeStep(src, context, fasterRoute);

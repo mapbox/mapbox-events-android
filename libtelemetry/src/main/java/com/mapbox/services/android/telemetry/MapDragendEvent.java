@@ -44,14 +44,6 @@ class MapDragendEvent extends Event implements Parcelable {
     return Type.MAP_DRAGEND;
   }
 
-  String getEvent() {
-    return event;
-  }
-
-  String getOrientation() {
-    return orientation;
-  }
-
   void setOrientation(String orientation) {
     this.orientation = orientation;
   }

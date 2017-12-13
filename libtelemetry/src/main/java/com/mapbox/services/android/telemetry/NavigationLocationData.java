@@ -4,11 +4,11 @@ import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-class NavigationLocationData implements Parcelable {
+public class NavigationLocationData implements Parcelable {
   private Location[] locationsBefore;
   private Location[] locationsAfter;
 
-  NavigationLocationData(Location[] locationsBefore, Location[] locationsAfter) {
+  public NavigationLocationData(Location[] locationsBefore, Location[] locationsAfter) {
     this.locationsBefore = locationsBefore;
     this.locationsAfter = locationsAfter;
   }

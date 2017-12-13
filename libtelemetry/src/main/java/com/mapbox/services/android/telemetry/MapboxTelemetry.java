@@ -13,6 +13,11 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 
 import java.util.ArrayList;
+
+import com.mapbox.services.android.core.location.LocationEnginePriority;
+
+import com.mapbox.services.android.core.permissions.PermissionsManager;
+
 import java.util.List;
 
 import okhttp3.Callback;
@@ -37,6 +42,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   private boolean isTelemetryEnabled = false;
   private boolean isOpted = false;
   private boolean serviceBound = false;
+  private PermissionCheckRunnable permissionCheckRunnable = null;
 
   private static final String EVENTS_USER_AGENT = "MapboxEventsAndroid/";
   private static final String TELEMETRY_USER_AGENT = "MapboxTelemetryAndroid/";
@@ -118,9 +124,16 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     }
   }
 
+
   public void updateUserAgent(String userAgent) {
     if (isUserAgentValid(userAgent)) {
       telemetryClient.updateUserAgent(TelemetryUtils.createFullUserAgent(userAgent, context));
+    }
+  }
+  
+  public void updateLocationPriority(@LocationEnginePriority.PowerMode int locationPriority) {
+    if (serviceBound) {
+      telemetryService.updateLocationPriority(locationPriority);
     }
   }
 
@@ -220,7 +233,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   }
 
   private boolean optLocationIn() {
-    if (isTelemetryEnabled && !isOpted) {
+    if (isTelemetryEnabled && !isOpted && checkLocationPermission()) {
       startLocation();
       registerEventReceiver();
       isOpted = true;
@@ -302,7 +315,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
       serviceBound = false;
     }
   };
-
+  
   private boolean isUserAgentValid(String userAgent) {
     if (!TelemetryUtils.isEmpty(userAgent)) {
       for (String userAgentPrefix : VALID_USER_AGENTS) {
@@ -327,5 +340,27 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   private void initializeQueue() {
     queue = new EventsQueue(new FullQueueFlusher(this));
     queue.setTelemetryInitialized(true);
+  }
+
+  boolean checkLocationPermission() {
+    if (PermissionsManager.areLocationPermissionsGranted(context)) {
+      return true;
+    } else {
+      permissionBackoff();
+      return false;
+    }
+  }
+
+  private void permissionBackoff() {
+    PermissionCheckRunnable permissionCheckRunnable = obtainPermissionCheckRunnable();
+    permissionCheckRunnable.run();
+  }
+
+  private PermissionCheckRunnable obtainPermissionCheckRunnable() {
+    if (permissionCheckRunnable == null) {
+      permissionCheckRunnable = new PermissionCheckRunnable(context, this);
+    }
+
+    return permissionCheckRunnable;
   }
 }
