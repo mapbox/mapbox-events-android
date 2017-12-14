@@ -1,15 +1,12 @@
 package com.mapbox.services.android.telemetry;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
-import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -206,27 +203,20 @@ public class MapEventFactory {
     return isConnectedToWifi(context);
   }
 
-  @SuppressWarnings( {"MissingPermission"})
   private boolean isConnectedToWifi(Context context) {
     try {
       WifiManager wifiMgr = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
       //noinspection MissingPermission
       WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
 
-      return wifiEnabledPermissionGrantedAndConnected(context, wifiMgr, wifiInfo);
+      return isWifiConnected(wifiMgr, wifiInfo);
     } catch (Exception exception) {
       return false;
     }
   }
 
-  private boolean wifiEnabledPermissionGrantedAndConnected(Context context, WifiManager wifiMgr,
-                                                           WifiInfo wifiInfo) {
-    return isPermissionGranted(context, Manifest.permission.ACCESS_WIFI_STATE) && wifiMgr.isWifiEnabled()
-      && networkConnected(wifiInfo);
-  }
-
-  private boolean isPermissionGranted(Context context, String permission) {
-    return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
+  private boolean isWifiConnected(WifiManager wifiMgr, WifiInfo wifiInfo) {
+    return wifiMgr.isWifiEnabled() && networkConnected(wifiInfo);
   }
 
   private boolean networkConnected(WifiInfo wifiInfo) {
