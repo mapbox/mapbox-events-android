@@ -54,7 +54,7 @@ class MockWebServerTest {
   void enqueueMockResponse(int code, String fileName) throws IOException {
     mockResponse = new MockResponse();
     mockResponse.setResponseCode(code);
-    String fileContent = getContentFromFile(fileName);
+    String fileContent = obtainContentFromFile(fileName);
     mockResponse.setBody(fileContent);
     server.enqueue(mockResponse);
   }
@@ -83,7 +83,7 @@ class MockWebServerTest {
 
   void assertRequestContainsHeader(String key, String expectedValue, int requestIndex)
     throws InterruptedException {
-    RecordedRequest recordedRequest = getRecordedRequestAtIndex(requestIndex);
+    RecordedRequest recordedRequest = obtainRecordedRequestAtIndex(requestIndex);
     String value = recordedRequest.getHeader(key);
     assertEquals(expectedValue, value);
   }
@@ -93,7 +93,7 @@ class MockWebServerTest {
     assertEquals(expectedValue, request.getRequestUrl().queryParameter(key));
   }
 
-  HttpUrl getBaseEndpointUrl() {
+  HttpUrl obtainBaseEndpointUrl() {
     return server.url("/");
   }
 
@@ -110,7 +110,7 @@ class MockWebServerTest {
     }
   }
 
-  String getContentFromFile(String fileName) throws IOException {
+  String obtainContentFromFile(String fileName) throws IOException {
     if (fileName == null) {
       return "";
     }
@@ -124,17 +124,17 @@ class MockWebServerTest {
     return stringBuilder.toString();
   }
 
-  TelemetryClient obtainDefaultTelemetryClient() {
-    HttpUrl localUrl = getBaseEndpointUrl();
-    SslClient sslClient = SslClient.localhost();
-    TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder()
-      .baseUrl(localUrl)
-      .sslSocketFactory(sslClient.socketFactory)
-      .x509TrustManager(sslClient.trustManager)
-      .build();
+  TelemetryClient obtainATelemetryClient(String accessToken, String userAgent) {
+    TelemetryClientSettings telemetryClientSettings = provideDefaultTelemetryClientSettings();
     Logger mockedLogger = mock(Logger.class);
-    return new TelemetryClient("anyAccessToken", "anyUserAgent", telemetryClientSettings,
-      mockedLogger);
+    return new TelemetryClient(accessToken, userAgent, telemetryClientSettings, mockedLogger);
+  }
+
+  List<Event> obtainAnEvent() {
+    boolean indifferentTelemetryEnabled = false;
+    Event theEvent = new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier", "anySdkVersion");
+
+    return obtainEvents(theEvent);
   }
 
   String obtainExpectedRequestBody(GsonBuilder gsonBuilder, Event... theEvents) {
@@ -145,11 +145,11 @@ class MockWebServerTest {
     return requestBody;
   }
 
-  List<Event> addEvents(Event... theEvents) {
+  List<Event> obtainEvents(Event... theEvents) {
     return Arrays.asList(theEvents);
   }
 
-  private RecordedRequest getRecordedRequestAtIndex(int requestIndex) throws InterruptedException {
+  private RecordedRequest obtainRecordedRequestAtIndex(int requestIndex) throws InterruptedException {
     RecordedRequest request = null;
     for (int i = 0; i <= requestIndex; i++) {
       request = server.takeRequest();
@@ -163,5 +163,16 @@ class MockWebServerTest {
     while (source.read(result, Integer.MAX_VALUE) != -1) {
     }
     return result;
+  }
+
+  private TelemetryClientSettings provideDefaultTelemetryClientSettings() {
+    HttpUrl localUrl = obtainBaseEndpointUrl();
+    SslClient sslClient = SslClient.localhost();
+
+    return new TelemetryClientSettings.Builder()
+      .baseUrl(localUrl)
+      .sslSocketFactory(sslClient.socketFactory)
+      .x509TrustManager(sslClient.trustManager)
+      .build();
   }
 }

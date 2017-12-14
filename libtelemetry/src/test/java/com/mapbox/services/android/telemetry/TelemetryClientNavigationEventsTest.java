@@ -103,124 +103,131 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
   @Test
   public void sendsTheCorrectBodyPostingAppUserTurnstileEvent() throws Exception {
-    TelemetryClient telemetryClient = obtainDefaultTelemetryClient();
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     boolean indifferentTelemetryEnabled = false;
-    Event theAppUserTurnstile = new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier", "anySdkVersion");
+    Event anAppUserTurnstile = new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier", "anySdkVersion");
+    List<Event> theAppUserTurnstile = obtainEvents(anAppUserTurnstile);
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvent(theAppUserTurnstile, mockedCallback);
+    telemetryClient.sendEvents(theAppUserTurnstile, mockedCallback);
 
-    String expectedRequestBody = obtainExpectedRequestBody(new GsonBuilder(), theAppUserTurnstile);
+    String expectedRequestBody = obtainExpectedRequestBody(new GsonBuilder(), theAppUserTurnstile.get(0));
     assertRequestBodyEquals(expectedRequestBody);
   }
 
   @Test
   public void sendsTheCorrectBodyPostingNavigationArriveEvent() throws Exception {
-    TelemetryClient telemetryClient = obtainDefaultTelemetryClient();
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type arrive = Event.Type.NAV_ARRIVE;
-    Event arriveEvent = obtainNavigationEvent(arrive);
+    Event anArriveEvent = obtainNavigationEvent(arrive);
+    List<Event> theArriveEvent = obtainEvents(anArriveEvent);
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvent(arriveEvent, mockedCallback);
+    telemetryClient.sendEvents(theArriveEvent, mockedCallback);
 
     GsonBuilder gsonBuilder = configureTypeAdapter(arrive, new GsonBuilder());
-    String expectedRequestBody = obtainExpectedRequestBody(gsonBuilder, arriveEvent);
+    String expectedRequestBody = obtainExpectedRequestBody(gsonBuilder, theArriveEvent.get(0));
     assertRequestBodyEquals(expectedRequestBody);
   }
 
   @Test
   public void sendsTheCorrectBodyPostingNavigationDepartEvent() throws Exception {
-    TelemetryClient telemetryClient = obtainDefaultTelemetryClient();
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type depart = Event.Type.NAV_DEPART;
-    Event departEvent = obtainNavigationEvent(depart);
+    Event aDepartEvent = obtainNavigationEvent(depart);
+    List<Event> theDepartEvent = obtainEvents(aDepartEvent);
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvent(departEvent, mockedCallback);
+    telemetryClient.sendEvents(theDepartEvent, mockedCallback);
 
     GsonBuilder gsonBuilder = configureTypeAdapter(depart, new GsonBuilder());
-    String expectedRequestBody = obtainExpectedRequestBody(gsonBuilder, departEvent);
+    String expectedRequestBody = obtainExpectedRequestBody(gsonBuilder, theDepartEvent.get(0));
     assertRequestBodyEquals(expectedRequestBody);
   }
 
   @Test
   public void sendsTheCorrectBodyPostingNavigationCancelEvent() throws Exception {
-    TelemetryClient telemetryClient = obtainDefaultTelemetryClient();
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type cancel = Event.Type.NAV_CANCEL;
-    Event cancelEvent = obtainNavigationEvent(cancel);
+    Event aCancelEvent = obtainNavigationEvent(cancel);
+    List<Event> theCancelEvent = obtainEvents(aCancelEvent);
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvent(cancelEvent, mockedCallback);
+    telemetryClient.sendEvents(theCancelEvent, mockedCallback);
 
     GsonBuilder gsonBuilder = configureTypeAdapter(cancel, new GsonBuilder());
-    String expectedRequestBody = obtainExpectedRequestBody(gsonBuilder, cancelEvent);
+    String expectedRequestBody = obtainExpectedRequestBody(gsonBuilder, theCancelEvent.get(0));
     assertRequestBodyEquals(expectedRequestBody);
   }
 
   @Test
   public void sendsTheCorrectBodyPostingNavigationFeedbackEvent() throws Exception {
-    TelemetryClient telemetryClient = obtainDefaultTelemetryClient();
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type feedback = Event.Type.NAV_FEEDBACK;
-    Event feedbackEvent = obtainNavigationEvent(feedback);
+    Event aFeedbackEvent = obtainNavigationEvent(feedback);
+    List<Event> theFeedbackEvent = obtainEvents(aFeedbackEvent);
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvent(feedbackEvent, mockedCallback);
+    telemetryClient.sendEvents(theFeedbackEvent, mockedCallback);
 
     GsonBuilder gsonBuilder = configureTypeAdapter(feedback, new GsonBuilder());
-    String expectedRequestBody = obtainExpectedRequestBody(gsonBuilder, feedbackEvent);
+    String expectedRequestBody = obtainExpectedRequestBody(gsonBuilder, theFeedbackEvent.get(0));
     assertRequestBodyEquals(expectedRequestBody);
   }
 
   @Test
   public void sendsTheCorrectBodyPostingNavigationRerouteEvent() throws Exception {
-    TelemetryClient telemetryClient = obtainDefaultTelemetryClient();
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type reroute = Event.Type.NAV_REROUTE;
-    Event rerouteEvent = obtainNavigationEvent(reroute);
+    Event aRerouteEvent = obtainNavigationEvent(reroute);
+    List<Event> theRerouteEvent = obtainEvents(aRerouteEvent);
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvent(rerouteEvent, mockedCallback);
+    telemetryClient.sendEvents(theRerouteEvent, mockedCallback);
 
     GsonBuilder gsonBuilder = configureTypeAdapter(reroute, new GsonBuilder());
-    String expectedRequestBody = obtainExpectedRequestBody(gsonBuilder, rerouteEvent);
+    String expectedRequestBody = obtainExpectedRequestBody(gsonBuilder, theRerouteEvent.get(0));
     assertRequestBodyEquals(expectedRequestBody);
   }
 
   @Test
   public void sendsTheCorrectBodyPostingNavigationFasterRouteEvent() throws Exception {
-    TelemetryClient telemetryClient = obtainDefaultTelemetryClient();
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type fasterRoute = Event.Type.NAV_FASTER_ROUTE;
-    Event fasterRouteEvent = obtainNavigationEvent(fasterRoute);
+    Event aFasterRouteEvent = obtainNavigationEvent(fasterRoute);
+    List<Event> theFasterRouteEvent = obtainEvents(aFasterRouteEvent);
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvent(fasterRouteEvent, mockedCallback);
+    telemetryClient.sendEvents(theFasterRouteEvent, mockedCallback);
 
     GsonBuilder gsonBuilder = configureTypeAdapter(fasterRoute, new GsonBuilder());
-    String expectedRequestBody = obtainExpectedRequestBody(gsonBuilder, fasterRouteEvent);
+    String expectedRequestBody = obtainExpectedRequestBody(gsonBuilder, theFasterRouteEvent.get(0));
     assertRequestBodyEquals(expectedRequestBody);
   }
 
   @Test
   public void sendsTheCorrectBodyPostingMultipleEvents() throws Exception {
-    TelemetryClient telemetryClient = obtainDefaultTelemetryClient();
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type reroute = Event.Type.NAV_REROUTE;
     Event rerouteEvent = obtainNavigationEvent(reroute);
     Event.Type fasterRoute = Event.Type.NAV_FASTER_ROUTE;
     Event fasterRouteEvent = obtainNavigationEvent(fasterRoute);
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
-    List<Event> events = addEvents(rerouteEvent, fasterRouteEvent);
+    List<Event> events = obtainEvents(rerouteEvent, fasterRouteEvent);
 
     telemetryClient.sendEvents(events, mockedCallback);
 
     GsonBuilder gsonBuilder = configureTypeAdapter(reroute, new GsonBuilder());
     gsonBuilder = configureTypeAdapter(fasterRoute, gsonBuilder);
-    String expectedRequestBody = obtainExpectedRequestBody(gsonBuilder, rerouteEvent, fasterRouteEvent);
+    String expectedRequestBody = obtainExpectedRequestBody(gsonBuilder, events.get(0), events.get(1));
     assertRequestBodyEquals(expectedRequestBody);
   }
 

@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSerializer;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -45,13 +44,6 @@ class TelemetryClient {
     ArrayList<Event> batch = new ArrayList<>();
     batch.addAll(events);
     sendBatch(batch, callback);
-  }
-
-  // TODO Remove send a single event method. Use sendEvents instead
-  void sendEvent(Event event, Callback callback) throws IOException {
-    ArrayList<Event> oneEvent = new ArrayList<>();
-    oneEvent.add(event);
-    sendBatch(oneEvent, callback);
   }
 
   void updateDebugLoggingEnabled(boolean debugLoggingEnabled) {

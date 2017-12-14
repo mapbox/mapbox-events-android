@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -27,186 +28,101 @@ public class TelemetryClientTest extends MockWebServerTest {
 
   @Test
   public void sendsContentTypeHeader() throws Exception {
-    HttpUrl localUrl = getBaseEndpointUrl();
-    SslClient sslClient = SslClient.localhost();
-    TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder()
-      .baseUrl(localUrl)
-      .sslSocketFactory(sslClient.socketFactory)
-      .x509TrustManager(sslClient.trustManager)
-      .build();
-    Logger mockedLogger = mock(Logger.class);
-    TelemetryClient telemetryClient = new TelemetryClient("anyAccessToken", "anyUserAgent", telemetryClientSettings,
-      mockedLogger);
-    boolean indifferentTelemetryEnabled = false;
-    Event mockedAppUserTurnstile =
-      new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier", "anySdkVersion");
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
+    List<Event> mockedEvent = obtainAnEvent();
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvent(mockedAppUserTurnstile, mockedCallback);
+    telemetryClient.sendEvents(mockedEvent, mockedCallback);
 
     assertRequestContainsHeader("Content-Type", "application/json; charset=utf-8");
   }
 
   @Test
   public void sendsContentEncodingHeader() throws Exception {
-    HttpUrl localUrl = getBaseEndpointUrl();
-    SslClient sslClient = SslClient.localhost();
-    TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder()
-      .baseUrl(localUrl)
-      .sslSocketFactory(sslClient.socketFactory)
-      .x509TrustManager(sslClient.trustManager)
-      .build();
-    Logger mockedLogger = mock(Logger.class);
-    TelemetryClient telemetryClient = new TelemetryClient("anyAccessToken", "anyUserAgent", telemetryClientSettings,
-      mockedLogger);
-    boolean indifferentTelemetryEnabled = false;
-    Event mockedAppUserTurnstile =
-      new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier", "anySdkVersion");
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
+    List<Event> mockedEvent = obtainAnEvent();
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvent(mockedAppUserTurnstile, mockedCallback);
+    telemetryClient.sendEvents(mockedEvent, mockedCallback);
 
     assertRequestContainsHeader("Content-Encoding", "gzip");
   }
 
   @Test
   public void sendsPostEventRequestWithTheCorrectAccessTokenParameter() throws Exception {
-    HttpUrl localUrl = getBaseEndpointUrl();
-    SslClient sslClient = SslClient.localhost();
-    TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder()
-      .baseUrl(localUrl)
-      .sslSocketFactory(sslClient.socketFactory)
-      .x509TrustManager(sslClient.trustManager)
-      .build();
-    Logger mockedLogger = mock(Logger.class);
-    TelemetryClient telemetryClient = new TelemetryClient("theAccessToken", "anyUserAgent", telemetryClientSettings,
-      mockedLogger);
-    boolean indifferentTelemetryEnabled = false;
-    Event mockedAppUserTurnstile =
-      new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier", "anySdkVersion");
+    TelemetryClient telemetryClient = obtainATelemetryClient("theAccessToken", "anyUserAgent");
+    List<Event> mockedEvent = obtainAnEvent();
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvent(mockedAppUserTurnstile, mockedCallback);
+    telemetryClient.sendEvents(mockedEvent, mockedCallback);
 
     assertRequestContainsParameter("access_token", "theAccessToken");
   }
 
   @Test
   public void sendsUserAgentHeader() throws Exception {
-    HttpUrl localUrl = getBaseEndpointUrl();
-    SslClient sslClient = SslClient.localhost();
-    TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder()
-      .baseUrl(localUrl)
-      .sslSocketFactory(sslClient.socketFactory)
-      .x509TrustManager(sslClient.trustManager)
-      .build();
-    Logger mockedLogger = mock(Logger.class);
-    TelemetryClient telemetryClient = new TelemetryClient("anyAccessToken", "theUserAgent", telemetryClientSettings,
-      mockedLogger);
-    boolean indifferentTelemetryEnabled = false;
-    Event mockedAppUserTurnstile =
-      new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier", "anySdkVersion");
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "theUserAgent");
+    List<Event> mockedEvent = obtainAnEvent();
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvent(mockedAppUserTurnstile, mockedCallback);
+    telemetryClient.sendEvents(mockedEvent, mockedCallback);
 
     assertRequestContainsHeader("User-Agent", "theUserAgent");
   }
 
   @Test
   public void sendsPostEventRequestToTheCorrectEndpoint() throws Exception {
-    HttpUrl localUrl = getBaseEndpointUrl();
-    SslClient sslClient = SslClient.localhost();
-    TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder()
-      .baseUrl(localUrl)
-      .sslSocketFactory(sslClient.socketFactory)
-      .x509TrustManager(sslClient.trustManager)
-      .build();
-    Logger mockedLogger = mock(Logger.class);
-    TelemetryClient telemetryClient = new TelemetryClient("anyAccessToken", "anyUserAgent", telemetryClientSettings,
-      mockedLogger);
-    boolean indifferentTelemetryEnabled = false;
-    Event mockedAppUserTurnstile =
-      new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier", "anySdkVersion");
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
+    List<Event> mockedEvent = obtainAnEvent();
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvent(mockedAppUserTurnstile, mockedCallback);
+    telemetryClient.sendEvents(mockedEvent, mockedCallback);
 
     assertPostRequestSentTo("/events/v2");
   }
 
   @Test
   public void sendsTheCorrectBodyPostingAnEvent() throws Exception {
-    HttpUrl localUrl = getBaseEndpointUrl();
-    SslClient sslClient = SslClient.localhost();
-    TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder()
-      .baseUrl(localUrl)
-      .sslSocketFactory(sslClient.socketFactory)
-      .x509TrustManager(sslClient.trustManager)
-      .build();
-    Logger mockedLogger = mock(Logger.class);
-    TelemetryClient telemetryClient = new TelemetryClient("anyAccessToken", "anyUserAgent", telemetryClientSettings,
-      mockedLogger);
-    boolean indifferentTelemetryEnabled = false;
-    Event theAppUserTurnstile = new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier", "anySdkVersion");
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
+    List<Event> theEvent = obtainAnEvent();
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvent(theAppUserTurnstile, mockedCallback);
+    telemetryClient.sendEvents(theEvent, mockedCallback);
 
     ArrayList<Event> events = new ArrayList<>(1);
-    events.add(theAppUserTurnstile);
+    events.add(theEvent.get(0));
     assertRequestBodyEquals(new Gson().toJson(events));
   }
 
   @Test
   public void receivesNoBodyPostingAnEventSuccessfully() throws Exception {
-    HttpUrl localUrl = getBaseEndpointUrl();
-    SslClient sslClient = SslClient.localhost();
-    TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder()
-      .baseUrl(localUrl)
-      .sslSocketFactory(sslClient.socketFactory)
-      .x509TrustManager(sslClient.trustManager)
-      .build();
-    Logger mockedLogger = mock(Logger.class);
-    TelemetryClient telemetryClient = new TelemetryClient("anyAccessToken", "anyUserAgent", telemetryClientSettings,
-      mockedLogger);
-    boolean indifferentTelemetryEnabled = false;
-    Event theAppUserTurnstile = new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier", "anySdkVersion");
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
+    List<Event> theEvent = obtainAnEvent();
     Callback mockedCallback = mock(Callback.class);
     enqueueMockNoResponse(204);
 
-    telemetryClient.sendEvent(theAppUserTurnstile, mockedCallback);
+    telemetryClient.sendEvents(theEvent, mockedCallback);
 
     assertResponseBodyEquals(null);
   }
 
   @Test
   public void parsesUnauthorizedRequestResponseProperlyPostingAnEvent() throws Exception {
-    HttpUrl localUrl = getBaseEndpointUrl();
-    SslClient sslClient = SslClient.localhost();
-    TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder()
-      .baseUrl(localUrl)
-      .sslSocketFactory(sslClient.socketFactory)
-      .x509TrustManager(sslClient.trustManager)
-      .build();
-    Logger mockedLogger = mock(Logger.class);
-    TelemetryClient telemetryClient = new TelemetryClient("anyAccessToken", "anyUserAgent", telemetryClientSettings,
-      mockedLogger);
-    boolean indifferentTelemetryEnabled = false;
-    Event theAppUserTurnstile = new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier", "anySdkVersion");
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
+    List<Event> theEvent = obtainAnEvent();
     final CountDownLatch latch = new CountDownLatch(1);
     final AtomicReference<String> bodyRef = new AtomicReference<>();
     final AtomicBoolean failureRef = new AtomicBoolean();
     Callback aCallback = provideACallback(latch, bodyRef, failureRef);
     enqueueMockResponse(401, "unauthorizedRequestResponse.json");
 
-    telemetryClient.sendEvent(theAppUserTurnstile, aCallback);
+    telemetryClient.sendEvents(theEvent, aCallback);
 
     latch.await();
     assertTelemetryResponseEquals(bodyRef.get(), "Unauthorized request, usually because of "
@@ -216,25 +132,15 @@ public class TelemetryClientTest extends MockWebServerTest {
 
   @Test
   public void parsesInvalidMessageBodyResponseProperlyPostingAnEvent() throws Exception {
-    HttpUrl localUrl = getBaseEndpointUrl();
-    SslClient sslClient = SslClient.localhost();
-    TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder()
-      .baseUrl(localUrl)
-      .sslSocketFactory(sslClient.socketFactory)
-      .x509TrustManager(sslClient.trustManager)
-      .build();
-    Logger mockedLogger = mock(Logger.class);
-    TelemetryClient telemetryClient = new TelemetryClient("anyAccessToken", "anyUserAgent", telemetryClientSettings,
-      mockedLogger);
-    boolean indifferentTelemetryEnabled = false;
-    Event theAppUserTurnstile = new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier", "anySdkVersion");
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
+    List<Event> theEvent = obtainAnEvent();
     final CountDownLatch latch = new CountDownLatch(1);
     final AtomicReference<String> bodyRef = new AtomicReference<>();
     final AtomicBoolean failureRef = new AtomicBoolean();
     Callback aCallback = provideACallback(latch, bodyRef, failureRef);
     enqueueMockResponse(422, "invalidMessageBodyResponse.json");
 
-    telemetryClient.sendEvent(theAppUserTurnstile, aCallback);
+    telemetryClient.sendEvents(theEvent, aCallback);
 
     latch.await();
     assertTelemetryResponseEquals(bodyRef.get(), "Invalid message body, check the types and required properties of "
@@ -247,7 +153,7 @@ public class TelemetryClientTest extends MockWebServerTest {
     OkHttpClient localOkHttpClientWithShortTimeout = new OkHttpClient.Builder()
       .readTimeout(100, TimeUnit.MILLISECONDS)
       .build();
-    HttpUrl localUrl = getBaseEndpointUrl();
+    HttpUrl localUrl = obtainBaseEndpointUrl();
     SslClient sslClient = SslClient.localhost();
     TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder()
       .client(localOkHttpClientWithShortTimeout)
@@ -255,18 +161,16 @@ public class TelemetryClientTest extends MockWebServerTest {
       .sslSocketFactory(sslClient.socketFactory)
       .x509TrustManager(sslClient.trustManager)
       .build();
-    Logger mockedLogger = mock(Logger.class);
     TelemetryClient telemetryClient = new TelemetryClient("anyAccessToken", "anyUserAgent", telemetryClientSettings,
-      mockedLogger);
-    boolean indifferentTelemetryEnabled = false;
-    Event theAppUserTurnstile = new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier", "anySdkVersion");
+      mock(Logger.class));
+    List<Event> theEvent = obtainAnEvent();
     final CountDownLatch latch = new CountDownLatch(1);
     final AtomicReference<String> bodyRef = new AtomicReference<>();
     final AtomicBoolean failureRef = new AtomicBoolean();
     Callback aCallback = provideACallback(latch, bodyRef, failureRef);
     enqueueMockNoResponse(504);
 
-    telemetryClient.sendEvent(theAppUserTurnstile, aCallback);
+    telemetryClient.sendEvents(theEvent, aCallback);
 
     latch.await();
     assertTrue(failureRef.get());

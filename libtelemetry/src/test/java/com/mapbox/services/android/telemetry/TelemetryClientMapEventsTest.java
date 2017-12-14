@@ -46,60 +46,63 @@ public class TelemetryClientMapEventsTest extends MockWebServerTest {
 
   @Test
   public void sendsTheCorrectBodyPostingMapLoadEvent() throws Exception {
-    TelemetryClient telemetryClient = obtainDefaultTelemetryClient();
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type load = Event.Type.MAP_LOAD;
-    Event loadEvent = obtainMapEvent(load);
+    Event aLoadEvent = obtainMapEvent(load);
+    List<Event> theLoadEvent = obtainEvents(aLoadEvent);
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvent(loadEvent, mockedCallback);
+    telemetryClient.sendEvents(theLoadEvent, mockedCallback);
 
-    String expectedRequestBody = obtainExpectedRequestBody(new GsonBuilder(), loadEvent);
+    String expectedRequestBody = obtainExpectedRequestBody(new GsonBuilder(), theLoadEvent.get(0));
     assertRequestBodyEquals(expectedRequestBody);
   }
 
   @Test
   public void sendsTheCorrectBodyPostingMapClickEvent() throws Exception {
-    TelemetryClient telemetryClient = obtainDefaultTelemetryClient();
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type click = Event.Type.MAP_CLICK;
-    Event clickEvent = obtainMapEvent(click);
+    Event aClickEvent = obtainMapEvent(click);
+    List<Event> theClickEvent = obtainEvents(aClickEvent);
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvent(clickEvent, mockedCallback);
+    telemetryClient.sendEvents(theClickEvent, mockedCallback);
 
-    String expectedRequestBody = obtainExpectedRequestBody(new GsonBuilder(), clickEvent);
+    String expectedRequestBody = obtainExpectedRequestBody(new GsonBuilder(), theClickEvent.get(0));
     assertRequestBodyEquals(expectedRequestBody);
   }
 
   @Test
   public void sendsTheCorrectBodyPostingMapDragendEvent() throws Exception {
-    TelemetryClient telemetryClient = obtainDefaultTelemetryClient();
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type dragend = Event.Type.MAP_DRAGEND;
-    Event dragendEvent = obtainMapEvent(dragend);
+    Event aDragendEvent = obtainMapEvent(dragend);
+    List<Event> theDragendEvent = obtainEvents(aDragendEvent);
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvent(dragendEvent, mockedCallback);
+    telemetryClient.sendEvents(theDragendEvent, mockedCallback);
 
-    String expectedRequestBody = obtainExpectedRequestBody(new GsonBuilder(), dragendEvent);
+    String expectedRequestBody = obtainExpectedRequestBody(new GsonBuilder(), theDragendEvent.get(0));
     assertRequestBodyEquals(expectedRequestBody);
   }
 
   @Test
   public void sendsTheCorrectBodyPostingMultipleEvents() throws Exception {
-    TelemetryClient telemetryClient = obtainDefaultTelemetryClient();
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type load = Event.Type.MAP_LOAD;
     Event loadEvent = obtainMapEvent(load);
     Event.Type click = Event.Type.MAP_CLICK;
     Event clickEvent = obtainMapEvent(click);
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
-    List<Event> events = addEvents(loadEvent, clickEvent);
+    List<Event> events = obtainEvents(loadEvent, clickEvent);
 
     telemetryClient.sendEvents(events, mockedCallback);
 
-    String expectedRequestBody = obtainExpectedRequestBody(new GsonBuilder(), loadEvent, clickEvent);
+    String expectedRequestBody = obtainExpectedRequestBody(new GsonBuilder(), events.get(0), events.get(1));
     assertRequestBodyEquals(expectedRequestBody);
   }
 
