@@ -1,6 +1,6 @@
 package com.mapbox.services.android.telemetry;
 
-class NavigationState {
+public class NavigationState {
   private NavigationMetadata navigationMetadata;
   private NavigationStepMetadata navigationStepMetadata;
   private NavigationCancelData navigationCancelData;
@@ -10,7 +10,7 @@ class NavigationState {
   private NavigationVoiceData navigationVoiceData;
   private FeedbackData feedbackData;
 
-  NavigationState(NavigationMetadata navigationMetadata) {
+  public NavigationState(NavigationMetadata navigationMetadata) {
     this.navigationMetadata = navigationMetadata;
   }
 
@@ -22,7 +22,7 @@ class NavigationState {
     return navigationStepMetadata;
   }
 
-  void setNavigationStepMetadata(NavigationStepMetadata navigationStepMetadata) {
+  public void setNavigationStepMetadata(NavigationStepMetadata navigationStepMetadata) {
     this.navigationStepMetadata = navigationStepMetadata;
   }
 
@@ -30,7 +30,7 @@ class NavigationState {
     return navigationCancelData;
   }
 
-  void setNavigationCancelData(NavigationCancelData navigationCancelData) {
+  public void setNavigationCancelData(NavigationCancelData navigationCancelData) {
     this.navigationCancelData = navigationCancelData;
   }
 
@@ -38,7 +38,7 @@ class NavigationState {
     return navigationLocationData;
   }
 
-  void setNavigationLocationData(NavigationLocationData navigationLocationData) {
+  public void setNavigationLocationData(NavigationLocationData navigationLocationData) {
     this.navigationLocationData = navigationLocationData;
   }
 
@@ -46,7 +46,7 @@ class NavigationState {
     return navigationRerouteData;
   }
 
-  void setNavigationRerouteData(NavigationRerouteData navigationRerouteData) {
+  public void setNavigationRerouteData(NavigationRerouteData navigationRerouteData) {
     this.navigationRerouteData = navigationRerouteData;
   }
 
@@ -54,7 +54,7 @@ class NavigationState {
     return feedbackEventData;
   }
 
-  void setFeedbackEventData(FeedbackEventData feedbackEventData) {
+  public void setFeedbackEventData(FeedbackEventData feedbackEventData) {
     this.feedbackEventData = feedbackEventData;
   }
 
@@ -62,7 +62,7 @@ class NavigationState {
     return navigationVoiceData;
   }
 
-  void setNavigationVoiceData(NavigationVoiceData navigationVoiceData) {
+  public void setNavigationVoiceData(NavigationVoiceData navigationVoiceData) {
     this.navigationVoiceData = navigationVoiceData;
   }
 
@@ -70,7 +70,7 @@ class NavigationState {
     return feedbackData;
   }
 
-  void setFeedbackData(FeedbackData feedbackData) {
+  public void setFeedbackData(FeedbackData feedbackData) {
     this.feedbackData = feedbackData;
   }
 }

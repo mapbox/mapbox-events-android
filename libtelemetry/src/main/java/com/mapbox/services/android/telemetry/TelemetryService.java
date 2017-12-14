@@ -2,10 +2,13 @@ package com.mapbox.services.android.telemetry;
 
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Location;
 import android.os.Binder;
+import android.os.Handler;
+
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
@@ -14,6 +17,9 @@ import com.mapbox.services.android.core.location.LocationEngine;
 import com.mapbox.services.android.core.location.LocationEngineListener;
 import com.mapbox.services.android.core.location.LocationEnginePriority;
 import com.mapbox.services.android.core.location.LocationEngineProvider;
+import com.mapbox.services.android.core.permissions.PermissionsManager;
+
+import java.lang.ref.WeakReference;
 
 import static com.mapbox.services.android.telemetry.LocationReceiver.LOCATION_RECEIVER_INTENT;
 import static com.mapbox.services.android.telemetry.TelemetryReceiver.TELEMETRY_RECEIVER_INTENT;
@@ -25,6 +31,8 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   private boolean isLocationReceiverRegistered = false;
   private boolean isTelemetryReceiverRegistered = false;
   private LocationEngine locationEngine = null;
+  @LocationEnginePriority.PowerMode
+  private int locationPriority = LocationEnginePriority.HIGH_ACCURACY;
 
   @Nullable
   @Override
@@ -36,7 +44,6 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
 
   @Override
   public void onCreate() {
-    // TODO Check for location permissions here
     createLocationReceiver();
     createTelemetryReceiver();
   }
@@ -48,7 +55,6 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
 
   @Override
   public void onDestroy() {
-    // TODO If the location receiver was not created (permissions were not granted) do not unregister
     unregisterLocationReceiver();
     unregisterTelemetryReceiver();
   }
@@ -111,8 +117,7 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   }
 
   private void setupLocationEngine() {
-    // TODO Expose a way to change the priority
-    locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
+    locationEngine.setPriority(locationPriority);
     locationEngine.addLocationEngineListener(this);
   }
 
@@ -165,6 +170,55 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   class TelemetryBinder extends Binder {
     TelemetryService obtainService() {
       return TelemetryService.this;
+    }
+  }
+
+  public void updateLocationPriority(@LocationEnginePriority.PowerMode int priority) {
+    locationPriority = priority;
+
+    if (locationEngine != null) {
+      disconnectLocationEngine();
+      locationEngine.setPriority(locationPriority);
+      locationEngine.activate();
+    }
+  }
+
+  private boolean checkLocationPermission() {
+    if (PermissionsManager.areLocationPermissionsGranted(this)) {
+      return true;
+    } else {
+      permissionBackoff(this);
+      return false;
+    }
+  }
+
+  private void permissionBackoff(final Context context) {
+    Handler handler = new Handler();
+    ExponentialBackoff counter = new ExponentialBackoff();
+
+    PermissionCheckRunnable permissionCheckRunnable = new PermissionCheckRunnable(this);
+
+    long nextWaitTime = counter.nextBackOffMillis();
+    handler.postDelayed(permissionCheckRunnable, nextWaitTime);
+  }
+
+  private static final class PermissionCheckRunnable implements Runnable {
+    private final WeakReference<TelemetryService> weakReference;
+    private final Handler handler = new Handler();
+    private final ExponentialBackoff counter = new ExponentialBackoff();
+
+    private PermissionCheckRunnable(TelemetryService telemetryService) {
+      this.weakReference = new WeakReference<>(telemetryService);
+    }
+
+    @Override
+    public void run() {
+      if (PermissionsManager.areLocationPermissionsGranted(weakReference.get())) {
+        weakReference.get().createLocationReceiver();
+      } else {
+        long nextWaitTime = counter.nextBackOffMillis();
+        handler.postDelayed(this, nextWaitTime);
+      }
     }
   }
 }

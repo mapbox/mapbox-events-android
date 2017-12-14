@@ -12,6 +12,12 @@ import android.net.NetworkInfo;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 
+import java.util.ArrayList;
+
+import com.mapbox.services.android.core.location.LocationEnginePriority;
+
+import com.mapbox.services.android.core.permissions.PermissionsManager;
+
 import java.util.List;
 
 import okhttp3.Callback;
@@ -19,9 +25,11 @@ import okhttp3.Callback;
 import static com.mapbox.services.android.telemetry.EventReceiver.EVENT_RECEIVER_INTENT;
 
 public class MapboxTelemetry implements FullQueueCallback, EventCallback {
+
   private final Context context;
   private String accessToken;
-  private final EventsQueue queue;
+  private String userAgent;
+  private EventsQueue queue;
   private TelemetryClient telemetryClient;
   private TelemetryService telemetryService;
   private final Callback httpCallback;
@@ -34,23 +42,43 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   private boolean isTelemetryEnabled = false;
   private boolean isOpted = false;
   private boolean serviceBound = false;
+  private PermissionCheckRunnable permissionCheckRunnable = null;
+
+  private static final String EVENTS_USER_AGENT = "MapboxEventsAndroid/";
+  private static final String TELEMETRY_USER_AGENT = "MapboxTelemetryAndroid/";
+  private static final String UNITY_USER_AGENT = "MapboxEventsUnityAndroid/";
+  private static final String NAVIGATION_USER_AGENT = "mapbox-navigation-android/";
+  private static final String NAVIGATION_UI_USER_AGENT = "mapbox-navigation-ui-android/";
+
+  private static final List<String> VALID_USER_AGENTS = new ArrayList<String>() {
+    {
+      add(EVENTS_USER_AGENT);
+      add(TELEMETRY_USER_AGENT);
+      add(UNITY_USER_AGENT);
+      add(NAVIGATION_USER_AGENT);
+      add(NAVIGATION_UI_USER_AGENT);
+    }
+  };
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent, Callback httpCallback) {
+    if (checkRequiredParameters(accessToken, userAgent)) {
+      initializeTelemetryClient();
+    }
+
     this.context = context;
-    this.accessToken = accessToken;
-    this.queue = new EventsQueue(new FullQueueFlusher(this));
-    initializeTelemetryClient(accessToken, userAgent);
     this.httpCallback = httpCallback;
     AlarmReceiver alarmReceiver = obtainAlarmReceiver(httpCallback);
     this.schedulerFlusher = new SchedulerFlusherFactory(context, alarmReceiver).supply();
+    initializeQueue();
   }
 
   // For testing only
-  MapboxTelemetry(Context context, String accessToken, EventsQueue queue, TelemetryClient telemetryClient,
-                  Callback httpCallback, SchedulerFlusher schedulerFlusher, Clock clock,
-                  LocalBroadcastManager localBroadcastManager) {
+  MapboxTelemetry(Context context, String accessToken, String userAgent, EventsQueue queue,
+                  TelemetryClient telemetryClient, Callback httpCallback, SchedulerFlusher schedulerFlusher,
+                  Clock clock, LocalBroadcastManager localBroadcastManager) {
+    checkRequiredParameters(accessToken, userAgent);
+
     this.context = context;
-    this.accessToken = accessToken;
     this.queue = queue;
     this.telemetryClient = telemetryClient;
     this.httpCallback = httpCallback;
@@ -101,6 +129,18 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
       telemetryClient.updateDebugLoggingEnabled(isDebugLoggingEnabled);
     }
   }
+  
+  public void updateUserAgent(String userAgent) {
+    if (isUserAgentValid(userAgent)) {
+      telemetryClient.updateUserAgent(TelemetryUtils.createFullUserAgent(userAgent, context));
+    }
+  }
+
+  public void updateLocationPriority(@LocationEnginePriority.PowerMode int locationPriority) {
+    if (serviceBound) {
+      telemetryService.updateLocationPriority(locationPriority);
+    }
+  }
 
   // Package private (no modifier) for testing purposes
   Intent obtainLocationServiceIntent() {
@@ -129,15 +169,12 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     return eventReceiverIntentFilter;
   }
 
-  private void initializeTelemetryClient(String accessToken, String userAgent) {
-    if (isTelemetryClientInitialized()) {
-      telemetryClient = createTelemetryClient(accessToken, userAgent);
-      queue.setTelemetryInitialized(true);
-    }
+  boolean checkRequiredParameters(String accessToken, String userAgent) {
+    return isAccessTokenValid(accessToken) && isUserAgentValid(userAgent);
   }
 
-  private boolean isTelemetryClientInitialized() {
-    return accessToken != null && !accessToken.isEmpty();
+  private void initializeTelemetryClient() {
+    telemetryClient = createTelemetryClient(accessToken, userAgent);
   }
 
   private TelemetryClient createTelemetryClient(String accessToken, String userAgent) {
@@ -184,7 +221,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   }
 
   private void sendEvents(List<Event> events, Callback httpCallback) {
-    if (isTelemetryClientInitialized()) {
+    if (checkRequiredParameters(accessToken, userAgent)) {
       telemetryClient.sendEvents(events, httpCallback);
     }
   }
@@ -201,7 +238,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   }
 
   private boolean optLocationIn() {
-    if (isTelemetryEnabled && !isOpted) {
+    if (isTelemetryEnabled && !isOpted && checkLocationPermission()) {
       startLocation();
       registerEventReceiver();
       isOpted = true;
@@ -283,4 +320,52 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
       serviceBound = false;
     }
   };
+
+  private boolean isUserAgentValid(String userAgent) {
+    if (!TelemetryUtils.isEmpty(userAgent)) {
+      for (String userAgentPrefix : VALID_USER_AGENTS) {
+        if (userAgent.startsWith(userAgentPrefix)) {
+          this.userAgent = userAgent;
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  private boolean isAccessTokenValid(String accessToken) {
+    if (!TelemetryUtils.isEmpty(accessToken)) {
+      this.accessToken = accessToken;
+      return true;
+    }
+
+    return false;
+  }
+
+  private void initializeQueue() {
+    queue = new EventsQueue(new FullQueueFlusher(this));
+    queue.setTelemetryInitialized(true);
+  }
+
+  boolean checkLocationPermission() {
+    if (PermissionsManager.areLocationPermissionsGranted(context)) {
+      return true;
+    } else {
+      permissionBackoff();
+      return false;
+    }
+  }
+
+  private void permissionBackoff() {
+    PermissionCheckRunnable permissionCheckRunnable = obtainPermissionCheckRunnable();
+    permissionCheckRunnable.run();
+  }
+
+  private PermissionCheckRunnable obtainPermissionCheckRunnable() {
+    if (permissionCheckRunnable == null) {
+      permissionCheckRunnable = new PermissionCheckRunnable(context, this);
+    }
+
+    return permissionCheckRunnable;
+  }
 }

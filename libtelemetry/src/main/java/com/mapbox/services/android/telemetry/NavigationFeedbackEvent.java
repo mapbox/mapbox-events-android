@@ -6,6 +6,8 @@ import android.os.Parcelable;
 import com.google.gson.annotations.JsonAdapter;
 
 class NavigationFeedbackEvent extends Event implements Parcelable {
+  private static final String NAVIGATION_FEEDBACK = "navigation.feedback";
+  private final String event;
   @JsonAdapter(NavigationMetadataSerializer.class)
   private NavigationMetadata metadata;
   @JsonAdapter(FeedbackEventDataSerializer.class)
@@ -17,6 +19,7 @@ class NavigationFeedbackEvent extends Event implements Parcelable {
   private NavigationStepMetadata step = null;
 
   NavigationFeedbackEvent(NavigationState navigationState) {
+    this.event = NAVIGATION_FEEDBACK;
     this.metadata = navigationState.getNavigationMetadata();
     this.feedbackEventData = navigationState.getFeedbackEventData();
     this.navigationLocationData = navigationState.getNavigationLocationData();
@@ -27,6 +30,10 @@ class NavigationFeedbackEvent extends Event implements Parcelable {
   @Override
   Type obtainType() {
     return Type.NAV_FEEDBACK;
+  }
+
+  String getEvent() {
+    return event;
   }
 
   NavigationMetadata getMetadata() {
@@ -50,6 +57,7 @@ class NavigationFeedbackEvent extends Event implements Parcelable {
   }
 
   private NavigationFeedbackEvent(Parcel in) {
+    event = in.readString();
     metadata = (NavigationMetadata) in.readValue(NavigationMetadata.class.getClassLoader());
     feedbackEventData = (FeedbackEventData) in.readValue(FeedbackEventData.class.getClassLoader());
     navigationLocationData = (NavigationLocationData) in.readValue(NavigationLocationData.class.getClassLoader());
@@ -64,6 +72,7 @@ class NavigationFeedbackEvent extends Event implements Parcelable {
 
   @Override
   public void writeToParcel(Parcel dest, int flags) {
+    dest.writeString(event);
     dest.writeValue(metadata);
     dest.writeValue(feedbackEventData);
     dest.writeValue(navigationLocationData);

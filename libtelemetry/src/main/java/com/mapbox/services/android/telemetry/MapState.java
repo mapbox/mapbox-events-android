@@ -1,10 +1,10 @@
 package com.mapbox.services.android.telemetry;
 
 public class MapState {
-  private String gesture;
   private float latitude;
   private float longitude;
   private float zoom;
+  private String gesture;
 
   public MapState(float latitude, float longitude, float zoom) {
     this.latitude = latitude;
@@ -16,19 +16,19 @@ public class MapState {
     this.gesture = gesture;
   }
 
-  public String getGesture() {
+  String getGesture() {
     return gesture;
   }
 
-  public float getLatitude() {
+  float getLatitude() {
     return latitude;
   }
 
-  public float getLongitude() {
+  float getLongitude() {
     return longitude;
   }
 
-  public float getZoom() {
+  float getZoom() {
     return zoom;
   }
 }

@@ -6,6 +6,8 @@ import android.os.Parcelable;
 import com.google.gson.annotations.JsonAdapter;
 
 class NavigationFasterRouteEvent extends Event implements Parcelable {
+  private static final String NAVIGATION_FASTER_ROUTE = "navigation.fasterRoute";
+  private final String event;
   @JsonAdapter(NavigationMetadataSerializer.class)
   private NavigationMetadata metadata = null;
   @JsonAdapter(NewDataSerializer.class)
@@ -13,6 +15,7 @@ class NavigationFasterRouteEvent extends Event implements Parcelable {
   private NavigationStepMetadata step = null;
 
   NavigationFasterRouteEvent(NavigationState navigationState) {
+    this.event = NAVIGATION_FASTER_ROUTE;
     NavigationRerouteData navigationRerouteData = navigationState.getNavigationRerouteData();
     this.navigationNewData = navigationRerouteData.getNavigationNewData();
     this.step = navigationState.getNavigationStepMetadata();
@@ -22,6 +25,10 @@ class NavigationFasterRouteEvent extends Event implements Parcelable {
   @Override
   Type obtainType() {
     return Type.NAV_REROUTE;
+  }
+
+  String getEvent() {
+    return event;
   }
 
   NavigationNewData getNavigationNewData() {
@@ -37,6 +44,7 @@ class NavigationFasterRouteEvent extends Event implements Parcelable {
   }
 
   private NavigationFasterRouteEvent(Parcel in) {
+    event = in.readString();
     navigationNewData = in.readParcelable(NavigationNewData.class.getClassLoader());
     step = in.readParcelable(NavigationStepMetadata.class.getClassLoader());
     metadata = in.readParcelable(NavigationMetadata.class.getClassLoader());
@@ -44,6 +52,7 @@ class NavigationFasterRouteEvent extends Event implements Parcelable {
 
   @Override
   public void writeToParcel(Parcel dest, int flags) {
+    dest.writeString(event);
     dest.writeParcelable(navigationNewData, flags);
     dest.writeParcelable(step, flags);
     dest.writeParcelable(metadata, flags);

@@ -3,12 +3,12 @@ package com.mapbox.services.android.telemetry;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-class NavigationNewData implements Parcelable {
+public class NavigationNewData implements Parcelable {
   private Integer newDistanceRemaining;
   private Integer newDurationRemaining;
   private String newGeometry;
 
-  NavigationNewData(int newDistanceRemaining, int newDurationRemaining, String newGeometry) {
+  public NavigationNewData(int newDistanceRemaining, int newDurationRemaining, String newGeometry) {
     this.newDistanceRemaining = newDistanceRemaining;
     this.newDurationRemaining = newDurationRemaining;
     this.newGeometry = newGeometry;

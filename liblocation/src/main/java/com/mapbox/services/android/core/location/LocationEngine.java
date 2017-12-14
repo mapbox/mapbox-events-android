@@ -2,7 +2,6 @@ package com.mapbox.services.android.core.location;
 
 import android.Manifest;
 import android.location.Location;
-import android.support.annotation.IntRange;
 import android.support.annotation.RequiresPermission;
 import android.support.annotation.Size;
 
@@ -24,6 +23,7 @@ public abstract class LocationEngine {
 
   private static final int TWO_MINUTES = 1000 * 60 * 2;
 
+  @LocationEnginePriority.PowerMode
   protected int priority;
   protected Integer interval = 1000;
   protected Integer fastestInterval = 1000;
@@ -103,6 +103,7 @@ public abstract class LocationEngine {
    * @return Integer representing one of the priorities listed inside the {@link LocationEnginePriority} file.
    * @since 2.0.0
    */
+  @LocationEnginePriority.PowerMode
   public int getPriority() {
     return priority;
   }
@@ -115,7 +116,7 @@ public abstract class LocationEngine {
    * @param priority One of the {@link LocationEnginePriority}s listed.
    * @since 2.0.0
    */
-  public void setPriority(@IntRange(from = 0, to = 3) int priority) {
+  public void setPriority(@LocationEnginePriority.PowerMode int priority) {
     this.priority = priority;
   }
 

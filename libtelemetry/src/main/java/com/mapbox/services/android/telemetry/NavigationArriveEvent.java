@@ -6,10 +6,13 @@ import android.os.Parcelable;
 import com.google.gson.annotations.JsonAdapter;
 
 class NavigationArriveEvent extends Event implements Parcelable {
+  private static final String NAVIGATION_ARRIVE = "navigation.arrive";
+  private final String event;
   @JsonAdapter(NavigationMetadataSerializer.class)
   private NavigationMetadata metadata;
 
   NavigationArriveEvent(NavigationState navigationState) {
+    this.event = NAVIGATION_ARRIVE;
     this.metadata = navigationState.getNavigationMetadata();
   }
 
@@ -18,11 +21,16 @@ class NavigationArriveEvent extends Event implements Parcelable {
     return Type.NAV_ARRIVE;
   }
 
+  String getEvent() {
+    return event;
+  }
+
   NavigationMetadata getMetadata() {
     return metadata;
   }
 
   private NavigationArriveEvent(Parcel in) {
+    event = in.readString();
     metadata = in.readParcelable(NavigationMetadata.class.getClassLoader());
   }
 
@@ -33,6 +41,7 @@ class NavigationArriveEvent extends Event implements Parcelable {
 
   @Override
   public void writeToParcel(Parcel dest, int flags) {
+    dest.writeString(event);
     dest.writeParcelable(metadata, flags);
   }
 

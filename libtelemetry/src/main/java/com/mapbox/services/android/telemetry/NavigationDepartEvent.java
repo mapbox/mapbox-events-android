@@ -6,10 +6,13 @@ import android.os.Parcelable;
 import com.google.gson.annotations.JsonAdapter;
 
 class NavigationDepartEvent extends Event implements Parcelable {
+  private static final String NAVIGATION_DEPART = "navigation.depart";
+  private final String event;
   @JsonAdapter(NavigationMetadataSerializer.class)
   private NavigationMetadata metadata;
 
   NavigationDepartEvent(NavigationState navigationState) {
+    this.event = NAVIGATION_DEPART;
     this.metadata = navigationState.getNavigationMetadata();
   }
 
@@ -18,11 +21,16 @@ class NavigationDepartEvent extends Event implements Parcelable {
     return Type.NAV_DEPART;
   }
 
+  String getEvent() {
+    return event;
+  }
+
   NavigationMetadata getMetadata() {
     return metadata;
   }
 
   private NavigationDepartEvent(Parcel in) {
+    event = in.readString();
     metadata = in.readParcelable(NavigationMetadata.class.getClassLoader());
   }
 
@@ -33,6 +41,7 @@ class NavigationDepartEvent extends Event implements Parcelable {
 
   @Override
   public void writeToParcel(Parcel dest, int flags) {
+    dest.writeString(event);
     dest.writeParcelable(metadata, flags);
   }
 
