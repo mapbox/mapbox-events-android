@@ -48,6 +48,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
    * @param context Android context
    * @return the connectivity state as reported by the Android system
    */
+  @SuppressWarnings( {"MissingPermission"})
   private static boolean getSystemConnectivity(Context context) {
     ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     NetworkInfo activeNetwork = cm.getActiveNetworkInfo();

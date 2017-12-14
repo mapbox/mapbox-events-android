@@ -7,6 +7,7 @@ import com.google.gson.JsonSerializer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
@@ -63,7 +64,7 @@ class TelemetryClient {
 
     // Extra debug in staging mode
     if (setting.getEnvironment().equals(Environment.STAGING)) {
-      logger.debug(LOG_TAG, String.format("Sending POST to %s with %d event(s) (user agent: %s) with "
+      logger.debug(LOG_TAG, String.format(Locale.US, "Sending POST to %s with %d event(s) (user agent: %s) with "
         + "payload: %s", url, batch.size(), userAgent, payload));
     }
 

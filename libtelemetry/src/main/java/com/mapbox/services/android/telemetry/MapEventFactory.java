@@ -206,9 +206,10 @@ public class MapEventFactory {
     return isConnectedToWifi(context);
   }
 
+  @SuppressWarnings( {"MissingPermission"})
   private boolean isConnectedToWifi(Context context) {
     try {
-      WifiManager wifiMgr = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+      WifiManager wifiMgr = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
       //noinspection MissingPermission
       WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
 
