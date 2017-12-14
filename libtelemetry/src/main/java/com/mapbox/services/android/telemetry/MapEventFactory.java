@@ -38,7 +38,8 @@ public class MapEventFactory {
   private static final int UNAVAILABLE_BATTERY_LEVEL = -1;
   private static final int DEFAULT_BATTERY_LEVEL = -1;
   private static final int NO_NETWORK = -1;
-  private static final String MAPSTATE_ILLEGAL_NULL = "MapState can not be null";
+  private static final String NOT_A_MAP_EVENT_TYPE = "Type must be a map event.";
+  private static final String MAP_STATE_ILLEGAL_NULL = "MapState can not be null.";
   private static final Map<Integer, String> NETWORKS = new HashMap<Integer, String>() {
     {
       put(TelephonyManager.NETWORK_TYPE_1xRTT, SINGLE_CARRIER_RTT);
@@ -94,9 +95,7 @@ public class MapEventFactory {
   }
 
   public Event createMapEvent(Event.Type type, MapState mapState) {
-    if (mapState == null) {
-      throw new IllegalArgumentException(MAPSTATE_ILLEGAL_NULL);
-    }
+    check(type, mapState);
     return BUILD_EVENT_MAP.get(type).build(context, mapState);
   }
 
@@ -224,5 +223,22 @@ public class MapEventFactory {
       return true;
     }
     return false;
+  }
+
+  private void check(Event.Type type, MapState mapState) {
+    checkMapEvent(type);
+    isNotNull(mapState);
+  }
+
+  private void checkMapEvent(Event.Type type) {
+    if (!Event.mapEventTypes.contains(type)) {
+      throw new IllegalArgumentException(NOT_A_MAP_EVENT_TYPE);
+    }
+  }
+
+  private void isNotNull(MapState mapState) {
+    if (mapState == null) {
+      throw new IllegalArgumentException(MAP_STATE_ILLEGAL_NULL);
+    }
   }
 }
