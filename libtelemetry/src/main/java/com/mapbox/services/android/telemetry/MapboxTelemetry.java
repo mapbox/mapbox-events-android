@@ -124,12 +124,13 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     }
   }
 
+
   public void updateDebugLoggingEnabled(boolean isDebugLoggingEnabled) {
     if (telemetryClient != null) {
       telemetryClient.updateDebugLoggingEnabled(isDebugLoggingEnabled);
     }
   }
-  
+
   public void updateUserAgent(String userAgent) {
     if (isUserAgentValid(userAgent)) {
       telemetryClient.updateUserAgent(TelemetryUtils.createFullUserAgent(userAgent, context));

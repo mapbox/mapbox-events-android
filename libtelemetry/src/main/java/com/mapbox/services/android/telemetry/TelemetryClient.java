@@ -84,7 +84,7 @@ class TelemetryClient {
   private boolean isExtraDebuggingNeeded() {
     return setting.isDebugLoggingEnabled() || setting.getEnvironment().equals(Environment.STAGING);
   }
-  
+
   private GsonBuilder configureGsonBuilder() {
     GsonBuilder gsonBuilder = new GsonBuilder();
     JsonSerializer<NavigationArriveEvent> arriveSerializer = new ArriveEventSerializer();
