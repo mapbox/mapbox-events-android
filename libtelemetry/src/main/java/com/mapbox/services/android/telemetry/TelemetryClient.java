@@ -7,7 +7,6 @@ import com.google.gson.JsonSerializer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
@@ -22,10 +21,12 @@ class TelemetryClient {
   private static final String EVENTS_ENDPOINT = "/events/v2";
   private static final String USER_AGENT_REQUEST_HEADER = "User-Agent";
   private static final String ACCESS_TOKEN_QUERY_PARAMETER = "access_token";
+  private static final String EXTRA_DEBUGGING_LOG = "Sending POST to %s with %d event(s) (user agent: %s) "
+    + "with payload: %s";
 
   private String accessToken = null;
   private String userAgent = null;
-  private final TelemetryClientSettings setting;
+  private TelemetryClientSettings setting;
   private final Logger logger;
 
   TelemetryClient(String accessToken, String userAgent, TelemetryClientSettings setting, Logger logger) {
@@ -52,6 +53,10 @@ class TelemetryClient {
     sendBatch(oneEvent, callback);
   }
 
+  void updateDebugLoggingEnabled(boolean debugLoggingEnabled) {
+    setting = setting.toBuilder().debugLoggingEnabled(debugLoggingEnabled).build();
+  }
+
   private void sendBatch(List<Event> batch, Callback callback) {
     GsonBuilder gsonBuilder = configureGsonBuilder();
     Gson gson = gsonBuilder.create();
@@ -62,10 +67,8 @@ class TelemetryClient {
     HttpUrl url = baseUrl.newBuilder(EVENTS_ENDPOINT)
       .addQueryParameter(ACCESS_TOKEN_QUERY_PARAMETER, accessToken).build();
 
-    // Extra debug in staging mode
-    if (setting.getEnvironment().equals(Environment.STAGING)) {
-      logger.debug(LOG_TAG, String.format(Locale.US, "Sending POST to %s with %d event(s) (user agent: %s) with "
-        + "payload: %s", url, batch.size(), userAgent, payload));
+    if (isExtraDebuggingNeeded()) {
+      logger.debug(LOG_TAG, String.format(EXTRA_DEBUGGING_LOG, url, batch.size(), userAgent, payload));
     }
 
     Request request = new Request.Builder()
@@ -76,6 +79,10 @@ class TelemetryClient {
 
     OkHttpClient client = setting.getClient();
     client.newCall(request).enqueue(callback);
+  }
+
+  private boolean isExtraDebuggingNeeded() {
+    return setting.isDebugLoggingEnabled() || setting.getEnvironment().equals(Environment.STAGING);
   }
 
   private GsonBuilder configureGsonBuilder() {
