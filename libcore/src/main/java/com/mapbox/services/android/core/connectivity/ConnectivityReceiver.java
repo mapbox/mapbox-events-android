@@ -49,9 +49,15 @@ public class ConnectivityReceiver extends BroadcastReceiver {
    * @return the connectivity state as reported by the Android system
    */
   private static boolean getSystemConnectivity(Context context) {
-    ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-    return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    try {
+      ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+      //noinspection MissingPermission
+      NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+      return isConnectedOrConnecting(activeNetwork);
+    } catch (Exception exception) {
+      return false;
+    }
   }
 
   /**
@@ -137,5 +143,9 @@ public class ConnectivityReceiver extends BroadcastReceiver {
     for (ConnectivityListener listener : connectivityListeners) {
       listener.onConnectivityChanged(connected);
     }
+  }
+
+  private static boolean isConnectedOrConnecting(NetworkInfo activeNetwork) {
+    return activeNetwork.isConnectedOrConnecting();
   }
 }
