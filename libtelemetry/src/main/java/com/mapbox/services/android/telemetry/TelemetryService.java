@@ -37,7 +37,7 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   @Nullable
   @Override
   public IBinder onBind(Intent intent) {
-    // A service may return null if clients can not bind to the service (preferred case)
+    // A service may return null if clients cannot bind to the service (preferred case)
     // For testing purposes a new telemetry binder is returned
     return new TelemetryBinder();
   }

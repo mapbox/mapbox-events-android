@@ -51,7 +51,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
           return obtainRerouteEvent();
         }
       });
-      put(Event.Type.NAV_FASTER, new ObtainNavEvent() {
+      put(Event.Type.NAV_FASTER_ROUTE, new ObtainNavEvent() {
         @Override
         public Event obtain() {
           return obtainFasterRouteEvent();
@@ -92,7 +92,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
             return configureRerouteTypeAdapter(gsonBuilder);
           }
         });
-        put(Event.Type.NAV_FASTER, new ConfigureTypeAdapter() {
+        put(Event.Type.NAV_FASTER_ROUTE, new ConfigureTypeAdapter() {
           @Override
           public GsonBuilder configure(GsonBuilder gsonBuilder) {
             return configureFasterRouteTypeAdapter(gsonBuilder);
@@ -193,7 +193,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
   @Test
   public void sendsTheCorrectBodyPostingNavigationFasterRouteEvent() throws Exception {
     TelemetryClient telemetryClient = obtainDefaultTelemetryClient();
-    Event.Type fasterRoute = Event.Type.NAV_FASTER;
+    Event.Type fasterRoute = Event.Type.NAV_FASTER_ROUTE;
     Event fasterRouteEvent = obtainNavigationEvent(fasterRoute);
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
@@ -210,7 +210,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
     TelemetryClient telemetryClient = obtainDefaultTelemetryClient();
     Event.Type reroute = Event.Type.NAV_REROUTE;
     Event rerouteEvent = obtainNavigationEvent(reroute);
-    Event.Type fasterRoute = Event.Type.NAV_FASTER;
+    Event.Type fasterRoute = Event.Type.NAV_FASTER_ROUTE;
     Event fasterRouteEvent = obtainNavigationEvent(fasterRoute);
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
@@ -322,7 +322,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
     NavigationStepMetadata navigationStepMetadata = new NavigationStepMetadata();
     navigationState.setNavigationRerouteData(navigationRerouteData);
     navigationState.setNavigationStepMetadata(navigationStepMetadata);
-    Event fasterRouteEvent = navigationEventFactory.createNavigationEvent(Event.Type.NAV_FASTER, navigationState);
+    Event fasterRouteEvent = navigationEventFactory.createNavigationEvent(Event.Type.NAV_FASTER_ROUTE, navigationState);
     return fasterRouteEvent;
   }
 

@@ -5,6 +5,8 @@ import java.util.Map;
 
 public class NavigationEventFactory {
 
+  private static final String NOT_A_NAVIGATION_EVENT_TYPE = "Type must be a navigation event.";
+  private static final String NAVIGATION_STATE_ILLEGAL_NULL = "NavigationState cannot be null.";
   private final Map<Event.Type, NavBuildEvent> BUILD_NAV_EVENT = new HashMap<Event.Type, NavBuildEvent>() {
     {
       put(Event.Type.NAV_ARRIVE, new NavBuildEvent() {
@@ -37,7 +39,7 @@ public class NavigationEventFactory {
           return buildNavigationRerouteEvent(navigationState);
         }
       });
-      put(Event.Type.NAV_FASTER, new NavBuildEvent() {
+      put(Event.Type.NAV_FASTER_ROUTE, new NavBuildEvent() {
         @Override
         public Event build(NavigationState navigationState) {
           return buildNavigationFasterRouteEvent(navigationState);
@@ -47,6 +49,7 @@ public class NavigationEventFactory {
   };
 
   public Event createNavigationEvent(Event.Type type, NavigationState navigationState) {
+    check(type, navigationState);
     return BUILD_NAV_EVENT.get(type).build(navigationState);
   }
 
@@ -67,10 +70,27 @@ public class NavigationEventFactory {
   }
 
   private NavigationFeedbackEvent buildNavigationFeedbackEvent(NavigationState navigationState) {
-    return  new NavigationFeedbackEvent(navigationState);
+    return new NavigationFeedbackEvent(navigationState);
   }
 
   private NavigationFasterRouteEvent buildNavigationFasterRouteEvent(NavigationState navigationState) {
-    return  new NavigationFasterRouteEvent(navigationState);
+    return new NavigationFasterRouteEvent(navigationState);
+  }
+
+  private void check(Event.Type type, NavigationState navigationState) {
+    checkNavigationEvent(type);
+    isNotNull(navigationState);
+  }
+
+  private void checkNavigationEvent(Event.Type type) {
+    if (!Event.navigationEventTypes.contains(type)) {
+      throw new IllegalArgumentException(NOT_A_NAVIGATION_EVENT_TYPE);
+    }
+  }
+
+  private void isNotNull(NavigationState navigationState) {
+    if (navigationState == null) {
+      throw new IllegalArgumentException(NAVIGATION_STATE_ILLEGAL_NULL);
+    }
   }
 }

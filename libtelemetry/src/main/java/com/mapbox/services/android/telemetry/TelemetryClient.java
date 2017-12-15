@@ -7,6 +7,7 @@ import com.google.gson.JsonSerializer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
@@ -68,7 +69,7 @@ class TelemetryClient {
       .addQueryParameter(ACCESS_TOKEN_QUERY_PARAMETER, accessToken).build();
 
     if (isExtraDebuggingNeeded()) {
-      logger.debug(LOG_TAG, String.format(EXTRA_DEBUGGING_LOG, url, batch.size(), userAgent, payload));
+      logger.debug(LOG_TAG, String.format(Locale.US, EXTRA_DEBUGGING_LOG, url, batch.size(), userAgent, payload));
     }
 
     Request request = new Request.Builder()
