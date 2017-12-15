@@ -6,7 +6,7 @@ import android.os.Parcelable;
 import com.google.gson.annotations.JsonAdapter;
 
 class NavigationFasterRouteEvent extends Event implements Parcelable {
-  private static final String NAVIGATION_REROUTE_DATA_STATE_ILLEGAL_NULL = "NavigationRerouteData can not be null.";
+  private static final String NAVIGATION_REROUTE_DATA_STATE_ILLEGAL_NULL = "NavigationRerouteData cannot be null.";
   private static final String NAVIGATION_FASTER_ROUTE = "navigation.fasterRoute";
   private final String event;
   @JsonAdapter(NavigationMetadataSerializer.class)

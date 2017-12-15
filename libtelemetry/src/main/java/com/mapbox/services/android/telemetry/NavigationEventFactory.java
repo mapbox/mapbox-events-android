@@ -6,7 +6,7 @@ import java.util.Map;
 public class NavigationEventFactory {
 
   private static final String NOT_A_NAVIGATION_EVENT_TYPE = "Type must be a navigation event.";
-  private static final String NAVIGATION_STATE_ILLEGAL_NULL = "NavigationState can not be null.";
+  private static final String NAVIGATION_STATE_ILLEGAL_NULL = "NavigationState cannot be null.";
   private final Map<Event.Type, NavBuildEvent> BUILD_NAV_EVENT = new HashMap<Event.Type, NavBuildEvent>() {
     {
       put(Event.Type.NAV_ARRIVE, new NavBuildEvent() {

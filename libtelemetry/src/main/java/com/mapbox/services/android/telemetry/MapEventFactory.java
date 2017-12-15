@@ -39,7 +39,7 @@ public class MapEventFactory {
   private static final int DEFAULT_BATTERY_LEVEL = -1;
   private static final int NO_NETWORK = -1;
   private static final String NOT_A_MAP_EVENT_TYPE = "Type must be a map event.";
-  private static final String MAP_STATE_ILLEGAL_NULL = "MapState can not be null.";
+  private static final String MAP_STATE_ILLEGAL_NULL = "MapState cannot be null.";
   private static final Map<Integer, String> NETWORKS = new HashMap<Integer, String>() {
     {
       put(TelephonyManager.NETWORK_TYPE_1xRTT, SINGLE_CARRIER_RTT);

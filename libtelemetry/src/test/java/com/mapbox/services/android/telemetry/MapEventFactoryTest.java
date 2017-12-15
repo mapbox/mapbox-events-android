@@ -6,6 +6,7 @@ import android.view.WindowManager;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
@@ -14,7 +15,7 @@ import static org.mockito.Mockito.when;
 public class MapEventFactoryTest {
 
   @Test
-  public void checksLoadType() throws Exception {
+  public void checksMapLoadEvent() throws Exception {
     Context mockedContext = obtainMockedContext();
     MapEventFactory aMapEventFactory = new MapEventFactory(mockedContext);
     MapState mockedMapState = mock(MapState.class);
@@ -25,7 +26,18 @@ public class MapEventFactoryTest {
   }
 
   @Test
-  public void checksClickType() throws Exception {
+  public void checksLoadType() throws Exception {
+    Context mockedContext = obtainMockedContext();
+    MapEventFactory aMapEventFactory = new MapEventFactory(mockedContext);
+    MapState mockedMapState = mock(MapState.class);
+
+    Event mapLoadEvent = aMapEventFactory.createMapEvent(Event.Type.MAP_LOAD, mockedMapState);
+
+    assertEquals(Event.Type.MAP_LOAD, mapLoadEvent.obtainType());
+  }
+
+  @Test
+  public void checksMapClickEvent() throws Exception {
     Context mockedContext = obtainMockedContext();
     MapEventFactory aMapEventFactory = new MapEventFactory(mockedContext);
     MapState mockedMapState = mock(MapState.class);
@@ -36,7 +48,18 @@ public class MapEventFactoryTest {
   }
 
   @Test
-  public void checksDragendType() throws Exception {
+  public void checksClickType() throws Exception {
+    Context mockedContext = obtainMockedContext();
+    MapEventFactory aMapEventFactory = new MapEventFactory(mockedContext);
+    MapState mockedMapState = mock(MapState.class);
+
+    Event mapClickEvent = aMapEventFactory.createMapEvent(Event.Type.MAP_CLICK, mockedMapState);
+
+    assertEquals(Event.Type.MAP_CLICK, mapClickEvent.obtainType());
+  }
+
+  @Test
+  public void checksMapDragendEvent() throws Exception {
     Context mockedContext = obtainMockedContext();
     MapEventFactory aMapEventFactory = new MapEventFactory(mockedContext);
     MapState mockedMapState = mock(MapState.class);
@@ -44,6 +67,17 @@ public class MapEventFactoryTest {
     Event mapDragendEvent = aMapEventFactory.createMapEvent(Event.Type.MAP_DRAGEND, mockedMapState);
 
     assertTrue(mapDragendEvent instanceof MapDragendEvent);
+  }
+
+  @Test
+  public void checksDragendType() throws Exception {
+    Context mockedContext = obtainMockedContext();
+    MapEventFactory aMapEventFactory = new MapEventFactory(mockedContext);
+    MapState mockedMapState = mock(MapState.class);
+
+    Event mapDragendEvent = aMapEventFactory.createMapEvent(Event.Type.MAP_DRAGEND, mockedMapState);
+
+    assertEquals(Event.Type.MAP_DRAGEND, mapDragendEvent.obtainType());
   }
 
   @Test(expected = IllegalArgumentException.class)

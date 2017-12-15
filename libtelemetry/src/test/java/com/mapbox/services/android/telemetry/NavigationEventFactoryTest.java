@@ -4,13 +4,14 @@ import org.junit.Test;
 
 import java.util.Date;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 public class NavigationEventFactoryTest {
 
   @Test
-  public void checksDepartType() throws Exception {
+  public void checksNavigationDepartEvent() throws Exception {
     NavigationEventFactory navigationEventFactory = new NavigationEventFactory();
     NavigationState mockedNavigationState = mock(NavigationState.class);
 
@@ -20,7 +21,17 @@ public class NavigationEventFactoryTest {
   }
 
   @Test
-  public void checksArriveType() throws Exception {
+  public void checksDepartType() throws Exception {
+    NavigationEventFactory navigationEventFactory = new NavigationEventFactory();
+    NavigationState mockedNavigationState = mock(NavigationState.class);
+
+    Event departEvent = navigationEventFactory.createNavigationEvent(Event.Type.NAV_DEPART, mockedNavigationState);
+
+    assertEquals(Event.Type.NAV_DEPART, departEvent.obtainType());
+  }
+
+  @Test
+  public void checksNavigationArriveEvent() throws Exception {
     NavigationEventFactory navigationEventFactory = new NavigationEventFactory();
     NavigationState mockedNavigationState = mock(NavigationState.class);
 
@@ -30,7 +41,17 @@ public class NavigationEventFactoryTest {
   }
 
   @Test
-  public void checksCancelType() throws Exception {
+  public void checksArriveType() throws Exception {
+    NavigationEventFactory navigationEventFactory = new NavigationEventFactory();
+    NavigationState mockedNavigationState = mock(NavigationState.class);
+
+    Event arriveEvent = navigationEventFactory.createNavigationEvent(Event.Type.NAV_ARRIVE, mockedNavigationState);
+
+    assertEquals(Event.Type.NAV_ARRIVE, arriveEvent.obtainType());
+  }
+
+  @Test
+  public void checksNavigationCancelEvent() throws Exception {
     NavigationEventFactory navigationEventFactory = new NavigationEventFactory();
     NavigationState mockedNavigationState = mock(NavigationState.class);
 
@@ -40,7 +61,17 @@ public class NavigationEventFactoryTest {
   }
 
   @Test
-  public void checksRerouteType() throws Exception {
+  public void checksCancelType() throws Exception {
+    NavigationEventFactory navigationEventFactory = new NavigationEventFactory();
+    NavigationState mockedNavigationState = mock(NavigationState.class);
+
+    Event cancelEvent = navigationEventFactory.createNavigationEvent(Event.Type.NAV_CANCEL, mockedNavigationState);
+
+    assertEquals(Event.Type.NAV_CANCEL, cancelEvent.obtainType());
+  }
+
+  @Test
+  public void checksNavigationRerouteEvent() throws Exception {
     NavigationEventFactory navigationEventFactory = new NavigationEventFactory();
     NavigationState mockedNavigationState = mock(NavigationState.class);
 
@@ -50,13 +81,47 @@ public class NavigationEventFactoryTest {
   }
 
   @Test
-  public void checksFeedbackType() throws Exception {
+  public void checksRerouteType() throws Exception {
+    NavigationEventFactory navigationEventFactory = new NavigationEventFactory();
+    NavigationState mockedNavigationState = mock(NavigationState.class);
+
+    Event rerouteEvent = navigationEventFactory.createNavigationEvent(Event.Type.NAV_REROUTE, mockedNavigationState);
+
+    assertEquals(Event.Type.NAV_REROUTE, rerouteEvent.obtainType());
+  }
+
+  @Test
+  public void checksNavigationFeedbackEvent() throws Exception {
     NavigationEventFactory navigationEventFactory = new NavigationEventFactory();
     NavigationState mockedNavigationState = mock(NavigationState.class);
 
     Event feedbackEvent = navigationEventFactory.createNavigationEvent(Event.Type.NAV_FEEDBACK, mockedNavigationState);
 
     assertTrue(feedbackEvent instanceof NavigationFeedbackEvent);
+  }
+
+  @Test
+  public void checksFeedbackType() throws Exception {
+    NavigationEventFactory navigationEventFactory = new NavigationEventFactory();
+    NavigationState mockedNavigationState = mock(NavigationState.class);
+
+    Event feedbackEvent = navigationEventFactory.createNavigationEvent(Event.Type.NAV_FEEDBACK, mockedNavigationState);
+
+    assertEquals(Event.Type.NAV_FEEDBACK, feedbackEvent.obtainType());
+  }
+
+  @Test
+  public void checksNavigationFasterRouteEvent() throws Exception {
+    NavigationEventFactory navigationEventFactory = new NavigationEventFactory();
+    NavigationState aValidNavigationState = obtainAValidNavigationState();
+    NavigationRerouteData mockedNavigationRerouteData = mock(NavigationRerouteData.class);
+    aValidNavigationState.setNavigationRerouteData(mockedNavigationRerouteData);
+
+
+    Event fasterRouteEvent = navigationEventFactory.createNavigationEvent(Event.Type.NAV_FASTER_ROUTE,
+      aValidNavigationState);
+
+    assertTrue(fasterRouteEvent instanceof NavigationFasterRouteEvent);
   }
 
   @Test
@@ -70,7 +135,7 @@ public class NavigationEventFactoryTest {
     Event fasterRouteEvent = navigationEventFactory.createNavigationEvent(Event.Type.NAV_FASTER_ROUTE,
       aValidNavigationState);
 
-    assertTrue(fasterRouteEvent instanceof NavigationFasterRouteEvent);
+    assertEquals(Event.Type.NAV_FASTER_ROUTE, fasterRouteEvent.obtainType());
   }
 
   @Test(expected = IllegalArgumentException.class)
