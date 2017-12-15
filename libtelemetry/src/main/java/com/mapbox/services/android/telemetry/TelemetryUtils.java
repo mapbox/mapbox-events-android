@@ -41,6 +41,14 @@ class TelemetryUtils {
     return fullUserAgent;
   }
 
+  static boolean isEmpty(String string) {
+    if (string == null || string.length() == 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   private static String obtainApplicationIdentifier(Context context) {
     try {
       String packageName = context.getPackageName();
@@ -51,14 +59,6 @@ class TelemetryUtils {
       return appIdentifier;
     } catch (Exception exception) {
       return EMPTY_STRING;
-    }
-  }
-
-  static boolean isEmpty(String string) {
-    if (string == null || string.length() == 0) {
-      return true;
-    } else {
-      return false;
     }
   }
 }

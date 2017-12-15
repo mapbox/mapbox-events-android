@@ -1,7 +1,6 @@
 package com.mapbox.services.android.telemetry;
 
 
-import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -12,12 +11,10 @@ import android.net.NetworkInfo;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 
-import java.util.ArrayList;
-
 import com.mapbox.services.android.core.location.LocationEnginePriority;
-
 import com.mapbox.services.android.core.permissions.PermissionsManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.Callback;
@@ -25,7 +22,20 @@ import okhttp3.Callback;
 import static com.mapbox.services.android.telemetry.EventReceiver.EVENT_RECEIVER_INTENT;
 
 public class MapboxTelemetry implements FullQueueCallback, EventCallback {
-
+  private static final String EVENTS_USER_AGENT = "MapboxEventsAndroid/";
+  private static final String TELEMETRY_USER_AGENT = "MapboxTelemetryAndroid/";
+  private static final String UNITY_USER_AGENT = "MapboxEventsUnityAndroid/";
+  private static final String NAVIGATION_USER_AGENT = "mapbox-navigation-android/";
+  private static final String NAVIGATION_UI_USER_AGENT = "mapbox-navigation-ui-android/";
+  private static final List<String> VALID_USER_AGENTS = new ArrayList<String>() {
+    {
+      add(EVENTS_USER_AGENT);
+      add(TELEMETRY_USER_AGENT);
+      add(UNITY_USER_AGENT);
+      add(NAVIGATION_USER_AGENT);
+      add(NAVIGATION_UI_USER_AGENT);
+    }
+  };
   private final Context context;
   private String accessToken;
   private String userAgent;
@@ -44,22 +54,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   private boolean serviceBound = false;
   private PermissionCheckRunnable permissionCheckRunnable = null;
 
-  private static final String EVENTS_USER_AGENT = "MapboxEventsAndroid/";
-  private static final String TELEMETRY_USER_AGENT = "MapboxTelemetryAndroid/";
-  private static final String UNITY_USER_AGENT = "MapboxEventsUnityAndroid/";
-  private static final String NAVIGATION_USER_AGENT = "mapbox-navigation-android/";
-  private static final String NAVIGATION_UI_USER_AGENT = "mapbox-navigation-ui-android/";
-
-  private static final List<String> VALID_USER_AGENTS = new ArrayList<String>() {
-    {
-      add(EVENTS_USER_AGENT);
-      add(TELEMETRY_USER_AGENT);
-      add(UNITY_USER_AGENT);
-      add(NAVIGATION_USER_AGENT);
-      add(NAVIGATION_UI_USER_AGENT);
-    }
-  };
-
   public MapboxTelemetry(Context context, String accessToken, String userAgent, Callback httpCallback) {
     if (checkRequiredParameters(accessToken, userAgent)) {
       initializeTelemetryClient();
@@ -67,9 +61,9 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
 
     this.context = context;
     this.httpCallback = httpCallback;
+    initializeQueue();
     AlarmReceiver alarmReceiver = obtainAlarmReceiver(httpCallback);
     this.schedulerFlusher = new SchedulerFlusherFactory(context, alarmReceiver).supply();
-    initializeQueue();
   }
 
   // For testing only
@@ -124,7 +118,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     }
   }
 
-
   public void updateDebugLoggingEnabled(boolean isDebugLoggingEnabled) {
     if (telemetryClient != null) {
       telemetryClient.updateDebugLoggingEnabled(isDebugLoggingEnabled);
@@ -141,6 +134,11 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     if (serviceBound) {
       telemetryService.updateLocationPriority(locationPriority);
     }
+  }
+
+  // Package private (no modifier) for testing purposes
+  boolean checkRequiredParameters(String accessToken, String userAgent) {
+    return isAccessTokenValid(accessToken) && isUserAgentValid(userAgent);
   }
 
   // Package private (no modifier) for testing purposes
@@ -170,8 +168,25 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     return eventReceiverIntentFilter;
   }
 
-  boolean checkRequiredParameters(String accessToken, String userAgent) {
-    return isAccessTokenValid(accessToken) && isUserAgentValid(userAgent);
+  private boolean isAccessTokenValid(String accessToken) {
+    if (!TelemetryUtils.isEmpty(accessToken)) {
+      this.accessToken = accessToken;
+      return true;
+    }
+
+    return false;
+  }
+
+  private boolean isUserAgentValid(String userAgent) {
+    if (!TelemetryUtils.isEmpty(userAgent)) {
+      for (String userAgentPrefix : VALID_USER_AGENTS) {
+        if (userAgent.startsWith(userAgentPrefix)) {
+          this.userAgent = userAgent;
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   private void initializeTelemetryClient() {
@@ -185,6 +200,11 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     telemetryClient = new TelemetryClient(accessToken, userAgent, telemetryClientSettings, new Logger());
 
     return telemetryClient;
+  }
+
+  private void initializeQueue() {
+    queue = new EventsQueue(new FullQueueFlusher(this));
+    queue.setTelemetryInitialized(true);
   }
 
   private AlarmReceiver obtainAlarmReceiver(final Callback httpCallback) {
@@ -213,12 +233,18 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   }
 
   private boolean isNetworkConnected() {
-    ConnectivityManager connectivityManager = (ConnectivityManager)
-      context.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-    @SuppressLint("MissingPermission")
-    NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-    // TODO We should consider using activeNetwork.isConnectedOrConnecting() instead of activeNetwork.isConnected()
-    return activeNetwork != null && activeNetwork.isConnected();
+    try {
+      ConnectivityManager connectivityManager = (ConnectivityManager)
+        context.getSystemService(Context.CONNECTIVITY_SERVICE);
+      //noinspection MissingPermission
+      NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+
+      // TODO We should consider using activeNetwork.isConnectedOrConnecting() instead of activeNetwork.isConnected()
+      // See ConnectivityReceiver#isConnected(Context context)
+      return activeNetwork.isConnected();
+    } catch (Exception exception) {
+      return false;
+    }
   }
 
   private void sendEvents(List<Event> events, Callback httpCallback) {
@@ -245,6 +271,28 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
       isOpted = true;
     }
     return isOpted;
+  }
+
+  private boolean checkLocationPermission() {
+    if (PermissionsManager.areLocationPermissionsGranted(context)) {
+      return true;
+    } else {
+      permissionBackoff();
+      return false;
+    }
+  }
+
+  private void permissionBackoff() {
+    PermissionCheckRunnable permissionCheckRunnable = obtainPermissionCheckRunnable();
+    permissionCheckRunnable.run();
+  }
+
+  private PermissionCheckRunnable obtainPermissionCheckRunnable() {
+    if (permissionCheckRunnable == null) {
+      permissionCheckRunnable = new PermissionCheckRunnable(context, this);
+    }
+
+    return permissionCheckRunnable;
   }
 
   private void startLocation() {
@@ -321,52 +369,4 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
       serviceBound = false;
     }
   };
-
-  private boolean isUserAgentValid(String userAgent) {
-    if (!TelemetryUtils.isEmpty(userAgent)) {
-      for (String userAgentPrefix : VALID_USER_AGENTS) {
-        if (userAgent.startsWith(userAgentPrefix)) {
-          this.userAgent = userAgent;
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  private boolean isAccessTokenValid(String accessToken) {
-    if (!TelemetryUtils.isEmpty(accessToken)) {
-      this.accessToken = accessToken;
-      return true;
-    }
-
-    return false;
-  }
-
-  private void initializeQueue() {
-    queue = new EventsQueue(new FullQueueFlusher(this));
-    queue.setTelemetryInitialized(true);
-  }
-
-  boolean checkLocationPermission() {
-    if (PermissionsManager.areLocationPermissionsGranted(context)) {
-      return true;
-    } else {
-      permissionBackoff();
-      return false;
-    }
-  }
-
-  private void permissionBackoff() {
-    PermissionCheckRunnable permissionCheckRunnable = obtainPermissionCheckRunnable();
-    permissionCheckRunnable.run();
-  }
-
-  private PermissionCheckRunnable obtainPermissionCheckRunnable() {
-    if (permissionCheckRunnable == null) {
-      permissionCheckRunnable = new PermissionCheckRunnable(context, this);
-    }
-
-    return permissionCheckRunnable;
-  }
 }

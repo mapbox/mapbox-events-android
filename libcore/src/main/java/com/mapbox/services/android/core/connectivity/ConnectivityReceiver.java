@@ -54,7 +54,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
       //noinspection MissingPermission
       NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
 
-      return isConnectedOrConnecting(activeNetwork);
+      return activeNetwork.isConnectedOrConnecting();
     } catch (Exception exception) {
       return false;
     }
@@ -143,9 +143,5 @@ public class ConnectivityReceiver extends BroadcastReceiver {
     for (ConnectivityListener listener : connectivityListeners) {
       listener.onConnectivityChanged(connected);
     }
-  }
-
-  private static boolean isConnectedOrConnecting(NetworkInfo activeNetwork) {
-    return activeNetwork.isConnectedOrConnecting();
   }
 }

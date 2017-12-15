@@ -31,8 +31,7 @@ public class MapboxTelemetryTest {
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
     ConnectivityManager mockedConnectivityManager = mock(ConnectivityManager.class);
-    when(mockedContext.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE))
-      .thenReturn(mockedConnectivityManager);
+    when(mockedContext.getSystemService(Context.CONNECTIVITY_SERVICE)).thenReturn(mockedConnectivityManager);
     NetworkInfo mockedNetworkInfo = mock(NetworkInfo.class);
     when(mockedConnectivityManager.getActiveNetworkInfo()).thenReturn(mockedNetworkInfo);
     when(mockedNetworkInfo.isConnected()).thenReturn(true);
@@ -58,8 +57,7 @@ public class MapboxTelemetryTest {
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
     ConnectivityManager mockedConnectivityManager = mock(ConnectivityManager.class);
-    when(mockedContext.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE))
-      .thenReturn(mockedConnectivityManager);
+    when(mockedContext.getSystemService(Context.CONNECTIVITY_SERVICE)).thenReturn(mockedConnectivityManager);
     when(mockedConnectivityManager.getActiveNetworkInfo()).thenReturn(null);
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
     TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
@@ -83,8 +81,7 @@ public class MapboxTelemetryTest {
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
     ConnectivityManager mockedConnectivityManager = mock(ConnectivityManager.class);
-    when(mockedContext.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE))
-      .thenReturn(mockedConnectivityManager);
+    when(mockedContext.getSystemService(Context.CONNECTIVITY_SERVICE)).thenReturn(mockedConnectivityManager);
     NetworkInfo mockedNetworkInfo = mock(NetworkInfo.class);
     when(mockedConnectivityManager.getActiveNetworkInfo()).thenReturn(mockedNetworkInfo);
     when(mockedNetworkInfo.isConnected()).thenReturn(false);
@@ -339,8 +336,7 @@ public class MapboxTelemetryTest {
     String nullAccessToken = null;
     String nullUserAgent = null;
     ConnectivityManager mockedConnectivityManager = mock(ConnectivityManager.class);
-    when(mockedContext.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE))
-      .thenReturn(mockedConnectivityManager);
+    when(mockedContext.getSystemService(Context.CONNECTIVITY_SERVICE)).thenReturn(mockedConnectivityManager);
     NetworkInfo mockedNetworkInfo = mock(NetworkInfo.class);
     when(mockedConnectivityManager.getActiveNetworkInfo()).thenReturn(mockedNetworkInfo);
     when(mockedNetworkInfo.isConnected()).thenReturn(true);
@@ -365,8 +361,7 @@ public class MapboxTelemetryTest {
     String emptyValidAccessToken = "";
     String emptyUserAgent = "";
     ConnectivityManager mockedConnectivityManager = mock(ConnectivityManager.class);
-    when(mockedContext.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE))
-      .thenReturn(mockedConnectivityManager);
+    when(mockedContext.getSystemService(Context.CONNECTIVITY_SERVICE)).thenReturn(mockedConnectivityManager);
     NetworkInfo mockedNetworkInfo = mock(NetworkInfo.class);
     when(mockedConnectivityManager.getActiveNetworkInfo()).thenReturn(mockedNetworkInfo);
     when(mockedNetworkInfo.isConnected()).thenReturn(true);
