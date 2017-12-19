@@ -6,7 +6,7 @@ import java.util.List;
  * Callback used in PermissionsManager
  */
 
-interface PermissionsListener {
+public interface PermissionsListener {
 
   void onExplanationNeeded(List<String> permissionsToExplain);
 
