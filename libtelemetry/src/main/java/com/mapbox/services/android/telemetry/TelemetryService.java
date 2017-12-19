@@ -26,7 +26,7 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   private boolean isTelemetryReceiverRegistered = false;
   private LocationEngine locationEngine = null;
   @LocationEnginePriority.PowerMode
-  private int locationPriority = LocationEnginePriority.HIGH_ACCURACY;
+  private int locationPriority = LocationEnginePriority.NO_POWER;
 
   @Nullable
   @Override
