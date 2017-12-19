@@ -40,6 +40,10 @@ public class LocationReceiver extends BroadcastReceiver {
     return locationIntent;
   }
 
+  void updateSessionIdentifier(SessionIdentifier sessionIdentifier) {
+    locationMapper.updateSessionIdentifier(sessionIdentifier);
+  }
+
   private boolean sendEvent(Location location, Context context) {
     if (isThereAnyNaN(location) || isThereAnyInfinite(location)) {
       return false;
@@ -76,9 +80,5 @@ public class LocationReceiver extends BroadcastReceiver {
     }
 
     return locationMapper;
-  }
-
-  void updateSessionIdentifier(SessionIdentifier sessionIdentifier) {
-    locationMapper.updateSessionIdentifier(sessionIdentifier);
   }
 }

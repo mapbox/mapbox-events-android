@@ -19,6 +19,10 @@ class LocationMapper {
     return locationEvent;
   }
 
+  void updateSessionIdentifier(SessionIdentifier sessionIdentifier) {
+    this.sessionIdentifier = sessionIdentifier;
+  }
+
   private LocationEvent createLocationEvent(Location location) {
     String sessionId = sessionIdentifier.getSessionId();
 
@@ -64,9 +68,5 @@ class LocationMapper {
       float accuracyRounded = Math.round(location.getAccuracy());
       locationEvent.setAccuracy(accuracyRounded);
     }
-  }
-
-  void updateSessionIdentifier(SessionIdentifier sessionIdentifier) {
-    this.sessionIdentifier = sessionIdentifier;
   }
 }
