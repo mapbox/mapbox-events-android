@@ -9,11 +9,14 @@ import android.content.ServiceConnection;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.IBinder;
+import android.support.annotation.IntRange;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.mapbox.services.android.core.location.LocationEnginePriority;
 import com.mapbox.services.android.core.permissions.PermissionsManager;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,6 +56,11 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   private boolean isOpted = false;
   private boolean serviceBound = false;
   private PermissionCheckRunnable permissionCheckRunnable = null;
+
+  @IntRange(from = 1, to = 24)
+  @Retention(RetentionPolicy.SOURCE)
+  private @interface Hours {
+  }
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent, Callback httpCallback) {
     if (checkRequiredParameters(accessToken, userAgent)) {
@@ -111,7 +119,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     return optLocationOut();
   }
 
-  public void updateSessionIdRotationInterval(int hour) {
+  public void updateSessionIdRotationInterval(@Hours int hour) {
     if (serviceBound) {
       SessionIdentifier sessionIdentifier = new SessionIdentifier(hour);
       telemetryService.updateSessionIdentifier(sessionIdentifier);
