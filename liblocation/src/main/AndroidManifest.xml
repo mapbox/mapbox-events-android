@@ -1,1 +1,6 @@
-<manifest package="com.mapbox.services.android.core.location"/>
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.mapbox.services.android.core.location">
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+</manifest>
