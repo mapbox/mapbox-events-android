@@ -38,7 +38,8 @@ public class MapEventFactory {
   private static final int UNAVAILABLE_BATTERY_LEVEL = -1;
   private static final int DEFAULT_BATTERY_LEVEL = -1;
   private static final int NO_NETWORK = -1;
-  private static final String NOT_A_MAP_EVENT_TYPE = "Type must be a map event.";
+  private static final String NOT_A_LOAD_MAP_EVENT_TYPE = "Type must be a load map event.";
+  private static final String NOT_A_GESTURE_MAP_EVENT_TYPE = "Type must be a gesture map event.";
   private static final String MAP_STATE_ILLEGAL_NULL = "MapState cannot be null.";
   private static final Map<Integer, String> NETWORKS = new HashMap<Integer, String>() {
     {
@@ -67,14 +68,8 @@ public class MapEventFactory {
     }
   };
   private Context context = null;
-  private final Map<Event.Type, MapBuildEvent> BUILD_EVENT_MAP = new HashMap<Event.Type, MapBuildEvent>() {
+  private final Map<Event.Type, MapBuildEvent> BUILD_EVENT_MAP_GESTURE = new HashMap<Event.Type, MapBuildEvent>() {
     {
-      put(Event.Type.MAP_LOAD, new MapBuildEvent() {
-        @Override
-        public Event build(Context context, MapState mapState) {
-          return buildMapLoadEvent(context);
-        }
-      });
       put(Event.Type.MAP_CLICK, new MapBuildEvent() {
         @Override
         public Event build(Context context, MapState mapState) {
@@ -94,25 +89,14 @@ public class MapEventFactory {
     this.context = context;
   }
 
-  public Event createMapEvent(Event.Type type, MapState mapState) {
-    check(type, mapState);
-    return BUILD_EVENT_MAP.get(type).build(context, mapState);
+  public Event createMapLoadEvent(Event.Type type) {
+    checkLoad(type);
+    return buildMapLoadEvent(context);
   }
 
-  private MapLoadEvent buildMapLoadEvent(Context context) {
-    MapLoadEvent mapLoadEvent = new MapLoadEvent();
-
-    mapLoadEvent.setUserId(TelemetryUtils.obtainUniversalUniqueIdentifier());
-    mapLoadEvent.setOrientation(obtainOrientation(context));
-    mapLoadEvent.setAccessibilityFontScale(obtainAccessibilityFontScaleSize(context));
-    mapLoadEvent.setCarrier(obtainCellularCarrier(context));
-    mapLoadEvent.setCellularNetworkType(obtainCellularNetworkType(context));
-    mapLoadEvent.setResolution(obtainDisplayDensity(context));
-    mapLoadEvent.setBatteryLevel(obtainBatteryLevel());
-    mapLoadEvent.setPluggedIn(isPluggedIn());
-    mapLoadEvent.setWifi(obtainConnectedToWifi(context));
-
-    return mapLoadEvent;
+  public Event createMapGestureEvent(Event.Type type, MapState mapState) {
+    checkGesture(type, mapState);
+    return BUILD_EVENT_MAP_GESTURE.get(type).build(context, mapState);
   }
 
   private MapClickEvent buildMapClickEvent(Context context, MapState mapState) {
@@ -225,14 +209,36 @@ public class MapEventFactory {
     return false;
   }
 
-  private void check(Event.Type type, MapState mapState) {
-    checkMapEvent(type);
+  private MapLoadEvent buildMapLoadEvent(Context context) {
+    MapLoadEvent mapLoadEvent = new MapLoadEvent();
+
+    mapLoadEvent.setUserId(TelemetryUtils.obtainUniversalUniqueIdentifier());
+    mapLoadEvent.setOrientation(obtainOrientation(context));
+    mapLoadEvent.setAccessibilityFontScale(obtainAccessibilityFontScaleSize(context));
+    mapLoadEvent.setCarrier(obtainCellularCarrier(context));
+    mapLoadEvent.setCellularNetworkType(obtainCellularNetworkType(context));
+    mapLoadEvent.setResolution(obtainDisplayDensity(context));
+    mapLoadEvent.setBatteryLevel(obtainBatteryLevel());
+    mapLoadEvent.setPluggedIn(isPluggedIn());
+    mapLoadEvent.setWifi(obtainConnectedToWifi(context));
+
+    return mapLoadEvent;
+  }
+
+  private void checkLoad(Event.Type type) {
+    if (type != Event.Type.MAP_LOAD) {
+      throw new IllegalArgumentException(NOT_A_LOAD_MAP_EVENT_TYPE);
+    }
+  }
+
+  private void checkGesture(Event.Type type, MapState mapState) {
+    checkGestureMapEvent(type);
     isNotNull(mapState);
   }
 
-  private void checkMapEvent(Event.Type type) {
-    if (!Event.mapEventTypes.contains(type)) {
-      throw new IllegalArgumentException(NOT_A_MAP_EVENT_TYPE);
+  private void checkGestureMapEvent(Event.Type type) {
+    if (!Event.mapGestureEventTypes.contains(type)) {
+      throw new IllegalArgumentException(NOT_A_GESTURE_MAP_EVENT_TYPE);
     }
   }
 

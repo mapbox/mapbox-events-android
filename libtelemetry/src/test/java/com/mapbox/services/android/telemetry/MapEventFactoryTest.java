@@ -18,9 +18,8 @@ public class MapEventFactoryTest {
   public void checksMapLoadEvent() throws Exception {
     Context mockedContext = obtainMockedContext();
     MapEventFactory aMapEventFactory = new MapEventFactory(mockedContext);
-    MapState mockedMapState = mock(MapState.class);
 
-    Event mapLoadEvent = aMapEventFactory.createMapEvent(Event.Type.MAP_LOAD, mockedMapState);
+    Event mapLoadEvent = aMapEventFactory.createMapLoadEvent(Event.Type.MAP_LOAD);
 
     assertTrue(mapLoadEvent instanceof MapLoadEvent);
   }
@@ -29,9 +28,8 @@ public class MapEventFactoryTest {
   public void checksLoadType() throws Exception {
     Context mockedContext = obtainMockedContext();
     MapEventFactory aMapEventFactory = new MapEventFactory(mockedContext);
-    MapState mockedMapState = mock(MapState.class);
 
-    Event mapLoadEvent = aMapEventFactory.createMapEvent(Event.Type.MAP_LOAD, mockedMapState);
+    Event mapLoadEvent = aMapEventFactory.createMapLoadEvent(Event.Type.MAP_LOAD);
 
     assertEquals(Event.Type.MAP_LOAD, mapLoadEvent.obtainType());
   }
@@ -42,7 +40,7 @@ public class MapEventFactoryTest {
     MapEventFactory aMapEventFactory = new MapEventFactory(mockedContext);
     MapState mockedMapState = mock(MapState.class);
 
-    Event mapClickEvent = aMapEventFactory.createMapEvent(Event.Type.MAP_CLICK, mockedMapState);
+    Event mapClickEvent = aMapEventFactory.createMapGestureEvent(Event.Type.MAP_CLICK, mockedMapState);
 
     assertTrue(mapClickEvent instanceof MapClickEvent);
   }
@@ -53,7 +51,7 @@ public class MapEventFactoryTest {
     MapEventFactory aMapEventFactory = new MapEventFactory(mockedContext);
     MapState mockedMapState = mock(MapState.class);
 
-    Event mapClickEvent = aMapEventFactory.createMapEvent(Event.Type.MAP_CLICK, mockedMapState);
+    Event mapClickEvent = aMapEventFactory.createMapGestureEvent(Event.Type.MAP_CLICK, mockedMapState);
 
     assertEquals(Event.Type.MAP_CLICK, mapClickEvent.obtainType());
   }
@@ -64,7 +62,7 @@ public class MapEventFactoryTest {
     MapEventFactory aMapEventFactory = new MapEventFactory(mockedContext);
     MapState mockedMapState = mock(MapState.class);
 
-    Event mapDragendEvent = aMapEventFactory.createMapEvent(Event.Type.MAP_DRAGEND, mockedMapState);
+    Event mapDragendEvent = aMapEventFactory.createMapGestureEvent(Event.Type.MAP_DRAGEND, mockedMapState);
 
     assertTrue(mapDragendEvent instanceof MapDragendEvent);
   }
@@ -75,19 +73,28 @@ public class MapEventFactoryTest {
     MapEventFactory aMapEventFactory = new MapEventFactory(mockedContext);
     MapState mockedMapState = mock(MapState.class);
 
-    Event mapDragendEvent = aMapEventFactory.createMapEvent(Event.Type.MAP_DRAGEND, mockedMapState);
+    Event mapDragendEvent = aMapEventFactory.createMapGestureEvent(Event.Type.MAP_DRAGEND, mockedMapState);
 
     assertEquals(Event.Type.MAP_DRAGEND, mapDragendEvent.obtainType());
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void checksInvalidType() throws Exception {
+  public void checksLoadInvalidType() throws Exception {
     Context mockedContext = obtainMockedContext();
     MapEventFactory aMapEventFactory = new MapEventFactory(mockedContext);
-    Event.Type notAMapType = Event.Type.NAV_ARRIVE;
+    Event.Type notALoadMapType = Event.Type.MAP_CLICK;
+
+    aMapEventFactory.createMapLoadEvent(notALoadMapType);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void checksGestureInvalidType() throws Exception {
+    Context mockedContext = obtainMockedContext();
+    MapEventFactory aMapEventFactory = new MapEventFactory(mockedContext);
+    Event.Type notAGestureMapType = Event.Type.MAP_LOAD;
     MapState mockedMapState = mock(MapState.class);
 
-    aMapEventFactory.createMapEvent(notAMapType, mockedMapState);
+    aMapEventFactory.createMapGestureEvent(notAGestureMapType, mockedMapState);
   }
 
   @Test
@@ -97,7 +104,7 @@ public class MapEventFactoryTest {
     Event.Type aDragendMapEventType = Event.Type.MAP_DRAGEND;
     MapState aValidMapState = obtainAValidMapState();
 
-    Event aDragendMapEvent = aMapEventFactory.createMapEvent(aDragendMapEventType, aValidMapState);
+    Event aDragendMapEvent = aMapEventFactory.createMapGestureEvent(aDragendMapEventType, aValidMapState);
 
     assertTrue(aDragendMapEvent instanceof MapDragendEvent);
   }
@@ -109,7 +116,7 @@ public class MapEventFactoryTest {
     Event.Type aDragendMapEventType = Event.Type.MAP_DRAGEND;
     MapState nullMapState = null;
 
-    aMapEventFactory.createMapEvent(aDragendMapEventType, nullMapState);
+    aMapEventFactory.createMapGestureEvent(aDragendMapEventType, nullMapState);
   }
 
   private Context obtainMockedContext() {

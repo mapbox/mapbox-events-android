@@ -111,8 +111,7 @@ public class TelemetryClientMapEventsTest extends MockWebServerTest {
     WindowManager mockedWindowManager = mock(WindowManager.class, RETURNS_DEEP_STUBS);
     when(mockedContext.getSystemService(Context.WINDOW_SERVICE)).thenReturn(mockedWindowManager);
     MapEventFactory mapEventFactory = new MapEventFactory(mockedContext);
-    MapState mapState = obtainDefaultMapState();
-    Event loadEvent = mapEventFactory.createMapEvent(Event.Type.MAP_LOAD, mapState);
+    Event loadEvent = mapEventFactory.createMapLoadEvent(Event.Type.MAP_LOAD);
     return loadEvent;
   }
 
@@ -134,7 +133,7 @@ public class TelemetryClientMapEventsTest extends MockWebServerTest {
     Context mockedContext = obtainMockedContext();
     MapEventFactory mapEventFactory = new MapEventFactory(mockedContext);
     MapState mapState = obtainDefaultMapState();
-    Event clickEvent = mapEventFactory.createMapEvent(Event.Type.MAP_CLICK, mapState);
+    Event clickEvent = mapEventFactory.createMapGestureEvent(Event.Type.MAP_CLICK, mapState);
     return clickEvent;
   }
 
@@ -142,7 +141,7 @@ public class TelemetryClientMapEventsTest extends MockWebServerTest {
     Context mockedContext = obtainMockedContext();
     MapEventFactory mapEventFactory = new MapEventFactory(mockedContext);
     MapState mapState = obtainDefaultMapState();
-    Event dragendEvent = mapEventFactory.createMapEvent(Event.Type.MAP_DRAGEND, mapState);
+    Event dragendEvent = mapEventFactory.createMapGestureEvent(Event.Type.MAP_DRAGEND, mapState);
     return dragendEvent;
   }
 
