@@ -1,6 +1,7 @@
 package com.mapbox.services.android.telemetry;
 
 
+import android.app.AlarmManager;
 import android.content.Context;
 import android.telephony.TelephonyManager;
 import android.view.WindowManager;
@@ -110,7 +111,8 @@ public class TelemetryClientMapEventsTest extends MockWebServerTest {
     Context mockedContext = obtainMockedContext();
     WindowManager mockedWindowManager = mock(WindowManager.class, RETURNS_DEEP_STUBS);
     when(mockedContext.getSystemService(Context.WINDOW_SERVICE)).thenReturn(mockedWindowManager);
-    MapEventFactory mapEventFactory = new MapEventFactory(mockedContext);
+    initializeMapboxTelemetry(mockedContext);
+    MapEventFactory mapEventFactory = new MapEventFactory();
     Event loadEvent = mapEventFactory.createMapLoadEvent(Event.Type.MAP_LOAD);
     return loadEvent;
   }
@@ -122,6 +124,16 @@ public class TelemetryClientMapEventsTest extends MockWebServerTest {
     return mockedContext;
   }
 
+  private void initializeMapboxTelemetry(Context context) {
+    AlarmManager mockedAlarmManager = mock(AlarmManager.class, RETURNS_DEEP_STUBS);
+    when(context.getSystemService(Context.ALARM_SERVICE)).thenReturn(mockedAlarmManager);
+    MapboxTelemetry.applicationContext = context;
+    String aValidAccessToken = "validAccessToken";
+    String aValidUserAgent = "MapboxTelemetryAndroid/";
+    Callback mockedHttpCallback = mock(Callback.class);
+    new MapboxTelemetry(context, aValidAccessToken, aValidUserAgent, mockedHttpCallback);
+  }
+
   private MapState obtainDefaultMapState() {
     float aLatitude = 40.416775f;
     float aLongitude = -3.703790f;
@@ -131,7 +143,8 @@ public class TelemetryClientMapEventsTest extends MockWebServerTest {
 
   private Event obtainClickEvent() {
     Context mockedContext = obtainMockedContext();
-    MapEventFactory mapEventFactory = new MapEventFactory(mockedContext);
+    initializeMapboxTelemetry(mockedContext);
+    MapEventFactory mapEventFactory = new MapEventFactory();
     MapState mapState = obtainDefaultMapState();
     Event clickEvent = mapEventFactory.createMapGestureEvent(Event.Type.MAP_CLICK, mapState);
     return clickEvent;
@@ -139,7 +152,8 @@ public class TelemetryClientMapEventsTest extends MockWebServerTest {
 
   private Event obtainDragendEvent() {
     Context mockedContext = obtainMockedContext();
-    MapEventFactory mapEventFactory = new MapEventFactory(mockedContext);
+    initializeMapboxTelemetry(mockedContext);
+    MapEventFactory mapEventFactory = new MapEventFactory();
     MapState mapState = obtainDefaultMapState();
     Event dragendEvent = mapEventFactory.createMapGestureEvent(Event.Type.MAP_DRAGEND, mapState);
     return dragendEvent;

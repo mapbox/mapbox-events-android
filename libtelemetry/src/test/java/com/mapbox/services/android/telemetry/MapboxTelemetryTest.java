@@ -25,23 +25,36 @@ import static org.mockito.Mockito.when;
 
 public class MapboxTelemetryTest {
 
+  @Test(expected = IllegalArgumentException.class)
+  public void checksNonNullApplicationContextRequired() throws Exception {
+    MapboxTelemetry.applicationContext = null;
+    Context nullApplicationContext = mock(Context.class);
+    when(nullApplicationContext.getApplicationContext()).thenReturn(null);
+    String anyAccessToken = "anyAccessToken";
+    String anyUserAgent = "anyUserAgent";
+    Callback mockedHttpCallback = mock(Callback.class);
+
+    new MapboxTelemetry(nullApplicationContext, anyAccessToken, anyUserAgent, mockedHttpCallback);
+  }
+
   @Test
   public void checksOnFullQueueSendEventsCalledWhenIsConnected() throws Exception {
     Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
-    String aValidAccessToken = "validAccessToken";
-    String aValidUserAgent = "MapboxTelemetryAndroid/";
     ConnectivityManager mockedConnectivityManager = mock(ConnectivityManager.class);
     when(mockedContext.getSystemService(Context.CONNECTIVITY_SERVICE)).thenReturn(mockedConnectivityManager);
     NetworkInfo mockedNetworkInfo = mock(NetworkInfo.class);
     when(mockedConnectivityManager.getActiveNetworkInfo()).thenReturn(mockedNetworkInfo);
     when(mockedNetworkInfo.isConnected()).thenReturn(true);
+    MapboxTelemetry.applicationContext = mockedContext;
+    String aValidAccessToken = "validAccessToken";
+    String aValidUserAgent = "MapboxTelemetryAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
     TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
     Callback mockedHttpCallback = mock(Callback.class);
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
-    MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken,  aValidUserAgent,
+    MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
       mockedLocalBroadcastManager);
     List<Event> mockedList = mock(List.class);
@@ -54,18 +67,19 @@ public class MapboxTelemetryTest {
   @Test
   public void checksOnFullQueueSendEventsNotCalledWhenConnectivityNotAvailable() throws Exception {
     Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
-    String aValidAccessToken = "validAccessToken";
-    String aValidUserAgent = "MapboxTelemetryAndroid/";
     ConnectivityManager mockedConnectivityManager = mock(ConnectivityManager.class);
     when(mockedContext.getSystemService(Context.CONNECTIVITY_SERVICE)).thenReturn(mockedConnectivityManager);
     when(mockedConnectivityManager.getActiveNetworkInfo()).thenReturn(null);
+    MapboxTelemetry.applicationContext = mockedContext;
+    String aValidAccessToken = "validAccessToken";
+    String aValidUserAgent = "MapboxTelemetryAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
     TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
     Callback mockedHttpCallback = mock(Callback.class);
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
-    MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken,  aValidUserAgent,
+    MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
       mockedLocalBroadcastManager);
     List<Event> mockedList = mock(List.class);
@@ -78,13 +92,14 @@ public class MapboxTelemetryTest {
   @Test
   public void checksOnFullQueueSendEventsNotCalledWhenIsNotConnected() throws Exception {
     Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
-    String aValidAccessToken = "validAccessToken";
-    String aValidUserAgent = "MapboxTelemetryAndroid/";
     ConnectivityManager mockedConnectivityManager = mock(ConnectivityManager.class);
     when(mockedContext.getSystemService(Context.CONNECTIVITY_SERVICE)).thenReturn(mockedConnectivityManager);
     NetworkInfo mockedNetworkInfo = mock(NetworkInfo.class);
     when(mockedConnectivityManager.getActiveNetworkInfo()).thenReturn(mockedNetworkInfo);
     when(mockedNetworkInfo.isConnected()).thenReturn(false);
+    MapboxTelemetry.applicationContext = mockedContext;
+    String aValidAccessToken = "validAccessToken";
+    String aValidUserAgent = "MapboxTelemetryAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
     TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
     Callback mockedHttpCallback = mock(Callback.class);
@@ -104,6 +119,7 @@ public class MapboxTelemetryTest {
   @Test
   public void checksOnEventReceivedPushCalled() throws Exception {
     Context mockedContext = mock(Context.class);
+    MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
@@ -125,6 +141,7 @@ public class MapboxTelemetryTest {
   @Test
   public void checksPush() throws Exception {
     Context mockedContext = mock(Context.class);
+    MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
@@ -146,6 +163,7 @@ public class MapboxTelemetryTest {
   @Test
   public void checksEnabled() throws Exception {
     Context mockedContext = mock(Context.class);
+    MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
@@ -165,7 +183,8 @@ public class MapboxTelemetryTest {
 
   @Test
   public void checksStartServiceWhenEnabled() throws Exception {
-    Context mockedContext = mock(Context.class);
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
@@ -186,6 +205,7 @@ public class MapboxTelemetryTest {
   @Test
   public void checksRegisterReceiverWhenEnabled() throws Exception {
     Context mockedContext = mock(Context.class);
+    MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
@@ -209,6 +229,7 @@ public class MapboxTelemetryTest {
   @Test
   public void checksFlusherRegisteringWhenEnabled() throws Exception {
     Context mockedContext = mock(Context.class);
+    MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
@@ -229,6 +250,7 @@ public class MapboxTelemetryTest {
   @Test
   public void checksFlusherSchedulingWhenEnabled() throws Exception {
     Context mockedContext = mock(Context.class);
+    MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
@@ -248,7 +270,8 @@ public class MapboxTelemetryTest {
 
   @Test
   public void checksDisabled() throws Exception {
-    Context mockedContext = mock(Context.class);
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
@@ -268,7 +291,8 @@ public class MapboxTelemetryTest {
 
   @Test
   public void checksStopServiceWhenDisabled() throws Exception {
-    Context mockedContext = mock(Context.class);
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
@@ -290,6 +314,7 @@ public class MapboxTelemetryTest {
   @Test
   public void checksUnregisterReceiverWhenDisabled() throws Exception {
     Context mockedContext = mock(Context.class);
+    MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
@@ -312,6 +337,7 @@ public class MapboxTelemetryTest {
   @Test
   public void checksFlusherUnregisteringWhenDisabled() throws Exception {
     Context mockedContext = mock(Context.class);
+    MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
@@ -333,13 +359,14 @@ public class MapboxTelemetryTest {
   @Test
   public void checksOnFullQueueSendEventsNotCalledWhenNullTelemetryClient() throws Exception {
     Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
-    String nullAccessToken = null;
-    String nullUserAgent = null;
     ConnectivityManager mockedConnectivityManager = mock(ConnectivityManager.class);
     when(mockedContext.getSystemService(Context.CONNECTIVITY_SERVICE)).thenReturn(mockedConnectivityManager);
     NetworkInfo mockedNetworkInfo = mock(NetworkInfo.class);
     when(mockedConnectivityManager.getActiveNetworkInfo()).thenReturn(mockedNetworkInfo);
     when(mockedNetworkInfo.isConnected()).thenReturn(true);
+    MapboxTelemetry.applicationContext = mockedContext;
+    String nullAccessToken = null;
+    String nullUserAgent = null;
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
     TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
     Callback mockedHttpCallback = mock(Callback.class);
@@ -358,13 +385,14 @@ public class MapboxTelemetryTest {
   @Test
   public void checksOnFullQueueSendEventsNotCalledWhenEmptyTelemetryClient() throws Exception {
     Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
-    String emptyValidAccessToken = "";
-    String emptyUserAgent = "";
     ConnectivityManager mockedConnectivityManager = mock(ConnectivityManager.class);
     when(mockedContext.getSystemService(Context.CONNECTIVITY_SERVICE)).thenReturn(mockedConnectivityManager);
     NetworkInfo mockedNetworkInfo = mock(NetworkInfo.class);
     when(mockedConnectivityManager.getActiveNetworkInfo()).thenReturn(mockedNetworkInfo);
     when(mockedNetworkInfo.isConnected()).thenReturn(true);
+    MapboxTelemetry.applicationContext = mockedContext;
+    String emptyValidAccessToken = "";
+    String emptyUserAgent = "";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
     TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
     Callback mockedHttpCallback = mock(Callback.class);
@@ -383,6 +411,7 @@ public class MapboxTelemetryTest {
   @Test
   public void checksOptedIn() throws Exception {
     Context mockedContext = mock(Context.class);
+    MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
@@ -403,7 +432,8 @@ public class MapboxTelemetryTest {
 
   @Test
   public void checksStartServiceWhenOptedIn() throws Exception {
-    Context mockedContext = mock(Context.class);
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
@@ -426,6 +456,7 @@ public class MapboxTelemetryTest {
   @Test
   public void checksRegisterReceiverWhenOptedIn() throws Exception {
     Context mockedContext = mock(Context.class);
+    MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
@@ -450,7 +481,8 @@ public class MapboxTelemetryTest {
 
   @Test
   public void checksOptedOut() throws Exception {
-    Context mockedContext = mock(Context.class);
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
@@ -470,7 +502,8 @@ public class MapboxTelemetryTest {
 
   @Test
   public void checksStopServiceWhenOptedOut() throws Exception {
-    Context mockedContext = mock(Context.class);
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
@@ -492,6 +525,7 @@ public class MapboxTelemetryTest {
   @Test
   public void checksUnregisterReceiverWhenOptedOut() throws Exception {
     Context mockedContext = mock(Context.class);
+    MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
@@ -513,7 +547,8 @@ public class MapboxTelemetryTest {
 
   @Test
   public void checksValidAccessTokenValidUserAgent() throws Exception {
-    Context mockedContext = mock(Context.class);
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
@@ -535,6 +570,7 @@ public class MapboxTelemetryTest {
   @Test
   public void checksNullAccessToken() throws Exception {
     Context mockedContext = mock(Context.class);
+    MapboxTelemetry.applicationContext = mockedContext;
     String invalidAccessTokenNull = null;
     String aValidUserAgent = "MapboxTelemetryAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
@@ -557,6 +593,7 @@ public class MapboxTelemetryTest {
   @Test
   public void checksUserAgentTelemetryAndroid() throws Exception {
     Context mockedContext = mock(Context.class);
+    MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String theTelemetryAndroidAgent = "MapboxTelemetryAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
@@ -579,6 +616,7 @@ public class MapboxTelemetryTest {
   @Test
   public void checksUserAgentUnity() throws Exception {
     Context mockedContext = mock(Context.class);
+    MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String theUnityAndroidAgent = "MapboxEventsUnityAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
@@ -601,6 +639,7 @@ public class MapboxTelemetryTest {
   @Test
   public void checksUserAgentNavigation() throws Exception {
     Context mockedContext = mock(Context.class);
+    MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String theNavigationAndroidAgent = "mapbox-navigation-android/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
@@ -622,7 +661,8 @@ public class MapboxTelemetryTest {
 
   @Test
   public void checksUserAgentNavigationUi() throws Exception {
-    Context mockedContext = mock(Context.class);
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String theNavigationUiAndroidAgent = "mapbox-navigation-ui-android/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
@@ -645,6 +685,7 @@ public class MapboxTelemetryTest {
   @Test
   public void checksUserAgentEvents() throws Exception {
     Context mockedContext = mock(Context.class);
+    MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String theEventsAndroidAgent = "MapboxEventsAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
@@ -667,6 +708,7 @@ public class MapboxTelemetryTest {
   @Test
   public void checksInvalidUserAgent() throws Exception {
     Context mockedContext = mock(Context.class);
+    MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aInvalidUserAgent = "invalidUserAgent";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
@@ -688,6 +730,7 @@ public class MapboxTelemetryTest {
   @Test
   public void checksNullUserAgent() throws Exception {
     Context mockedContext = mock(Context.class);
+    MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aNullUserAgent = null;
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
