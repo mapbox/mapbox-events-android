@@ -130,8 +130,7 @@ public class TelemetryClientMapEventsTest extends MockWebServerTest {
     MapboxTelemetry.applicationContext = context;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
-    Callback mockedHttpCallback = mock(Callback.class);
-    new MapboxTelemetry(context, aValidAccessToken, aValidUserAgent, mockedHttpCallback);
+    new MapboxTelemetry(context, aValidAccessToken, aValidUserAgent);
   }
 
   private MapState obtainDefaultMapState() {
