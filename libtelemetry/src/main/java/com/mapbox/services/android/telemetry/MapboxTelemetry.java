@@ -111,9 +111,9 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     return optLocationOut();
   }
 
-  public void updateSessionIdRotationInterval(@SessionInterval.Hour int hour) {
+  public void updateSessionIdRotationInterval(SessionInterval sessionInterval) {
     if (serviceBound) {
-      SessionIdentifier sessionIdentifier = new SessionIdentifier(hour);
+      SessionIdentifier sessionIdentifier = new SessionIdentifier(sessionInterval.val);
       telemetryService.updateSessionIdentifier(sessionIdentifier);
     }
   }
