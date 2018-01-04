@@ -133,7 +133,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     }
   }
 
-  public void updateLocationPriority(@LocationEnginePriority.PowerMode int locationPriority) {
+  public void updateLocationPriority(LocationEnginePriority locationPriority) {
     if (serviceBound) {
       telemetryService.updateLocationPriority(locationPriority);
     }
