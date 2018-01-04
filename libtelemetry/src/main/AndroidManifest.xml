@@ -6,7 +6,6 @@
     <!--Needed: uses-sdk:minSdkVersion 14 cannot be smaller than version 15 declared in Lost-->
     <uses-sdk tools:overrideLibrary="com.mapzen.lost"/>
 
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <application>
         <service android:name="com.mapbox.services.android.telemetry.TelemetryService"/>
     </application>
