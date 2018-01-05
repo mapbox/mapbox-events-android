@@ -36,7 +36,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
       add(NAVIGATION_UI_USER_AGENT);
     }
   };
-  private final Context context;
+  private static final String NON_NULL_APPLICATION_CONTEXT_REQUIRED = "Non-null application context required.";
   private String accessToken;
   private String userAgent;
   private EventsQueue queue;
@@ -53,26 +53,25 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   private boolean isOpted = false;
   private boolean serviceBound = false;
   private PermissionCheckRunnable permissionCheckRunnable = null;
+  static Context applicationContext = null;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent, Callback httpCallback) {
+    initializeContext(context);
     if (checkRequiredParameters(accessToken, userAgent)) {
       initializeTelemetryClient();
     }
-
-    this.context = context;
     this.httpCallback = httpCallback;
     initializeQueue();
     AlarmReceiver alarmReceiver = obtainAlarmReceiver(httpCallback);
-    this.schedulerFlusher = new SchedulerFlusherFactory(context, alarmReceiver).supply();
+    this.schedulerFlusher = new SchedulerFlusherFactory(applicationContext, alarmReceiver).supply();
   }
 
   // For testing only
   MapboxTelemetry(Context context, String accessToken, String userAgent, EventsQueue queue,
                   TelemetryClient telemetryClient, Callback httpCallback, SchedulerFlusher schedulerFlusher,
                   Clock clock, LocalBroadcastManager localBroadcastManager) {
+    initializeContext(context);
     checkRequiredParameters(accessToken, userAgent);
-
-    this.context = context;
     this.queue = queue;
     this.telemetryClient = telemetryClient;
     this.httpCallback = httpCallback;
@@ -126,7 +125,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
 
   public void updateUserAgent(String userAgent) {
     if (isUserAgentValid(userAgent)) {
-      telemetryClient.updateUserAgent(TelemetryUtils.createFullUserAgent(userAgent, context));
+      telemetryClient.updateUserAgent(TelemetryUtils.createFullUserAgent(userAgent, applicationContext));
     }
   }
 
@@ -144,7 +143,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   // Package private (no modifier) for testing purposes
   Intent obtainLocationServiceIntent() {
     if (locationServiceIntent == null) {
-      locationServiceIntent = new Intent(context, TelemetryService.class);
+      locationServiceIntent = new Intent(applicationContext, TelemetryService.class);
     }
 
     return locationServiceIntent;
@@ -166,6 +165,16 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     }
 
     return eventReceiverIntentFilter;
+  }
+
+  private void initializeContext(Context context) {
+    if (applicationContext == null) {
+      if (context.getApplicationContext() != null) {
+        applicationContext = context.getApplicationContext();
+      } else {
+        throw new IllegalArgumentException(NON_NULL_APPLICATION_CONTEXT_REQUIRED);
+      }
+    }
   }
 
   private boolean isAccessTokenValid(String accessToken) {
@@ -235,7 +244,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   private boolean isNetworkConnected() {
     try {
       ConnectivityManager connectivityManager = (ConnectivityManager)
-        context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
       //noinspection MissingPermission
       NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
 
@@ -274,7 +283,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   }
 
   private boolean checkLocationPermission() {
-    if (PermissionsManager.areLocationPermissionsGranted(context)) {
+    if (PermissionsManager.areLocationPermissionsGranted(applicationContext)) {
       return true;
     } else {
       permissionBackoff();
@@ -289,15 +298,15 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
 
   private PermissionCheckRunnable obtainPermissionCheckRunnable() {
     if (permissionCheckRunnable == null) {
-      permissionCheckRunnable = new PermissionCheckRunnable(context, this);
+      permissionCheckRunnable = new PermissionCheckRunnable(applicationContext, this);
     }
 
     return permissionCheckRunnable;
   }
 
   private void startLocation() {
-    context.startService(obtainLocationServiceIntent());
-    context.bindService(obtainLocationServiceIntent(), serviceConnection, Context.BIND_AUTO_CREATE);
+    applicationContext.startService(obtainLocationServiceIntent());
+    applicationContext.bindService(obtainLocationServiceIntent(), serviceConnection, Context.BIND_AUTO_CREATE);
   }
 
   private void registerEventReceiver() {
@@ -309,7 +318,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
 
   private LocalBroadcastManager obtainLocalBroadcastManager() {
     if (localBroadcastManager == null) {
-      localBroadcastManager = LocalBroadcastManager.getInstance(context);
+      localBroadcastManager = LocalBroadcastManager.getInstance(applicationContext);
     }
 
     return localBroadcastManager;
@@ -343,10 +352,10 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
 
   private void stopLocation() {
     if (serviceBound) {
-      context.unbindService(serviceConnection);
+      applicationContext.unbindService(serviceConnection);
       serviceBound = false;
     }
-    context.stopService(obtainLocationServiceIntent());
+    applicationContext.stopService(obtainLocationServiceIntent());
   }
 
   private void unregisterEventReceiver() {

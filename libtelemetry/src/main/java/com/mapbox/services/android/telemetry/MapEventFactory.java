@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MapEventFactory {
+  private static final String APPLICATION_CONTEXT_CANT_BE_NULL = "Create a MapboxTelemetry instance before calling "
+    + "this method.";
   private static final String SINGLE_CARRIER_RTT = "1xRTT";
   private static final String CODE_DIVISION_MULTIPLE_ACCESS = "CDMA";
   private static final String ENHANCED_DATA_GSM_EVOLUTION = "EDGE";
@@ -67,60 +69,61 @@ public class MapEventFactory {
       put(Configuration.ORIENTATION_PORTRAIT, PORTRAIT);
     }
   };
-  private Context context = null;
   private final Map<Event.Type, MapBuildEvent> BUILD_EVENT_MAP_GESTURE = new HashMap<Event.Type, MapBuildEvent>() {
     {
       put(Event.Type.MAP_CLICK, new MapBuildEvent() {
         @Override
-        public Event build(Context context, MapState mapState) {
-          return buildMapClickEvent(context, mapState);
+        public Event build(MapState mapState) {
+          return buildMapClickEvent(mapState);
         }
       });
       put(Event.Type.MAP_DRAGEND, new MapBuildEvent() {
         @Override
-        public Event build(Context context, MapState mapState) {
-          return buildMapDragendEvent(context, mapState);
+        public Event build(MapState mapState) {
+          return buildMapDragendEvent(mapState);
         }
       });
     }
   };
 
-  public MapEventFactory(Context context) {
-    this.context = context;
+  public MapEventFactory() {
+    if (MapboxTelemetry.applicationContext == null) {
+      throw new IllegalStateException(APPLICATION_CONTEXT_CANT_BE_NULL);
+    }
   }
 
   public Event createMapLoadEvent(Event.Type type) {
     checkLoad(type);
-    return buildMapLoadEvent(context);
+    return buildMapLoadEvent();
   }
 
   public Event createMapGestureEvent(Event.Type type, MapState mapState) {
     checkGesture(type, mapState);
-    return BUILD_EVENT_MAP_GESTURE.get(type).build(context, mapState);
+    return BUILD_EVENT_MAP_GESTURE.get(type).build(mapState);
   }
 
-  private MapClickEvent buildMapClickEvent(Context context, MapState mapState) {
+  private MapClickEvent buildMapClickEvent(MapState mapState) {
     MapClickEvent mapClickEvent = new MapClickEvent(mapState);
 
-    mapClickEvent.setOrientation(obtainOrientation(context));
-    mapClickEvent.setCarrier(obtainCellularCarrier(context));
-    mapClickEvent.setCellularNetworkType(obtainCellularNetworkType(context));
+    mapClickEvent.setOrientation(obtainOrientation(MapboxTelemetry.applicationContext));
+    mapClickEvent.setCarrier(obtainCellularCarrier(MapboxTelemetry.applicationContext));
+    mapClickEvent.setCellularNetworkType(obtainCellularNetworkType(MapboxTelemetry.applicationContext));
     mapClickEvent.setBatteryLevel(obtainBatteryLevel());
     mapClickEvent.setPluggedIn(isPluggedIn());
-    mapClickEvent.setWifi(obtainConnectedToWifi(context));
+    mapClickEvent.setWifi(obtainConnectedToWifi(MapboxTelemetry.applicationContext));
 
     return mapClickEvent;
   }
 
-  private MapDragendEvent buildMapDragendEvent(Context context, MapState mapState) {
+  private MapDragendEvent buildMapDragendEvent(MapState mapState) {
     MapDragendEvent mapDragendEvent = new MapDragendEvent(mapState);
 
-    mapDragendEvent.setOrientation(obtainOrientation(context));
-    mapDragendEvent.setCarrier(obtainCellularCarrier(context));
-    mapDragendEvent.setCellularNetworkType(obtainCellularNetworkType(context));
+    mapDragendEvent.setOrientation(obtainOrientation(MapboxTelemetry.applicationContext));
+    mapDragendEvent.setCarrier(obtainCellularCarrier(MapboxTelemetry.applicationContext));
+    mapDragendEvent.setCellularNetworkType(obtainCellularNetworkType(MapboxTelemetry.applicationContext));
     mapDragendEvent.setBatteryLevel(obtainBatteryLevel());
     mapDragendEvent.setPluggedIn(isPluggedIn());
-    mapDragendEvent.setWifi(obtainConnectedToWifi(context));
+    mapDragendEvent.setWifi(obtainConnectedToWifi(MapboxTelemetry.applicationContext));
 
     return mapDragendEvent;
   }
@@ -157,7 +160,7 @@ public class MapEventFactory {
   }
 
   private int obtainBatteryLevel() {
-    Intent batteryStatus = registerBatteryUpdates(context);
+    Intent batteryStatus = registerBatteryUpdates(MapboxTelemetry.applicationContext);
 
     if (batteryStatus == null) {
       return UNAVAILABLE_BATTERY_LEVEL;
@@ -174,7 +177,7 @@ public class MapEventFactory {
   }
 
   private boolean isPluggedIn() {
-    Intent batteryStatus = registerBatteryUpdates(context);
+    Intent batteryStatus = registerBatteryUpdates(MapboxTelemetry.applicationContext);
     int chargePlug = batteryStatus.getIntExtra(BatteryManager.EXTRA_PLUGGED, DEFAULT_BATTERY_LEVEL);
     final boolean pluggedIntoUSB = chargePlug == BatteryManager.BATTERY_PLUGGED_USB;
     final boolean pluggedIntoAC = chargePlug == BatteryManager.BATTERY_PLUGGED_AC;
@@ -209,18 +212,18 @@ public class MapEventFactory {
     return false;
   }
 
-  private MapLoadEvent buildMapLoadEvent(Context context) {
+  private MapLoadEvent buildMapLoadEvent() {
     MapLoadEvent mapLoadEvent = new MapLoadEvent();
 
     mapLoadEvent.setUserId(TelemetryUtils.obtainUniversalUniqueIdentifier());
-    mapLoadEvent.setOrientation(obtainOrientation(context));
-    mapLoadEvent.setAccessibilityFontScale(obtainAccessibilityFontScaleSize(context));
-    mapLoadEvent.setCarrier(obtainCellularCarrier(context));
-    mapLoadEvent.setCellularNetworkType(obtainCellularNetworkType(context));
-    mapLoadEvent.setResolution(obtainDisplayDensity(context));
+    mapLoadEvent.setOrientation(obtainOrientation(MapboxTelemetry.applicationContext));
+    mapLoadEvent.setAccessibilityFontScale(obtainAccessibilityFontScaleSize(MapboxTelemetry.applicationContext));
+    mapLoadEvent.setCarrier(obtainCellularCarrier(MapboxTelemetry.applicationContext));
+    mapLoadEvent.setCellularNetworkType(obtainCellularNetworkType(MapboxTelemetry.applicationContext));
+    mapLoadEvent.setResolution(obtainDisplayDensity(MapboxTelemetry.applicationContext));
     mapLoadEvent.setBatteryLevel(obtainBatteryLevel());
     mapLoadEvent.setPluggedIn(isPluggedIn());
-    mapLoadEvent.setWifi(obtainConnectedToWifi(context));
+    mapLoadEvent.setWifi(obtainConnectedToWifi(MapboxTelemetry.applicationContext));
 
     return mapLoadEvent;
   }
