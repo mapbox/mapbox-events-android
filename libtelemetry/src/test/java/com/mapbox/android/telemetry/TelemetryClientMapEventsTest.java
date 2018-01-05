@@ -113,7 +113,7 @@ public class TelemetryClientMapEventsTest extends MockWebServerTest {
     when(mockedContext.getSystemService(Context.WINDOW_SERVICE)).thenReturn(mockedWindowManager);
     initializeMapboxTelemetry(mockedContext);
     MapEventFactory mapEventFactory = new MapEventFactory();
-    Event loadEvent = mapEventFactory.createMapLoadEvent(Event.Type.MAP_LOAD);
+    Event loadEvent = mapEventFactory.createMapLoadEvent(Event.Type.MAP_LOAD, "aValidUserId");
     return loadEvent;
   }
 

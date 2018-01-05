@@ -37,20 +37,17 @@ class MapLoadEvent extends Event implements Parcelable {
   @SerializedName("wifi")
   private Boolean wifi = null;
 
-  MapLoadEvent() {
+  MapLoadEvent(String userId) {
     this.event = MAP_LOAD;
     this.model = Build.MODEL;
     this.operatingSystem = OPERATING_SYSTEM;
     this.created = TelemetryUtils.obtainCurrentDate();
+    this.userId = userId;
   }
 
   @Override
   Type obtainType() {
     return Type.MAP_LOAD;
-  }
-
-  void setUserId(String userId) {
-    this.userId = userId;
   }
 
   void setResolution(float resolution) {
