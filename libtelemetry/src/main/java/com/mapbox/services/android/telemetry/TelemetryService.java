@@ -87,8 +87,8 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
 
     if (locationEngine != null) {
       disconnectLocationEngine();
-      locationEngine.setPriority(locationPriority);
-      locationEngine.activate();
+      setupLocationEngine();
+      activateLocationEngine();
     }
   }
 
