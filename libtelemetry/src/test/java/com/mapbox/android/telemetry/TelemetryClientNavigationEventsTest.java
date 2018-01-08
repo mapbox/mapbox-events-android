@@ -105,7 +105,8 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
   public void sendsTheCorrectBodyPostingAppUserTurnstileEvent() throws Exception {
     TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     boolean indifferentTelemetryEnabled = false;
-    Event anAppUserTurnstile = new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier", "anySdkVersion");
+    Event anAppUserTurnstile = new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier",
+      "anySdkVersion", "anyUserId");
     List<Event> theAppUserTurnstile = obtainEvents(anAppUserTurnstile);
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
@@ -272,7 +273,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
     NavigationEventFactory navigationEventFactory = new NavigationEventFactory();
     Date aDate = new Date();
     NavigationState navigationState = obtainDefaultNavigationState(aDate);
-    FeedbackEventData navigationFeedbackData = new FeedbackEventData("userId", "general",
+    FeedbackEventData navigationFeedbackData = new FeedbackEventData("anyUserId", "general",
       "unknown", "audio");
     FeedbackData feedbackData = obtainFeedbackData();
     NavigationVoiceData navigationVoiceData = new NavigationVoiceData("voiceInstruction",
