@@ -2,17 +2,17 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.mapbox.services.android.telemetry">
+    package="com.mapbox.android.telemetry">
     <!--Needed: uses-sdk:minSdkVersion 14 cannot be smaller than version 15 declared in Lost-->
     <uses-sdk tools:overrideLibrary="com.mapzen.lost"/>
 
     <application>
-        <service android:name="com.mapbox.services.android.telemetry.TelemetryService"/>
+        <service android:name="com.mapbox.android.telemetry.TelemetryService"/>
     </application>
     <!--TODO Remove comment after analyzing the impact on the performance when adding SchedulerFlusherJobService-->
     <!--<application>-->
     <!--<service-->
-    <!--android:name="com.mapbox.services.android.telemetry.SchedulerFlusherJobService"-->
+    <!--android:name="com.mapbox.android.telemetry.SchedulerFlusherJobService"-->
     <!--android:permission="android.permission.BIND_JOB_SERVICE"/>-->
     <!--</application>-->
 </manifest>

@@ -5,7 +5,7 @@ android {
     buildToolsVersion androidVersions.buildToolsVersion
 
     defaultConfig {
-        applicationId "com.mapbox.services.android.telemetry.testapp"
+        applicationId "com.mapbox.android.events.testapp"
         minSdkVersion androidVersions.minSdkVersion
         targetSdkVersion androidVersions.targetSdkVersion
         versionCode 1
