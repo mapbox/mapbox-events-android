@@ -19,7 +19,7 @@ public class SerializerTest {
   public void checkArriveSerializing() throws Exception {
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22, 180, "sdkIdentifier", "sdkVersion",
-      "sessionID", 10.5, 15.67, "geometry", "profile", false, "device", "LostLocationEngine", 50);
+      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "device", "LostLocationEngine", 50);
     metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
     NavigationState navigationState = new NavigationState(metadata);
 
@@ -47,7 +47,7 @@ public class SerializerTest {
   public void checkDepartSerializing() throws Exception {
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22, 180, "sdkIdentifier", "sdkVersion",
-      "sessionID", 10.5, 15.67, "geometry", "profile", false, "device", "LostLocationEngine", 50);
+      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "device", "LostLocationEngine", 50);
     metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
     NavigationState navigationState = new NavigationState(metadata);
 
@@ -77,7 +77,7 @@ public class SerializerTest {
   public void checkCancelSerializing() throws Exception {
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22,
-      180, "sdkIdentifier", "sdkVersion", "sessionID", 10.5,
+      180, "sdkIdentifier", "sdkVersion", 3, "sessionID", 10.5,
       15.67, "geometry", "profile", false, "device",
       "LostLocationEngine", 50);
     metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
@@ -116,7 +116,7 @@ public class SerializerTest {
   public void checkFeedbackSerializing() throws Exception {
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22, 180, "sdkIdentifier", "sdkVersion",
-      "sessionID", 10.5, 15.67, "geometry", "profile", false, "device", "LostLocationEngine", 50);
+      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "device", "LostLocationEngine", 50);
     metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
     FeedbackEventData navigationFeedbackData = new FeedbackEventData("userId", "general",
       "unknown", "audio");
@@ -162,7 +162,7 @@ public class SerializerTest {
   public void checkRerouteSerializing() throws Exception {
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22,
-      180, "sdkIdent", "sdkversion", "sessionID", 10.5,
+      180, "sdkIdent", "sdkversion", 3, "sessionID", 10.5,
       15.67, "geometry", "profile", true, "device",
       "MockLocationEngine", 1300);
     metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
@@ -235,7 +235,7 @@ public class SerializerTest {
   public void checkFasterRouteSerializing() throws Exception {
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22,
-      180, "sdkIdent", "sdkversion", "sessionID", 10.5,
+      180, "sdkIdent", "sdkversion", 3, "sessionID", 10.5,
       15.67, "geometry", "profile", true, "device",
       "MockLocationEngine", 1300);
     metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
