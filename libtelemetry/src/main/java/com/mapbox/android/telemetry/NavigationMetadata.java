@@ -8,7 +8,6 @@ import java.util.Date;
 
 public class NavigationMetadata implements Parcelable {
   private static final String OPERATING_SYSTEM = "Android - " + Build.VERSION.RELEASE;
-  private static final int EVENT_VERSION = 3;
   private int absoluteDistanceToDestination;
   private Integer percentTimeInPortrait = null;
   private Integer percentTimeInForeground = null;
@@ -48,9 +47,9 @@ public class NavigationMetadata implements Parcelable {
   private String connectivity = null;
 
   public NavigationMetadata(Date startTimestamp, int distanceCompleted, int distanceRemaining, int durationRemaining,
-                            String sdKIdentifier, String sdkVersion, String sessionIdentifier, double lat, double lng,
-                            String geometry, String profile, boolean isSimulation, String device, String locationEngine,
-                            int absoluteDistanceToDestination) {
+                            String sdKIdentifier, String sdkVersion, int eventVersion, String sessionIdentifier,
+                            double lat, double lng, String geometry, String profile, boolean isSimulation,
+                            String device, String locationEngine, int absoluteDistanceToDestination) {
     this.startTimestamp = TelemetryUtils.generateCreateDateFormatted(startTimestamp);
     this.distanceCompleted = distanceCompleted;
     this.distanceRemaining = distanceRemaining;
@@ -58,7 +57,7 @@ public class NavigationMetadata implements Parcelable {
     this.operatingSystem = OPERATING_SYSTEM;
     this.sdKIdentifier = sdKIdentifier;
     this.sdkVersion = sdkVersion;
-    this.eventVersion = EVENT_VERSION;
+    this.eventVersion = eventVersion;
     this.sessionIdentifier = sessionIdentifier;
     this.lat = lat;
     this.lng = lng;
