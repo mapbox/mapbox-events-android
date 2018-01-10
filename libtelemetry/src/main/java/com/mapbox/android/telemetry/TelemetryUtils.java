@@ -1,6 +1,7 @@
 package com.mapbox.android.telemetry;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.text.TextUtils;
 
@@ -18,6 +19,8 @@ class TelemetryUtils {
   private static final String THREE_STRING_FORMAT = "%s/%s/%s";
   private static final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_AND_TIME_PATTERN, Locale.US);
   private static final Locale DEFAULT_LOCALE = Locale.US;
+  private static final String MAPBOX_SHARED_PREFERENCES = "MapboxSharedPreferences";
+  private static final String MAPBOX_SHARED_PREFERENCE_KEY_ENABLED_TELEMETRY = "mapboxEnabledTelemetry";
 
   static String obtainCurrentDate() {
     return dateFormat.format(new Date());
@@ -60,5 +63,26 @@ class TelemetryUtils {
     } catch (Exception exception) {
       return EMPTY_STRING;
     }
+  }
+
+  private static SharedPreferences obtainSharedPreferences() {
+    return MapboxTelemetry.applicationContext.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
+  }
+
+  static boolean updateEnabledTelemetry(boolean enabledTelemetry) {
+    SharedPreferences sharedPreferences = obtainSharedPreferences();
+    SharedPreferences.Editor editor = sharedPreferences.edit();
+
+    editor.putBoolean(MAPBOX_SHARED_PREFERENCE_KEY_ENABLED_TELEMETRY, enabledTelemetry);
+    editor.apply();
+
+    return enabledTelemetry;
+  }
+
+  static boolean retrieveEnabledTelemetry() {
+    SharedPreferences sharedPreferences = obtainSharedPreferences();
+    Boolean enabledTelemetry = sharedPreferences.getBoolean(MAPBOX_SHARED_PREFERENCE_KEY_ENABLED_TELEMETRY, false);
+
+    return enabledTelemetry;
   }
 }
