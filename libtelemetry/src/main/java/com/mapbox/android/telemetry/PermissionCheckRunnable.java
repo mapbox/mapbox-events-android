@@ -19,7 +19,7 @@ class PermissionCheckRunnable implements Runnable {
   @Override
   public void run() {
     if (PermissionsManager.areLocationPermissionsGranted(context)) {
-      mapboxTelemetry.optIn();
+      mapboxTelemetry.optLocationIn();
     } else {
       long nextWaitTime = counter.nextBackOffMillis();
       handler.postDelayed(this, nextWaitTime);

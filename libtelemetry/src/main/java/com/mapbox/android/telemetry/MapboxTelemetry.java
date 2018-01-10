@@ -57,11 +57,9 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent, Callback httpCallback) {
     initializeContext(context);
-    if (checkRequiredParameters(accessToken, userAgent)) {
-      initializeTelemetryClient();
-    }
-    this.httpCallback = httpCallback;
     initializeQueue();
+    checkRequiredParameters(accessToken, userAgent);
+    this.httpCallback = httpCallback;
     AlarmReceiver alarmReceiver = obtainAlarmReceiver(httpCallback);
     this.schedulerFlusher = new SchedulerFlusherFactory(applicationContext, alarmReceiver).supply();
   }
@@ -71,8 +69,8 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
                   TelemetryClient telemetryClient, Callback httpCallback, SchedulerFlusher schedulerFlusher,
                   Clock clock, LocalBroadcastManager localBroadcastManager) {
     initializeContext(context);
-    checkRequiredParameters(accessToken, userAgent);
     this.queue = queue;
+    checkRequiredParameters(accessToken, userAgent);
     this.telemetryClient = telemetryClient;
     this.httpCallback = httpCallback;
     this.schedulerFlusher = schedulerFlusher;
@@ -82,16 +80,23 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
 
   @Override
   public void onFullQueue(List<Event> fullQueue) {
-    sendEventsIfPossible(fullQueue, httpCallback);
+    if (isTelemetryEnabled) {
+      sendEventsIfPossible(fullQueue, httpCallback);
+    }
   }
 
   @Override
   public void onEventReceived(Event event) {
-    queue.push(event);
+    pushToQueue(event);
   }
 
   public boolean push(Event event) {
-    return queue.push(event);
+    if (sendEventIfWhitelisted(event)) {
+      return true;
+    }
+
+    boolean isPushed = pushToQueue(event);
+    return isPushed;
   }
 
   public boolean enable() {
@@ -100,14 +105,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
 
   public boolean disable() {
     return stopTelemetry();
-  }
-
-  public boolean optIn() {
-    return optLocationIn();
-  }
-
-  public boolean optOut() {
-    return optLocationOut();
   }
 
   public void updateSessionIdRotationInterval(int hour) {
@@ -135,9 +132,32 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     }
   }
 
+  boolean optLocationIn() {
+    if (isTelemetryEnabled && !isOpted && checkLocationPermission()) {
+      startLocation();
+      registerEventReceiver();
+      isOpted = true;
+    }
+    return isOpted;
+  }
+
+  boolean optLocationOut() {
+    if (isTelemetryEnabled && isOpted) {
+      stopLocation();
+      unregisterEventReceiver();
+      isOpted = false;
+    }
+    return isOpted;
+  }
+
   // Package private (no modifier) for testing purposes
   boolean checkRequiredParameters(String accessToken, String userAgent) {
-    return isAccessTokenValid(accessToken) && isUserAgentValid(userAgent);
+    boolean areValidParameters = areRequiredParametersValid(accessToken, userAgent);
+    if (areValidParameters) {
+      initializeTelemetryClient();
+      queue.setTelemetryInitialized(true);
+    }
+    return areValidParameters;
   }
 
   // Package private (no modifier) for testing purposes
@@ -177,6 +197,14 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     }
   }
 
+  private void initializeQueue() {
+    queue = new EventsQueue(new FullQueueFlusher(this));
+  }
+
+  private boolean areRequiredParametersValid(String accessToken, String userAgent) {
+    return isAccessTokenValid(accessToken) && isUserAgentValid(userAgent);
+  }
+
   private boolean isAccessTokenValid(String accessToken) {
     if (!TelemetryUtils.isEmpty(accessToken)) {
       this.accessToken = accessToken;
@@ -199,7 +227,9 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   }
 
   private void initializeTelemetryClient() {
-    telemetryClient = createTelemetryClient(accessToken, userAgent);
+    if (telemetryClient == null) {
+      telemetryClient = createTelemetryClient(accessToken, userAgent);
+    }
   }
 
   private TelemetryClient createTelemetryClient(String accessToken, String userAgent) {
@@ -211,28 +241,27 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     return telemetryClient;
   }
 
-  private void initializeQueue() {
-    queue = new EventsQueue(new FullQueueFlusher(this));
-    queue.setTelemetryInitialized(true);
-  }
-
   private AlarmReceiver obtainAlarmReceiver(final Callback httpCallback) {
     return new AlarmReceiver(new SchedulerCallback() {
       @Override
       public void onPeriodRaised() {
         // TODO Remove after including UI sample app tests
         System.out.println("MapboxTelemetry#onPeriodRaised");
-        List<Event> currentEvents = queue.flush();
-        boolean areThereAnyEvents = currentEvents.size() > 0;
-        if (areThereAnyEvents) {
-          sendEventsIfPossible(currentEvents, httpCallback);
-        }
+        flushEnqueuedEvents(httpCallback);
       }
 
       @Override
       public void onError() {
       }
     });
+  }
+
+  private void flushEnqueuedEvents(Callback httpCallback) {
+    List<Event> currentEvents = queue.flush();
+    boolean areThereAnyEvents = currentEvents.size() > 0;
+    if (areThereAnyEvents) {
+      sendEventsIfPossible(currentEvents, httpCallback);
+    }
   }
 
   private void sendEventsIfPossible(List<Event> events, Callback httpCallback) {
@@ -262,24 +291,32 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     }
   }
 
+  private boolean pushToQueue(Event event) {
+    if (isTelemetryEnabled) {
+      return queue.push(event);
+    }
+    return false;
+  }
+
+  private boolean sendEventIfWhitelisted(Event event) {
+    if (Event.Type.TURNSTILE.equals(event.obtainType())) {
+      List<Event> appUserTurnstile = new ArrayList<>(1);
+      appUserTurnstile.add(event);
+      sendEventsIfPossible(appUserTurnstile, httpCallback);
+      return true;
+    }
+    return false;
+  }
+
   private boolean startTelemetry() {
     if (!isTelemetryEnabled) {
       isTelemetryEnabled = true;
-      optIn();
+      optLocationIn();
       schedulerFlusher.register();
       Clock clock = obtainClock();
       schedulerFlusher.schedule(clock.giveMeTheElapsedRealtime());
     }
     return isTelemetryEnabled;
-  }
-
-  private boolean optLocationIn() {
-    if (isTelemetryEnabled && !isOpted && checkLocationPermission()) {
-      startLocation();
-      registerEventReceiver();
-      isOpted = true;
-    }
-    return isOpted;
   }
 
   private boolean checkLocationPermission() {
@@ -334,20 +371,12 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
 
   private boolean stopTelemetry() {
     if (isTelemetryEnabled) {
-      optOut();
+      flushEnqueuedEvents(httpCallback);
+      optLocationOut();
       schedulerFlusher.unregister();
       isTelemetryEnabled = false;
     }
     return isTelemetryEnabled;
-  }
-
-  private boolean optLocationOut() {
-    if (isTelemetryEnabled && isOpted) {
-      stopLocation();
-      unregisterEventReceiver();
-      isOpted = false;
-    }
-    return isOpted;
   }
 
   private void stopLocation() {
