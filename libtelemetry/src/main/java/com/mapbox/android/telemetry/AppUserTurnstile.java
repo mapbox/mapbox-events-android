@@ -28,10 +28,10 @@ public class AppUserTurnstile extends Event implements Parcelable {
   @SerializedName("operatingSystem")
   private String operatingSystem = null;
 
-  public AppUserTurnstile(boolean enabledTelemetry, String sdkIdentifier, String sdkVersion) {
+  public AppUserTurnstile(boolean enabledTelemetry, String sdkIdentifier, String sdkVersion, String userId) {
     this.event = APP_USER_TURNSTILE;
     this.created = TelemetryUtils.obtainCurrentDate();
-    this.userId = TelemetryUtils.obtainUniversalUniqueIdentifier();
+    this.userId = userId;
     this.enabledTelemetry = enabledTelemetry;
     this.sdkIdentifier = sdkIdentifier;
     this.sdkVersion = sdkVersion;
