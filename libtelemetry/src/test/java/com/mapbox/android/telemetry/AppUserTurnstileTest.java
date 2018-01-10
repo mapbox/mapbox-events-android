@@ -23,7 +23,6 @@ public class AppUserTurnstileTest {
 
   private Event obtainAnAppUserTurnstileEvent() {
     boolean indifferentTelemetryEnabled = false;
-    return new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier", "anySdkVersion",
-      "anyUserId");
+    return new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier", "anySdkVersion");
   }
 }

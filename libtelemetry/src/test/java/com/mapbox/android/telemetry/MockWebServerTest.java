@@ -133,7 +133,7 @@ class MockWebServerTest {
   List<Event> obtainAnEvent() {
     boolean indifferentTelemetryEnabled = false;
     Event theEvent = new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier",
-      "anySdkVersion", "anyUserId");
+      "anySdkVersion");
 
     return obtainEvents(theEvent);
   }
