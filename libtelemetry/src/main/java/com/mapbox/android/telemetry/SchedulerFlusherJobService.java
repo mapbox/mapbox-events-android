@@ -13,7 +13,7 @@ import static com.mapbox.android.telemetry.JobSchedulerFlusher.STOP_JOB_INTENT_K
 import static com.mapbox.android.telemetry.SchedulerFlusherFactory.SCHEDULER_FLUSHER_INTENT;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-public class SchedulerFlusherJobService extends JobService {
+class SchedulerFlusherJobService extends JobService {
   private static final String ON_START_INTENT_EXTRA = "onStart";
   private static final String ON_ERROR_INTENT_EXTRA = "onError";
 
