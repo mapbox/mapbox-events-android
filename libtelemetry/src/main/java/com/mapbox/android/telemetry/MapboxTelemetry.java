@@ -21,7 +21,7 @@ import okhttp3.Callback;
 
 import static com.mapbox.android.telemetry.EventReceiver.EVENT_RECEIVER_INTENT;
 
-public class MapboxTelemetry implements FullQueueCallback, EventCallback {
+public class MapboxTelemetry implements FullQueueCallback, EventCallback, ServiceTaskCallback {
   private static final String EVENTS_USER_AGENT = "MapboxEventsAndroid/";
   private static final String TELEMETRY_USER_AGENT = "MapboxTelemetryAndroid/";
   private static final String UNITY_USER_AGENT = "MapboxEventsUnityAndroid/";
@@ -88,6 +88,13 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
   @Override
   public void onEventReceived(Event event) {
     pushToQueue(event);
+  }
+
+  @Override
+  public void onTaskRemoved() {
+    if (serviceBound) {
+      stopTelemetry();
+    }
   }
 
   public boolean push(Event event) {
@@ -328,9 +335,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     if (!isTelemetryEnabled) {
       isTelemetryEnabled = true;
       optLocationIn();
-      schedulerFlusher.register();
-      Clock clock = obtainClock();
-      schedulerFlusher.schedule(clock.giveMeTheElapsedRealtime());
+      registerFlusher();
     }
     return isTelemetryEnabled;
   }
@@ -377,6 +382,12 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     return localBroadcastManager;
   }
 
+  private void registerFlusher() {
+    schedulerFlusher.register();
+    Clock clock = obtainClock();
+    schedulerFlusher.schedule(clock.giveMeTheElapsedRealtime());
+  }
+
   private Clock obtainClock() {
     if (clock == null) {
       clock = new Clock();
@@ -415,6 +426,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
       TelemetryService.TelemetryBinder binder = (TelemetryService.TelemetryBinder) service;
       telemetryService = binder.obtainService();
       serviceBound = true;
+      telemetryService.injectServiceTask(MapboxTelemetry.this);
     }
 
     @Override
