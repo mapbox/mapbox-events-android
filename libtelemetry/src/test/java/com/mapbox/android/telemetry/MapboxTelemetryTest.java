@@ -16,6 +16,7 @@ import okhttp3.Callback;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -61,9 +62,10 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
+      mockedLocalBroadcastManager, indifferentServiceBound);
     List<Event> mockedList = mock(List.class);
     theMapboxTelemetry.enable();
 
@@ -84,9 +86,10 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
+      mockedLocalBroadcastManager, indifferentServiceBound);
     List<Event> mockedList = mock(List.class);
 
     theMapboxTelemetry.onFullQueue(mockedList);
@@ -106,9 +109,10 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
+      mockedLocalBroadcastManager, indifferentServiceBound);
     List<Event> mockedList = mock(List.class);
 
     theMapboxTelemetry.onFullQueue(mockedList);
@@ -128,9 +132,10 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
+      mockedLocalBroadcastManager, indifferentServiceBound);
     Event mockedEvent = mock(Event.class);
     theMapboxTelemetry.enable();
 
@@ -151,9 +156,10 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
+      mockedLocalBroadcastManager, indifferentServiceBound);
     Event mockedEvent = mock(Event.class);
 
     theMapboxTelemetry.onEventReceived(mockedEvent);
@@ -173,9 +179,10 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
+      mockedLocalBroadcastManager, indifferentServiceBound);
     Event whitelistedEvent = new AppUserTurnstile(true, "anySdkIdentifier", "anySdkVersion");
     ArgumentCaptor<List<Event>> eventsCaptor = ArgumentCaptor.forClass((Class) List.class);
     theMapboxTelemetry.enable();
@@ -198,9 +205,10 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
+      mockedLocalBroadcastManager, indifferentServiceBound);
     Event mockedEvent = mock(Event.class);
     theMapboxTelemetry.enable();
 
@@ -221,9 +229,10 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
+      mockedLocalBroadcastManager, indifferentServiceBound);
     Event mockedEvent = mock(Event.class);
 
     theMapboxTelemetry.push(mockedEvent);
@@ -243,9 +252,10 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
+      mockedLocalBroadcastManager, indifferentServiceBound);
 
     boolean isEnabled = theMapboxTelemetry.enable();
 
@@ -264,9 +274,10 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
+      mockedLocalBroadcastManager, indifferentServiceBound);
 
     theMapboxTelemetry.enable();
 
@@ -285,9 +296,10 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
+      mockedLocalBroadcastManager, indifferentServiceBound);
     EventReceiver theEventReceiver = theMapboxTelemetry.obtainEventReceiver();
     IntentFilter theEventReceiverIntentFilter = theMapboxTelemetry.obtainEventReceiverIntentFilter();
 
@@ -309,9 +321,10 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
+      mockedLocalBroadcastManager, indifferentServiceBound);
 
     theMapboxTelemetry.enable();
 
@@ -330,9 +343,10 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
+      mockedLocalBroadcastManager, indifferentServiceBound);
 
     theMapboxTelemetry.enable();
 
@@ -351,9 +365,10 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
+      mockedLocalBroadcastManager, indifferentServiceBound);
 
     boolean isEnabled = theMapboxTelemetry.disable();
 
@@ -372,9 +387,10 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
+      mockedLocalBroadcastManager, indifferentServiceBound);
     theMapboxTelemetry.enable();
 
     theMapboxTelemetry.disable();
@@ -394,9 +410,10 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
+      mockedLocalBroadcastManager, indifferentServiceBound);
     theMapboxTelemetry.enable();
 
     theMapboxTelemetry.disable();
@@ -416,9 +433,10 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
+      mockedLocalBroadcastManager, indifferentServiceBound);
     EventReceiver theEventReceiver = theMapboxTelemetry.obtainEventReceiver();
     theMapboxTelemetry.enable();
 
@@ -439,9 +457,10 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
+      mockedLocalBroadcastManager, indifferentServiceBound);
     theMapboxTelemetry.enable();
 
     theMapboxTelemetry.disable();
@@ -461,9 +480,10 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, nullAccessToken, nullUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
+      mockedLocalBroadcastManager, indifferentServiceBound);
     List<Event> mockedList = mock(List.class);
 
     theMapboxTelemetry.onFullQueue(mockedList);
@@ -483,9 +503,10 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, emptyValidAccessToken, emptyUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
+      mockedLocalBroadcastManager, indifferentServiceBound);
     List<Event> mockedList = mock(List.class);
 
     theMapboxTelemetry.onFullQueue(mockedList);
@@ -505,9 +526,10 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
+      mockedLocalBroadcastManager, indifferentServiceBound);
     theMapboxTelemetry.enable();
 
     boolean validRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aValidUserAgent);
@@ -527,9 +549,10 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, invalidAccessTokenNull, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
+      mockedLocalBroadcastManager, indifferentServiceBound);
     theMapboxTelemetry.enable();
 
     boolean validRequiredParameters = theMapboxTelemetry.checkRequiredParameters(invalidAccessTokenNull,
@@ -550,9 +573,10 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, theTelemetryAndroidAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
+      mockedLocalBroadcastManager, indifferentServiceBound);
     theMapboxTelemetry.enable();
 
     boolean validRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken,
@@ -573,9 +597,10 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, theUnityAndroidAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
+      mockedLocalBroadcastManager, indifferentServiceBound);
     theMapboxTelemetry.enable();
 
     boolean validRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken,
@@ -596,9 +621,10 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken,
       theNavigationAndroidAgent, mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher,
-      mockedClock, mockedLocalBroadcastManager);
+      mockedClock, mockedLocalBroadcastManager, indifferentServiceBound);
     theMapboxTelemetry.enable();
 
     boolean validRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken,
@@ -619,9 +645,10 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken,
       theNavigationUiAndroidAgent, mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher,
-      mockedClock, mockedLocalBroadcastManager);
+      mockedClock, mockedLocalBroadcastManager, indifferentServiceBound);
     theMapboxTelemetry.enable();
 
     boolean validRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken,
@@ -642,9 +669,10 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, theEventsAndroidAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
+      mockedLocalBroadcastManager, indifferentServiceBound);
     theMapboxTelemetry.enable();
 
     boolean validRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken,
@@ -665,9 +693,10 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aInvalidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
+      mockedLocalBroadcastManager, indifferentServiceBound);
     theMapboxTelemetry.enable();
 
     boolean validRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aInvalidUserAgent);
@@ -687,9 +716,10 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aNullUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
+      mockedLocalBroadcastManager, indifferentServiceBound);
     theMapboxTelemetry.enable();
 
     boolean validRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aNullUserAgent);
@@ -742,6 +772,32 @@ public class MapboxTelemetryTest {
     assertFalse(updatedAccessToken);
   }
 
+  @Test
+  public void checksSessionIdRotationIntervalUpdated() throws Exception {
+    boolean serviceBound = true;
+    TelemetryService mockedTelemetryService = mock(TelemetryService.class);
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(serviceBound, mockedTelemetryService);
+    SessionInterval aValidSessionInterval = new SessionInterval(12);
+
+    boolean updatedSessionInterval = theMapboxTelemetry.updateSessionIdRotationInterval(aValidSessionInterval);
+
+    verify(mockedTelemetryService, times(1)).updateSessionIdentifier(any(SessionIdentifier.class));
+    assertTrue(updatedSessionInterval);
+  }
+
+  @Test
+  public void checksSessionIdRotationIntervalNotUpdated() throws Exception {
+    boolean serviceNotBound = false;
+    TelemetryService mockedTelemetryService = mock(TelemetryService.class);
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(serviceNotBound, mockedTelemetryService);
+    SessionInterval aValidSessionInterval = new SessionInterval(12);
+
+    boolean notUpdatedSessionInterval = theMapboxTelemetry.updateSessionIdRotationInterval(aValidSessionInterval);
+
+    verify(mockedTelemetryService, never()).updateSessionIdentifier(any(SessionIdentifier.class));
+    assertFalse(notUpdatedSessionInterval);
+  }
+
   private MapboxTelemetry obtainMapboxTelemetryWith(TelemetryClient telemetryClient) {
     Context mockedContext = mock(Context.class);
     MapboxTelemetry.applicationContext = mockedContext;
@@ -752,9 +808,30 @@ public class MapboxTelemetryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    boolean indifferentServiceBound = true;
     return new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, telemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
+      mockedLocalBroadcastManager, indifferentServiceBound);
+  }
+
+  private MapboxTelemetry obtainMapboxTelemetryWith(boolean isServiceBound, TelemetryService telemetryService) {
+    Context mockedContext = mock(Context.class);
+    MapboxTelemetry.applicationContext = mockedContext;
+    String aValidAccessToken = "validAccessToken";
+    String aValidUserAgent = "MapboxTelemetryAndroid/";
+    EventsQueue mockedEventsQueue = mock(EventsQueue.class);
+    TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
+    Callback mockedHttpCallback = mock(Callback.class);
+    SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
+    Clock mockedClock = mock(Clock.class);
+    LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
+    MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
+      mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
+      mockedLocalBroadcastManager, isServiceBound);
+    if (isServiceBound) {
+      theMapboxTelemetry.injectTelemetryService(telemetryService);
+    }
+    return theMapboxTelemetry;
   }
 
   private Context obtainNetworkConnectedMockedContext() {
