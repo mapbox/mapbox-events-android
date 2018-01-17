@@ -27,6 +27,19 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   private LocationEngine locationEngine = null;
   @LocationEnginePriority.PowerMode
   private int locationPriority = LocationEnginePriority.NO_POWER;
+  private ServiceTaskCallback serviceTaskCallback = null;
+
+  @Override
+  public void onCreate() {
+    super.onCreate();
+    createLocationReceiver();
+    createTelemetryReceiver();
+  }
+
+  @Override
+  public int onStartCommand(Intent intent, int flags, int startId) {
+    return START_STICKY;
+  }
 
   @Nullable
   @Override
@@ -37,20 +50,16 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   }
 
   @Override
-  public void onCreate() {
-    createLocationReceiver();
-    createTelemetryReceiver();
-  }
-
-  @Override
-  public int onStartCommand(Intent intent, int flags, int startId) {
-    return START_STICKY;
-  }
-
-  @Override
   public void onDestroy() {
     unregisterLocationReceiver();
     unregisterTelemetryReceiver();
+    super.onDestroy();
+  }
+
+  @Override
+  public void onTaskRemoved(Intent rootIntent) {
+    serviceTaskCallback.onTaskRemoved();
+    super.onTaskRemoved(rootIntent);
   }
 
   @Override
@@ -90,6 +99,10 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
       setupLocationEngine();
       activateLocationEngine();
     }
+  }
+
+  void injectServiceTask(ServiceTaskCallback callback) {
+    this.serviceTaskCallback = callback;
   }
 
   // For testing only

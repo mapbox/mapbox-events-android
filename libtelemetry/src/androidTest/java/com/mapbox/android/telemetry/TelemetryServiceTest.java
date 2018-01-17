@@ -16,6 +16,9 @@ import java.util.concurrent.CountDownLatch;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @RunWith(AndroidJUnit4.class)
 public class TelemetryServiceTest {
@@ -107,6 +110,22 @@ public class TelemetryServiceTest {
     foregroundService(boundService);
 
     assertLocationReceiverRegistered(boundService);
+  }
+
+  @Test
+  public void checksOnTaskRemovedCallbackWhenOnTaskRemovedCalled() throws Exception {
+    Intent serviceIntent = new Intent(InstrumentationRegistry.getTargetContext(), TelemetryService.class);
+    final TelemetryService[] boundService = new TelemetryService[1];
+    final CountDownLatch latchConnected = new CountDownLatch(1);
+    ServiceConnection serviceConnection = setupServiceConnection(boundService, latchConnected);
+    startService(serviceIntent);
+    waitUntilServiceIsBound(serviceIntent, latchConnected, serviceConnection);
+    ServiceTaskCallback mockedCallback = mock(ServiceTaskCallback.class);
+    boundService[0].injectServiceTask(mockedCallback);
+
+    boundService[0].onTaskRemoved(serviceIntent);
+
+    verify(mockedCallback, times(1)).onTaskRemoved();
   }
 
   private ServiceConnection setupServiceConnection(final TelemetryService[] boundService,
