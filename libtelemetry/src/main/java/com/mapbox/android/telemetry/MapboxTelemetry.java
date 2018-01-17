@@ -204,7 +204,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   private void initializeContext(Context context) {
     if (applicationContext == null) {
-      if (context.getApplicationContext() != null) {
+      if (context != null && context.getApplicationContext() != null) {
         applicationContext = context.getApplicationContext();
       } else {
         throw new IllegalArgumentException(NON_NULL_APPLICATION_CONTEXT_REQUIRED);

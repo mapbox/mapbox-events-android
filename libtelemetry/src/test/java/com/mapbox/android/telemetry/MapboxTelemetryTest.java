@@ -28,6 +28,16 @@ import static org.mockito.Mockito.when;
 public class MapboxTelemetryTest {
 
   @Test(expected = IllegalArgumentException.class)
+  public void checksNonNullContextRequired() throws Exception {
+    MapboxTelemetry.applicationContext = null;
+    String anyAccessToken = "anyAccessToken";
+    String anyUserAgent = "anyUserAgent";
+    Callback mockedHttpCallback = mock(Callback.class);
+
+    new MapboxTelemetry(null, anyAccessToken, anyUserAgent, mockedHttpCallback);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
   public void checksNonNullApplicationContextRequired() throws Exception {
     MapboxTelemetry.applicationContext = null;
     Context nullApplicationContext = mock(Context.class);
