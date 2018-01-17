@@ -248,10 +248,8 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   private TelemetryClient createTelemetryClient(String accessToken, String userAgent) {
-    TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder()
-      .environment(Environment.STAGING)
-      .build();
-    telemetryClient = new TelemetryClient(accessToken, userAgent, telemetryClientSettings, new Logger());
+    TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(accessToken, userAgent, new Logger());
+    telemetryClient = telemetryClientFactory.obtainTelemetryClient(applicationContext);
 
     return telemetryClient;
   }

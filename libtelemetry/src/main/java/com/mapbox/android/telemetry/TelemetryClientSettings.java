@@ -12,7 +12,7 @@ import okhttp3.ConnectionSpec;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 
-public class TelemetryClientSettings {
+class TelemetryClientSettings {
   private static final String STAGING_EVENTS_HOST = "api-events-staging.tilestream.net";
   private static final String COM_EVENTS_HOST = "events.mapbox.com";
   private static final String CHINA_EVENTS_HOST = "events.mapbox.cn";
@@ -56,6 +56,76 @@ public class TelemetryClientSettings {
     return debugLoggingEnabled;
   }
 
+  Builder toBuilder() {
+    return new Builder()
+      .environment(environment)
+      .client(client)
+      .baseUrl(baseUrl)
+      .sslSocketFactory(sslSocketFactory)
+      .x509TrustManager(x509TrustManager)
+      .debugLoggingEnabled(debugLoggingEnabled);
+  }
+
+  static HttpUrl configureUrlHostname(String eventsHost) {
+    HttpUrl.Builder builder = new HttpUrl.Builder().scheme(HTTPS_SCHEME);
+    builder.host(eventsHost);
+    return builder.build();
+  }
+
+  static final class Builder {
+    Environment environment = Environment.COM;
+    OkHttpClient client = new OkHttpClient();
+    HttpUrl baseUrl = null;
+    SSLSocketFactory sslSocketFactory = null;
+    X509TrustManager x509TrustManager = null;
+    boolean debugLoggingEnabled = false;
+
+    Builder() {
+    }
+
+    Builder environment(Environment environment) {
+      this.environment = environment;
+      return this;
+    }
+
+    Builder client(OkHttpClient client) {
+      if (client != null) {
+        this.client = client;
+      }
+      return this;
+    }
+
+    Builder baseUrl(HttpUrl baseUrl) {
+      if (baseUrl != null) {
+        this.baseUrl = baseUrl;
+      }
+      return this;
+    }
+
+    Builder sslSocketFactory(SSLSocketFactory sslSocketFactory) {
+      this.sslSocketFactory = sslSocketFactory;
+      return this;
+    }
+
+    Builder x509TrustManager(X509TrustManager x509TrustManager) {
+      this.x509TrustManager = x509TrustManager;
+      return this;
+    }
+
+    Builder debugLoggingEnabled(boolean debugLoggingEnabled) {
+      this.debugLoggingEnabled = debugLoggingEnabled;
+      return this;
+    }
+
+    TelemetryClientSettings build() {
+      if (baseUrl == null) {
+        String eventsHost = HOSTS.get(environment);
+        this.baseUrl = configureUrlHostname(eventsHost);
+      }
+      return new TelemetryClientSettings(this);
+    }
+  }
+
   private OkHttpClient configureHttpClient() {
     CertificatePinnerFactory factory = new CertificatePinnerFactory();
     OkHttpClient.Builder builder = client.newBuilder()
@@ -72,75 +142,5 @@ public class TelemetryClientSettings {
 
   private boolean isSocketFactoryUnset(SSLSocketFactory sslSocketFactory, X509TrustManager x509TrustManager) {
     return sslSocketFactory != null && x509TrustManager != null;
-  }
-
-  Builder toBuilder() {
-    return new Builder()
-      .environment(environment)
-      .client(client)
-      .baseUrl(baseUrl)
-      .sslSocketFactory(sslSocketFactory)
-      .x509TrustManager(x509TrustManager)
-      .debugLoggingEnabled(debugLoggingEnabled);
-  }
-
-  public static final class Builder {
-    Environment environment = Environment.COM;
-    OkHttpClient client = new OkHttpClient();
-    HttpUrl baseUrl = null;
-    SSLSocketFactory sslSocketFactory = null;
-    X509TrustManager x509TrustManager = null;
-    boolean debugLoggingEnabled = false;
-
-    public Builder() {
-    }
-
-    public Builder environment(Environment environment) {
-      this.environment = environment;
-      return this;
-    }
-
-    public Builder client(OkHttpClient client) {
-      if (client != null) {
-        this.client = client;
-      }
-      return this;
-    }
-
-    public Builder baseUrl(HttpUrl baseUrl) {
-      if (baseUrl != null) {
-        this.baseUrl = baseUrl;
-      }
-      return this;
-    }
-
-    public Builder sslSocketFactory(SSLSocketFactory sslSocketFactory) {
-      this.sslSocketFactory = sslSocketFactory;
-      return this;
-    }
-
-    public Builder x509TrustManager(X509TrustManager x509TrustManager) {
-      this.x509TrustManager = x509TrustManager;
-      return this;
-    }
-
-    public Builder debugLoggingEnabled(boolean debugLoggingEnabled) {
-      this.debugLoggingEnabled = debugLoggingEnabled;
-      return this;
-    }
-
-    public TelemetryClientSettings build() {
-      if (baseUrl == null) {
-        this.baseUrl = configureUrlHostname();
-      }
-      return new TelemetryClientSettings(this);
-    }
-
-    private HttpUrl configureUrlHostname() {
-      HttpUrl.Builder builder = new HttpUrl.Builder().scheme(HTTPS_SCHEME);
-      String eventsHost = HOSTS.get(environment);
-      builder.host(eventsHost);
-      return builder.build();
-    }
   }
 }

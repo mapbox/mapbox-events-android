@@ -54,6 +54,16 @@ class TelemetryClient {
     setting = setting.toBuilder().debugLoggingEnabled(debugLoggingEnabled).build();
   }
 
+  // For testing only
+  String obtainAccessToken() {
+    return accessToken;
+  }
+
+  // For testing only
+  TelemetryClientSettings obtainSetting() {
+    return setting;
+  }
+
   private void sendBatch(List<Event> batch, Callback callback) {
     GsonBuilder gsonBuilder = configureGsonBuilder();
     Gson gson = gsonBuilder.create();
