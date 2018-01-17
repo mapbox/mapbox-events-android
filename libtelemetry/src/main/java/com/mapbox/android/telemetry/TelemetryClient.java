@@ -36,6 +36,10 @@ class TelemetryClient {
     this.logger = logger;
   }
 
+  void updateAccessToken(String accessToken) {
+    this.accessToken = accessToken;
+  }
+
   void updateUserAgent(String userAgent) {
     this.userAgent = userAgent;
   }

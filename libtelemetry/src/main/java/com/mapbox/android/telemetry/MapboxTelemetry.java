@@ -132,6 +132,14 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     }
   }
 
+  public boolean updateAccessToken(String accessToken) {
+    if (isAccessTokenValid(accessToken) && updateTelemetryClient(accessToken)) {
+      this.accessToken = accessToken;
+      return true;
+    }
+    return false;
+  }
+
   boolean optLocationIn() {
     if (isTelemetryEnabled && !isOpted && checkLocationPermission()) {
       startLocation();
@@ -239,6 +247,14 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback {
     telemetryClient = new TelemetryClient(accessToken, userAgent, telemetryClientSettings, new Logger());
 
     return telemetryClient;
+  }
+
+  private boolean updateTelemetryClient(String accessToken) {
+    if (telemetryClient != null) {
+      telemetryClient.updateAccessToken(accessToken);
+      return true;
+    }
+    return false;
   }
 
   private AlarmReceiver obtainAlarmReceiver(final Callback httpCallback) {
