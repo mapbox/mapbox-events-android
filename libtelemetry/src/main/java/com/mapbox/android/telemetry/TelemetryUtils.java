@@ -68,8 +68,9 @@ class TelemetryUtils {
     Boolean enabledTelemetry = sharedPreferences.getBoolean(MAPBOX_SHARED_PREFERENCE_KEY_ENABLED_TELEMETRY, false);
 
     return enabledTelemetry;
+  }
 
-   static String retrieveVendorId() {
+  static String retrieveVendorId() {
     SharedPreferences sharedPreferences = obtainSharedPreferences();
     String mapboxVendorId  = sharedPreferences.getString(MAPBOX_SHARED_PREFERENCE_KEY_VENDOR_ID, "");
 
