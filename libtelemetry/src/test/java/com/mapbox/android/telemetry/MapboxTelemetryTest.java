@@ -118,7 +118,7 @@ public class MapboxTelemetryTest {
 
   @Test
   public void checksOnEventReceivedPushCalledWhenTelemetryEnabled() throws Exception {
-    Context mockedContext = mock(Context.class);
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
@@ -141,7 +141,7 @@ public class MapboxTelemetryTest {
 
   @Test
   public void checksOnEventReceivedPushNotCalledWhenTelemetryDisabled() throws Exception {
-    Context mockedContext = mock(Context.class);
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
@@ -188,7 +188,7 @@ public class MapboxTelemetryTest {
 
   @Test
   public void checksPushIfTelemetryEnabled() throws Exception {
-    Context mockedContext = mock(Context.class);
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
@@ -211,7 +211,7 @@ public class MapboxTelemetryTest {
 
   @Test
   public void checksPushIfTelemetryDisabled() throws Exception {
-    Context mockedContext = mock(Context.class);
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
@@ -233,7 +233,7 @@ public class MapboxTelemetryTest {
 
   @Test
   public void checksEnabled() throws Exception {
-    Context mockedContext = mock(Context.class);
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
@@ -275,7 +275,7 @@ public class MapboxTelemetryTest {
 
   @Test
   public void checksRegisterReceiverWhenEnabled() throws Exception {
-    Context mockedContext = mock(Context.class);
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
@@ -299,7 +299,7 @@ public class MapboxTelemetryTest {
 
   @Test
   public void checksFlusherRegisteringWhenEnabled() throws Exception {
-    Context mockedContext = mock(Context.class);
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
@@ -320,7 +320,7 @@ public class MapboxTelemetryTest {
 
   @Test
   public void checksFlusherSchedulingWhenEnabled() throws Exception {
-    Context mockedContext = mock(Context.class);
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
@@ -406,7 +406,7 @@ public class MapboxTelemetryTest {
 
   @Test
   public void checksUnregisterReceiverWhenDisabled() throws Exception {
-    Context mockedContext = mock(Context.class);
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
@@ -429,7 +429,7 @@ public class MapboxTelemetryTest {
 
   @Test
   public void checksFlusherUnregisteringWhenDisabled() throws Exception {
-    Context mockedContext = mock(Context.class);
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
@@ -517,7 +517,7 @@ public class MapboxTelemetryTest {
 
   @Test
   public void checksNullAccessToken() throws Exception {
-    Context mockedContext = mock(Context.class);
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     MapboxTelemetry.applicationContext = mockedContext;
     String invalidAccessTokenNull = null;
     String aValidUserAgent = "MapboxTelemetryAndroid/";
@@ -540,7 +540,7 @@ public class MapboxTelemetryTest {
 
   @Test
   public void checksUserAgentTelemetryAndroid() throws Exception {
-    Context mockedContext = mock(Context.class);
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String theTelemetryAndroidAgent = "MapboxTelemetryAndroid/";
@@ -563,7 +563,7 @@ public class MapboxTelemetryTest {
 
   @Test
   public void checksUserAgentUnity() throws Exception {
-    Context mockedContext = mock(Context.class);
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String theUnityAndroidAgent = "MapboxEventsUnityAndroid/";
@@ -586,7 +586,7 @@ public class MapboxTelemetryTest {
 
   @Test
   public void checksUserAgentNavigation() throws Exception {
-    Context mockedContext = mock(Context.class);
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String theNavigationAndroidAgent = "mapbox-navigation-android/";
@@ -632,7 +632,7 @@ public class MapboxTelemetryTest {
 
   @Test
   public void checksUserAgentEvents() throws Exception {
-    Context mockedContext = mock(Context.class);
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String theEventsAndroidAgent = "MapboxEventsAndroid/";
@@ -655,7 +655,7 @@ public class MapboxTelemetryTest {
 
   @Test
   public void checksInvalidUserAgent() throws Exception {
-    Context mockedContext = mock(Context.class);
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aInvalidUserAgent = "invalidUserAgent";
@@ -677,7 +677,7 @@ public class MapboxTelemetryTest {
 
   @Test
   public void checksNullUserAgent() throws Exception {
-    Context mockedContext = mock(Context.class);
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aNullUserAgent = null;

@@ -331,7 +331,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   private boolean startTelemetry() {
     if (!isTelemetryEnabled) {
-      isTelemetryEnabled = true;
+      isTelemetryEnabled = TelemetryUtils.updateEnabledTelemetry(true);
       optLocationIn();
       registerFlusher();
     }
@@ -399,7 +399,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
       flushEnqueuedEvents(httpCallback);
       optLocationOut();
       schedulerFlusher.unregister();
-      isTelemetryEnabled = false;
+      isTelemetryEnabled = TelemetryUtils.updateEnabledTelemetry(false);
     }
     return isTelemetryEnabled;
   }

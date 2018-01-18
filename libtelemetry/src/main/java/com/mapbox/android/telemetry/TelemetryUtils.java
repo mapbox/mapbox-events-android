@@ -20,6 +20,7 @@ class TelemetryUtils {
   private static final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_AND_TIME_PATTERN, Locale.US);
   private static final Locale DEFAULT_LOCALE = Locale.US;
   private static final String MAPBOX_SHARED_PREFERENCES = "MapboxSharedPreferences";
+  private static final String MAPBOX_SHARED_PREFERENCE_KEY_ENABLED_TELEMETRY = "mapboxEnabledTelemetry";
   private static final String MAPBOX_SHARED_PREFERENCE_KEY_VENDOR_ID = "mapboxVendorId";
 
   static String obtainCurrentDate() {
@@ -50,6 +51,23 @@ class TelemetryUtils {
     } else {
       return false;
     }
+  }
+
+  static boolean updateEnabledTelemetry(boolean enabledTelemetry) {
+    SharedPreferences sharedPreferences = obtainSharedPreferences();
+    SharedPreferences.Editor editor = sharedPreferences.edit();
+
+    editor.putBoolean(MAPBOX_SHARED_PREFERENCE_KEY_ENABLED_TELEMETRY, enabledTelemetry);
+    editor.apply();
+
+    return enabledTelemetry;
+  }
+
+  static boolean retrieveEnabledTelemetry() {
+    SharedPreferences sharedPreferences = obtainSharedPreferences();
+    Boolean enabledTelemetry = sharedPreferences.getBoolean(MAPBOX_SHARED_PREFERENCE_KEY_ENABLED_TELEMETRY, false);
+
+    return enabledTelemetry;
   }
 
   static String retrieveVendorId() {
