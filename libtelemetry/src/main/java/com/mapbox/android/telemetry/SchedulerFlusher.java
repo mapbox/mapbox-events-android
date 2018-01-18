@@ -1,7 +1,6 @@
 package com.mapbox.android.telemetry;
 
-// TODO Access can be package-private, remove public modifier after removing instances from the test app
-public interface SchedulerFlusher {
+interface SchedulerFlusher {
 
   void register();
 

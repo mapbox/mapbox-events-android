@@ -6,16 +6,14 @@ import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
 
-// TODO Access can be package-private, remove public modifier after removing instances from the test app
-public class LocationReceiver extends BroadcastReceiver {
+class LocationReceiver extends BroadcastReceiver {
   private static final String LOCATION_RECEIVED_INTENT_KEY = "location_received";
   private static final String ON_LOCATION_INTENT_EXTRA = "onLocation";
   static final String LOCATION_RECEIVER_INTENT = "com.mapbox.location_receiver";
   private EventSender eventSender = null;
   private LocationMapper locationMapper = null;
 
-  // TODO Access can be package-private, remove public modifier after removing instances from the test app
-  public LocationReceiver() {
+  LocationReceiver() {
   }
 
   // For testing only
@@ -32,8 +30,7 @@ public class LocationReceiver extends BroadcastReceiver {
     }
   }
 
-  // TODO Access can be package-private, remove public modifier after removing instances from the test app
-  public static Intent supplyIntent(Location location) {
+  static Intent supplyIntent(Location location) {
     Intent locationIntent = new Intent(LOCATION_RECEIVER_INTENT);
     locationIntent.putExtra(LOCATION_RECEIVED_INTENT_KEY, ON_LOCATION_INTENT_EXTRA);
     locationIntent.putExtra(LocationManager.KEY_LOCATION_CHANGED, location);

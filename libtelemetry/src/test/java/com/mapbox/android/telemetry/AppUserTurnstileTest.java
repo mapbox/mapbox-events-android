@@ -11,6 +11,14 @@ import static org.mockito.Mockito.mock;
 
 public class AppUserTurnstileTest {
 
+  @Test(expected = IllegalStateException.class)
+  public void checksMapboxTelemetryNotInitialized() throws Exception {
+    MapboxTelemetry.applicationContext = null;
+
+    boolean indifferentTelemetryEnabled = false;
+    new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier", "anySdkVersion");
+  }
+
   @Test
   public void checksMapLoadEvent() throws Exception {
     Event anAppUserTurnstileEvent = obtainAnAppUserTurnstileEvent();
