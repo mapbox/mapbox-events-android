@@ -1,6 +1,6 @@
 package com.mapbox.services.android.core.location;
 
 
-interface UpdateAndroidProvider {
+public interface UpdateAndroidProvider {
   void update();
 }

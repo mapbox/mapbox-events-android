@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.mapbox.android.core.permissions.PermissionsManager;
+import com.mapbox.services.android.core.location.UpdateAndroidProvider;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
