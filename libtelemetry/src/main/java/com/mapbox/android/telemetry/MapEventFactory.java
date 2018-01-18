@@ -43,7 +43,6 @@ public class MapEventFactory {
   private static final String NOT_A_LOAD_MAP_EVENT_TYPE = "Type must be a load map event.";
   private static final String NOT_A_GESTURE_MAP_EVENT_TYPE = "Type must be a gesture map event.";
   private static final String MAP_STATE_ILLEGAL_NULL = "MapState cannot be null.";
-  private static final String USER_ID_NULL_EMPTY = "UserId cannot be null or empty.";
   private static final Map<Integer, String> NETWORKS = new HashMap<Integer, String>() {
     {
       put(TelephonyManager.NETWORK_TYPE_1xRTT, SINGLE_CARRIER_RTT);
@@ -93,10 +92,9 @@ public class MapEventFactory {
     }
   }
 
-  public Event createMapLoadEvent(Event.Type type, String userId) {
+  public Event createMapLoadEvent(Event.Type type) {
     checkLoad(type);
-    checkUserId(userId);
-    return buildMapLoadEvent(userId);
+    return buildMapLoadEvent();
   }
 
   public Event createMapGestureEvent(Event.Type type, MapState mapState) {
@@ -214,7 +212,8 @@ public class MapEventFactory {
     return false;
   }
 
-  private MapLoadEvent buildMapLoadEvent(String userId) {
+  private MapLoadEvent buildMapLoadEvent() {
+    String userId = TelemetryUtils.retrieveVendorId();
     MapLoadEvent mapLoadEvent = new MapLoadEvent(userId);
 
     mapLoadEvent.setOrientation(obtainOrientation(MapboxTelemetry.applicationContext));
@@ -232,12 +231,6 @@ public class MapEventFactory {
   private void checkLoad(Event.Type type) {
     if (type != Event.Type.MAP_LOAD) {
       throw new IllegalArgumentException(NOT_A_LOAD_MAP_EVENT_TYPE);
-    }
-  }
-
-  private void checkUserId(String userId) {
-    if (TelemetryUtils.isEmpty(userId)) {
-      throw new IllegalArgumentException(USER_ID_NULL_EMPTY);
     }
   }
 

@@ -16,7 +16,7 @@ public class CertificatePinnerFactoryTest {
     Map<String, List<String>> stagingCertificatesPins = certificatePinnerFactory
       .provideCertificatesPinsFor(Environment.STAGING);
 
-    assertTrue(stagingCertificatesPins.containsKey("cloudfront-staging.tilestream.net"));
+    assertTrue(stagingCertificatesPins.containsKey("api-events-staging.tilestream.net"));
   }
 
   @Test
@@ -26,8 +26,8 @@ public class CertificatePinnerFactoryTest {
     Map<String, List<String>> stagingCertificatesPins = certificatePinnerFactory
       .provideCertificatesPinsFor(Environment.STAGING);
 
-    assertTrue(stagingCertificatesPins.containsKey("cloudfront-staging.tilestream.net"));
-    List<String> stagingPins = stagingCertificatesPins.get("cloudfront-staging.tilestream.net");
+    assertTrue(stagingCertificatesPins.containsKey("api-events-staging.tilestream.net"));
+    List<String> stagingPins = stagingCertificatesPins.get("api-events-staging.tilestream.net");
     assertTrue(stagingPins.contains("sha256/3euxrJOrEZI15R4104UsiAkDqe007EPyZ6eTL/XxdAY="));
     assertTrue(stagingPins.contains("sha256/5kJvNEMw0KjrCAu7eXY5HZdvyCS13BbA0VJG1RSP91w="));
     assertTrue(stagingPins.contains("sha256/r/mIkG3eEpVdm+u/ko/cwxzOMo1bk4TyHIlByibiA5E="));

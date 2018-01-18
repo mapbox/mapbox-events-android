@@ -10,6 +10,8 @@ import com.google.gson.annotations.SerializedName;
 public class AppUserTurnstile extends Event implements Parcelable {
   private static final String APP_USER_TURNSTILE = "appUserTurnstile";
   private static final String OPERATING_SYSTEM = "Android - " + Build.VERSION.RELEASE;
+  private static final String APPLICATION_CONTEXT_CANT_BE_NULL = "Create a MapboxTelemetry instance before calling "
+    + "this method.";
 
   @SerializedName("event")
   private final String event;
@@ -28,10 +30,11 @@ public class AppUserTurnstile extends Event implements Parcelable {
   @SerializedName("operatingSystem")
   private String operatingSystem = null;
 
-  public AppUserTurnstile(boolean enabledTelemetry, String sdkIdentifier, String sdkVersion, String userId) {
+  public AppUserTurnstile(boolean enabledTelemetry, String sdkIdentifier, String sdkVersion) {
+    checkApplicationContext();
     this.event = APP_USER_TURNSTILE;
     this.created = TelemetryUtils.obtainCurrentDate();
-    this.userId = userId;
+    this.userId = TelemetryUtils.retrieveVendorId();
     this.enabledTelemetry = enabledTelemetry;
     this.sdkIdentifier = sdkIdentifier;
     this.sdkVersion = sdkVersion;
@@ -84,4 +87,10 @@ public class AppUserTurnstile extends Event implements Parcelable {
       return new AppUserTurnstile[size];
     }
   };
+
+  private void checkApplicationContext() {
+    if (MapboxTelemetry.applicationContext == null) {
+      throw new IllegalStateException(APPLICATION_CONTEXT_CANT_BE_NULL);
+    }
+  }
 }
