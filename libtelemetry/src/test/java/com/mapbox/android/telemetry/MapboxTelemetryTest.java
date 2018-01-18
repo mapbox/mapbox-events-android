@@ -117,29 +117,6 @@ public class MapboxTelemetryTest {
   }
 
   @Test
-  public void checksOnEventReceivedPushCalledWhenTelemetryEnabled() throws Exception {
-    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
-    MapboxTelemetry.applicationContext = mockedContext;
-    String aValidAccessToken = "validAccessToken";
-    String aValidUserAgent = "MapboxTelemetryAndroid/";
-    EventsQueue mockedEventsQueue = mock(EventsQueue.class);
-    TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
-    Callback mockedHttpCallback = mock(Callback.class);
-    SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
-    Clock mockedClock = mock(Clock.class);
-    LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
-    MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
-      mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
-    Event mockedEvent = mock(Event.class);
-    theMapboxTelemetry.enable();
-
-    theMapboxTelemetry.onEventReceived(mockedEvent);
-
-    verify(mockedEventsQueue, times(1)).push(eq(mockedEvent));
-  }
-
-  @Test
   public void checksOnEventReceivedPushCalled() throws Exception {
     Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     MapboxTelemetry.applicationContext = mockedContext;
@@ -164,28 +141,6 @@ public class MapboxTelemetryTest {
 
   @Test
   public void checksOnEventReceivedPushNotCalledWhenTelemetryDisabled() throws Exception {
-    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
-    MapboxTelemetry.applicationContext = mockedContext;
-    String aValidAccessToken = "validAccessToken";
-    String aValidUserAgent = "MapboxTelemetryAndroid/";
-    EventsQueue mockedEventsQueue = mock(EventsQueue.class);
-    TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
-    Callback mockedHttpCallback = mock(Callback.class);
-    SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
-    Clock mockedClock = mock(Clock.class);
-    LocalBroadcastManager mockedLocalBroadcastManager = mock(LocalBroadcastManager.class);
-    MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
-      mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      mockedLocalBroadcastManager);
-    Event mockedEvent = mock(Event.class);
-
-    theMapboxTelemetry.onEventReceived(mockedEvent);
-
-    verify(mockedEventsQueue, never()).push(eq(mockedEvent));
-  }
-
-  @Test
-  public void checksPush() throws Exception {
     Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
@@ -267,9 +222,7 @@ public class MapboxTelemetryTest {
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
       mockedLocalBroadcastManager);
-
     Event mockedEvent = mock(Event.class);
-
     theMapboxTelemetry.enable();
 
     theMapboxTelemetry.push(mockedEvent);

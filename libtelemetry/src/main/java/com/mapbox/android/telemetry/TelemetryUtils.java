@@ -52,23 +52,6 @@ class TelemetryUtils {
     }
   }
 
-  private static String obtainApplicationIdentifier(Context context) {
-    try {
-      String packageName = context.getPackageName();
-      PackageInfo packageInfo = context.getPackageManager().getPackageInfo(packageName, 0);
-      String appIdentifier = String.format(DEFAULT_LOCALE, THREE_STRING_FORMAT, packageName,
-        packageInfo.versionName, packageInfo.versionCode);
-
-      return appIdentifier;
-    } catch (Exception exception) {
-      return EMPTY_STRING;
-    }
-  }
-
-  private static SharedPreferences obtainSharedPreferences() {
-    return MapboxTelemetry.applicationContext.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
-  }
-
   static boolean updateEnabledTelemetry(boolean enabledTelemetry) {
     SharedPreferences sharedPreferences = obtainSharedPreferences();
     SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -84,5 +67,22 @@ class TelemetryUtils {
     Boolean enabledTelemetry = sharedPreferences.getBoolean(MAPBOX_SHARED_PREFERENCE_KEY_ENABLED_TELEMETRY, false);
 
     return enabledTelemetry;
+  }
+
+  private static String obtainApplicationIdentifier(Context context) {
+    try {
+      String packageName = context.getPackageName();
+      PackageInfo packageInfo = context.getPackageManager().getPackageInfo(packageName, 0);
+      String appIdentifier = String.format(DEFAULT_LOCALE, THREE_STRING_FORMAT, packageName,
+        packageInfo.versionName, packageInfo.versionCode);
+
+      return appIdentifier;
+    } catch (Exception exception) {
+      return EMPTY_STRING;
+    }
+  }
+
+  private static SharedPreferences obtainSharedPreferences() {
+    return MapboxTelemetry.applicationContext.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
   }
 }

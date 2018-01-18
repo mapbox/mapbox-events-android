@@ -49,7 +49,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private Intent locationServiceIntent = null;
   private EventReceiver eventReceiver = null;
   private IntentFilter eventReceiverIntentFilter = null;
-  private Boolean isTelemetryEnabled;
+  private boolean isTelemetryEnabled = false;
   private boolean isOpted = false;
   private boolean serviceBound = false;
   private PermissionCheckRunnable permissionCheckRunnable = null;
@@ -62,7 +62,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     this.httpCallback = httpCallback;
     AlarmReceiver alarmReceiver = obtainAlarmReceiver(httpCallback);
     this.schedulerFlusher = new SchedulerFlusherFactory(applicationContext, alarmReceiver).supply();
-    this.isTelemetryEnabled = TelemetryUtils.retrieveEnabledTelemetry();
   }
 
   // For testing only
@@ -77,7 +76,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     this.schedulerFlusher = schedulerFlusher;
     this.clock = clock;
     this.localBroadcastManager = localBroadcastManager;
-    this.isTelemetryEnabled = TelemetryUtils.retrieveEnabledTelemetry();
   }
 
   @Override
