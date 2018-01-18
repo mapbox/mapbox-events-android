@@ -5,12 +5,15 @@ import android.location.Location;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.mapbox.services.android.core.location.UpdateLostRequestPriority;
 import com.mapzen.android.lost.api.LocationListener;
 import com.mapzen.android.lost.api.LocationRequest;
 import com.mapzen.android.lost.api.LocationServices;
 import com.mapzen.android.lost.api.LostApiClient;
 
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Sample LocationEngine using the Open Source Lost library
@@ -24,6 +27,35 @@ class LostLocationEngine extends LocationEngine implements
 
   private WeakReference<Context> context;
   private LostApiClient lostApiClient;
+  private final Map<LocationEnginePriority, UpdateLostRequestPriority> REQUEST_PRIORITY = new
+    HashMap<LocationEnginePriority, UpdateLostRequestPriority>() {
+      {
+        put(LocationEnginePriority.NO_POWER, new UpdateLostRequestPriority() {
+          @Override
+          public void update(LocationRequest request) {
+            request.setPriority(LocationRequest.PRIORITY_NO_POWER);
+          }
+        });
+        put(LocationEnginePriority.LOW_POWER, new UpdateLostRequestPriority() {
+          @Override
+          public void update(LocationRequest request) {
+            request.setPriority(LocationRequest.PRIORITY_LOW_POWER);
+          }
+        });
+        put(LocationEnginePriority.BALANCED_POWER_ACCURACY, new UpdateLostRequestPriority() {
+          @Override
+          public void update(LocationRequest request) {
+            request.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+          }
+        });
+        put(LocationEnginePriority.HIGH_ACCURACY, new UpdateLostRequestPriority() {
+          @Override
+          public void update(LocationRequest request) {
+            request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+          }
+        });
+      }
+    };
 
   private LostLocationEngine(Context context) {
     super();
@@ -123,15 +155,7 @@ class LostLocationEngine extends LocationEngine implements
       request.setSmallestDisplacement(smallestDisplacement);
     }
 
-    if (priority == LocationEnginePriority.NO_POWER) {
-      request.setPriority(LocationRequest.PRIORITY_NO_POWER);
-    } else if (priority == LocationEnginePriority.LOW_POWER) {
-      request.setPriority(LocationRequest.PRIORITY_LOW_POWER);
-    } else if (priority == LocationEnginePriority.BALANCED_POWER_ACCURACY) {
-      request.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-    } else if (priority == LocationEnginePriority.HIGH_ACCURACY) {
-      request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-    }
+    updateRequestPriority(request);
 
     if (lostApiClient.isConnected()) {
       //noinspection MissingPermission
@@ -174,5 +198,9 @@ class LostLocationEngine extends LocationEngine implements
         lostApiClient.connect();
       }
     }
+  }
+
+  private void updateRequestPriority(LocationRequest request) {
+    REQUEST_PRIORITY.get(priority).update(request);
   }
 }

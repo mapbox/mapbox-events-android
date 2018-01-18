@@ -11,8 +11,11 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.mapbox.services.android.core.location.UpdateGoogleRequestPriority;
 
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Sample LocationEngine using Google Play Services
@@ -24,6 +27,35 @@ class GoogleLocationEngine extends LocationEngine implements
 
   private WeakReference<Context> context;
   private GoogleApiClient googleApiClient;
+  private final Map<LocationEnginePriority, UpdateGoogleRequestPriority> REQUEST_PRIORITY = new
+    HashMap<LocationEnginePriority, UpdateGoogleRequestPriority>() {
+      {
+        put(LocationEnginePriority.NO_POWER, new UpdateGoogleRequestPriority() {
+          @Override
+          public void update(LocationRequest request) {
+            request.setPriority(LocationRequest.PRIORITY_NO_POWER);
+          }
+        });
+        put(LocationEnginePriority.LOW_POWER, new UpdateGoogleRequestPriority() {
+          @Override
+          public void update(LocationRequest request) {
+            request.setPriority(LocationRequest.PRIORITY_LOW_POWER);
+          }
+        });
+        put(LocationEnginePriority.BALANCED_POWER_ACCURACY, new UpdateGoogleRequestPriority() {
+          @Override
+          public void update(LocationRequest request) {
+            request.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+          }
+        });
+        put(LocationEnginePriority.HIGH_ACCURACY, new UpdateGoogleRequestPriority() {
+          @Override
+          public void update(LocationRequest request) {
+            request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+          }
+        });
+      }
+    };
 
   private GoogleLocationEngine(Context context) {
     super();
@@ -99,15 +131,7 @@ class GoogleLocationEngine extends LocationEngine implements
       request.setSmallestDisplacement(smallestDisplacement);
     }
 
-    if (priority == LocationEnginePriority.NO_POWER) {
-      request.setPriority(LocationRequest.PRIORITY_NO_POWER);
-    } else if (priority == LocationEnginePriority.LOW_POWER) {
-      request.setPriority(LocationRequest.PRIORITY_LOW_POWER);
-    } else if (priority == LocationEnginePriority.BALANCED_POWER_ACCURACY) {
-      request.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-    } else if (priority == LocationEnginePriority.HIGH_ACCURACY) {
-      request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-    }
+    updateRequestPriority(request);
 
     if (googleApiClient.isConnected()) {
       //noinspection MissingPermission
@@ -142,5 +166,9 @@ class GoogleLocationEngine extends LocationEngine implements
         googleApiClient.connect();
       }
     }
+  }
+
+  private void updateRequestPriority(LocationRequest request) {
+    REQUEST_PRIORITY.get(priority).update(request);
   }
 }
