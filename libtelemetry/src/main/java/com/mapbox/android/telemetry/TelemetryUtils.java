@@ -1,6 +1,7 @@
 package com.mapbox.android.telemetry;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.text.TextUtils;
 
@@ -18,6 +19,8 @@ class TelemetryUtils {
   private static final String THREE_STRING_FORMAT = "%s/%s/%s";
   private static final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_AND_TIME_PATTERN, Locale.US);
   private static final Locale DEFAULT_LOCALE = Locale.US;
+  private static final String MAPBOX_SHARED_PREFERENCES = "MapboxSharedPreferences";
+  private static final String MAPBOX_SHARED_PREFERENCE_KEY_VENDOR_ID = "mapboxVendorId";
 
   static String obtainCurrentDate() {
     return dateFormat.format(new Date());
@@ -49,6 +52,28 @@ class TelemetryUtils {
     }
   }
 
+  static String retrieveVendorId() {
+    SharedPreferences sharedPreferences = obtainSharedPreferences();
+    String mapboxVendorId  = sharedPreferences.getString(MAPBOX_SHARED_PREFERENCE_KEY_VENDOR_ID, "");
+
+    if (TelemetryUtils.isEmpty(mapboxVendorId)) {
+      mapboxVendorId = TelemetryUtils.updateVendorId();
+    }
+
+    return mapboxVendorId;
+  }
+
+  private static String updateVendorId() {
+    SharedPreferences sharedPreferences = obtainSharedPreferences();
+    SharedPreferences.Editor editor = sharedPreferences.edit();
+
+    String uniqueId = obtainUniversalUniqueIdentifier();
+    editor.putString(MAPBOX_SHARED_PREFERENCE_KEY_VENDOR_ID, uniqueId);
+    editor.apply();
+
+    return uniqueId;
+  }
+
   private static String obtainApplicationIdentifier(Context context) {
     try {
       String packageName = context.getPackageName();
@@ -60,5 +85,9 @@ class TelemetryUtils {
     } catch (Exception exception) {
       return EMPTY_STRING;
     }
+  }
+
+  private static SharedPreferences obtainSharedPreferences() {
+    return MapboxTelemetry.applicationContext.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
   }
 }
