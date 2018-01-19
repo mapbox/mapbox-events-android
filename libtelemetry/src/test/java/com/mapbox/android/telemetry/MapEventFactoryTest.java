@@ -7,8 +7,6 @@ import android.view.WindowManager;
 
 import org.junit.Test;
 
-import okhttp3.Callback;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -140,8 +138,7 @@ public class MapEventFactoryTest {
     MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
-    Callback mockedHttpCallback = mock(Callback.class);
-    new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent, mockedHttpCallback);
+    new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent);
   }
 
   private MapState obtainAValidMapState() {

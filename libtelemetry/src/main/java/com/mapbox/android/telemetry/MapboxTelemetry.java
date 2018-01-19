@@ -13,15 +13,20 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import com.mapbox.android.core.location.LocationEnginePriority;
 import com.mapbox.android.core.permissions.PermissionsManager;
+import com.mapbox.services.android.telemetry.TelemetryListener;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArraySet;
 
+import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.Response;
 
 import static com.mapbox.android.telemetry.EventReceiver.EVENT_RECEIVER_INTENT;
 
-public class MapboxTelemetry implements FullQueueCallback, EventCallback, ServiceTaskCallback {
+public class MapboxTelemetry implements FullQueueCallback, EventCallback, ServiceTaskCallback, Callback {
   private static final String EVENTS_USER_AGENT = "MapboxEventsAndroid/";
   private static final String TELEMETRY_USER_AGENT = "MapboxTelemetryAndroid/";
   private static final String UNITY_USER_AGENT = "MapboxEventsUnityAndroid/";
@@ -42,7 +47,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private EventsQueue queue;
   private TelemetryClient telemetryClient;
   private TelemetryService telemetryService;
-  private final Callback httpCallback;
+  private Callback httpCallback;
   private final SchedulerFlusher schedulerFlusher;
   private Clock clock = null;
   private LocalBroadcastManager localBroadcastManager = null;
@@ -54,16 +59,18 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private boolean isOpted = false;
   private boolean isServiceBound = false;
   private PermissionCheckRunnable permissionCheckRunnable = null;
+  private CopyOnWriteArraySet<TelemetryListener> telemetryListeners = null;
   static Context applicationContext = null;
 
-  public MapboxTelemetry(Context context, String accessToken, String userAgent, Callback httpCallback) {
+  public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
     initializeQueue();
     checkRequiredParameters(accessToken, userAgent);
-    this.httpCallback = httpCallback;
-    AlarmReceiver alarmReceiver = obtainAlarmReceiver(httpCallback);
+    this.httpCallback = this;
+    AlarmReceiver alarmReceiver = obtainAlarmReceiver();
     this.schedulerFlusher = new SchedulerFlusherFactory(applicationContext, alarmReceiver).supply();
     this.serviceConnection = obtainServiceConnection();
+    initializeTelemetryListeners();
   }
 
   // For testing only
@@ -79,12 +86,13 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     this.clock = clock;
     this.localBroadcastManager = localBroadcastManager;
     this.isServiceBound = isServiceBound;
+    initializeTelemetryListeners();
   }
 
   @Override
   public void onFullQueue(List<Event> fullQueue) {
     if (isTelemetryEnabled) {
-      sendEventsIfPossible(fullQueue, httpCallback);
+      sendEventsIfPossible(fullQueue);
     }
   }
 
@@ -97,6 +105,20 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   public void onTaskRemoved() {
     if (isServiceBound) {
       stopTelemetry();
+    }
+  }
+
+  @Override
+  public void onFailure(Call call, IOException exception) {
+    for (TelemetryListener telemetryListener : telemetryListeners) {
+      telemetryListener.onHttpFailure(exception.getMessage());
+    }
+  }
+
+  @Override
+  public void onResponse(Call call, Response response) {
+    for (TelemetryListener telemetryListener : telemetryListeners) {
+      telemetryListener.onHttpResponse(response.isSuccessful(), response.code());
     }
   }
 
@@ -151,6 +173,14 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
       return true;
     }
     return false;
+  }
+
+  public boolean addTelemetryListener(TelemetryListener listener) {
+    return telemetryListeners.add(listener);
+  }
+
+  public boolean removeTelemetryListener(TelemetryListener listener) {
+    return telemetryListeners.remove(listener);
   }
 
   boolean optLocationIn() {
@@ -273,13 +303,13 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     return false;
   }
 
-  private AlarmReceiver obtainAlarmReceiver(final Callback httpCallback) {
+  private AlarmReceiver obtainAlarmReceiver() {
     return new AlarmReceiver(new SchedulerCallback() {
       @Override
       public void onPeriodRaised() {
         // TODO Remove after including UI sample app tests
         System.out.println("MapboxTelemetry#onPeriodRaised");
-        flushEnqueuedEvents(httpCallback);
+        flushEnqueuedEvents();
       }
 
       @Override
@@ -288,17 +318,17 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     });
   }
 
-  private void flushEnqueuedEvents(Callback httpCallback) {
+  private void flushEnqueuedEvents() {
     List<Event> currentEvents = queue.flush();
     boolean areThereAnyEvents = currentEvents.size() > 0;
     if (areThereAnyEvents) {
-      sendEventsIfPossible(currentEvents, httpCallback);
+      sendEventsIfPossible(currentEvents);
     }
   }
 
-  private void sendEventsIfPossible(List<Event> events, Callback httpCallback) {
+  private void sendEventsIfPossible(List<Event> events) {
     if (isNetworkConnected()) {
-      sendEvents(events, httpCallback);
+      sendEvents(events);
     }
   }
 
@@ -317,7 +347,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     }
   }
 
-  private void sendEvents(List<Event> events, Callback httpCallback) {
+  private void sendEvents(List<Event> events) {
     if (checkRequiredParameters(accessToken, userAgent)) {
       telemetryClient.sendEvents(events, httpCallback);
     }
@@ -348,11 +378,15 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     return false;
   }
 
+  private void initializeTelemetryListeners() {
+    telemetryListeners = new CopyOnWriteArraySet<>();
+  }
+
   private boolean sendEventIfWhitelisted(Event event) {
     if (Event.Type.TURNSTILE.equals(event.obtainType())) {
       List<Event> appUserTurnstile = new ArrayList<>(1);
       appUserTurnstile.add(event);
-      sendEventsIfPossible(appUserTurnstile, httpCallback);
+      sendEventsIfPossible(appUserTurnstile);
       return true;
     }
     return false;
@@ -425,7 +459,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   private boolean stopTelemetry() {
     if (isTelemetryEnabled) {
-      flushEnqueuedEvents(httpCallback);
+      flushEnqueuedEvents();
       optLocationOut();
       schedulerFlusher.unregister();
       isTelemetryEnabled = TelemetryUtils.updateEnabledTelemetry(false);

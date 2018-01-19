@@ -33,9 +33,8 @@ public class MapboxTelemetryTest {
     MapboxTelemetry.applicationContext = null;
     String anyAccessToken = "anyAccessToken";
     String anyUserAgent = "anyUserAgent";
-    Callback mockedHttpCallback = mock(Callback.class);
 
-    new MapboxTelemetry(null, anyAccessToken, anyUserAgent, mockedHttpCallback);
+    new MapboxTelemetry(null, anyAccessToken, anyUserAgent);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -45,9 +44,8 @@ public class MapboxTelemetryTest {
     when(nullApplicationContext.getApplicationContext()).thenReturn(null);
     String anyAccessToken = "anyAccessToken";
     String anyUserAgent = "anyUserAgent";
-    Callback mockedHttpCallback = mock(Callback.class);
 
-    new MapboxTelemetry(nullApplicationContext, anyAccessToken, anyUserAgent, mockedHttpCallback);
+    new MapboxTelemetry(nullApplicationContext, anyAccessToken, anyUserAgent);
   }
 
   @Test
