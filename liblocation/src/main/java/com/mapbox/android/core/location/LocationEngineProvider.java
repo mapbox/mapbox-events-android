@@ -15,7 +15,6 @@ public class LocationEngineProvider {
   private static final List<LocationEngine.Type> OPTIONAL_LOCATION_ENGINES = new ArrayList<LocationEngine.Type>() {
     {
       add(LocationEngine.Type.GOOGLE_PLAY_SERVICES);
-      add(LocationEngine.Type.LOST);
     }
   };
 
@@ -51,7 +50,6 @@ public class LocationEngineProvider {
     ClasspathChecker classpathChecker = new ClasspathChecker();
     Map<LocationEngine.Type, LocationEngineSupplier> locationSources = new HashMap<>();
     locationSources.put(LocationEngine.Type.GOOGLE_PLAY_SERVICES, new GoogleLocationEngineFactory(classpathChecker));
-    locationSources.put(LocationEngine.Type.LOST, new LostLocationEngineFactory(classpathChecker));
     locationSources.put(LocationEngine.Type.ANDROID, new AndroidLocationEngineFactory());
 
     return locationSources;
