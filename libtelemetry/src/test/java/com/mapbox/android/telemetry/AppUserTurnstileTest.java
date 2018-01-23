@@ -15,8 +15,7 @@ public class AppUserTurnstileTest {
   public void checksMapboxTelemetryNotInitialized() throws Exception {
     MapboxTelemetry.applicationContext = null;
 
-    boolean indifferentTelemetryEnabled = false;
-    new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier", "anySdkVersion");
+    new AppUserTurnstile("anySdkIdentifier", "anySdkVersion");
   }
 
   @Test
@@ -37,6 +36,6 @@ public class AppUserTurnstileTest {
     Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     MapboxTelemetry.applicationContext = mockedContext;
     boolean indifferentTelemetryEnabled = false;
-    return new AppUserTurnstile(indifferentTelemetryEnabled, "anySdkIdentifier", "anySdkVersion");
+    return new AppUserTurnstile("anySdkIdentifier", "anySdkVersion");
   }
 }
