@@ -1,6 +1,6 @@
-package com.mapbox.services.android.telemetry;
+package com.mapbox.android.telemetry;
 
-public interface TelemetryListener {
+interface TelemetryListener {
 
   void onHttpResponse(boolean successful, int code);
 
