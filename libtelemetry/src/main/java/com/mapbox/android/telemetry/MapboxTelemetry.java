@@ -13,7 +13,6 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import com.mapbox.android.core.location.LocationEnginePriority;
 import com.mapbox.android.core.permissions.PermissionsManager;
-import com.mapbox.services.android.telemetry.TelemetryListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
