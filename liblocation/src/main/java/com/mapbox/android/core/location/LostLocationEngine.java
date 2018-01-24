@@ -5,7 +5,6 @@ import android.location.Location;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.mapbox.services.android.core.location.UpdateLostRequestPriority;
 import com.mapzen.android.lost.api.LocationListener;
 import com.mapzen.android.lost.api.LocationRequest;
 import com.mapzen.android.lost.api.LocationServices;

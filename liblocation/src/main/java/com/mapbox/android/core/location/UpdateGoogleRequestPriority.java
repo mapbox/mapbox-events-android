@@ -1,8 +1,8 @@
-package com.mapbox.services.android.core.location;
+package com.mapbox.android.core.location;
 
 
 import com.google.android.gms.location.LocationRequest;
 
-public interface UpdateGoogleRequestPriority {
+interface UpdateGoogleRequestPriority {
   void update(LocationRequest request);
 }

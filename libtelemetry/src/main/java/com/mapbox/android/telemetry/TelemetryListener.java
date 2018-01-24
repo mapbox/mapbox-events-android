@@ -1,4 +1,4 @@
-package com.mapbox.services.android.telemetry;
+package com.mapbox.android.telemetry;
 
 public interface TelemetryListener {
 

@@ -11,7 +11,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.mapbox.services.android.core.location.UpdateGoogleRequestPriority;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
