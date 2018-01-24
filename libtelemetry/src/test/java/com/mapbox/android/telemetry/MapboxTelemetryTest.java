@@ -181,7 +181,7 @@ public class MapboxTelemetryTest {
     MapboxTelemetry theMapboxTelemetry = new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
       mockedLocalBroadcastManager, indifferentServiceBound);
-    Event whitelistedEvent = new AppUserTurnstile(true, "anySdkIdentifier", "anySdkVersion");
+    Event whitelistedEvent = new AppUserTurnstile("anySdkIdentifier", "anySdkVersion");
     ArgumentCaptor<List<Event>> eventsCaptor = ArgumentCaptor.forClass((Class) List.class);
     theMapboxTelemetry.enable();
 
