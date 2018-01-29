@@ -15,11 +15,11 @@ class MapClickEvent extends Event implements Parcelable {
   @SerializedName("gesture")
   private final String gesture;
   @SerializedName("lat")
-  private float latitude;
+  private double latitude;
   @SerializedName("lng")
-  private float longitude;
+  private double longitude;
   @SerializedName("zoom")
-  private float zoom;
+  private double zoom;
   @SerializedName("orientation")
   private String orientation = null;
   @SerializedName("batteryLevel")
@@ -75,9 +75,9 @@ class MapClickEvent extends Event implements Parcelable {
     event = in.readString();
     created = in.readString();
     gesture = in.readString();
-    latitude = in.readFloat();
-    longitude = in.readFloat();
-    zoom = in.readFloat();
+    latitude = in.readDouble();
+    longitude = in.readDouble();
+    zoom = in.readDouble();
     orientation = in.readString();
     batteryLevel = in.readByte() == 0x00 ? null : in.readInt();
     byte pluggedInVal = in.readByte();
@@ -98,9 +98,9 @@ class MapClickEvent extends Event implements Parcelable {
     dest.writeString(event);
     dest.writeString(created);
     dest.writeString(gesture);
-    dest.writeFloat(latitude);
-    dest.writeFloat(longitude);
-    dest.writeFloat(zoom);
+    dest.writeDouble(latitude);
+    dest.writeDouble(longitude);
+    dest.writeDouble(zoom);
     dest.writeString(orientation);
     if (batteryLevel == null) {
       dest.writeByte((byte) (0x00));
