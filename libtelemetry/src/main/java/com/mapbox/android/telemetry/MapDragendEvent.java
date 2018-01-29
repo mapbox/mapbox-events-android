@@ -13,11 +13,11 @@ class MapDragendEvent extends Event implements Parcelable {
   @SerializedName("created")
   private String created;
   @SerializedName("lat")
-  private float latitude;
+  private double latitude;
   @SerializedName("lng")
-  private float longitude;
+  private double longitude;
   @SerializedName("zoom")
-  private float zoom;
+  private double zoom;
   @SerializedName("orientation")
   private String orientation = null;
   @SerializedName("batteryLevel")
@@ -71,9 +71,9 @@ class MapDragendEvent extends Event implements Parcelable {
   private MapDragendEvent(Parcel in) {
     event = in.readString();
     created = in.readString();
-    latitude = in.readFloat();
-    longitude = in.readFloat();
-    zoom = in.readFloat();
+    latitude = in.readDouble();
+    longitude = in.readDouble();
+    zoom = in.readDouble();
     orientation = in.readString();
     batteryLevel = in.readByte() == 0x00 ? null : in.readInt();
     byte pluggedInVal = in.readByte();
@@ -93,9 +93,9 @@ class MapDragendEvent extends Event implements Parcelable {
   public void writeToParcel(Parcel dest, int flags) {
     dest.writeString(event);
     dest.writeString(created);
-    dest.writeFloat(latitude);
-    dest.writeFloat(longitude);
-    dest.writeFloat(zoom);
+    dest.writeDouble(latitude);
+    dest.writeDouble(longitude);
+    dest.writeDouble(zoom);
     dest.writeString(orientation);
     if (batteryLevel == null) {
       dest.writeByte((byte) (0x00));

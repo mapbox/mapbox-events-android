@@ -134,9 +134,9 @@ public class TelemetryClientMapEventsTest extends MockWebServerTest {
   }
 
   private MapState obtainDefaultMapState() {
-    float aLatitude = 40.416775f;
-    float aLongitude = -3.703790f;
-    float aZoom = 1.5f;
+    double aLatitude = 40.416775d;
+    double aLongitude = -3.703790d;
+    double aZoom = 1.5d;
     return new MapState(aLatitude, aLongitude, aZoom);
   }
 
