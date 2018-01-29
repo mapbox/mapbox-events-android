@@ -131,8 +131,7 @@ class MockWebServerTest {
   }
 
   List<Event> obtainAnEvent() {
-    Event theEvent = new AppUserTurnstile("anySdkIdentifier",
-      "anySdkVersion");
+    Event theEvent = new AppUserTurnstile("anySdkIdentifier", "anySdkVersion", false);
 
     return obtainEvents(theEvent);
   }

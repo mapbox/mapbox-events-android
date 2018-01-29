@@ -21,8 +21,7 @@ public class TelemetryClientAppUserTurnstileEventTest extends MockWebServerTest 
     Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     MapboxTelemetry.applicationContext = mockedContext;
     TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
-    Event anAppUserTurnstile = new AppUserTurnstile("anySdkIdentifier",
-      "anySdkVersion");
+    Event anAppUserTurnstile = new AppUserTurnstile("anySdkIdentifier", "anySdkVersion", false);
     List<Event> theAppUserTurnstile = obtainEvents(anAppUserTurnstile);
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
