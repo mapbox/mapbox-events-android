@@ -13,15 +13,14 @@ import java.util.UUID;
 import okhttp3.internal.Util;
 
 class TelemetryUtils {
+  static final String MAPBOX_SHARED_PREFERENCES = "MapboxSharedPreferences";
+  static final String MAPBOX_SHARED_PREFERENCE_KEY_VENDOR_ID = "mapboxVendorId";
   private static final String DATE_AND_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
   private static final String EMPTY_STRING = "";
   private static final String TWO_STRING_FORMAT = "%s%s";
   private static final String THREE_STRING_FORMAT = "%s/%s/%s";
   private static final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_AND_TIME_PATTERN, Locale.US);
   private static final Locale DEFAULT_LOCALE = Locale.US;
-  private static final String MAPBOX_SHARED_PREFERENCES = "MapboxSharedPreferences";
-  private static final String MAPBOX_SHARED_PREFERENCE_KEY_ENABLED_TELEMETRY = "mapboxEnabledTelemetry";
-  private static final String MAPBOX_SHARED_PREFERENCE_KEY_VENDOR_ID = "mapboxVendorId";
 
   static String obtainCurrentDate() {
     return dateFormat.format(new Date());
@@ -53,32 +52,19 @@ class TelemetryUtils {
     }
   }
 
-  static boolean updateEnabledTelemetry(boolean enabledTelemetry) {
-    SharedPreferences sharedPreferences = obtainSharedPreferences();
-    SharedPreferences.Editor editor = sharedPreferences.edit();
-
-    editor.putBoolean(MAPBOX_SHARED_PREFERENCE_KEY_ENABLED_TELEMETRY, enabledTelemetry);
-    editor.apply();
-
-    return enabledTelemetry;
-  }
-
-  static boolean retrieveEnabledTelemetry() {
-    SharedPreferences sharedPreferences = obtainSharedPreferences();
-    Boolean enabledTelemetry = sharedPreferences.getBoolean(MAPBOX_SHARED_PREFERENCE_KEY_ENABLED_TELEMETRY, false);
-
-    return enabledTelemetry;
-  }
-
   static String retrieveVendorId() {
     SharedPreferences sharedPreferences = obtainSharedPreferences();
-    String mapboxVendorId  = sharedPreferences.getString(MAPBOX_SHARED_PREFERENCE_KEY_VENDOR_ID, "");
+    String mapboxVendorId = sharedPreferences.getString(MAPBOX_SHARED_PREFERENCE_KEY_VENDOR_ID, "");
 
     if (TelemetryUtils.isEmpty(mapboxVendorId)) {
       mapboxVendorId = TelemetryUtils.updateVendorId();
     }
 
     return mapboxVendorId;
+  }
+
+  static SharedPreferences obtainSharedPreferences() {
+    return MapboxTelemetry.applicationContext.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
   }
 
   private static String updateVendorId() {
@@ -103,9 +89,5 @@ class TelemetryUtils {
     } catch (Exception exception) {
       return EMPTY_STRING;
     }
-  }
-
-  private static SharedPreferences obtainSharedPreferences() {
-    return MapboxTelemetry.applicationContext.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
   }
 }

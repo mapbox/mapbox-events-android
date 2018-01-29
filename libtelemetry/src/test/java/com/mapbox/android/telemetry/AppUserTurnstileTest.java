@@ -1,13 +1,17 @@
 package com.mapbox.android.telemetry;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import org.junit.Test;
 
+import static com.mapbox.android.telemetry.TelemetryEnabler.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE;
+import static com.mapbox.android.telemetry.TelemetryUtils.MAPBOX_SHARED_PREFERENCES;
+import static com.mapbox.android.telemetry.TelemetryUtils.MAPBOX_SHARED_PREFERENCE_KEY_VENDOR_ID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class AppUserTurnstileTest {
 
@@ -15,7 +19,7 @@ public class AppUserTurnstileTest {
   public void checksMapboxTelemetryNotInitialized() throws Exception {
     MapboxTelemetry.applicationContext = null;
 
-    new AppUserTurnstile("anySdkIdentifier", "anySdkVersion");
+    new AppUserTurnstile("anySdkIdentifier", "anySdkVersion", false);
   }
 
   @Test
@@ -33,9 +37,16 @@ public class AppUserTurnstileTest {
   }
 
   private Event obtainAnAppUserTurnstileEvent() {
-    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    Context mockedContext = mock(Context.class);
+    SharedPreferences mockedSharedPreferences = mock(SharedPreferences.class);
+    when(mockedContext.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE))
+      .thenReturn(mockedSharedPreferences);
+    when(mockedSharedPreferences.getString(MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE,
+      TelemetryEnabler.State.NOT_INITIALIZED.name())).thenReturn(TelemetryEnabler.State.NOT_INITIALIZED.name());
+    when(mockedSharedPreferences.getString(MAPBOX_SHARED_PREFERENCE_KEY_VENDOR_ID, "")).thenReturn("");
+    SharedPreferences.Editor mockedEditor = mock(SharedPreferences.Editor.class);
+    when(mockedSharedPreferences.edit()).thenReturn(mockedEditor);
     MapboxTelemetry.applicationContext = mockedContext;
-    boolean indifferentTelemetryEnabled = false;
-    return new AppUserTurnstile("anySdkIdentifier", "anySdkVersion");
+    return new AppUserTurnstile("anySdkIdentifier", "anySdkVersion", false);
   }
 }

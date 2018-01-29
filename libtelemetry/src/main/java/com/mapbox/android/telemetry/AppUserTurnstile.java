@@ -7,6 +7,8 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
 
+import static com.mapbox.android.telemetry.TelemetryEnabler.TELEMETRY_STATES;
+
 public class AppUserTurnstile extends Event implements Parcelable {
   private static final String APP_USER_TURNSTILE = "appUserTurnstile";
   private static final String OPERATING_SYSTEM = "Android - " + Build.VERSION.RELEASE;
@@ -35,7 +37,21 @@ public class AppUserTurnstile extends Event implements Parcelable {
     this.event = APP_USER_TURNSTILE;
     this.created = TelemetryUtils.obtainCurrentDate();
     this.userId = TelemetryUtils.retrieveVendorId();
-    this.enabledTelemetry = TelemetryUtils.retrieveEnabledTelemetry();
+    TelemetryEnabler telemetryEnabler = new TelemetryEnabler(true);
+    this.enabledTelemetry = TELEMETRY_STATES.get(telemetryEnabler.obtainTelemetryState());
+    this.sdkIdentifier = sdkIdentifier;
+    this.sdkVersion = sdkVersion;
+    this.model = Build.MODEL;
+    this.operatingSystem = OPERATING_SYSTEM;
+  }
+
+  AppUserTurnstile(String sdkIdentifier, String sdkVersion, boolean isFromPreferences) {
+    checkApplicationContext();
+    this.event = APP_USER_TURNSTILE;
+    this.created = TelemetryUtils.obtainCurrentDate();
+    this.userId = TelemetryUtils.retrieveVendorId();
+    TelemetryEnabler telemetryEnabler = new TelemetryEnabler(isFromPreferences);
+    this.enabledTelemetry = TELEMETRY_STATES.get(telemetryEnabler.obtainTelemetryState());
     this.sdkIdentifier = sdkIdentifier;
     this.sdkVersion = sdkVersion;
     this.model = Build.MODEL;
