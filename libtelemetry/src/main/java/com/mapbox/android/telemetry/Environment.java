@@ -1,7 +1,7 @@
 package com.mapbox.android.telemetry;
 
 
-public enum Environment {
+enum Environment {
   STAGING,
   COM,
   CHINA
