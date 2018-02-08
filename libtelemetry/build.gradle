@@ -12,7 +12,6 @@ android {
         versionCode 1
         versionName version
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        multiDexEnabled true
     }
 
     testOptions {
