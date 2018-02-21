@@ -1,4 +1,4 @@
-package com.mapbox.android.telemetry;
+package com.mapbox.android.telemetry.maps.events;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +11,10 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
+
+import com.mapbox.android.telemetry.Event;
+import com.mapbox.android.telemetry.MapboxTelemetry;
+import com.mapbox.android.telemetry.TelemetryUtils;
 
 import java.util.HashMap;
 import java.util.Map;

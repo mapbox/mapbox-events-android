@@ -1,4 +1,4 @@
-package com.mapbox.android.telemetry.navigationutilities;
+package com.mapbox.android.telemetry.navigationutils;
 
 import android.content.Context;
 import android.media.AudioManager;

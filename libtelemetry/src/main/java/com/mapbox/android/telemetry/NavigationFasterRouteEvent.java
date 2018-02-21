@@ -25,7 +25,7 @@ class NavigationFasterRouteEvent extends Event implements Parcelable {
   }
 
   @Override
-  Type obtainType() {
+  public Type obtainType() {
     return Type.NAV_FASTER_ROUTE;
   }
 

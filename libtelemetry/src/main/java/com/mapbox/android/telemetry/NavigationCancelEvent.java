@@ -20,7 +20,7 @@ class NavigationCancelEvent extends Event implements Parcelable {
   }
 
   @Override
-  Type obtainType() {
+  public Type obtainType() {
     return Type.NAV_CANCEL;
   }
 

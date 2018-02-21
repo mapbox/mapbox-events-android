@@ -7,6 +7,8 @@ import android.telephony.TelephonyManager;
 import android.view.WindowManager;
 
 import com.google.gson.GsonBuilder;
+import com.mapbox.android.telemetry.maps.events.MapEventFactory;
+import com.mapbox.android.telemetry.maps.events.MapState;
 
 import org.junit.Test;
 

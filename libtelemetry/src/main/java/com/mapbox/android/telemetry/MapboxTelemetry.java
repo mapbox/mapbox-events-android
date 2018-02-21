@@ -59,7 +59,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private boolean isServiceBound = false;
   private PermissionCheckRunnable permissionCheckRunnable = null;
   private CopyOnWriteArraySet<TelemetryListener> telemetryListeners = null;
-  static Context applicationContext = null;
+  public static Context applicationContext = null;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
