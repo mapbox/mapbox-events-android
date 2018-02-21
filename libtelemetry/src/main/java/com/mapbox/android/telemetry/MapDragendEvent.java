@@ -1,21 +1,17 @@
-package com.mapbox.android.telemetry.maps.events;
+package com.mapbox.android.telemetry;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
-import com.mapbox.android.telemetry.Event;
-import com.mapbox.android.telemetry.TelemetryUtils;
 
-class MapClickEvent extends Event implements Parcelable {
-  private static final String MAP_CLICK = "map.click";
+class MapDragendEvent extends Event implements Parcelable {
+  private static final String MAP_DRAGEND = "map.dragend";
 
   @SerializedName("event")
   private final String event;
   @SerializedName("created")
   private String created;
-  @SerializedName("gesture")
-  private final String gesture;
   @SerializedName("lat")
   private double latitude;
   @SerializedName("lng")
@@ -35,9 +31,8 @@ class MapClickEvent extends Event implements Parcelable {
   @SerializedName("wifi")
   private Boolean wifi = null;
 
-  MapClickEvent(MapState mapState) {
-    this.event = MAP_CLICK;
-    this.gesture = mapState.getGesture();
+  MapDragendEvent(MapState mapState) {
+    this.event = MAP_DRAGEND;
     this.latitude = mapState.getLatitude();
     this.longitude = mapState.getLongitude();
     this.zoom = mapState.getZoom();
@@ -45,8 +40,8 @@ class MapClickEvent extends Event implements Parcelable {
   }
 
   @Override
-  public Type obtainType() {
-    return Type.MAP_CLICK;
+  Type obtainType() {
+    return Type.MAP_DRAGEND;
   }
 
   void setOrientation(String orientation) {
@@ -73,10 +68,9 @@ class MapClickEvent extends Event implements Parcelable {
     this.wifi = wifi;
   }
 
-  private MapClickEvent(Parcel in) {
+  private MapDragendEvent(Parcel in) {
     event = in.readString();
     created = in.readString();
-    gesture = in.readString();
     latitude = in.readDouble();
     longitude = in.readDouble();
     zoom = in.readDouble();
@@ -99,7 +93,6 @@ class MapClickEvent extends Event implements Parcelable {
   public void writeToParcel(Parcel dest, int flags) {
     dest.writeString(event);
     dest.writeString(created);
-    dest.writeString(gesture);
     dest.writeDouble(latitude);
     dest.writeDouble(longitude);
     dest.writeDouble(zoom);
@@ -124,15 +117,15 @@ class MapClickEvent extends Event implements Parcelable {
     }
   }
 
-  public static final Creator<MapClickEvent> CREATOR = new Creator<MapClickEvent>() {
+  public static final Creator<MapDragendEvent> CREATOR = new Creator<MapDragendEvent>() {
     @Override
-    public MapClickEvent createFromParcel(Parcel in) {
-      return new MapClickEvent(in);
+    public MapDragendEvent createFromParcel(Parcel in) {
+      return new MapDragendEvent(in);
     }
 
     @Override
-    public MapClickEvent[] newArray(int size) {
-      return new MapClickEvent[size];
+    public MapDragendEvent[] newArray(int size) {
+      return new MapDragendEvent[size];
     }
   };
 }

@@ -1,12 +1,9 @@
-package com.mapbox.android.telemetry.maps.events;
+package com.mapbox.android.telemetry;
 
 import android.app.AlarmManager;
 import android.content.Context;
 import android.telephony.TelephonyManager;
 import android.view.WindowManager;
-
-import com.mapbox.android.telemetry.Event;
-import com.mapbox.android.telemetry.MapboxTelemetry;
 
 import org.junit.Test;
 

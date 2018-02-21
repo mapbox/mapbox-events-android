@@ -1,25 +1,29 @@
-package com.mapbox.android.telemetry.maps.events;
+package com.mapbox.android.telemetry;
 
+import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
-import com.mapbox.android.telemetry.Event;
-import com.mapbox.android.telemetry.TelemetryUtils;
 
-class MapDragendEvent extends Event implements Parcelable {
-  private static final String MAP_DRAGEND = "map.dragend";
+class MapLoadEvent extends Event implements Parcelable {
+  private static final String MAP_LOAD = "map.load";
+  private static final String OPERATING_SYSTEM = "Android - " + Build.VERSION.RELEASE;
 
   @SerializedName("event")
   private final String event;
   @SerializedName("created")
   private String created;
-  @SerializedName("lat")
-  private double latitude;
-  @SerializedName("lng")
-  private double longitude;
-  @SerializedName("zoom")
-  private double zoom;
+  @SerializedName("userId")
+  private String userId;
+  @SerializedName("model")
+  private String model = null;
+  @SerializedName("operatingSystem")
+  private String operatingSystem = null;
+  @SerializedName("resolution")
+  private Float resolution = null;
+  @SerializedName("accessibilityFontScale")
+  private Float accessibilityFontScale = null;
   @SerializedName("orientation")
   private String orientation = null;
   @SerializedName("batteryLevel")
@@ -33,17 +37,25 @@ class MapDragendEvent extends Event implements Parcelable {
   @SerializedName("wifi")
   private Boolean wifi = null;
 
-  MapDragendEvent(MapState mapState) {
-    this.event = MAP_DRAGEND;
-    this.latitude = mapState.getLatitude();
-    this.longitude = mapState.getLongitude();
-    this.zoom = mapState.getZoom();
+  MapLoadEvent(String userId) {
+    this.event = MAP_LOAD;
+    this.model = Build.MODEL;
+    this.operatingSystem = OPERATING_SYSTEM;
     this.created = TelemetryUtils.obtainCurrentDate();
+    this.userId = userId;
   }
 
   @Override
-  public Type obtainType() {
-    return Type.MAP_DRAGEND;
+  Type obtainType() {
+    return Type.MAP_LOAD;
+  }
+
+  void setResolution(float resolution) {
+    this.resolution = resolution;
+  }
+
+  void setAccessibilityFontScale(float accessibilityFontScale) {
+    this.accessibilityFontScale = accessibilityFontScale;
   }
 
   void setOrientation(String orientation) {
@@ -70,12 +82,14 @@ class MapDragendEvent extends Event implements Parcelable {
     this.wifi = wifi;
   }
 
-  private MapDragendEvent(Parcel in) {
+  private MapLoadEvent(Parcel in) {
     event = in.readString();
     created = in.readString();
-    latitude = in.readDouble();
-    longitude = in.readDouble();
-    zoom = in.readDouble();
+    userId = in.readString();
+    model = in.readString();
+    operatingSystem = in.readString();
+    resolution = in.readByte() == 0x00 ? null : in.readFloat();
+    accessibilityFontScale = in.readByte() == 0x00 ? null : in.readFloat();
     orientation = in.readString();
     batteryLevel = in.readByte() == 0x00 ? null : in.readInt();
     byte pluggedInVal = in.readByte();
@@ -95,9 +109,21 @@ class MapDragendEvent extends Event implements Parcelable {
   public void writeToParcel(Parcel dest, int flags) {
     dest.writeString(event);
     dest.writeString(created);
-    dest.writeDouble(latitude);
-    dest.writeDouble(longitude);
-    dest.writeDouble(zoom);
+    dest.writeString(userId);
+    dest.writeString(model);
+    dest.writeString(operatingSystem);
+    if (resolution == null) {
+      dest.writeByte((byte) (0x00));
+    } else {
+      dest.writeByte((byte) (0x01));
+      dest.writeFloat(resolution);
+    }
+    if (accessibilityFontScale == null) {
+      dest.writeByte((byte) (0x00));
+    } else {
+      dest.writeByte((byte) (0x01));
+      dest.writeFloat(accessibilityFontScale);
+    }
     dest.writeString(orientation);
     if (batteryLevel == null) {
       dest.writeByte((byte) (0x00));
@@ -119,15 +145,16 @@ class MapDragendEvent extends Event implements Parcelable {
     }
   }
 
-  public static final Creator<MapDragendEvent> CREATOR = new Creator<MapDragendEvent>() {
+  @SuppressWarnings("unused")
+  public static final Creator<MapLoadEvent> CREATOR = new Creator<MapLoadEvent>() {
     @Override
-    public MapDragendEvent createFromParcel(Parcel in) {
-      return new MapDragendEvent(in);
+    public MapLoadEvent createFromParcel(Parcel in) {
+      return new MapLoadEvent(in);
     }
 
     @Override
-    public MapDragendEvent[] newArray(int size) {
-      return new MapDragendEvent[size];
+    public MapLoadEvent[] newArray(int size) {
+      return new MapLoadEvent[size];
     }
   };
 }

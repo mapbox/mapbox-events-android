@@ -1,31 +1,25 @@
-package com.mapbox.android.telemetry.maps.events;
+package com.mapbox.android.telemetry;
 
-import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
-import com.mapbox.android.telemetry.Event;
-import com.mapbox.android.telemetry.TelemetryUtils;
 
-class MapLoadEvent extends Event implements Parcelable {
-  private static final String MAP_LOAD = "map.load";
-  private static final String OPERATING_SYSTEM = "Android - " + Build.VERSION.RELEASE;
+class MapClickEvent extends Event implements Parcelable {
+  private static final String MAP_CLICK = "map.click";
 
   @SerializedName("event")
   private final String event;
   @SerializedName("created")
   private String created;
-  @SerializedName("userId")
-  private String userId;
-  @SerializedName("model")
-  private String model = null;
-  @SerializedName("operatingSystem")
-  private String operatingSystem = null;
-  @SerializedName("resolution")
-  private Float resolution = null;
-  @SerializedName("accessibilityFontScale")
-  private Float accessibilityFontScale = null;
+  @SerializedName("gesture")
+  private final String gesture;
+  @SerializedName("lat")
+  private double latitude;
+  @SerializedName("lng")
+  private double longitude;
+  @SerializedName("zoom")
+  private double zoom;
   @SerializedName("orientation")
   private String orientation = null;
   @SerializedName("batteryLevel")
@@ -39,25 +33,18 @@ class MapLoadEvent extends Event implements Parcelable {
   @SerializedName("wifi")
   private Boolean wifi = null;
 
-  MapLoadEvent(String userId) {
-    this.event = MAP_LOAD;
-    this.model = Build.MODEL;
-    this.operatingSystem = OPERATING_SYSTEM;
+  MapClickEvent(MapState mapState) {
+    this.event = MAP_CLICK;
+    this.gesture = mapState.getGesture();
+    this.latitude = mapState.getLatitude();
+    this.longitude = mapState.getLongitude();
+    this.zoom = mapState.getZoom();
     this.created = TelemetryUtils.obtainCurrentDate();
-    this.userId = userId;
   }
 
   @Override
-  public Type obtainType() {
-    return Type.MAP_LOAD;
-  }
-
-  void setResolution(float resolution) {
-    this.resolution = resolution;
-  }
-
-  void setAccessibilityFontScale(float accessibilityFontScale) {
-    this.accessibilityFontScale = accessibilityFontScale;
+  Type obtainType() {
+    return Type.MAP_CLICK;
   }
 
   void setOrientation(String orientation) {
@@ -84,14 +71,13 @@ class MapLoadEvent extends Event implements Parcelable {
     this.wifi = wifi;
   }
 
-  private MapLoadEvent(Parcel in) {
+  private MapClickEvent(Parcel in) {
     event = in.readString();
     created = in.readString();
-    userId = in.readString();
-    model = in.readString();
-    operatingSystem = in.readString();
-    resolution = in.readByte() == 0x00 ? null : in.readFloat();
-    accessibilityFontScale = in.readByte() == 0x00 ? null : in.readFloat();
+    gesture = in.readString();
+    latitude = in.readDouble();
+    longitude = in.readDouble();
+    zoom = in.readDouble();
     orientation = in.readString();
     batteryLevel = in.readByte() == 0x00 ? null : in.readInt();
     byte pluggedInVal = in.readByte();
@@ -111,21 +97,10 @@ class MapLoadEvent extends Event implements Parcelable {
   public void writeToParcel(Parcel dest, int flags) {
     dest.writeString(event);
     dest.writeString(created);
-    dest.writeString(userId);
-    dest.writeString(model);
-    dest.writeString(operatingSystem);
-    if (resolution == null) {
-      dest.writeByte((byte) (0x00));
-    } else {
-      dest.writeByte((byte) (0x01));
-      dest.writeFloat(resolution);
-    }
-    if (accessibilityFontScale == null) {
-      dest.writeByte((byte) (0x00));
-    } else {
-      dest.writeByte((byte) (0x01));
-      dest.writeFloat(accessibilityFontScale);
-    }
+    dest.writeString(gesture);
+    dest.writeDouble(latitude);
+    dest.writeDouble(longitude);
+    dest.writeDouble(zoom);
     dest.writeString(orientation);
     if (batteryLevel == null) {
       dest.writeByte((byte) (0x00));
@@ -147,16 +122,15 @@ class MapLoadEvent extends Event implements Parcelable {
     }
   }
 
-  @SuppressWarnings("unused")
-  public static final Creator<MapLoadEvent> CREATOR = new Creator<MapLoadEvent>() {
+  public static final Creator<MapClickEvent> CREATOR = new Creator<MapClickEvent>() {
     @Override
-    public MapLoadEvent createFromParcel(Parcel in) {
-      return new MapLoadEvent(in);
+    public MapClickEvent createFromParcel(Parcel in) {
+      return new MapClickEvent(in);
     }
 
     @Override
-    public MapLoadEvent[] newArray(int size) {
-      return new MapLoadEvent[size];
+    public MapClickEvent[] newArray(int size) {
+      return new MapClickEvent[size];
     }
   };
 }

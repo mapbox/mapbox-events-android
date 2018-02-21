@@ -17,7 +17,7 @@ class NavigationDepartEvent extends Event implements Parcelable {
   }
 
   @Override
-  public Type obtainType() {
+  Type obtainType() {
     return Type.NAV_DEPART;
   }
 

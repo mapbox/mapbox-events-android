@@ -1,4 +1,4 @@
-package com.mapbox.android.telemetry.maps.events;
+package com.mapbox.android.telemetry;
 
 public class MapState {
   private double latitude;

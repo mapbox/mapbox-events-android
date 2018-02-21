@@ -12,7 +12,7 @@ import java.util.UUID;
 
 import okhttp3.internal.Util;
 
-public class TelemetryUtils {
+class TelemetryUtils {
   static final String MAPBOX_SHARED_PREFERENCES = "MapboxSharedPreferences";
   static final String MAPBOX_SHARED_PREFERENCE_KEY_VENDOR_ID = "mapboxVendorId";
   private static final String DATE_AND_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
@@ -22,7 +22,7 @@ public class TelemetryUtils {
   private static final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_AND_TIME_PATTERN, Locale.US);
   private static final Locale DEFAULT_LOCALE = Locale.US;
 
-  public static String obtainCurrentDate() {
+  static String obtainCurrentDate() {
     return dateFormat.format(new Date());
   }
 
@@ -52,7 +52,7 @@ public class TelemetryUtils {
     }
   }
 
-  public static String retrieveVendorId() {
+  static String retrieveVendorId() {
     SharedPreferences sharedPreferences = obtainSharedPreferences();
     String mapboxVendorId = sharedPreferences.getString(MAPBOX_SHARED_PREFERENCE_KEY_VENDOR_ID, "");
 
