@@ -59,7 +59,7 @@ public class AppUserTurnstile extends Event implements Parcelable {
   }
 
   @Override
-  public Type obtainType() {
+  Type obtainType() {
     return Type.TURNSTILE;
   }
 

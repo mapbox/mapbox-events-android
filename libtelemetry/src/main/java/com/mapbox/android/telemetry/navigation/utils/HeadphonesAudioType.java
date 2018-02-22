@@ -1,10 +1,10 @@
-package com.mapbox.android.telemetry.navigationutils;
+package com.mapbox.android.telemetry.navigation.utils;
 
 import android.content.Context;
 import android.media.AudioManager;
 
-class BluetoothAudioType implements AudioTypeResolver {
-  private static final String BLUETOOTH = "bluetooth";
+class HeadphonesAudioType implements AudioTypeResolver {
+  private static final String HEADPHONES = "headphones";
   private AudioTypeResolver chain;
 
   @Override
@@ -15,8 +15,8 @@ class BluetoothAudioType implements AudioTypeResolver {
   @Override
   public String obtainAudioType(Context context) {
     AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-    if (audioManager.isBluetoothScoOn()) {
-      return BLUETOOTH;
+    if (audioManager.isWiredHeadsetOn()) {
+      return HEADPHONES;
     } else {
       return chain.obtainAudioType(context);
     }
