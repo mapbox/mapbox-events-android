@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
   }
 
   private String obtainAccessToken() {
-    String accessToken = R.string.mapbox_access_token;
+    String accessToken = getString(R.string.mapbox_access_token);
     return accessToken;
   }
 
