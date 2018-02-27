@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import okhttp3.HttpUrl;
-import okhttp3.internal.tls.SslClient;
+import okhttp3.mockwebserver.internal.tls.SslClient;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
