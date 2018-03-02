@@ -316,8 +316,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     return new AlarmReceiver(new SchedulerCallback() {
       @Override
       public void onPeriodRaised() {
-        // TODO Remove after including UI sample app tests
-        System.out.println("MapboxTelemetry#onPeriodRaised");
         flushEnqueuedEvents();
       }
 
