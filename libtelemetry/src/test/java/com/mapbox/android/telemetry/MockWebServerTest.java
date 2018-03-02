@@ -14,6 +14,9 @@ import java.net.HttpURLConnection;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
+
 import okhttp3.HttpUrl;
 import okhttp3.mockwebserver.internal.tls.SslClient;
 import okhttp3.mockwebserver.MockResponse;
@@ -172,6 +175,12 @@ class MockWebServerTest {
       .baseUrl(localUrl)
       .sslSocketFactory(sslClient.socketFactory)
       .x509TrustManager(sslClient.trustManager)
+      .hostnameVerifier(new HostnameVerifier() {
+        @Override
+        public boolean verify(String hostname, SSLSession session) {
+          return true;
+        }
+      })
       .build();
   }
 }

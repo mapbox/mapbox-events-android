@@ -14,6 +14,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
+
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
@@ -183,6 +186,12 @@ public class TelemetryClientTest extends MockWebServerTest {
       .baseUrl(localUrl)
       .sslSocketFactory(sslClient.socketFactory)
       .x509TrustManager(sslClient.trustManager)
+      .hostnameVerifier(new HostnameVerifier() {
+        @Override
+        public boolean verify(String hostname, SSLSession session) {
+          return true;
+        }
+      })
       .build();
     TelemetryClient telemetryClient = new TelemetryClient("anyAccessToken", "anyUserAgent", telemetryClientSettings,
       mock(Logger.class));
