@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.UUID;
 
-import okhttp3.internal.Util;
+import okio.Buffer;
 
 class TelemetryUtils {
   static final String MAPBOX_SHARED_PREFERENCES = "MapboxSharedPreferences";
@@ -37,7 +37,7 @@ class TelemetryUtils {
 
   static String createFullUserAgent(String userAgent, Context context) {
     String appIdentifier = TelemetryUtils.obtainApplicationIdentifier(context);
-    String newUserAgent = Util.toHumanReadableAscii(String.format(DEFAULT_LOCALE, TWO_STRING_FORMAT, appIdentifier,
+    String newUserAgent = toHumanReadableAscii(String.format(DEFAULT_LOCALE, TWO_STRING_FORMAT, appIdentifier,
       userAgent));
     String fullUserAgent = TextUtils.isEmpty(appIdentifier) ? userAgent : newUserAgent;
 
@@ -89,5 +89,23 @@ class TelemetryUtils {
     } catch (Exception exception) {
       return EMPTY_STRING;
     }
+  }
+
+  private static String toHumanReadableAscii(String s) {
+    for (int i = 0, length = s.length(), c; i < length; i += Character.charCount(c)) {
+      c = s.codePointAt(i);
+      if (c > '\u001f' && c < '\u007f') {
+        continue;
+      }
+
+      Buffer buffer = new Buffer();
+      buffer.writeUtf8(s, 0, i);
+      for (int j = i; j < length; j += Character.charCount(c)) {
+        c = s.codePointAt(j);
+        buffer.writeUtf8CodePoint(c > '\u001f' && c < '\u007f' ? c : '?');
+      }
+      return buffer.readUtf8();
+    }
+    return s;
   }
 }
