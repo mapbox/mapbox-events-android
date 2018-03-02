@@ -8,6 +8,8 @@
 
     <application>
         <service android:name="com.mapbox.android.telemetry.TelemetryService"/>
+        <service android:name=".LocationJobService"
+                 android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
     <!--TODO Remove comment after analyzing the impact on the performance when adding SchedulerFlusherJobService-->
     <!--<application>-->
