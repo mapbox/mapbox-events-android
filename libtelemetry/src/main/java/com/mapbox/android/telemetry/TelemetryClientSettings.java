@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.X509TrustManager;
 
@@ -29,6 +30,7 @@ class TelemetryClientSettings {
   private final HttpUrl baseUrl;
   private final SSLSocketFactory sslSocketFactory;
   private final X509TrustManager x509TrustManager;
+  private final HostnameVerifier hostnameVerifier;
   private boolean debugLoggingEnabled;
 
   TelemetryClientSettings(Builder builder) {
@@ -37,6 +39,7 @@ class TelemetryClientSettings {
     this.baseUrl = builder.baseUrl;
     this.sslSocketFactory = builder.sslSocketFactory;
     this.x509TrustManager = builder.x509TrustManager;
+    this.hostnameVerifier = builder.hostnameVerifier;
     this.debugLoggingEnabled = builder.debugLoggingEnabled;
   }
 
@@ -63,6 +66,7 @@ class TelemetryClientSettings {
       .baseUrl(baseUrl)
       .sslSocketFactory(sslSocketFactory)
       .x509TrustManager(x509TrustManager)
+      .hostnameVerifier(hostnameVerifier)
       .debugLoggingEnabled(debugLoggingEnabled);
   }
 
@@ -78,6 +82,7 @@ class TelemetryClientSettings {
     HttpUrl baseUrl = null;
     SSLSocketFactory sslSocketFactory = null;
     X509TrustManager x509TrustManager = null;
+    HostnameVerifier hostnameVerifier = null;
     boolean debugLoggingEnabled = false;
 
     Builder() {
@@ -112,6 +117,11 @@ class TelemetryClientSettings {
       return this;
     }
 
+    Builder hostnameVerifier(HostnameVerifier hostnameVerifier) {
+      this.hostnameVerifier = hostnameVerifier;
+      return this;
+    }
+
     Builder debugLoggingEnabled(boolean debugLoggingEnabled) {
       this.debugLoggingEnabled = debugLoggingEnabled;
       return this;
@@ -135,6 +145,7 @@ class TelemetryClientSettings {
       .connectionSpecs(Arrays.asList(ConnectionSpec.MODERN_TLS, ConnectionSpec.COMPATIBLE_TLS));
     if (isSocketFactoryUnset(sslSocketFactory, x509TrustManager)) {
       builder.sslSocketFactory(sslSocketFactory, x509TrustManager);
+      builder.hostnameVerifier(hostnameVerifier);
     }
 
     return builder.build();
