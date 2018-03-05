@@ -16,13 +16,22 @@ import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
+
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-public class LocationJobService extends JobService implements LocationListener {
+public class LocationJobService extends JobService implements LocationListener, Callback {
   private final String LOG_TAG = "JobService";
   private static final int JOB_ID = 1;
   private static final int FIVE_MIN = 60 * 1000 * 5;
   private LocationManager locationManager;
   private JobParameters currentParams;
+  private TelemetryClient telemetryClient;
 
   @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
   public static void schedule(Context context) {
@@ -56,9 +65,15 @@ public class LocationJobService extends JobService implements LocationListener {
     return true;
   }
 
+  public void setTelemetryClient(TelemetryClient telemetryClient) {
+    Log.d(LOG_TAG,"Telemetry client: " + telemetryClient);
+    this.telemetryClient = telemetryClient;
+  }
+
   @Override
   public boolean onStopJob(JobParameters params) {
     Log.d(LOG_TAG,"stop job");
+    jobFinished(currentParams, true);
     return false;
   }
 
@@ -68,7 +83,13 @@ public class LocationJobService extends JobService implements LocationListener {
     Log.d(LOG_TAG,location.getLatitude() + ", " + location.getLongitude());
 
     locationManager.removeUpdates(this);
-    jobFinished(currentParams, true);
+
+    LocationEvent locationEvent = createLocationEvent(location);
+
+    List<Event> event = new ArrayList<>(1);
+    event.add(locationEvent);
+
+    telemetryClient.sendEvents(event, this);
   }
 
   @Override
@@ -84,5 +105,25 @@ public class LocationJobService extends JobService implements LocationListener {
   @Override
   public void onProviderDisabled(String provider) {
 
+  }
+
+  private LocationEvent createLocationEvent(Location location) {
+    LocationEvent locationEvent = new LocationEvent("JobScheduler", location.getLatitude(), location.getLongitude());
+    locationEvent.setAccuracy(location.getAccuracy());
+    locationEvent.setAltitude(location.getAltitude());
+
+    return locationEvent;
+  }
+
+  @Override
+  public void onFailure(Call call, IOException e) {
+    Log.d(LOG_TAG,"call failed");
+  }
+
+  @Override
+  public void onResponse(Call call, Response response) throws IOException {
+    Log.d(LOG_TAG,"call response: " + response);
+
+    jobFinished(currentParams, true);
   }
 }

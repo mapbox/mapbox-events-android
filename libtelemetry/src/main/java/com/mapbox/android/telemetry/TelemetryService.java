@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Location;
 import android.os.Binder;
-import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
@@ -22,7 +21,6 @@ import static com.mapbox.android.telemetry.TelemetryReceiver.TELEMETRY_RECEIVER_
 public class TelemetryService extends Service implements TelemetryCallback, LocationEngineListener {
   private LocationReceiver locationReceiver = null;
   private TelemetryReceiver telemetryReceiver = null;
-  private LocationJobService locationJobService = null;
   // For testing only:
   private boolean isLocationReceiverRegistered = false;
   private boolean isTelemetryReceiverRegistered = false;
@@ -35,7 +33,6 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
     super.onCreate();
     createLocationReceiver();
     createTelemetryReceiver();
-    locationJobService = new LocationJobService();
   }
 
   @Override
@@ -55,9 +52,6 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   public void onDestroy() {
     unregisterLocationReceiver();
     unregisterTelemetryReceiver();
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      locationJobService.schedule(this);
-    }
     super.onDestroy();
   }
 

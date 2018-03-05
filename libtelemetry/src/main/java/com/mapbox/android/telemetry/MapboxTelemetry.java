@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 
@@ -60,10 +61,14 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private PermissionCheckRunnable permissionCheckRunnable = null;
   private CopyOnWriteArraySet<TelemetryListener> telemetryListeners = null;
   static Context applicationContext = null;
+  private LocationJobService locationJobService = null;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
     initializeQueue();
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      this.locationJobService = new LocationJobService();
+    }
     checkRequiredParameters(accessToken, userAgent);
     this.httpCallback = this;
     AlarmReceiver alarmReceiver = obtainAlarmReceiver();
@@ -137,6 +142,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   public boolean enable() {
     telemetryEnabler.updateTelemetryState(TelemetryEnabler.State.ENABLED);
     startTelemetry();
+    startBackgroundLocation();
     return true;
   }
 
@@ -294,6 +300,9 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private void initializeTelemetryClient() {
     if (telemetryClient == null) {
       telemetryClient = createTelemetryClient(accessToken, userAgent);
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        locationJobService.setTelemetryClient(telemetryClient);
+      }
     }
   }
 
@@ -408,6 +417,12 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     }
     optLocationIn();
     return true;
+  }
+
+  private void startBackgroundLocation() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      locationJobService.schedule(applicationContext);
+    }
   }
 
   private boolean checkLocationPermission() {
