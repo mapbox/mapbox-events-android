@@ -33,7 +33,9 @@ public class LocationJobService extends JobService implements LocationListener {
         .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
 
     JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-    jobScheduler.schedule(builder.build());
+    if (jobScheduler != null) {
+      jobScheduler.schedule(builder.build());
+    }
   }
 
   @SuppressLint("MissingPermission")
@@ -46,9 +48,10 @@ public class LocationJobService extends JobService implements LocationListener {
     criteria.setPowerRequirement(Criteria.POWER_HIGH);
 
     locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-    locationManager.getBestProvider(criteria, true);
-
-    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0.0f, this);
+    if (locationManager != null) {
+      locationManager.getBestProvider(criteria, true);
+      locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0.0f, this);
+    }
 
     return true;
   }
