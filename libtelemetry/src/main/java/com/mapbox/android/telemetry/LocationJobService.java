@@ -22,12 +22,10 @@ public class LocationJobService extends JobService implements LocationListener {
   private static final int JOB_ID = 1;
   private static final int FIVE_MIN = 60 * 1000 * 5;
   private LocationManager locationManager;
-  private static Context context;
   private JobParameters currentParams;
 
   @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-  public static void schedule(Context aContext) {
-    context = aContext;
+  public static void schedule(Context context) {
     ComponentName component = new ComponentName(context, LocationJobService.class);
     JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, component)
         .setMinimumLatency(FIVE_MIN)
@@ -47,7 +45,7 @@ public class LocationJobService extends JobService implements LocationListener {
     criteria.setHorizontalAccuracy(Criteria.ACCURACY_HIGH);
     criteria.setPowerRequirement(Criteria.POWER_HIGH);
 
-    locationManager = (LocationManager) this.getSystemService(this.LOCATION_SERVICE);
+    locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
     locationManager.getBestProvider(criteria, true);
 
     locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0.0f, this);
