@@ -223,7 +223,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     if (areValidParameters) {
       initializeTelemetryClient();
       queue.setTelemetryInitialized(true);
-      saveTokenAndAgent();
     }
     return areValidParameters;
   }
@@ -420,6 +419,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   private void startBackgroundLocation() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      saveTokenAndAgent();
       locationJobService.schedule(applicationContext);
     }
   }
