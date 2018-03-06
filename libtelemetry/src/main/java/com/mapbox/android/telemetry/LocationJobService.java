@@ -18,6 +18,7 @@ import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -104,6 +105,16 @@ public class LocationJobService extends JobService implements LocationListener, 
 
   }
 
+  @Override
+  public void onFailure(Call call, IOException e) {
+    Log.d(LOG_TAG,"call failed");
+  }
+
+  @Override
+  public void onResponse(Call call, Response response) throws IOException {
+    jobFinished(currentParams, true);
+  }
+
   private TelemetryClient createTelemetryClient() {
     TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(obtainAccessToken(), obtainUserAgent(),
       new Logger());
@@ -112,24 +123,15 @@ public class LocationJobService extends JobService implements LocationListener, 
   }
 
   private LocationEvent createLocationEvent(Location location) {
-    LocationEvent locationEvent = new LocationEvent("JobScheduler", location.getLatitude(),
-      location.getLongitude());
+    double latitudeScaled = round(location.getLatitude());
+    double longitudeScaled = round(location.getLongitude());
+    double longitudeWrapped = wrapLongitude(longitudeScaled);
+
+    LocationEvent locationEvent = new LocationEvent("JobScheduler", latitudeScaled, longitudeWrapped);
     locationEvent.setAccuracy((float) Math.round(location.getAccuracy()));
-    locationEvent.setAltitude(location.getAltitude());
+    locationEvent.setAltitude((double) Math.round(location.getAltitude()));
 
     return locationEvent;
-  }
-
-  @Override
-  public void onFailure(Call call, IOException e) {
-    Log.d(LOG_TAG,"call failed");
-  }
-
-  @Override
-  public void onResponse(Call call, Response response) throws IOException {
-    Log.d(LOG_TAG,"call response: " + response);
-
-    jobFinished(currentParams, true);
   }
 
   private String obtainUserAgent() {
@@ -144,5 +146,26 @@ public class LocationJobService extends JobService implements LocationListener, 
     String accessToken = sharedPreferences.getString("accessToken", "");
 
     return accessToken;
+  }
+
+  private double round(double value) {
+    return new BigDecimal(value).setScale(7, BigDecimal.ROUND_DOWN).doubleValue();
+  }
+
+  private double wrapLongitude(double longitude) {
+    double wrapped = longitude;
+    if ((longitude < -180) || (longitude > 180)) {
+      wrapped = wrap(longitude, -180, 180);
+    }
+    return wrapped;
+  }
+
+  private double wrap(double value, double min, double max) {
+    double delta = max - min;
+
+    double firstMod = (value - min) % delta;
+    double secondMod = (firstMod + delta) % delta;
+
+    return secondMod + min;
   }
 }
