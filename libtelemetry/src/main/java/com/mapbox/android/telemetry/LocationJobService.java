@@ -7,6 +7,7 @@ import android.app.job.JobScheduler;
 import android.app.job.JobService;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -31,7 +32,6 @@ public class LocationJobService extends JobService implements LocationListener, 
   private static final int FIVE_MIN = 60 * 1000 * 5;
   private LocationManager locationManager;
   private JobParameters currentParams;
-  private TelemetryClient telemetryClient;
 
   @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
   public static void schedule(Context context) {
@@ -65,11 +65,6 @@ public class LocationJobService extends JobService implements LocationListener, 
     return true;
   }
 
-  public void setTelemetryClient(TelemetryClient telemetryClient) {
-    Log.d(LOG_TAG,"Telemetry client: " + telemetryClient);
-    this.telemetryClient = telemetryClient;
-  }
-
   @Override
   public boolean onStopJob(JobParameters params) {
     Log.d(LOG_TAG,"stop job");
@@ -89,6 +84,8 @@ public class LocationJobService extends JobService implements LocationListener, 
     List<Event> event = new ArrayList<>(1);
     event.add(locationEvent);
 
+    TelemetryClient telemetryClient = createTelemetryClient();
+
     telemetryClient.sendEvents(event, this);
   }
 
@@ -107,9 +104,17 @@ public class LocationJobService extends JobService implements LocationListener, 
 
   }
 
+  private TelemetryClient createTelemetryClient() {
+    TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(obtainAccessToken(), obtainUserAgent(),
+      new Logger());
+    TelemetryClient telemetryClient = telemetryClientFactory.obtainTelemetryClient(getApplicationContext());
+    return telemetryClient;
+  }
+
   private LocationEvent createLocationEvent(Location location) {
-    LocationEvent locationEvent = new LocationEvent("JobScheduler", location.getLatitude(), location.getLongitude());
-    locationEvent.setAccuracy(location.getAccuracy());
+    LocationEvent locationEvent = new LocationEvent("JobScheduler", location.getLatitude(),
+      location.getLongitude());
+    locationEvent.setAccuracy((float) Math.round(location.getAccuracy()));
     locationEvent.setAltitude(location.getAltitude());
 
     return locationEvent;
@@ -125,5 +130,19 @@ public class LocationJobService extends JobService implements LocationListener, 
     Log.d(LOG_TAG,"call response: " + response);
 
     jobFinished(currentParams, true);
+  }
+
+  private String obtainUserAgent() {
+    SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences();
+    String userAgent = sharedPreferences.getString("userAgent", "");
+
+    return userAgent;
+  }
+
+  private String obtainAccessToken() {
+    SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences();
+    String accessToken = sharedPreferences.getString("accessToken", "");
+
+    return accessToken;
   }
 }

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
@@ -222,6 +223,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     if (areValidParameters) {
       initializeTelemetryClient();
       queue.setTelemetryInitialized(true);
+      saveTokenAndAgent();
     }
     return areValidParameters;
   }
@@ -300,9 +302,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private void initializeTelemetryClient() {
     if (telemetryClient == null) {
       telemetryClient = createTelemetryClient(accessToken, userAgent);
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        locationJobService.setTelemetryClient(telemetryClient);
-      }
     }
   }
 
@@ -502,5 +501,15 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     LocalBroadcastManager localBroadcastManager = obtainLocalBroadcastManager();
     EventReceiver eventReceiver = obtainEventReceiver();
     localBroadcastManager.unregisterReceiver(eventReceiver);
+  }
+
+  private void saveTokenAndAgent() {
+    SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences();
+
+    SharedPreferences.Editor editor = sharedPreferences.edit();
+
+    editor.putString("accessToken", accessToken);
+    editor.putString("userAgent", userAgent);
+    editor.apply();
   }
 }
