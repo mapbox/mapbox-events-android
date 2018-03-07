@@ -172,7 +172,8 @@ public class LocationJobService extends JobService implements LocationListener, 
   }
 
   private SharedPreferences obtainSharedPreferences() {
-    SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("MapboxSharedPreferences", Context.MODE_PRIVATE);
+    SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("MapboxSharedPreferences",
+      Context.MODE_PRIVATE);
 
     return sharedPreferences;
   }
