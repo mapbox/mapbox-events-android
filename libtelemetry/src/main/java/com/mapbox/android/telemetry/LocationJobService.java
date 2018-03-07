@@ -14,6 +14,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
@@ -33,6 +34,8 @@ public class LocationJobService extends JobService implements LocationListener, 
   private static final int FIVE_MIN = 60 * 1000 * 5;
   private LocationManager locationManager;
   private JobParameters currentParams;
+  private ArrayList<Location> gpsLocations;
+  private boolean gpsOn;
 
   @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
   public static void schedule(Context context) {
@@ -53,6 +56,9 @@ public class LocationJobService extends JobService implements LocationListener, 
   @Override
   public boolean onStartJob(JobParameters params) {
     currentParams = params;
+    gpsLocations = new ArrayList<Location>();
+    gpsOn = true;
+    final LocationListener locationListener = this;
     Log.d(LOG_TAG,"start job");
     Criteria criteria = new Criteria();
     criteria.setHorizontalAccuracy(Criteria.ACCURACY_HIGH);
@@ -63,6 +69,18 @@ public class LocationJobService extends JobService implements LocationListener, 
       locationManager.getBestProvider(criteria, true);
       locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0.0f, this);
     }
+
+    new CountDownTimer(15000, 1000) {
+      public void onTick(long millisUntilFinished) {
+
+      }
+
+      public void onFinish() {
+        locationManager.removeUpdates(locationListener);
+        gpsOn = false;
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0.0f, locationListener);
+      }
+    }.start();
 
     return true;
   }
@@ -79,16 +97,26 @@ public class LocationJobService extends JobService implements LocationListener, 
   public void onLocationChanged(Location location) {
     Log.d(LOG_TAG,location.getLatitude() + ", " + location.getLongitude());
 
-    locationManager.removeUpdates(this);
+    if (gpsOn) {
+      gpsLocations.add(location);
 
-    LocationEvent locationEvent = createLocationEvent(location);
+      if (gpsLocations.size() == 5) {
+        locationManager.removeUpdates(this);
 
-    List<Event> event = new ArrayList<>(1);
-    event.add(locationEvent);
+        int bestAccuracyPosition = 0;
+        for (int i = 1; i < gpsLocations.size(); i++) {
+          Location bestAccLoc = gpsLocations.get(bestAccuracyPosition);
+          Location currentLoc = gpsLocations.get(i);
 
-    TelemetryClient telemetryClient = createTelemetryClient();
-
-    telemetryClient.sendEvents(event, this);
+          if (currentLoc.getAccuracy() < bestAccLoc.getAccuracy()) {
+            bestAccuracyPosition = i;
+          }
+        }
+        sendLocation(gpsLocations.get(bestAccuracyPosition));
+      }
+    } else {
+      sendLocation(location);
+    }
   }
 
   @Override
@@ -176,5 +204,16 @@ public class LocationJobService extends JobService implements LocationListener, 
       Context.MODE_PRIVATE);
 
     return sharedPreferences;
+  }
+
+  private void sendLocation(Location location) {
+    LocationEvent locationEvent = createLocationEvent(location);
+
+    List<Event> event = new ArrayList<>(1);
+    event.add(locationEvent);
+
+    TelemetryClient telemetryClient = createTelemetryClient();
+
+    telemetryClient.sendEvents(event, this);
   }
 }
