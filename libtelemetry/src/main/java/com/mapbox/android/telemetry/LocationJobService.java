@@ -38,6 +38,7 @@ public class LocationJobService extends JobService implements LocationListener, 
   public static void schedule(Context context) {
     ComponentName component = new ComponentName(context, LocationJobService.class);
     JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, component)
+        .setPersisted(true)
         .setMinimumLatency(FIVE_MIN)
         .setOverrideDeadline(2 * FIVE_MIN)
         .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
@@ -108,6 +109,7 @@ public class LocationJobService extends JobService implements LocationListener, 
   @Override
   public void onFailure(Call call, IOException e) {
     Log.d(LOG_TAG,"call failed");
+    jobFinished(currentParams, true);
   }
 
   @Override
@@ -135,14 +137,14 @@ public class LocationJobService extends JobService implements LocationListener, 
   }
 
   private String obtainUserAgent() {
-    SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences();
+    SharedPreferences sharedPreferences = obtainSharedPreferences();
     String userAgent = sharedPreferences.getString("userAgent", "");
 
     return userAgent;
   }
 
   private String obtainAccessToken() {
-    SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences();
+    SharedPreferences sharedPreferences = obtainSharedPreferences();
     String accessToken = sharedPreferences.getString("accessToken", "");
 
     return accessToken;
@@ -167,5 +169,11 @@ public class LocationJobService extends JobService implements LocationListener, 
     double secondMod = (firstMod + delta) % delta;
 
     return secondMod + min;
+  }
+
+  private SharedPreferences obtainSharedPreferences() {
+    SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("MapboxSharedPreferences", Context.MODE_PRIVATE);
+
+    return sharedPreferences;
   }
 }
