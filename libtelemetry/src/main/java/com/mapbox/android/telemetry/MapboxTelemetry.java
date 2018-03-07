@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.IBinder;
@@ -41,6 +43,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     }
   };
   private static final String NON_NULL_APPLICATION_CONTEXT_REQUIRED = "Non-null application context required.";
+  private static final String KEY_META_DATA_DISABLE = "com.mapbox.DisableEvents";
   private String accessToken;
   private String userAgent;
   private EventsQueue queue;
@@ -485,5 +488,21 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     LocalBroadcastManager localBroadcastManager = obtainLocalBroadcastManager();
     EventReceiver eventReceiver = obtainEventReceiver();
     localBroadcastManager.unregisterReceiver(eventReceiver);
+  }
+
+  private boolean isTelemetryDisabled() {
+    try {
+      ApplicationInfo appInformation = applicationContext.getPackageManager().getApplicationInfo(
+        applicationContext.getPackageName(), PackageManager.GET_META_DATA);
+
+      if (appInformation != null && appInformation.metaData != null) {
+        boolean disableBool = appInformation.metaData.getBoolean(KEY_META_DATA_DISABLE);
+        return disableBool;
+      }
+    } catch (PackageManager.NameNotFoundException exception) {
+      exception.printStackTrace();
+    }
+
+    return false;
   }
 }
