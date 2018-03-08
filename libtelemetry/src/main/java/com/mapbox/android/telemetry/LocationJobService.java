@@ -97,6 +97,10 @@ public class LocationJobService extends JobService implements LocationListener, 
   public void onLocationChanged(Location location) {
     Log.d(LOG_TAG,location.getLatitude() + ", " + location.getLongitude());
 
+    if (location.getAccuracy() > 50) {
+      return;
+    }
+
     if (gpsOn) {
       gpsLocations.add(location);
 
@@ -115,6 +119,7 @@ public class LocationJobService extends JobService implements LocationListener, 
         sendLocation(gpsLocations.get(bestAccuracyPosition));
       }
     } else {
+      locationManager.removeUpdates(this);
       sendLocation(location);
     }
   }
