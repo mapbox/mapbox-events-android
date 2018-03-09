@@ -15,12 +15,11 @@ public class EventReceiverInstrumentationTest {
 
   @Test
   public void checksEventIntent() throws Exception {
-    EventReceiver theEventReceiver = new EventReceiver();
     Intent expectedEventIntent = new Intent("com.mapbox.event_receiver");
     expectedEventIntent.putExtra("event_received", "onEvent");
     Event mockedEvent = mock(Event.class);
 
-    Intent eventIntent = theEventReceiver.supplyIntent(mockedEvent);
+    Intent eventIntent = EventReceiver.supplyIntent(mockedEvent);
 
     assertTrue(eventIntent.filterEquals(expectedEventIntent));
     assertTrue(eventIntent.hasExtra("event_received"));

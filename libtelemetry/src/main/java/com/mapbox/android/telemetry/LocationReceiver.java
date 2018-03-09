@@ -5,20 +5,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
+import android.support.annotation.NonNull;
 
 class LocationReceiver extends BroadcastReceiver {
   private static final String LOCATION_RECEIVED_INTENT_KEY = "location_received";
   private static final String ON_LOCATION_INTENT_EXTRA = "onLocation";
   static final String LOCATION_RECEIVER_INTENT = "com.mapbox.location_receiver";
-  private EventSender eventSender = null;
+  private final EventCallback callback;
   private LocationMapper locationMapper = null;
 
-  LocationReceiver() {
-  }
-
-  // For testing only
-  LocationReceiver(EventSender sender) {
-    this.eventSender = sender;
+  LocationReceiver(@NonNull EventCallback callback) {
+    this.callback = callback;
   }
 
   @Override
@@ -26,7 +23,7 @@ class LocationReceiver extends BroadcastReceiver {
     String locationReceived = intent.getStringExtra(LOCATION_RECEIVED_INTENT_KEY);
     if (ON_LOCATION_INTENT_EXTRA.equals(locationReceived)) {
       Location location = (Location) intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
-      sendEvent(location, context);
+      sendEvent(location);
     }
   }
 
@@ -41,15 +38,14 @@ class LocationReceiver extends BroadcastReceiver {
     locationMapper.updateSessionIdentifier(sessionIdentifier);
   }
 
-  private boolean sendEvent(Location location, Context context) {
+  private boolean sendEvent(Location location) {
     if (isThereAnyNaN(location) || isThereAnyInfinite(location)) {
       return false;
     }
 
-    EventSender eventSender = obtainEventSender(context);
     LocationMapper obtainLocationEvent = obtainLocationMapper();
     LocationEvent locationEvent = obtainLocationEvent.from(location);
-    eventSender.send(locationEvent);
+    callback.onEventReceived(locationEvent);
     return true;
   }
 
@@ -61,14 +57,6 @@ class LocationReceiver extends BroadcastReceiver {
   private boolean isThereAnyInfinite(Location location) {
     return Double.isInfinite(location.getLatitude()) || Double.isInfinite(location.getLongitude())
       || Double.isInfinite(location.getAltitude()) || Float.isInfinite(location.getAccuracy());
-  }
-
-  private EventSender obtainEventSender(Context context) {
-    if (eventSender == null) {
-      eventSender = new EventSender(context);
-    }
-
-    return eventSender;
   }
 
   private LocationMapper obtainLocationMapper() {

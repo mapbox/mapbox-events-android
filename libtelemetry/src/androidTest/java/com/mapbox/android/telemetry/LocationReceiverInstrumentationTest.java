@@ -18,7 +18,8 @@ public class LocationReceiverInstrumentationTest {
 
   @Test
   public void checksLocationIntent() throws Exception {
-    LocationReceiver theLocationReceiver = new LocationReceiver();
+    EventCallback dummyEventCallback = mock(EventCallback.class);
+    LocationReceiver theLocationReceiver = new LocationReceiver(dummyEventCallback);
     Intent expectedLocationIntent = new Intent("com.mapbox.location_receiver");
     expectedLocationIntent.putExtra("location_received", "onLocation");
     Location mockedLocation = mock(Location.class);

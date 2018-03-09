@@ -60,8 +60,7 @@ ext {
             // unit test
             junit                  : "junit:junit:${version.junit}",
             mockito                : "org.mockito:mockito-core:${version.mockito}",
-            mockitoAndroid         : "org.mockito:mockito-android:${version.mockito}",
-
+            mockitoAndroid         : "org.mockito:mockito-android:${version.mockito}"
     ]
 
     pluginDependencies = [

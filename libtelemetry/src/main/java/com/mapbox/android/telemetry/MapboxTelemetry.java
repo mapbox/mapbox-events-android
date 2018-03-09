@@ -1,15 +1,14 @@
 package com.mapbox.android.telemetry;
 
 
+import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.IBinder;
-import android.support.v4.content.LocalBroadcastManager;
 
 import com.mapbox.android.core.location.LocationEnginePriority;
 import com.mapbox.android.core.permissions.PermissionsManager;
@@ -22,8 +21,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
-
-import static com.mapbox.android.telemetry.EventReceiver.EVENT_RECEIVER_INTENT;
 
 public class MapboxTelemetry implements FullQueueCallback, EventCallback, ServiceTaskCallback, Callback {
   private static final String EVENTS_USER_AGENT = "MapboxEventsAndroid/";
@@ -41,6 +38,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     }
   };
   private static final String NON_NULL_APPLICATION_CONTEXT_REQUIRED = "Non-null application context required.";
+  private static final int NO_FLAGS = 0;
   private String accessToken;
   private String userAgent;
   private EventsQueue queue;
@@ -49,13 +47,11 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private Callback httpCallback;
   private final SchedulerFlusher schedulerFlusher;
   private Clock clock = null;
-  private LocalBroadcastManager localBroadcastManager = null;
   private ServiceConnection serviceConnection = null;
   private Intent locationServiceIntent = null;
-  private EventReceiver eventReceiver = null;
-  private IntentFilter eventReceiverIntentFilter = null;
   private final TelemetryEnabler telemetryEnabler;
-  private boolean isOpted = false;
+  private final TelemetryLocationEnabler telemetryLocationEnabler;
+  private boolean isLocationOpted = false;
   private boolean isServiceBound = false;
   private PermissionCheckRunnable permissionCheckRunnable = null;
   private CopyOnWriteArraySet<TelemetryListener> telemetryListeners = null;
@@ -70,14 +66,16 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     this.schedulerFlusher = new SchedulerFlusherFactory(applicationContext, alarmReceiver).supply();
     this.serviceConnection = obtainServiceConnection();
     this.telemetryEnabler = new TelemetryEnabler(true);
+    this.telemetryLocationEnabler = new TelemetryLocationEnabler(true);
     initializeTelemetryListeners();
+    initializeTelemetryLocationState();
   }
 
   // For testing only
   MapboxTelemetry(Context context, String accessToken, String userAgent, EventsQueue queue,
                   TelemetryClient telemetryClient, Callback httpCallback, SchedulerFlusher schedulerFlusher,
-                  Clock clock, LocalBroadcastManager localBroadcastManager, boolean isServiceBound,
-                  TelemetryEnabler telemetryEnabler) {
+                  Clock clock, boolean isServiceBound, TelemetryEnabler telemetryEnabler,
+                  TelemetryLocationEnabler telemetryLocationEnabler) {
     initializeContext(context);
     this.queue = queue;
     checkRequiredParameters(accessToken, userAgent);
@@ -85,8 +83,8 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     this.httpCallback = httpCallback;
     this.schedulerFlusher = schedulerFlusher;
     this.clock = clock;
-    this.localBroadcastManager = localBroadcastManager;
     this.telemetryEnabler = telemetryEnabler;
+    this.telemetryLocationEnabler = telemetryLocationEnabler;
     this.isServiceBound = isServiceBound;
     initializeTelemetryListeners();
   }
@@ -106,9 +104,8 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   @Override
   public void onTaskRemoved() {
-    if (isServiceBound) {
-      stopTelemetry();
-    }
+    flushEnqueuedEvents();
+    unregisterTelemetry();
   }
 
   @Override
@@ -199,23 +196,42 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   boolean optLocationIn() {
-    TelemetryEnabler.State telemetryState = telemetryEnabler.obtainTelemetryState();
-    if (TelemetryEnabler.State.ENABLED.equals(telemetryState) && !isOpted && checkLocationPermission()) {
-      startLocation();
-      registerEventReceiver();
-      isOpted = true;
-    }
-    return isOpted;
+    startTelemetryService();
+    bindTelemetryService();
+    return isLocationOpted;
   }
 
   boolean optLocationOut() {
-    TelemetryEnabler.State telemetryState = telemetryEnabler.obtainTelemetryState();
-    if (TelemetryEnabler.State.ENABLED.equals(telemetryState) && isOpted) {
-      stopLocation();
-      unregisterEventReceiver();
-      isOpted = false;
+    TelemetryLocationEnabler.LocationState telemetryLocationState = telemetryLocationEnabler
+      .obtainTelemetryLocationState();
+    if (isServiceBound) {
+      telemetryService.unbindInstance();
+      telemetryService.removeServiceTask(this);
+      if (telemetryService.obtainBoundInstances() == 0
+        && TelemetryLocationEnabler.LocationState.ENABLED.equals(telemetryLocationState)) {
+        applicationContext.unbindService(serviceConnection);
+        isServiceBound = false;
+        stopLocation();
+        isLocationOpted = false;
+      } else {
+        applicationContext.unbindService(serviceConnection);
+        isServiceBound = false;
+      }
     }
-    return isOpted;
+    return isLocationOpted;
+  }
+
+  private void startTelemetryService() {
+    TelemetryLocationEnabler.LocationState telemetryLocationState = telemetryLocationEnabler
+      .obtainTelemetryLocationState();
+    if (TelemetryLocationEnabler.LocationState.DISABLED.equals(telemetryLocationState) && checkLocationPermission()) {
+      startLocation();
+      isLocationOpted = true;
+    }
+  }
+
+  private void bindTelemetryService() {
+    applicationContext.bindService(obtainLocationServiceIntent(), serviceConnection, NO_FLAGS);
   }
 
   // Package private (no modifier) for testing purposes
@@ -235,24 +251,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     }
 
     return locationServiceIntent;
-  }
-
-  // Package private (no modifier) for testing purposes
-  EventReceiver obtainEventReceiver() {
-    if (eventReceiver == null) {
-      eventReceiver = new EventReceiver(this);
-    }
-
-    return eventReceiver;
-  }
-
-  // Package private (no modifier) for testing purposes
-  IntentFilter obtainEventReceiverIntentFilter() {
-    if (eventReceiverIntentFilter == null) {
-      eventReceiverIntentFilter = new IntentFilter(EVENT_RECEIVER_INTENT);
-    }
-
-    return eventReceiverIntentFilter;
   }
 
   // Package private (no modifier) for testing purposes
@@ -374,8 +372,12 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
       public void onServiceConnected(ComponentName className, IBinder service) {
         TelemetryService.TelemetryBinder binder = (TelemetryService.TelemetryBinder) service;
         telemetryService = binder.obtainService();
+        telemetryService.addServiceTask(MapboxTelemetry.this);
+        if (telemetryService.obtainBoundInstances() == 0) {
+          telemetryService.injectEventsQueue(queue);
+        }
+        telemetryService.bindInstance();
         isServiceBound = true;
-        telemetryService.injectServiceTask(MapboxTelemetry.this);
       }
 
       @Override
@@ -386,6 +388,26 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     };
   }
 
+  private void initializeTelemetryListeners() {
+    telemetryListeners = new CopyOnWriteArraySet<>();
+  }
+
+  private void initializeTelemetryLocationState() {
+    if (!isMyServiceRunning(TelemetryService.class)) {
+      telemetryLocationEnabler.updateTelemetryLocationState(TelemetryLocationEnabler.LocationState.DISABLED);
+    }
+  }
+
+  private boolean isMyServiceRunning(Class<?> serviceClass) {
+    ActivityManager manager = (ActivityManager) applicationContext.getSystemService(Context.ACTIVITY_SERVICE);
+    for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+      if (serviceClass.getName().equals(service.service.getClassName())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   private boolean pushToQueue(Event event) {
     TelemetryEnabler.State telemetryState = telemetryEnabler.obtainTelemetryState();
     if (TelemetryEnabler.State.ENABLED.equals(telemetryState)) {
@@ -394,8 +416,30 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     return false;
   }
 
-  private void initializeTelemetryListeners() {
-    telemetryListeners = new CopyOnWriteArraySet<>();
+  private void unregisterTelemetry() {
+    stopAlarm();
+    unbindTelemetryService();
+    stopTelemetryService();
+  }
+
+  private void stopAlarm() {
+    schedulerFlusher.unregister();
+  }
+
+  private void unbindTelemetryService() {
+    if (isServiceBound) {
+      telemetryService.unbindInstance();
+      applicationContext.unbindService(serviceConnection);
+    }
+  }
+
+  private void stopTelemetryService() {
+    TelemetryLocationEnabler.LocationState telemetryLocationState = telemetryLocationEnabler
+      .obtainTelemetryLocationState();
+    if (telemetryService.obtainBoundInstances() == 0
+      && TelemetryLocationEnabler.LocationState.ENABLED.equals(telemetryLocationState)) {
+      stopLocation();
+    }
   }
 
   private boolean sendEventIfWhitelisted(Event event) {
@@ -409,11 +453,13 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   private boolean startTelemetry() {
-    if (!isOpted) {
-      registerFlusher();
+    TelemetryEnabler.State telemetryState = telemetryEnabler.obtainTelemetryState();
+    if (TelemetryEnabler.State.ENABLED.equals(telemetryState)) {
+      startAlarm();
+      optLocationIn();
+      return true;
     }
-    optLocationIn();
-    return true;
+    return false;
   }
 
   private boolean checkLocationPermission() {
@@ -440,25 +486,9 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   private void startLocation() {
     applicationContext.startService(obtainLocationServiceIntent());
-    applicationContext.bindService(obtainLocationServiceIntent(), serviceConnection, Context.BIND_AUTO_CREATE);
   }
 
-  private void registerEventReceiver() {
-    LocalBroadcastManager localBroadcastManager = obtainLocalBroadcastManager();
-    EventReceiver eventReceiver = obtainEventReceiver();
-    IntentFilter eventReceiverIntentFilter = obtainEventReceiverIntentFilter();
-    localBroadcastManager.registerReceiver(eventReceiver, eventReceiverIntentFilter);
-  }
-
-  private LocalBroadcastManager obtainLocalBroadcastManager() {
-    if (localBroadcastManager == null) {
-      localBroadcastManager = LocalBroadcastManager.getInstance(applicationContext);
-    }
-
-    return localBroadcastManager;
-  }
-
-  private void registerFlusher() {
+  private void startAlarm() {
     schedulerFlusher.register();
     Clock clock = obtainClock();
     schedulerFlusher.schedule(clock.giveMeTheElapsedRealtime());
@@ -473,25 +503,17 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   private boolean stopTelemetry() {
-    flushEnqueuedEvents();
-    if (isOpted) {
-      schedulerFlusher.unregister();
+    TelemetryEnabler.State telemetryState = telemetryEnabler.obtainTelemetryState();
+    if (TelemetryEnabler.State.ENABLED.equals(telemetryState)) {
+      flushEnqueuedEvents();
+      stopAlarm();
+      optLocationOut();
+      return true;
     }
-    optLocationOut();
-    return true;
+    return false;
   }
 
   private void stopLocation() {
-    if (isServiceBound) {
-      applicationContext.unbindService(serviceConnection);
-      isServiceBound = false;
-    }
     applicationContext.stopService(obtainLocationServiceIntent());
-  }
-
-  private void unregisterEventReceiver() {
-    LocalBroadcastManager localBroadcastManager = obtainLocalBroadcastManager();
-    EventReceiver eventReceiver = obtainEventReceiver();
-    localBroadcastManager.unregisterReceiver(eventReceiver);
   }
 }

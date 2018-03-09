@@ -27,12 +27,12 @@ public class LocationReceiverTest {
     when(mockedIntent.getExtras()).thenReturn(mockedBundle);
     Location mockedLocation = mock(Location.class);
     when(mockedBundle.get(eq(LocationManager.KEY_LOCATION_CHANGED))).thenReturn(mockedLocation);
-    EventSender mockedEventSender = mock(EventSender.class);
-    LocationReceiver theLocationReceiver = new LocationReceiver(mockedEventSender);
+    EventCallback mockedEventCallback = mock(EventCallback.class);
+    LocationReceiver theLocationReceiver = new LocationReceiver(mockedEventCallback);
 
     theLocationReceiver.onReceive(mockedContext, mockedIntent);
 
-    verify(mockedEventSender, times(1)).send(any(LocationEvent.class));
+    verify(mockedEventCallback, times(1)).onEventReceived(any(LocationEvent.class));
   }
 
   @Test
@@ -45,12 +45,12 @@ public class LocationReceiverTest {
     Location mockedLocation = mock(Location.class);
     when(mockedBundle.get(eq(LocationManager.KEY_LOCATION_CHANGED))).thenReturn(mockedLocation);
     when(mockedLocation.getLatitude()).thenReturn(Double.NaN);
-    EventSender mockedEventSender = mock(EventSender.class);
-    LocationReceiver theLocationReceiver = new LocationReceiver(mockedEventSender);
+    EventCallback mockedEventCallback = mock(EventCallback.class);
+    LocationReceiver theLocationReceiver = new LocationReceiver(mockedEventCallback);
 
     theLocationReceiver.onReceive(mockedContext, mockedIntent);
 
-    verify(mockedEventSender, never()).send(any(LocationEvent.class));
+    verify(mockedEventCallback, never()).onEventReceived(any(LocationEvent.class));
   }
 
   @Test
@@ -63,12 +63,12 @@ public class LocationReceiverTest {
     Location mockedLocation = mock(Location.class);
     when(mockedBundle.get(eq(LocationManager.KEY_LOCATION_CHANGED))).thenReturn(mockedLocation);
     when(mockedLocation.getLongitude()).thenReturn(Double.NaN);
-    EventSender mockedEventSender = mock(EventSender.class);
-    LocationReceiver theLocationReceiver = new LocationReceiver(mockedEventSender);
+    EventCallback mockedEventCallback = mock(EventCallback.class);
+    LocationReceiver theLocationReceiver = new LocationReceiver(mockedEventCallback);
 
     theLocationReceiver.onReceive(mockedContext, mockedIntent);
 
-    verify(mockedEventSender, never()).send(any(LocationEvent.class));
+    verify(mockedEventCallback, never()).onEventReceived(any(LocationEvent.class));
   }
 
   @Test
@@ -81,12 +81,12 @@ public class LocationReceiverTest {
     Location mockedLocation = mock(Location.class);
     when(mockedBundle.get(eq(LocationManager.KEY_LOCATION_CHANGED))).thenReturn(mockedLocation);
     when(mockedLocation.getAltitude()).thenReturn(Double.NaN);
-    EventSender mockedEventSender = mock(EventSender.class);
-    LocationReceiver theLocationReceiver = new LocationReceiver(mockedEventSender);
+    EventCallback mockedEventCallback = mock(EventCallback.class);
+    LocationReceiver theLocationReceiver = new LocationReceiver(mockedEventCallback);
 
     theLocationReceiver.onReceive(mockedContext, mockedIntent);
 
-    verify(mockedEventSender, never()).send(any(LocationEvent.class));
+    verify(mockedEventCallback, never()).onEventReceived(any(LocationEvent.class));
   }
 
   @Test
@@ -99,12 +99,12 @@ public class LocationReceiverTest {
     Location mockedLocation = mock(Location.class);
     when(mockedBundle.get(eq(LocationManager.KEY_LOCATION_CHANGED))).thenReturn(mockedLocation);
     when(mockedLocation.getAccuracy()).thenReturn(Float.NaN);
-    EventSender mockedEventSender = mock(EventSender.class);
-    LocationReceiver theLocationReceiver = new LocationReceiver(mockedEventSender);
+    EventCallback mockedEventCallback = mock(EventCallback.class);
+    LocationReceiver theLocationReceiver = new LocationReceiver(mockedEventCallback);
 
     theLocationReceiver.onReceive(mockedContext, mockedIntent);
 
-    verify(mockedEventSender, never()).send(any(LocationEvent.class));
+    verify(mockedEventCallback, never()).onEventReceived(any(LocationEvent.class));
   }
 
   @Test
@@ -117,12 +117,12 @@ public class LocationReceiverTest {
     Location mockedLocation = mock(Location.class);
     when(mockedBundle.get(eq(LocationManager.KEY_LOCATION_CHANGED))).thenReturn(mockedLocation);
     when(mockedLocation.getLatitude()).thenReturn(Double.POSITIVE_INFINITY);
-    EventSender mockedEventSender = mock(EventSender.class);
-    LocationReceiver theLocationReceiver = new LocationReceiver(mockedEventSender);
+    EventCallback mockedEventCallback = mock(EventCallback.class);
+    LocationReceiver theLocationReceiver = new LocationReceiver(mockedEventCallback);
 
     theLocationReceiver.onReceive(mockedContext, mockedIntent);
 
-    verify(mockedEventSender, never()).send(any(LocationEvent.class));
+    verify(mockedEventCallback, never()).onEventReceived(any(LocationEvent.class));
   }
 
   @Test
@@ -135,12 +135,12 @@ public class LocationReceiverTest {
     Location mockedLocation = mock(Location.class);
     when(mockedBundle.get(eq(LocationManager.KEY_LOCATION_CHANGED))).thenReturn(mockedLocation);
     when(mockedLocation.getLongitude()).thenReturn(Double.POSITIVE_INFINITY);
-    EventSender mockedEventSender = mock(EventSender.class);
-    LocationReceiver theLocationReceiver = new LocationReceiver(mockedEventSender);
+    EventCallback mockedEventCallback = mock(EventCallback.class);
+    LocationReceiver theLocationReceiver = new LocationReceiver(mockedEventCallback);
 
     theLocationReceiver.onReceive(mockedContext, mockedIntent);
 
-    verify(mockedEventSender, never()).send(any(LocationEvent.class));
+    verify(mockedEventCallback, never()).onEventReceived(any(LocationEvent.class));
   }
 
   @Test
@@ -153,12 +153,12 @@ public class LocationReceiverTest {
     Location mockedLocation = mock(Location.class);
     when(mockedBundle.get(eq(LocationManager.KEY_LOCATION_CHANGED))).thenReturn(mockedLocation);
     when(mockedLocation.getAltitude()).thenReturn(Double.POSITIVE_INFINITY);
-    EventSender mockedEventSender = mock(EventSender.class);
-    LocationReceiver theLocationReceiver = new LocationReceiver(mockedEventSender);
+    EventCallback mockedEventCallback = mock(EventCallback.class);
+    LocationReceiver theLocationReceiver = new LocationReceiver(mockedEventCallback);
 
     theLocationReceiver.onReceive(mockedContext, mockedIntent);
 
-    verify(mockedEventSender, never()).send(any(LocationEvent.class));
+    verify(mockedEventCallback, never()).onEventReceived(any(LocationEvent.class));
   }
 
   @Test
@@ -171,12 +171,12 @@ public class LocationReceiverTest {
     Location mockedLocation = mock(Location.class);
     when(mockedBundle.get(eq(LocationManager.KEY_LOCATION_CHANGED))).thenReturn(mockedLocation);
     when(mockedLocation.getAccuracy()).thenReturn(Float.POSITIVE_INFINITY);
-    EventSender mockedEventSender = mock(EventSender.class);
-    LocationReceiver theLocationReceiver = new LocationReceiver(mockedEventSender);
+    EventCallback mockedEventCallback = mock(EventCallback.class);
+    LocationReceiver theLocationReceiver = new LocationReceiver(mockedEventCallback);
 
     theLocationReceiver.onReceive(mockedContext, mockedIntent);
 
-    verify(mockedEventSender, never()).send(any(LocationEvent.class));
+    verify(mockedEventCallback, never()).onEventReceived(any(LocationEvent.class));
   }
 
   @Test
@@ -189,12 +189,12 @@ public class LocationReceiverTest {
     Location mockedLocation = mock(Location.class);
     when(mockedBundle.get(eq(LocationManager.KEY_LOCATION_CHANGED))).thenReturn(mockedLocation);
     when(mockedLocation.getLatitude()).thenReturn(Double.NEGATIVE_INFINITY);
-    EventSender mockedEventSender = mock(EventSender.class);
-    LocationReceiver theLocationReceiver = new LocationReceiver(mockedEventSender);
+    EventCallback mockedEventCallback = mock(EventCallback.class);
+    LocationReceiver theLocationReceiver = new LocationReceiver(mockedEventCallback);
 
     theLocationReceiver.onReceive(mockedContext, mockedIntent);
 
-    verify(mockedEventSender, never()).send(any(LocationEvent.class));
+    verify(mockedEventCallback, never()).onEventReceived(any(LocationEvent.class));
   }
 
   @Test
@@ -207,12 +207,12 @@ public class LocationReceiverTest {
     Location mockedLocation = mock(Location.class);
     when(mockedBundle.get(eq(LocationManager.KEY_LOCATION_CHANGED))).thenReturn(mockedLocation);
     when(mockedLocation.getLongitude()).thenReturn(Double.NEGATIVE_INFINITY);
-    EventSender mockedEventSender = mock(EventSender.class);
-    LocationReceiver theLocationReceiver = new LocationReceiver(mockedEventSender);
+    EventCallback mockedEventCallback = mock(EventCallback.class);
+    LocationReceiver theLocationReceiver = new LocationReceiver(mockedEventCallback);
 
     theLocationReceiver.onReceive(mockedContext, mockedIntent);
 
-    verify(mockedEventSender, never()).send(any(LocationEvent.class));
+    verify(mockedEventCallback, never()).onEventReceived(any(LocationEvent.class));
   }
 
   @Test
@@ -225,12 +225,12 @@ public class LocationReceiverTest {
     Location mockedLocation = mock(Location.class);
     when(mockedBundle.get(eq(LocationManager.KEY_LOCATION_CHANGED))).thenReturn(mockedLocation);
     when(mockedLocation.getAltitude()).thenReturn(Double.NEGATIVE_INFINITY);
-    EventSender mockedEventSender = mock(EventSender.class);
-    LocationReceiver theLocationReceiver = new LocationReceiver(mockedEventSender);
+    EventCallback mockedEventCallback = mock(EventCallback.class);
+    LocationReceiver theLocationReceiver = new LocationReceiver(mockedEventCallback);
 
     theLocationReceiver.onReceive(mockedContext, mockedIntent);
 
-    verify(mockedEventSender, never()).send(any(LocationEvent.class));
+    verify(mockedEventCallback, never()).onEventReceived(any(LocationEvent.class));
   }
 
   @Test
@@ -243,11 +243,11 @@ public class LocationReceiverTest {
     Location mockedLocation = mock(Location.class);
     when(mockedBundle.get(eq(LocationManager.KEY_LOCATION_CHANGED))).thenReturn(mockedLocation);
     when(mockedLocation.getAccuracy()).thenReturn(Float.NEGATIVE_INFINITY);
-    EventSender mockedEventSender = mock(EventSender.class);
-    LocationReceiver theLocationReceiver = new LocationReceiver(mockedEventSender);
+    EventCallback mockedEventCallback = mock(EventCallback.class);
+    LocationReceiver theLocationReceiver = new LocationReceiver(mockedEventCallback);
 
     theLocationReceiver.onReceive(mockedContext, mockedIntent);
 
-    verify(mockedEventSender, never()).send(any(LocationEvent.class));
+    verify(mockedEventCallback, never()).onEventReceived(any(LocationEvent.class));
   }
 }
