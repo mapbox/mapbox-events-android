@@ -62,14 +62,10 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private PermissionCheckRunnable permissionCheckRunnable = null;
   private CopyOnWriteArraySet<TelemetryListener> telemetryListeners = null;
   static Context applicationContext = null;
-  private LocationJobService locationJobService = null;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
     initializeQueue();
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      this.locationJobService = new LocationJobService();
-    }
     checkRequiredParameters(accessToken, userAgent);
     this.httpCallback = this;
     AlarmReceiver alarmReceiver = obtainAlarmReceiver();
@@ -420,7 +416,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private void startBackgroundLocation() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       saveTokenAndAgent();
-      locationJobService.schedule(applicationContext);
+      LocationJobService.schedule(applicationContext);
     }
   }
 

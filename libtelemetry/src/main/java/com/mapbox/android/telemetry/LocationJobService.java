@@ -95,11 +95,11 @@ public class LocationJobService extends JobService implements LocationListener, 
   @SuppressLint("MissingPermission")
   @Override
   public void onLocationChanged(Location location) {
-    Log.d(LOG_TAG,location.getLatitude() + ", " + location.getLongitude());
-
     if (location.getAccuracy() > 50) {
       return;
     }
+
+    Log.d(LOG_TAG,location.getLatitude() + ", " + location.getLongitude());
 
     if (gpsOn) {
       gpsLocations.add(location);
