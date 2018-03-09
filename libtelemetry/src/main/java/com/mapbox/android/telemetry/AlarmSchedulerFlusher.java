@@ -7,28 +7,31 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
+import static android.app.PendingIntent.FLAG_CANCEL_CURRENT;
 import static com.mapbox.android.telemetry.SchedulerFlusherFactory.FLUSHING_PERIOD_IN_MILLIS;
 import static com.mapbox.android.telemetry.SchedulerFlusherFactory.SCHEDULER_FLUSHER_INTENT;
 
 class AlarmSchedulerFlusher implements SchedulerFlusher {
-  private static final int SCHEDULER_FLUSHER_ALARM_ID = 0;
-  private static final int NO_FLAGS = 0;
   private final Context context;
   private final AlarmManager manager;
   private final AlarmReceiver receiver;
+  private final int requestCode;
   private PendingIntent pendingIntent;
 
-  AlarmSchedulerFlusher(Context context, AlarmManager manager, AlarmReceiver receiver) {
+  AlarmSchedulerFlusher(Context context, AlarmManager manager, AlarmReceiver receiver, int requestCode) {
     this.context = context;
     this.manager = manager;
     this.receiver = receiver;
+    this.requestCode = requestCode;
   }
 
   @Override
   public void register() {
-    Intent alarmIntent = receiver.supplyIntent();
-    pendingIntent = PendingIntent.getBroadcast(context, SCHEDULER_FLUSHER_ALARM_ID, alarmIntent, NO_FLAGS);
-    context.registerReceiver(receiver, new IntentFilter(SCHEDULER_FLUSHER_INTENT));
+    Intent alarmIntent = receiver.supplyIntent(requestCode);
+    pendingIntent = PendingIntent.getBroadcast(context, requestCode, alarmIntent, FLAG_CANCEL_CURRENT);
+    String action = SCHEDULER_FLUSHER_INTENT + Integer.toString(requestCode);
+    IntentFilter filter = new IntentFilter(action);
+    context.registerReceiver(receiver, filter);
   }
 
   @Override
