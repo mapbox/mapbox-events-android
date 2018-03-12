@@ -19,14 +19,16 @@ public class AlarmSchedulerFlusherTest {
     Context mockedContext = mock(Context.class);
     AlarmManager mockedAlarmManager = mock(AlarmManager.class);
     AlarmReceiver mockedAlarmReceiver = mock(AlarmReceiver.class);
+    int requestCode = (int) System.currentTimeMillis();
     AlarmSchedulerFlusher theAlarmSchedulerFlusher = new AlarmSchedulerFlusher(mockedContext, mockedAlarmManager,
-      mockedAlarmReceiver);
+      mockedAlarmReceiver, requestCode);
 
     theAlarmSchedulerFlusher.register();
 
+    IntentFilter expectedFilter = new IntentFilter("com.mapbox.scheduler_flusher" + Integer.toString(requestCode));
     verify(mockedContext, times(1)).registerReceiver(
       eq(mockedAlarmReceiver),
-      refEq(new IntentFilter("scheduler_flusher"))
+      refEq(expectedFilter)
     );
   }
 
@@ -35,8 +37,9 @@ public class AlarmSchedulerFlusherTest {
     Context mockedContext = mock(Context.class);
     AlarmManager mockedAlarmManager = mock(AlarmManager.class);
     AlarmReceiver mockedAlarmReceiver = mock(AlarmReceiver.class);
+    int requestCode = (int) System.currentTimeMillis();
     AlarmSchedulerFlusher theAlarmSchedulerFlusher = new AlarmSchedulerFlusher(mockedContext, mockedAlarmManager,
-      mockedAlarmReceiver);
+      mockedAlarmReceiver, requestCode);
     long elapsedMockedTime = 1000;
     long millisInASecond = 1000;
 
@@ -55,8 +58,9 @@ public class AlarmSchedulerFlusherTest {
     Context mockedContext = mock(Context.class);
     AlarmManager mockedAlarmManager = mock(AlarmManager.class);
     AlarmReceiver mockedAlarmReceiver = mock(AlarmReceiver.class);
+    int requestCode = (int) System.currentTimeMillis();
     AlarmSchedulerFlusher theAlarmSchedulerFlusher = new AlarmSchedulerFlusher(mockedContext, mockedAlarmManager,
-      mockedAlarmReceiver);
+      mockedAlarmReceiver, requestCode);
 
     theAlarmSchedulerFlusher.unregister();
 
