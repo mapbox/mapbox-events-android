@@ -21,7 +21,6 @@ android {
 }
 
 dependencies {
-    provided dependenciesList.lost
     provided dependenciesList.gmsLocation
 
     compile dependenciesList.supportAppcompatV7

@@ -51,7 +51,6 @@ dependencies {
     androidTestCompile dependenciesList.testRunner
     androidTestCompile dependenciesList.testRules
     androidTestCompile dependenciesList.gmsLocation
-    androidTestCompile dependenciesList.lost
 }
 
 apply from: 'javadoc.gradle'

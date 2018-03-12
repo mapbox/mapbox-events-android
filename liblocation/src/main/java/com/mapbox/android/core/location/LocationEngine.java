@@ -18,7 +18,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public abstract class LocationEngine {
   public enum Type {
-    GOOGLE_PLAY_SERVICES, LOST, ANDROID, MOCK
+    GOOGLE_PLAY_SERVICES, ANDROID
   }
 
   private static final int TWO_MINUTES = 1000 * 60 * 2;
