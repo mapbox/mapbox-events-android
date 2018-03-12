@@ -41,10 +41,11 @@ public class LocationJobService extends JobService implements LocationListener, 
   public static void schedule(Context context) {
     ComponentName component = new ComponentName(context, LocationJobService.class);
     JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, component)
+        .setPeriodic(FIVE_MIN)
         .setPersisted(true)
-        .setMinimumLatency(FIVE_MIN)
-        .setOverrideDeadline(2 * FIVE_MIN)
-        .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
+        .setRequiresCharging(false)
+        .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+        .setRequiresDeviceIdle(false);
 
     JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
     if (jobScheduler != null) {
@@ -76,9 +77,11 @@ public class LocationJobService extends JobService implements LocationListener, 
       }
 
       public void onFinish() {
-        locationManager.removeUpdates(locationListener);
-        gpsOn = false;
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0.0f, locationListener);
+        if (gpsOn) {
+          locationManager.removeUpdates(locationListener);
+          gpsOn = false;
+          locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0.0f, locationListener);
+        }
       }
     }.start();
 
@@ -88,7 +91,7 @@ public class LocationJobService extends JobService implements LocationListener, 
   @Override
   public boolean onStopJob(JobParameters params) {
     Log.d(LOG_TAG,"stop job");
-    jobFinished(currentParams, true);
+    jobFinished(currentParams, false);
     return false;
   }
 
@@ -142,12 +145,12 @@ public class LocationJobService extends JobService implements LocationListener, 
   @Override
   public void onFailure(Call call, IOException e) {
     Log.d(LOG_TAG,"call failed");
-    jobFinished(currentParams, true);
+    jobFinished(currentParams, false);
   }
 
   @Override
   public void onResponse(Call call, Response response) throws IOException {
-    jobFinished(currentParams, true);
+    jobFinished(currentParams, false);
   }
 
   private TelemetryClient createTelemetryClient() {
@@ -212,6 +215,7 @@ public class LocationJobService extends JobService implements LocationListener, 
   }
 
   private void sendLocation(Location location) {
+    gpsOn = false;
     LocationEvent locationEvent = createLocationEvent(location);
 
     List<Event> event = new ArrayList<>(1);
