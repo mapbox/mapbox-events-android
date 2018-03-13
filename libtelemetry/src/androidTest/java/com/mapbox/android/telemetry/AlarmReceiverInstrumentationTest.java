@@ -16,10 +16,11 @@ public class AlarmReceiverInstrumentationTest {
   public void checksAlarmIntent() throws Exception {
     SchedulerCallback mockedSchedulerCallback = mock(SchedulerCallback.class);
     AlarmReceiver theAlarmReceiver = new AlarmReceiver(mockedSchedulerCallback);
-    Intent expectedAlarmIntent = new Intent("com.mapbox.scheduler_flusher");
+    int requestCode = (int) System.currentTimeMillis();
+    Intent expectedAlarmIntent = new Intent("com.mapbox.scheduler_flusher" + Integer.toString(requestCode));
     expectedAlarmIntent.putExtra("alarm_fired", "onAlarm");
 
-    Intent alarmIntent = theAlarmReceiver.supplyIntent();
+    Intent alarmIntent = theAlarmReceiver.supplyIntent(requestCode);
 
     assertTrue(alarmIntent.filterEquals(expectedAlarmIntent));
     assertTrue(alarmIntent.hasExtra("alarm_fired"));
