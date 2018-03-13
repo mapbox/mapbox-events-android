@@ -7,7 +7,6 @@ import android.app.job.JobScheduler;
 import android.app.job.JobService;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -15,6 +14,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.PersistableBundle;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
@@ -36,16 +36,21 @@ public class LocationJobService extends JobService implements LocationListener, 
   private JobParameters currentParams;
   private ArrayList<Location> gpsLocations;
   private boolean gpsOn;
+  private String accessToken;
+  private String userAgent;
 
   @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-  public static void schedule(Context context) {
+  public static void schedule(Context context, String userAgent, String accessToken) {
+    PersistableBundle bundle = new PersistableBundle();
+
     ComponentName component = new ComponentName(context, LocationJobService.class);
     JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, component)
         .setPeriodic(FIVE_MIN)
         .setPersisted(true)
         .setRequiresCharging(false)
         .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-        .setRequiresDeviceIdle(false);
+        .setRequiresDeviceIdle(false)
+        .setExtras(bundle);
 
     JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
     if (jobScheduler != null) {
@@ -59,6 +64,12 @@ public class LocationJobService extends JobService implements LocationListener, 
     currentParams = params;
     gpsLocations = new ArrayList<Location>();
     gpsOn = true;
+    userAgent = params.getExtras().getString("userAgent");
+    accessToken = params.getExtras().getString("accessToken");
+
+    Log.d(LOG_TAG,"accessToken: " + accessToken);
+    Log.d(LOG_TAG,"userAgent: " + userAgent);
+
     final LocationListener locationListener = this;
     Log.d(LOG_TAG,"start job");
     Criteria criteria = new Criteria();
@@ -154,7 +165,7 @@ public class LocationJobService extends JobService implements LocationListener, 
   }
 
   private TelemetryClient createTelemetryClient() {
-    TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(obtainAccessToken(), obtainUserAgent(),
+    TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(accessToken, userAgent,
       new Logger());
     TelemetryClient telemetryClient = telemetryClientFactory.obtainTelemetryClient(getApplicationContext());
     return telemetryClient;
@@ -170,20 +181,6 @@ public class LocationJobService extends JobService implements LocationListener, 
     locationEvent.setAltitude((double) Math.round(location.getAltitude()));
 
     return locationEvent;
-  }
-
-  private String obtainUserAgent() {
-    SharedPreferences sharedPreferences = obtainSharedPreferences();
-    String userAgent = sharedPreferences.getString("userAgent", "");
-
-    return userAgent;
-  }
-
-  private String obtainAccessToken() {
-    SharedPreferences sharedPreferences = obtainSharedPreferences();
-    String accessToken = sharedPreferences.getString("accessToken", "");
-
-    return accessToken;
   }
 
   private double round(double value) {
@@ -205,13 +202,6 @@ public class LocationJobService extends JobService implements LocationListener, 
     double secondMod = (firstMod + delta) % delta;
 
     return secondMod + min;
-  }
-
-  private SharedPreferences obtainSharedPreferences() {
-    SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("MapboxSharedPreferences",
-      Context.MODE_PRIVATE);
-
-    return sharedPreferences;
   }
 
   private void sendLocation(Location location) {
