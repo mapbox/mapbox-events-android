@@ -6,8 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.IBinder;
@@ -138,7 +136,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   public boolean enable() {
-    if (!isTelemetryDisabled()) {
+    if (!ManifestMetaData.obtainDisableEventsTag(applicationContext)) {
       telemetryEnabler.updateTelemetryState(TelemetryEnabler.State.ENABLED);
       startTelemetry();
       return true;
@@ -492,21 +490,5 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     LocalBroadcastManager localBroadcastManager = obtainLocalBroadcastManager();
     EventReceiver eventReceiver = obtainEventReceiver();
     localBroadcastManager.unregisterReceiver(eventReceiver);
-  }
-
-  private boolean isTelemetryDisabled() {
-    try {
-      ApplicationInfo appInformation = applicationContext.getPackageManager().getApplicationInfo(
-        applicationContext.getPackageName(), PackageManager.GET_META_DATA);
-
-      if (appInformation != null && appInformation.metaData != null) {
-        boolean disableBool = appInformation.metaData.getBoolean(KEY_META_DATA_DISABLE);
-        return disableBool;
-      }
-    } catch (PackageManager.NameNotFoundException exception) {
-      exception.printStackTrace();
-    }
-
-    return false;
   }
 }
