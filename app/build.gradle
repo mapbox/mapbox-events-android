@@ -30,6 +30,9 @@ dependencies {
     androidTestCompile(dependenciesList.testEspressoCore, {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+
+    compile project(":libtelemetry")
+    compile project(":libcore")
 }
 
 apply from: "${rootDir}/gradle/developer-config.gradle"
