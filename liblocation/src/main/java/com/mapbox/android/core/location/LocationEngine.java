@@ -10,9 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * Abstract implementation of a location engine. A location engine makes it simple to switch between providers without
  * the hassle of including boilerplate inside your code. This allows developers to use Google Play Services location
- * provider or the default LOST location provider, among others. For a good example setting up a location engine from
- * this abstract class, have a look at the {@code LostLocationEngine} found inside the {@code libandroid-services}
- * module.
+ * provider or the default ANDROID location provider, among others.
  *
  * @since 2.0.0
  */

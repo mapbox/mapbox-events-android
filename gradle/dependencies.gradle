@@ -9,7 +9,6 @@ ext {
 
     version = [
             mapboxServices   : '2.2.6',
-            lost             : '3.0.4',
             gmsLocation      : '11.0.4',
             junit            : '4.12',
             supportLibVersion: '25.4.0',
@@ -29,9 +28,6 @@ ext {
     dependenciesList = [
             // mapbox
             mapboxServices         : "com.mapbox.mapboxsdk:mapbox-java-services:${version.mapboxServices}",
-
-            // lost
-            lost                   : "com.mapzen.android:lost:${version.lost}",
 
             // play services
             gmsLocation            : "com.google.android.gms:play-services-location:${version.gmsLocation}",
