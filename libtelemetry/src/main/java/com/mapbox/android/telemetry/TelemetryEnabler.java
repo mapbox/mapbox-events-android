@@ -1,7 +1,10 @@
 package com.mapbox.android.telemetry;
 
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +32,7 @@ public class TelemetryEnabler {
       put(State.DISABLED.name(), State.DISABLED);
     }
   };
+  private static final String KEY_META_DATA_DISABLE = "com.mapbox.DisableEvents";
   private boolean isFromPreferences = true;
   private State currentTelemetryState = State.NOT_INITIALIZED;
 
@@ -63,6 +67,22 @@ public class TelemetryEnabler {
 
   void injectTelemetryState(State state) {
     currentTelemetryState = state;
+  }
+
+  static boolean isEventsEnabled(Context context) {
+    try {
+      ApplicationInfo appInformation = context.getPackageManager().getApplicationInfo(
+        context.getPackageName(), PackageManager.GET_META_DATA);
+
+      if (appInformation != null && appInformation.metaData != null) {
+        boolean disableBool = appInformation.metaData.getBoolean(KEY_META_DATA_DISABLE);
+        return disableBool;
+      }
+    } catch (PackageManager.NameNotFoundException exception) {
+      exception.printStackTrace();
+    }
+
+    return false;
   }
 
   private State updatePreferences(State telemetryState) {

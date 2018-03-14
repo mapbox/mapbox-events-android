@@ -41,7 +41,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     }
   };
   private static final String NON_NULL_APPLICATION_CONTEXT_REQUIRED = "Non-null application context required.";
-  private static final String KEY_META_DATA_DISABLE = "com.mapbox.DisableEvents";
   private String accessToken;
   private String userAgent;
   private EventsQueue queue;
@@ -136,7 +135,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   public boolean enable() {
-    if (!ManifestMetaData.obtainDisableEventsTag(applicationContext)) {
+    if (!TelemetryEnabler.isEventsEnabled(applicationContext)) {
       telemetryEnabler.updateTelemetryState(TelemetryEnabler.State.ENABLED);
       startTelemetry();
       return true;
