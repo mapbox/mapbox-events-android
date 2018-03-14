@@ -39,17 +39,17 @@ public class LocationJobService extends JobService implements LocationListener, 
   private String accessToken;
   private String userAgent;
 
-  @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+  @RequiresApi(api = Build.VERSION_CODES.N)
   public static void schedule(Context context, String userAgent, String accessToken) {
     PersistableBundle bundle = new PersistableBundle();
+    bundle.putString("userAgent", userAgent);
+    bundle.putString("accessToken", accessToken);
 
     ComponentName component = new ComponentName(context, LocationJobService.class);
     JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, component)
-        .setPeriodic(FIVE_MIN)
+        .setPeriodic(FIVE_MIN, 2 * FIVE_MIN)
         .setPersisted(true)
-        .setRequiresCharging(false)
         .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-        .setRequiresDeviceIdle(false)
         .setExtras(bundle);
 
     JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
@@ -66,9 +66,6 @@ public class LocationJobService extends JobService implements LocationListener, 
     gpsOn = true;
     userAgent = params.getExtras().getString("userAgent");
     accessToken = params.getExtras().getString("accessToken");
-
-    Log.d(LOG_TAG,"accessToken: " + accessToken);
-    Log.d(LOG_TAG,"userAgent: " + userAgent);
 
     final LocationListener locationListener = this;
     Log.d(LOG_TAG,"start job");
@@ -161,6 +158,7 @@ public class LocationJobService extends JobService implements LocationListener, 
 
   @Override
   public void onResponse(Call call, Response response) throws IOException {
+    Log.d(LOG_TAG,"job finished");
     jobFinished(currentParams, false);
   }
 
@@ -208,11 +206,18 @@ public class LocationJobService extends JobService implements LocationListener, 
     gpsOn = false;
     LocationEvent locationEvent = createLocationEvent(location);
 
-    List<Event> event = new ArrayList<>(1);
+    final List<Event> event = new ArrayList<>(1);
     event.add(locationEvent);
 
-    TelemetryClient telemetryClient = createTelemetryClient();
+    final Callback callback = this;
 
-    telemetryClient.sendEvents(event, this);
+    new Thread(new Runnable() {
+      public void run() {
+        TelemetryClient telemetryClient = createTelemetryClient();
+        telemetryClient.sendEvents(event, callback);
+      }
+    }).start();
+
+
   }
 }
