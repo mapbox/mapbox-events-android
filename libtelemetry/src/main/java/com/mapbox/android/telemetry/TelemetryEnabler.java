@@ -32,7 +32,7 @@ public class TelemetryEnabler {
       put(State.DISABLED.name(), State.DISABLED);
     }
   };
-  private static final String KEY_META_DATA_DISABLE = "com.mapbox.DisableEvents";
+  private static final String KEY_META_DATA_ENABLED = "com.mapbox.EnableEvents";
   private boolean isFromPreferences = true;
   private State currentTelemetryState = State.NOT_INITIALIZED;
 
@@ -75,14 +75,14 @@ public class TelemetryEnabler {
         context.getPackageName(), PackageManager.GET_META_DATA);
 
       if (appInformation != null && appInformation.metaData != null) {
-        boolean disableBool = appInformation.metaData.getBoolean(KEY_META_DATA_DISABLE);
-        return disableBool;
+        boolean isEnabled = appInformation.metaData.getBoolean(KEY_META_DATA_ENABLED);
+        return isEnabled;
       }
     } catch (PackageManager.NameNotFoundException exception) {
       exception.printStackTrace();
     }
 
-    return false;
+    return true;
   }
 
   private State updatePreferences(State telemetryState) {
