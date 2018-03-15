@@ -150,6 +150,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
       telemetryEnabler.updateTelemetryState(TelemetryEnabler.State.DISABLED);
       return true;
     }
+    
     return false;
   }
 
