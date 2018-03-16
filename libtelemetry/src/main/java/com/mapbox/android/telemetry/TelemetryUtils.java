@@ -12,7 +12,7 @@ import java.util.UUID;
 
 import okio.Buffer;
 
-class TelemetryUtils {
+public class TelemetryUtils {
   static final String MAPBOX_SHARED_PREFERENCES = "MapboxSharedPreferences";
   static final String MAPBOX_SHARED_PREFERENCE_KEY_VENDOR_ID = "mapboxVendorId";
   private static final String DATE_AND_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
@@ -91,7 +91,7 @@ class TelemetryUtils {
     }
   }
 
-  private static String toHumanReadableAscii(String s) {
+  public static String toHumanReadableAscii(String s) {
     for (int i = 0, length = s.length(), c; i < length; i += Character.charCount(c)) {
       c = s.codePointAt(i);
       if (c > '\u001f' && c < '\u007f') {

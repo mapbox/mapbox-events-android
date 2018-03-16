@@ -30,6 +30,7 @@ public class TelemetryServiceTest {
   @Test
   public void checksLocationReceiverIsUpWhenServiceStarted() throws Exception {
     Intent serviceIntent = new Intent(InstrumentationRegistry.getTargetContext(), TelemetryService.class);
+    serviceIntent.putExtra("isLocationEnablerFromPreferences", false);
     final TelemetryService[] boundService = new TelemetryService[1];
     final CountDownLatch latchConnected = new CountDownLatch(1);
     ServiceConnection serviceConnection = setupServiceConnection(boundService, latchConnected);
@@ -43,6 +44,7 @@ public class TelemetryServiceTest {
   @Test
   public void checksTelemetryReceiverIsUpWhenServiceStarted() throws Exception {
     Intent serviceIntent = new Intent(InstrumentationRegistry.getTargetContext(), TelemetryService.class);
+    serviceIntent.putExtra("isLocationEnablerFromPreferences", false);
     final TelemetryService[] boundService = new TelemetryService[1];
     final CountDownLatch latchConnected = new CountDownLatch(1);
     ServiceConnection serviceConnection = setupServiceConnection(boundService, latchConnected);
@@ -56,6 +58,7 @@ public class TelemetryServiceTest {
   @Test
   public void checksLocationReceiverIsDownWhenServiceStopped() throws Exception {
     Intent serviceIntent = new Intent(InstrumentationRegistry.getTargetContext(), TelemetryService.class);
+    serviceIntent.putExtra("isLocationEnablerFromPreferences", false);
     final TelemetryService[] boundService = new TelemetryService[1];
     final CountDownLatch latchConnected = new CountDownLatch(1);
     ServiceConnection serviceConnection = setupServiceConnection(boundService, latchConnected);
@@ -71,6 +74,7 @@ public class TelemetryServiceTest {
   @Test
   public void checksTelemetryReceiverIsDownWhenServiceStopped() throws Exception {
     Intent serviceIntent = new Intent(InstrumentationRegistry.getTargetContext(), TelemetryService.class);
+    serviceIntent.putExtra("isLocationEnablerFromPreferences", false);
     final TelemetryService[] boundService = new TelemetryService[1];
     final CountDownLatch latchConnected = new CountDownLatch(1);
     ServiceConnection serviceConnection = setupServiceConnection(boundService, latchConnected);
@@ -86,6 +90,7 @@ public class TelemetryServiceTest {
   @Test
   public void checksLocationReceiverIsDownWhenOnBackgroundCalled() throws Exception {
     Intent serviceIntent = new Intent(InstrumentationRegistry.getTargetContext(), TelemetryService.class);
+    serviceIntent.putExtra("isLocationEnablerFromPreferences", false);
     final TelemetryService[] boundService = new TelemetryService[1];
     final CountDownLatch latchConnected = new CountDownLatch(1);
     ServiceConnection serviceConnection = setupServiceConnection(boundService, latchConnected);
@@ -100,6 +105,7 @@ public class TelemetryServiceTest {
   @Test
   public void checksTelemetryReceiverIsUpWhenOnForegroundCalled() throws Exception {
     Intent serviceIntent = new Intent(InstrumentationRegistry.getTargetContext(), TelemetryService.class);
+    serviceIntent.putExtra("isLocationEnablerFromPreferences", false);
     final TelemetryService[] boundService = new TelemetryService[1];
     final CountDownLatch latchConnected = new CountDownLatch(1);
     ServiceConnection serviceConnection = setupServiceConnection(boundService, latchConnected);
@@ -115,13 +121,14 @@ public class TelemetryServiceTest {
   @Test
   public void checksOnTaskRemovedCallbackWhenOnTaskRemovedCalled() throws Exception {
     Intent serviceIntent = new Intent(InstrumentationRegistry.getTargetContext(), TelemetryService.class);
+    serviceIntent.putExtra("isLocationEnablerFromPreferences", false);
     final TelemetryService[] boundService = new TelemetryService[1];
     final CountDownLatch latchConnected = new CountDownLatch(1);
     ServiceConnection serviceConnection = setupServiceConnection(boundService, latchConnected);
     startService(serviceIntent);
     waitUntilServiceIsBound(serviceIntent, latchConnected, serviceConnection);
     ServiceTaskCallback mockedCallback = mock(ServiceTaskCallback.class);
-    boundService[0].injectServiceTask(mockedCallback);
+    boundService[0].addServiceTask(mockedCallback);
 
     boundService[0].onTaskRemoved(serviceIntent);
 
