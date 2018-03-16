@@ -145,9 +145,13 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   public boolean disable() {
-    stopTelemetry();
-    telemetryEnabler.updateTelemetryState(TelemetryEnabler.State.DISABLED);
-    return true;
+    if (TelemetryEnabler.isEventsEnabled(applicationContext)) {
+      stopTelemetry();
+      telemetryEnabler.updateTelemetryState(TelemetryEnabler.State.DISABLED);
+      return true;
+    }
+
+    return false;
   }
 
   public boolean updateSessionIdRotationInterval(SessionInterval interval) {
