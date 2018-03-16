@@ -3,6 +3,7 @@ package com.mapbox.android.telemetry;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 
 
 class TelemetryReceiver extends BroadcastReceiver {
@@ -13,7 +14,7 @@ class TelemetryReceiver extends BroadcastReceiver {
   static final String TELEMETRY_RECEIVER_INTENT = "com.mapbox.telemetry_receiver";
   private final TelemetryCallback callback;
 
-  TelemetryReceiver(TelemetryCallback callback) {
+  TelemetryReceiver(@NonNull TelemetryCallback callback) {
     this.callback = callback;
   }
 
@@ -21,15 +22,11 @@ class TelemetryReceiver extends BroadcastReceiver {
   public void onReceive(Context context, Intent intent) {
     String background = intent.getStringExtra(BACKGROUND_RECEIVED_INTENT_KEY);
     if (ON_BACKGROUND_INTENT_EXTRA.equals(background)) {
-      if (callback != null) {
-        callback.onBackground();
-      }
+      callback.onBackground();
     }
     String foreground = intent.getStringExtra(FOREGROUND_RECEIVED_INTENT_KEY);
     if (ON_FOREGROUND_INTENT_EXTRA.equals(foreground)) {
-      if (callback != null) {
-        callback.onForeground();
-      }
+      callback.onForeground();
     }
   }
 
