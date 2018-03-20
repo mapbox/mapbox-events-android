@@ -21,6 +21,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import okhttp3.Call;
@@ -79,7 +80,7 @@ public class LocationJobService extends JobService implements LocationListener, 
       locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0.0f, this);
     }
 
-    new CountDownTimer(15000, 1000) {
+    new CountDownTimer(20000, 1000) {
       public void onTick(long millisUntilFinished) {
 
       }
@@ -113,17 +114,7 @@ public class LocationJobService extends JobService implements LocationListener, 
 
       if (gpsLocations.size() == 5) {
         locationManager.removeUpdates(this);
-
-        int bestAccuracyPosition = 0;
-        for (int i = 1; i < gpsLocations.size(); i++) {
-          Location bestAccLoc = gpsLocations.get(bestAccuracyPosition);
-          Location currentLoc = gpsLocations.get(i);
-
-          if (currentLoc.getAccuracy() < bestAccLoc.getAccuracy()) {
-            bestAccuracyPosition = i;
-          }
-        }
-        sendLocation(gpsLocations.get(bestAccuracyPosition));
+        sendLocation(gpsLocations);
       }
     } else {
       if (location.getAccuracy() > 50) {
@@ -131,7 +122,7 @@ public class LocationJobService extends JobService implements LocationListener, 
       }
 
       locationManager.removeUpdates(this);
-      sendLocation(location);
+      sendLocation(Arrays.asList(location));
     }
   }
 
@@ -202,19 +193,22 @@ public class LocationJobService extends JobService implements LocationListener, 
     return secondMod + min;
   }
 
-  private void sendLocation(Location location) {
+  private void sendLocation(List<Location> locations) {
     gpsOn = false;
-    LocationEvent locationEvent = createLocationEvent(location);
 
-    final List<Event> event = new ArrayList<>(1);
-    event.add(locationEvent);
+    final List<Event> events = new ArrayList<>(locations.size());
+
+    for (Location location : locations) {
+      LocationEvent locationEvent = createLocationEvent(location);
+      events.add(locationEvent);
+    }
 
     final Callback callback = this;
 
     new Thread(new Runnable() {
       public void run() {
         TelemetryClient telemetryClient = createTelemetryClient();
-        telemetryClient.sendEvents(event, callback);
+        telemetryClient.sendEvents(events, callback);
       }
     }).start();
 
