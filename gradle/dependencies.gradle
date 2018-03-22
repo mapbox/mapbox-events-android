@@ -9,14 +9,13 @@ ext {
 
     version = [
             mapboxServices   : '2.2.6',
-            lost             : '3.0.4',
             gmsLocation      : '11.0.4',
             junit            : '4.12',
             supportLibVersion: '25.4.0',
             constraintLayout : '1.0.2',
             mockito          : '2.11.0',
             testRunnerVersion: '1.0.1',
-            okhttp3          : '3.9.0',
+            okhttp3          : '3.10.0',
             gson             : '2.8.2',
             espressoVersion  : '3.0.1'
     ]
@@ -29,9 +28,6 @@ ext {
     dependenciesList = [
             // mapbox
             mapboxServices         : "com.mapbox.mapboxsdk:mapbox-java-services:${version.mapboxServices}",
-
-            // lost
-            lost                   : "com.mapzen.android:lost:${version.lost}",
 
             // play services
             gmsLocation            : "com.google.android.gms:play-services-location:${version.gmsLocation}",
@@ -64,8 +60,7 @@ ext {
             // unit test
             junit                  : "junit:junit:${version.junit}",
             mockito                : "org.mockito:mockito-core:${version.mockito}",
-            mockitoAndroid         : "org.mockito:mockito-android:${version.mockito}",
-
+            mockitoAndroid         : "org.mockito:mockito-android:${version.mockito}"
     ]
 
     pluginDependencies = [

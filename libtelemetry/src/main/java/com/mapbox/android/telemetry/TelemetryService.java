@@ -15,28 +15,37 @@ import com.mapbox.android.core.location.LocationEngineListener;
 import com.mapbox.android.core.location.LocationEnginePriority;
 import com.mapbox.android.core.location.LocationEngineProvider;
 
+import java.util.concurrent.CopyOnWriteArraySet;
+
 import static com.mapbox.android.telemetry.LocationReceiver.LOCATION_RECEIVER_INTENT;
 import static com.mapbox.android.telemetry.TelemetryReceiver.TELEMETRY_RECEIVER_INTENT;
 
-public class TelemetryService extends Service implements TelemetryCallback, LocationEngineListener {
+public class TelemetryService extends Service implements TelemetryCallback, LocationEngineListener, EventCallback {
+  public static final String IS_LOCATION_ENABLER_FROM_PREFERENCES = "isLocationEnablerFromPreferences";
   private LocationReceiver locationReceiver = null;
   private TelemetryReceiver telemetryReceiver = null;
+  private EventsQueue queue = null;
+  private int boundInstances = 0;
+  private LocationEngine locationEngine = null;
+  private LocationEnginePriority locationPriority = LocationEnginePriority.NO_POWER;
+  private CopyOnWriteArraySet<ServiceTaskCallback> serviceTaskCallbacks = null;
+  private TelemetryLocationEnabler telemetryLocationEnabler;
   // For testing only:
+  private boolean isLocationEnablerFromPreferences = true;
   private boolean isLocationReceiverRegistered = false;
   private boolean isTelemetryReceiverRegistered = false;
-  private LocationEngine locationEngine = null;
-  private ServiceTaskCallback serviceTaskCallback = null;
-  private LocationEnginePriority locationPriority = LocationEnginePriority.NO_POWER;
 
   @Override
   public void onCreate() {
     super.onCreate();
     createLocationReceiver();
     createTelemetryReceiver();
+    createServiceTaskCallbacks();
   }
 
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {
+    enableTelemetryLocationState(intent);
     return START_STICKY;
   }
 
@@ -52,12 +61,15 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   public void onDestroy() {
     unregisterLocationReceiver();
     unregisterTelemetryReceiver();
+    disableTelemetryLocationState();
     super.onDestroy();
   }
 
   @Override
   public void onTaskRemoved(Intent rootIntent) {
-    serviceTaskCallback.onTaskRemoved();
+    for (ServiceTaskCallback callback : serviceTaskCallbacks) {
+      callback.onTaskRemoved();
+    }
     super.onTaskRemoved(rootIntent);
   }
 
@@ -86,6 +98,13 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
     LocalBroadcastManager.getInstance(this).sendBroadcast(LocationReceiver.supplyIntent(location));
   }
 
+  @Override
+  public void onEventReceived(Event event) {
+    if (queue != null) {
+      queue.push(event);
+    }
+  }
+
   public void updateSessionIdentifier(SessionIdentifier sessionIdentifier) {
     locationReceiver.updateSessionIdentifier(sessionIdentifier);
   }
@@ -100,8 +119,28 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
     }
   }
 
-  void injectServiceTask(ServiceTaskCallback callback) {
-    this.serviceTaskCallback = callback;
+  void bindInstance() {
+    boundInstances++;
+  }
+
+  void unbindInstance() {
+    boundInstances--;
+  }
+
+  int obtainBoundInstances() {
+    return boundInstances;
+  }
+
+  boolean addServiceTask(ServiceTaskCallback callback) {
+    return serviceTaskCallbacks.add(callback);
+  }
+
+  boolean removeServiceTask(ServiceTaskCallback callback) {
+    return serviceTaskCallbacks.remove(callback);
+  }
+
+  void injectEventsQueue(EventsQueue queue) {
+    this.queue = queue;
   }
 
   // For testing only
@@ -115,7 +154,7 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   }
 
   private void createLocationReceiver() {
-    locationReceiver = new LocationReceiver();
+    locationReceiver = new LocationReceiver(this);
     registerLocationReceiver();
   }
 
@@ -156,6 +195,19 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
     isTelemetryReceiverRegistered = true;
   }
 
+  private void createServiceTaskCallbacks() {
+    serviceTaskCallbacks = new CopyOnWriteArraySet<>();
+  }
+
+  private void enableTelemetryLocationState(Intent intent) {
+    isLocationEnablerFromPreferences = intent.getBooleanExtra(IS_LOCATION_ENABLER_FROM_PREFERENCES, true);
+
+    if (isLocationEnablerFromPreferences) {
+      telemetryLocationEnabler = new TelemetryLocationEnabler(true);
+      telemetryLocationEnabler.updateTelemetryLocationState(TelemetryLocationEnabler.LocationState.ENABLED);
+    }
+  }
+
   private void unregisterLocationReceiver() {
     disconnectLocationEngine();
     LocalBroadcastManager.getInstance(getApplicationContext())
@@ -181,6 +233,12 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
     LocalBroadcastManager.getInstance(getApplicationContext())
       .unregisterReceiver(telemetryReceiver);
     isTelemetryReceiverRegistered = false;
+  }
+
+  private void disableTelemetryLocationState() {
+    if (isLocationEnablerFromPreferences) {
+      telemetryLocationEnabler.updateTelemetryLocationState(TelemetryLocationEnabler.LocationState.DISABLED);
+    }
   }
 
   class TelemetryBinder extends Binder {

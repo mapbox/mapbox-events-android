@@ -42,7 +42,7 @@ public class AppUserTurnstileTest {
     when(mockedContext.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE))
       .thenReturn(mockedSharedPreferences);
     when(mockedSharedPreferences.getString(MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE,
-      TelemetryEnabler.State.NOT_INITIALIZED.name())).thenReturn(TelemetryEnabler.State.NOT_INITIALIZED.name());
+      TelemetryEnabler.State.DISABLED.name())).thenReturn(TelemetryEnabler.State.DISABLED.name());
     when(mockedSharedPreferences.getString(MAPBOX_SHARED_PREFERENCE_KEY_VENDOR_ID, "")).thenReturn("");
     SharedPreferences.Editor mockedEditor = mock(SharedPreferences.Editor.class);
     when(mockedSharedPreferences.edit()).thenReturn(mockedEditor);

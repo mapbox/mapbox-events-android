@@ -178,7 +178,7 @@ public class NavigationEventFactoryTest {
 
   private NavigationState obtainAValidNavigationState() {
     NavigationMetadata metadata = new NavigationMetadata(new Date(), 13, 22, 180, "sdkIdentifier", "sdkVersion",
-      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "device", "LostLocationEngine", 50);
+      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "device", "AndroidLocationEngine", 50);
     return new NavigationState(metadata);
   }
 }

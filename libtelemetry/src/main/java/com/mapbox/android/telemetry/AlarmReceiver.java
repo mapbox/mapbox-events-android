@@ -4,6 +4,7 @@ package com.mapbox.android.telemetry;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 
 import static com.mapbox.android.telemetry.SchedulerFlusherFactory.SCHEDULER_FLUSHER_INTENT;
 
@@ -12,7 +13,7 @@ class AlarmReceiver extends BroadcastReceiver {
   private static final String ON_ALARM_INTENT_EXTRA = "onAlarm";
   private final SchedulerCallback callback;
 
-  AlarmReceiver(SchedulerCallback callback) {
+  AlarmReceiver(@NonNull SchedulerCallback callback) {
     this.callback = callback;
   }
 
@@ -24,8 +25,8 @@ class AlarmReceiver extends BroadcastReceiver {
     }
   }
 
-  Intent supplyIntent() {
-    Intent alarmIntent = new Intent(SCHEDULER_FLUSHER_INTENT);
+  Intent supplyIntent(int requestCode) {
+    Intent alarmIntent = new Intent(SCHEDULER_FLUSHER_INTENT + Integer.toString(requestCode));
     alarmIntent.putExtra(ALARM_FIRED_INTENT_KEY, ON_ALARM_INTENT_EXTRA);
     return alarmIntent;
   }
