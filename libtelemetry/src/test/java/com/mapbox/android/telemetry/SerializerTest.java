@@ -19,7 +19,7 @@ public class SerializerTest {
   public void checkArriveSerializing() throws Exception {
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22, 180, "sdkIdentifier", "sdkVersion",
-      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "device", "LostLocationEngine", 50);
+      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "device", "AndroidLocationEngine", 50);
     metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
     NavigationState navigationState = new NavigationState(metadata);
 
@@ -38,7 +38,7 @@ public class SerializerTest {
       + "\"sdKIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
-      + "\"device\":\"device\",\"locationEngine\":\"LostLocationEngine\"}";
+      + "\"device\":\"device\",\"locationEngine\":\"AndroidLocationEngine\"}";
 
     assertEquals(expectedJson, payload);
   }
@@ -47,7 +47,7 @@ public class SerializerTest {
   public void checkDepartSerializing() throws Exception {
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22, 180, "sdkIdentifier", "sdkVersion",
-      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "device", "LostLocationEngine", 50);
+      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "device", "AndroidLocationEngine", 50);
     metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
     NavigationState navigationState = new NavigationState(metadata);
 
@@ -67,7 +67,7 @@ public class SerializerTest {
       + "\"sdKIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
-      + "\"device\":\"device\",\"locationEngine\":\"LostLocationEngine\",\"event\":\"navigation.depart\"}";
+      + "\"device\":\"device\",\"locationEngine\":\"AndroidLocationEngine\",\"event\":\"navigation.depart\"}";
 
     assertEquals(expectedJson, payload);
   }
@@ -79,7 +79,7 @@ public class SerializerTest {
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22,
       180, "sdkIdentifier", "sdkVersion", 3, "sessionID", 10.5,
       15.67, "geometry", "profile", false, "device",
-      "LostLocationEngine", 50);
+      "AndroidLocationEngine", 50);
     metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
 
     NavigationCancelData navigationCancelData =
@@ -107,7 +107,7 @@ public class SerializerTest {
       + "\"sdKIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
-      + "\"device\":\"device\",\"locationEngine\":\"LostLocationEngine\"}";
+      + "\"device\":\"device\",\"locationEngine\":\"AndroidLocationEngine\"}";
 
     assertEquals(expectedJson, payload);
   }
@@ -116,7 +116,7 @@ public class SerializerTest {
   public void checkFeedbackSerializing() throws Exception {
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22, 180, "sdkIdentifier", "sdkVersion",
-      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "device", "LostLocationEngine", 50);
+      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "device", "AndroidLocationEngine", 50);
     metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
     FeedbackEventData navigationFeedbackData = new FeedbackEventData("userId", "general",
       "unknown", "audio");
@@ -151,7 +151,7 @@ public class SerializerTest {
       + "\"sdKIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
-      + "\"device\":\"device\",\"locationEngine\":\"LostLocationEngine\",\"userId\":\"userId\","
+      + "\"device\":\"device\",\"locationEngine\":\"AndroidLocationEngine\",\"userId\":\"userId\","
       + "\"feedbackType\":\"general\",\"source\":\"unknown\",\"audio\":\"audio\",\"locationsBefore\":[{}],"
       + "\"locationsAfter\":[{}],\"feedbackId\":\"feedbackId\"}";
 

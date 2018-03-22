@@ -21,7 +21,8 @@ class SchedulerFlusherFactory {
     // return new JobSchedulerFlusher(context, callback);
     // } else {
     AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-    return new AlarmSchedulerFlusher(context, alarmManager, alarmReceiver);
+    int requestCode = (int) System.currentTimeMillis();
+    return new AlarmSchedulerFlusher(context, alarmManager, alarmReceiver, requestCode);
     // }
   }
 }

@@ -28,6 +28,10 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
     }
 
     testOptions {
@@ -51,7 +55,6 @@ dependencies {
     androidTestCompile dependenciesList.testRunner
     androidTestCompile dependenciesList.testRules
     androidTestCompile dependenciesList.gmsLocation
-    androidTestCompile dependenciesList.lost
 }
 
 apply from: 'javadoc.gradle'
