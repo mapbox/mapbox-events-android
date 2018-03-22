@@ -4,7 +4,17 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v3.0.0-beta.2
+
+- Fix Duplicate Location Data - [#80](https://github.com/mapbox/mapbox-events-android/pull/80)
+- Fix Overwritten Alarm - [#79](https://github.com/mapbox/mapbox-events-android/pull/79)
+- Enable Telemetry Manifest Tag - [#77](https://github.com/mapbox/mapbox-events-android/pull/77)
+- Remove System.out Call - [#73](https://github.com/mapbox/mapbox-events-android/pull/73)
+- Update OkHttp to version 3.10.0 - [#72](https://github.com/mapbox/mapbox-events-android/pull/72)
+- Repo Refactoring - [#67](https://github.com/mapbox/mapbox-events-android/pull/67)
+
 ### v3.0.0-beta.1
+
 - Environment Enum now package-private - [#62](https://github.com/mapbox/mapbox-events-android/pull/62)
 - SessionId rotation interval time in correct range - [#53](https://github.com/mapbox/mapbox-events-android/pull/53)
 - Lazy token initialization - [#52](https://github.com/mapbox/mapbox-events-android/pull/52)
@@ -30,6 +40,10 @@ Mapbox welcomes participation and contributions from everyone.
 - Port Location Code from MAS - [#6](https://github.com/mapbox/mapbox-events-android/pull/6)
 
 ## Mapbox Android Core
+
+### v0.2.0-beta.2
+
+- Update Proguard Rules - [#81](https://github.com/mapbox/mapbox-events-android/pull/81)
 
 ### v0.2.0-beta.1
 
