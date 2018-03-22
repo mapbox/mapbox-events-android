@@ -78,8 +78,8 @@ public class TelemetryEnabler {
       ApplicationInfo appInformation = context.getPackageManager().getApplicationInfo(
         context.getPackageName(), PackageManager.GET_META_DATA);
 
-      if (appInformation != null && appInformation.metaData.containsKey(KEY_META_DATA_ENABLED)) {
-        boolean isEnabled = appInformation.metaData.getBoolean(KEY_META_DATA_ENABLED);
+      if (appInformation != null && appInformation.metaData != null) {
+        boolean isEnabled = appInformation.metaData.getBoolean(KEY_META_DATA_ENABLED, true);
         return isEnabled;
       }
     } catch (PackageManager.NameNotFoundException exception) {
