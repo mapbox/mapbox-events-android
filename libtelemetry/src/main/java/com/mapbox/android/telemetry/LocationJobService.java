@@ -32,7 +32,7 @@ import okhttp3.Response;
 public class LocationJobService extends JobService implements LocationListener, Callback {
   private final String LOG_TAG = "JobService";
   private static final int JOB_ID = 1;
-  private static final int FIVE_MIN = 60 * 1000 * 5;
+  private static final int FIVE_MIN = 60 * 1000 * 2;
   private LocationManager locationManager;
   private JobParameters currentParams;
   private ArrayList<Location> gpsLocations;
@@ -48,7 +48,7 @@ public class LocationJobService extends JobService implements LocationListener, 
 
     ComponentName component = new ComponentName(context, LocationJobService.class);
     JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, component)
-        .setPeriodic(FIVE_MIN, 2 * FIVE_MIN)
+        .setPeriodic(FIVE_MIN, 3 * FIVE_MIN)
         .setPersisted(true)
         .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
         .setExtras(bundle);
