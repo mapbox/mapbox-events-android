@@ -7,7 +7,7 @@ Mapbox welcomes participation and contributions from everyone.
 ### v3.0.0-beta.3
 - Correct UserAgent - [#92](https://github.com/mapbox/mapbox-events-android/pull/92)
 - Metadata tag optional - [#91](https://github.com/mapbox/mapbox-events-android/pull/91)
-- Adjust header titiles in javadoc - [#89](https://github.com/mapbox/mapbox-events-android/pull/89)
+- Adjust header titles in javadoc - [#89](https://github.com/mapbox/mapbox-events-android/pull/89)
 
 ### v3.0.0-beta.2
 - Fix Duplicate Location Data - [#80](https://github.com/mapbox/mapbox-events-android/pull/80)
@@ -46,7 +46,7 @@ Mapbox welcomes participation and contributions from everyone.
 
 ### v0.2.0-beta.3
 - Set fastestInterval and smallestDisplacement in AndroidLocationEngine - [#93](https://github.com/mapbox/mapbox-events-android/pull/93)
-- Adjust header titiles in javadoc - [#89](https://github.com/mapbox/mapbox-events-android/pull/89)
+- Adjust header titles in javadoc - [#89](https://github.com/mapbox/mapbox-events-android/pull/89)
 
 ### v0.2.0-beta.2
 - Update Proguard Rules - [#81](https://github.com/mapbox/mapbox-events-android/pull/81)
