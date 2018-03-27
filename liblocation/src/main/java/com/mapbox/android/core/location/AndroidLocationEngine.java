@@ -17,7 +17,7 @@ import java.util.Map;
  * A location engine that uses core android.location and has no external dependencies
  * https://developer.android.com/guide/topics/location/strategies.html
  */
-class AndroidLocationEngine extends LocationEngine implements LocationListener {
+public class AndroidLocationEngine extends LocationEngine implements LocationListener {
 
   private static final String DEFAULT_PROVIDER = LocationManager.PASSIVE_PROVIDER;
   private static final long DEFAULT_MIN_TIME = 0;
@@ -58,7 +58,7 @@ class AndroidLocationEngine extends LocationEngine implements LocationListener {
       }
     };
 
-  private AndroidLocationEngine(Context context) {
+  public AndroidLocationEngine(Context context) {
     super();
 
     this.context = new WeakReference<>(context);
