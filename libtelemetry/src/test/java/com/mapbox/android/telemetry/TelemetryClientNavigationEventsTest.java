@@ -278,12 +278,9 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
     FeedbackEventData navigationFeedbackData = new FeedbackEventData("anyUserId", "general",
       "unknown", "audio");
     FeedbackData feedbackData = obtainFeedbackData();
-    NavigationVoiceData navigationVoiceData = new NavigationVoiceData("voiceInstruction",
-      TelemetryUtils.generateCreateDateFormatted(aDate));
     NavigationLocationData navigationLocationData = obtainLocationData();
     navigationState.setNavigationLocationData(navigationLocationData);
     navigationState.setFeedbackEventData(navigationFeedbackData);
-    navigationState.setNavigationVoiceData(navigationVoiceData);
     navigationState.setFeedbackData(feedbackData);
     Event feedbackEvent = navigationEventFactory.createNavigationEvent(Event.Type.NAV_FEEDBACK, navigationState);
     return feedbackEvent;
@@ -301,14 +298,11 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
     NavigationState navigationState = obtainDefaultNavigationState(aDate);
     NavigationNewData navigationNewData = obtainNewData();
     NavigationRerouteData navigationRerouteData = new NavigationRerouteData(navigationNewData, 12000);
-    NavigationVoiceData navigationVoiceData = new NavigationVoiceData("voiceInstruction",
-      TelemetryUtils.generateCreateDateFormatted(aDate));
     FeedbackData feedbackData = obtainFeedbackData();
     NavigationStepMetadata navigationStepMetadata = new NavigationStepMetadata();
     NavigationLocationData navigationLocationData = obtainLocationData();
     navigationState.setNavigationLocationData(navigationLocationData);
     navigationState.setNavigationRerouteData(navigationRerouteData);
-    navigationState.setNavigationVoiceData(navigationVoiceData);
     navigationState.setFeedbackData(feedbackData);
     navigationState.setNavigationStepMetadata(navigationStepMetadata);
     Event rerouteEvent = navigationEventFactory.createNavigationEvent(Event.Type.NAV_REROUTE, navigationState);

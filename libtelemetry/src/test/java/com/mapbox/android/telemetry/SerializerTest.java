@@ -121,8 +121,6 @@ public class SerializerTest {
     FeedbackEventData navigationFeedbackData = new FeedbackEventData("userId", "general",
       "unknown", "audio");
     FeedbackData feedbackData = new FeedbackData("feedbackId");
-    NavigationVoiceData navigationVoiceData = new NavigationVoiceData("voiceInstruction",
-      TelemetryUtils.generateCreateDateFormatted(testDate));
     Location[] locationsBefore = new Location[1];
     locationsBefore[0] = mock(Location.class);
     Location[] locationsAfter = new Location[1];
@@ -132,7 +130,6 @@ public class SerializerTest {
     NavigationState navigationState = new NavigationState(metadata);
     navigationState.setNavigationLocationData(navigationLocationData);
     navigationState.setFeedbackEventData(navigationFeedbackData);
-    navigationState.setNavigationVoiceData(navigationVoiceData);
     navigationState.setFeedbackData(feedbackData);
 
     NavigationFeedbackEvent navigationFeedbackEvent = new NavigationFeedbackEvent(navigationState);
@@ -170,8 +167,6 @@ public class SerializerTest {
     NavigationNewData navigationNewData = new NavigationNewData(100, 750,
       "mewGeometry");
     NavigationRerouteData navigationRerouteData = new NavigationRerouteData(navigationNewData, 12000);
-    NavigationVoiceData navigationVoiceData = new NavigationVoiceData("voiceInstruction",
-      TelemetryUtils.generateCreateDateFormatted(testDate));
     FeedbackData feedbackData = new FeedbackData("feedbackId");
     feedbackData.setScreenshot("screenshot");
 
@@ -196,7 +191,6 @@ public class SerializerTest {
     NavigationState navigationState = new NavigationState(metadata);
     navigationState.setNavigationLocationData(navigationLocationData);
     navigationState.setNavigationRerouteData(navigationRerouteData);
-    navigationState.setNavigationVoiceData(navigationVoiceData);
     navigationState.setFeedbackData(feedbackData);
     navigationState.setNavigationStepMetadata(navigationStepMetadata);
 
@@ -219,9 +213,7 @@ public class SerializerTest {
       + "\"device\":\"device\",\"locationEngine\":\"MockLocationEngine\",\"navigationNewData\":"
       + "{\"newDistanceRemaining\":100,\"newDurationRemaining\":750,\"newGeometry\":\"mewGeometry\"},"
       + "\"secondsSinceLastReroute\":12000,\"locationsBefore\":[null],\"locationsAfter\":[null],"
-      + "\"feedbackId\":\"feedbackId\",\"screenshot\":\"screenshot\",\"voiceInstruction\":\"voiceInstruction\","
-      + "\"voiceInstructionTimestamp\":\""
-      + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"step\":"
+      + "\"feedbackId\":\"feedbackId\",\"screenshot\":\"screenshot\",\"step\":"
       + "{\"upcomingInstruction\":\"upcomingInstruction\",\"upcomingType\":\"upcomingType\","
       + "\"upcomingModifier\":\"upcomingModifier\",\"upcomingName\":\"upcomingName\","
       + "\"previousInstruction\":\"previousInstruction\",\"previousType\":\"previousType\","

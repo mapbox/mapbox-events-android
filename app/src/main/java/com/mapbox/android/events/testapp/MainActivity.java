@@ -2,12 +2,10 @@ package com.mapbox.android.events.testapp;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.android.telemetry.MapboxTelemetry;
-import com.mapbox.android.telemetry.TelemetryUtils;
 
 import java.util.List;
 
@@ -65,10 +63,5 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
     if (granted) {
       mapboxTelemetry.enable();
     }
-  }
-
-  private void checkBattery() {
-    Log.e(LOG_TAG, "batteryLevel: " + TelemetryUtils.getBatteryLevel());
-    Log.e(LOG_TAG, "pluggedIn: " + TelemetryUtils.isPluggedIn());
   }
 }

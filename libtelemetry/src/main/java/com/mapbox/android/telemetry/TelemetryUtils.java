@@ -154,6 +154,10 @@ public class TelemetryUtils {
     }
   }
 
+  public static String buildUUID() {
+    return UUID.randomUUID().toString();
+  }
+
   static String obtainCurrentDate() {
     return dateFormat.format(new Date());
   }
