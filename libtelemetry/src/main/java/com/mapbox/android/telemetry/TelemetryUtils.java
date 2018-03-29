@@ -2,9 +2,11 @@ package com.mapbox.android.telemetry;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.media.AudioManager;
+import android.os.BatteryManager;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
@@ -26,6 +28,7 @@ public class TelemetryUtils {
   private static final String THREE_STRING_FORMAT = "%s/%s/%s";
   private static final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_AND_TIME_PATTERN, Locale.US);
   private static final Locale DEFAULT_LOCALE = Locale.US;
+  private static final int UNAVAILABLE_BATTERY_LEVEL = 100;
 
 
   public static String toHumanReadableAscii(String s) {
@@ -84,6 +87,31 @@ public class TelemetryUtils {
     }
 
     return "Background";
+  }
+
+  public static int getBatteryLevel() {
+    Intent batteryStatus = MapboxTelemetry.batteryStatus;
+
+    if (batteryStatus != null) {
+      int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+      int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+      return Math.round((level / (float) scale) * 100);
+    } else {
+      return UNAVAILABLE_BATTERY_LEVEL;
+    }
+  }
+
+  public static boolean isPluggedIn() {
+    Intent batteryStatus = MapboxTelemetry.batteryStatus;
+
+    if (batteryStatus != null) {
+      int chargePlug = batteryStatus.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+      if (chargePlug == BatteryManager.BATTERY_PLUGGED_USB
+        || chargePlug == BatteryManager.BATTERY_PLUGGED_AC) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public static String getCellularNetworkType(Context context) {
