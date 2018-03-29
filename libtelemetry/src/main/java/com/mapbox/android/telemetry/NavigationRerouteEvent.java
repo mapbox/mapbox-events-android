@@ -17,6 +17,7 @@ class NavigationRerouteEvent extends Event implements Parcelable {
   @JsonAdapter(FeedbackDataSerializer.class)
   private FeedbackData feedbackData;
   private NavigationStepMetadata step = null;
+  private String created;
 
   NavigationRerouteEvent(NavigationState navigationState) {
     this.event = NAVIGATION_REROUTE;
@@ -90,4 +91,8 @@ class NavigationRerouteEvent extends Event implements Parcelable {
       return new NavigationRerouteEvent[size];
     }
   };
+
+  public void setCreated(String created) {
+    this.created = created;
+  }
 }
