@@ -1,19 +1,34 @@
 package com.mapbox.android.telemetry;
 
+import android.content.Context;
 import android.location.Location;
+import android.media.AudioManager;
+import android.telephony.TelephonyManager;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSerializer;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 
 public class SerializerTest {
+
+  @Before
+  public void setupMapboxTelemetry() {
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    MapboxTelemetry.applicationContext = mockedContext;
+    AudioManager mockedAudioManager = mock(AudioManager.class, RETURNS_DEEP_STUBS);
+    NavigationUtils.audioManager = mockedAudioManager;
+    TelephonyManager mockedTelephonyManager = mock(TelephonyManager.class, RETURNS_DEEP_STUBS);
+    TelemetryUtils.telephonyManager = mockedTelephonyManager;
+  }
 
   @Test
   public void checkArriveSerializing() throws Exception {
@@ -38,7 +53,8 @@ public class SerializerTest {
       + "\"sdKIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
-      + "\"locationEngine\":\"AndroidLocationEngine\"}";
+      + "\"locationEngine\":\"AndroidLocationEngine\",\"volumeLevel\":0,\"screenBrightness\":0,"
+      + "\"batteryPluggedIn\":false,\"batteryLevel\":100,\"connectivity\":\"Unknown\"}";
 
     assertEquals(expectedJson, payload);
   }
@@ -67,7 +83,8 @@ public class SerializerTest {
       + "\"sdKIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
-      + "\"locationEngine\":\"AndroidLocationEngine\",\"event\":\"navigation.depart\"}";
+      + "\"locationEngine\":\"AndroidLocationEngine\",\"volumeLevel\":0,\"screenBrightness\":0,"
+      + "\"batteryPluggedIn\":false,\"batteryLevel\":100,\"connectivity\":\"Unknown\",\"event\":\"navigation.depart\"}";
 
     assertEquals(expectedJson, payload);
   }
@@ -107,7 +124,8 @@ public class SerializerTest {
       + "\"sdKIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
-      + "\"locationEngine\":\"AndroidLocationEngine\"}";
+      + "\"locationEngine\":\"AndroidLocationEngine\",\"volumeLevel\":0,\"screenBrightness\":0,"
+      + "\"batteryPluggedIn\":false,\"batteryLevel\":100,\"connectivity\":\"Unknown\"}";
 
     assertEquals(expectedJson, payload);
   }
@@ -148,7 +166,8 @@ public class SerializerTest {
       + "\"sdKIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
-      + "\"locationEngine\":\"AndroidLocationEngine\",\"userId\":\"userId\","
+      + "\"locationEngine\":\"AndroidLocationEngine\",\"volumeLevel\":0,\"screenBrightness\":0,"
+      + "\"batteryPluggedIn\":false,\"batteryLevel\":100,\"connectivity\":\"Unknown\",\"userId\":\"userId\","
       + "\"feedbackType\":\"general\",\"source\":\"unknown\",\"audio\":\"audio\",\"locationsBefore\":[{}],"
       + "\"locationsAfter\":[{}],\"feedbackId\":\"" + feedbackData.getFeedbackId() + "\"}";
 
@@ -210,7 +229,8 @@ public class SerializerTest {
       + "\"sdKIdentifier\":\"sdkIdent\",\"sdkVersion\":\"sdkversion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":true,"
-      + "\"locationEngine\":\"MockLocationEngine\",\"navigationNewData\":"
+      + "\"locationEngine\":\"MockLocationEngine\",\"volumeLevel\":0,\"screenBrightness\":0,"
+      + "\"batteryPluggedIn\":false,\"batteryLevel\":100,\"connectivity\":\"Unknown\",\"navigationNewData\":"
       + "{\"newDistanceRemaining\":100,\"newDurationRemaining\":750,\"newGeometry\":\"mewGeometry\"},"
       + "\"secondsSinceLastReroute\":12000,\"locationsBefore\":[null],\"locationsAfter\":[null],"
       + "\"feedbackId\":\"" + feedbackData.getFeedbackId() + "\",\"screenshot\":\"screenshot\",\"step\":"
@@ -269,7 +289,8 @@ public class SerializerTest {
       + "\"sdKIdentifier\":\"sdkIdent\",\"sdkVersion\":\"sdkversion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":true,"
-      + "\"locationEngine\":\"MockLocationEngine\",\"newDistanceRemaining\":100,"
+      + "\"locationEngine\":\"MockLocationEngine\",\"volumeLevel\":0,\"screenBrightness\":0,"
+      + "\"batteryPluggedIn\":false,\"batteryLevel\":100,\"connectivity\":\"Unknown\",\"newDistanceRemaining\":100,"
       + "\"newDurationRemaining\":750,\"newGeometry\":\"mewGeometry\",\"step\":"
       + "{\"upcomingInstruction\":\"upcomingInstruction\",\"upcomingType\":\"upcomingType\","
       + "\"upcomingModifier\":\"upcomingModifier\",\"upcomingName\":\"upcomingName\",\"previousInstruction\":"

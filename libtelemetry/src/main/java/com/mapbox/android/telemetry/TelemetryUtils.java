@@ -5,9 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
-import android.media.AudioManager;
 import android.os.BatteryManager;
-import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
@@ -29,6 +27,7 @@ public class TelemetryUtils {
   private static final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_AND_TIME_PATTERN, Locale.US);
   private static final Locale DEFAULT_LOCALE = Locale.US;
   private static final int UNAVAILABLE_BATTERY_LEVEL = 100;
+  static TelephonyManager telephonyManager = null;
 
 
   public static String toHumanReadableAscii(String s) {
@@ -47,28 +46,6 @@ public class TelemetryUtils {
       return buffer.readUtf8();
     }
     return s;
-  }
-
-  static int getVolumeLevel(Context context) {
-    AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-    return (int) Math.floor(100.0 * audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
-      / audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
-  }
-
-  static int getScreenBrightness(Context context) {
-    int screenBrightness;
-    try {
-      screenBrightness = android.provider.Settings.System.getInt(
-        context.getContentResolver(),
-        android.provider.Settings.System.SCREEN_BRIGHTNESS);
-
-      // Android returns values between 0 and 255, here we normalize to 0-100.
-      screenBrightness = (int) Math.floor(100.0 * screenBrightness / 255.0);
-    } catch (Settings.SettingNotFoundException exception) {
-      screenBrightness = -1;
-    }
-
-    return screenBrightness;
   }
 
   static String getApplicationState(Context context) {
@@ -114,9 +91,13 @@ public class TelemetryUtils {
     return false;
   }
 
-  static String getCellularNetworkType(Context context) {
-    TelephonyManager manager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-    switch (manager.getNetworkType()) {
+  static String getCellularNetworkType() {
+    if (telephonyManager == null) {
+      telephonyManager = (TelephonyManager) MapboxTelemetry.applicationContext
+        .getSystemService(Context.TELEPHONY_SERVICE);
+    }
+
+    switch (telephonyManager.getNetworkType()) {
       case TelephonyManager.NETWORK_TYPE_1xRTT:
         return "1xRTT";
       case TelephonyManager.NETWORK_TYPE_CDMA:

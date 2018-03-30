@@ -76,10 +76,6 @@ class LocationEvent extends Event implements Parcelable {
     return operatingSystem;
   }
 
-  public void setOperatingSystem(String operatingSystem) {
-    this.operatingSystem = operatingSystem;
-  }
-
   public void setApplicationState(String applicationState) {
     this.applicationState = applicationState;
   }

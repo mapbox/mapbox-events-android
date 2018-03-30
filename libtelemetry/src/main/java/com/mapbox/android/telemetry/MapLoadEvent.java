@@ -43,6 +43,9 @@ class MapLoadEvent extends Event implements Parcelable {
     this.operatingSystem = OPERATING_SYSTEM;
     this.created = TelemetryUtils.obtainCurrentDate();
     this.userId = userId;
+    this.batteryLevel = TelemetryUtils.getBatteryLevel();
+    this.pluggedIn = TelemetryUtils.isPluggedIn();
+    this.cellularNetworkType = TelemetryUtils.getCellularNetworkType();
   }
 
   @Override
@@ -62,20 +65,8 @@ class MapLoadEvent extends Event implements Parcelable {
     this.orientation = orientation;
   }
 
-  void setBatteryLevel(int batteryLevel) {
-    this.batteryLevel = batteryLevel;
-  }
-
-  void setPluggedIn(boolean pluggedIn) {
-    this.pluggedIn = pluggedIn;
-  }
-
   void setCarrier(String carrier) {
     this.carrier = carrier;
-  }
-
-  void setCellularNetworkType(String cellularNetworkType) {
-    this.cellularNetworkType = cellularNetworkType;
   }
 
   void setWifi(boolean wifi) {

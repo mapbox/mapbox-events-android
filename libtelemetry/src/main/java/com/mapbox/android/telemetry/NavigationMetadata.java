@@ -68,6 +68,11 @@ public class NavigationMetadata implements Parcelable {
     this.device = Build.MODEL;
     this.locationEngine = locationEngine;
     this.absoluteDistanceToDestination = absoluteDistanceToDestination;
+    this.volumeLevel = NavigationUtils.getVolumeLevel();
+    this.batteryLevel = TelemetryUtils.getBatteryLevel();
+    this.screenBrightness = NavigationUtils.getScreenBrightness();
+    this.batteryPluggedIn = TelemetryUtils.isPluggedIn();
+    this.connectivity = TelemetryUtils.getCellularNetworkType();
   }
 
   String getStartTimestamp() {
@@ -235,16 +240,8 @@ public class NavigationMetadata implements Parcelable {
     return volumeLevel;
   }
 
-  public void setVolumeLevel(Integer volumeLevel) {
-    this.volumeLevel = volumeLevel;
-  }
-
   Integer getScreenBrightness() {
     return screenBrightness;
-  }
-
-  public void setScreenBrightness(Integer screenBrightness) {
-    this.screenBrightness = screenBrightness;
   }
 
   String getApplicationState() {
@@ -259,24 +256,12 @@ public class NavigationMetadata implements Parcelable {
     return batteryPluggedIn;
   }
 
-  public void setBatteryPluggedIn(Boolean batteryPluggedIn) {
-    this.batteryPluggedIn = batteryPluggedIn;
-  }
-
   Integer getBatteryLevel() {
     return batteryLevel;
   }
 
-  public void setBatteryLevel(Integer batteryLevel) {
-    this.batteryLevel = batteryLevel;
-  }
-
   String getConnectivity() {
     return connectivity;
-  }
-
-  public void setConnectivity(String connectivity) {
-    this.connectivity = connectivity;
   }
 
   int getAbsoluteDistanceToDestination() {

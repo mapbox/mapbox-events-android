@@ -6,7 +6,6 @@ import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.BatteryManager;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -18,51 +17,13 @@ import java.util.Map;
 public class MapEventFactory {
   private static final String APPLICATION_CONTEXT_CANT_BE_NULL = "Create a MapboxTelemetry instance before calling "
     + "this method.";
-  private static final String SINGLE_CARRIER_RTT = "1xRTT";
-  private static final String CODE_DIVISION_MULTIPLE_ACCESS = "CDMA";
-  private static final String ENHANCED_DATA_GSM_EVOLUTION = "EDGE";
-  private static final String ENHANCED_HIGH_RATE_PACKET_DATA = "EHRPD";
-  private static final String EVOLUTION_DATA_OPTIMIZED_0 = "EVDO_0";
-  private static final String EVOLUTION_DATA_OPTIMIZED_A = "EVDO_A";
-  private static final String EVOLUTION_DATA_OPTIMIZED_B = "EVDO_B";
-  private static final String GENERAL_PACKET_RADIO_SERVICE = "GPRS";
-  private static final String HIGH_SPEED_DOWNLINK_PACKET_ACCESS = "HSDPA";
-  private static final String HIGH_SPEED_PACKET_ACCESS = "HSPA";
-  private static final String HIGH_SPEED_PACKET_ACCESS_PLUS = "HSPAP";
-  private static final String HIGH_SPEED_UNLINK_PACKET_ACCESS = "HSUPA";
-  private static final String INTEGRATED_DIGITAL_ENHANCED_NETWORK = "IDEN";
-  private static final String LONG_TERM_EVOLUTION = "LTE";
-  private static final String UNIVERSAL_MOBILE_TELCO_SERVICE = "UMTS";
-  private static final String UNKNOWN = "Unknown";
   private static final String LANDSCAPE = "Landscape";
   private static final String PORTRAIT = "Portrait";
   private static final String NO_CARRIER = "EMPTY_CARRIER";
-  private static final int UNAVAILABLE_BATTERY_LEVEL = -1;
-  private static final int DEFAULT_BATTERY_LEVEL = -1;
   private static final int NO_NETWORK = -1;
   private static final String NOT_A_LOAD_MAP_EVENT_TYPE = "Type must be a load map event.";
   private static final String NOT_A_GESTURE_MAP_EVENT_TYPE = "Type must be a gesture map event.";
   private static final String MAP_STATE_ILLEGAL_NULL = "MapState cannot be null.";
-  private static final Map<Integer, String> NETWORKS = new HashMap<Integer, String>() {
-    {
-      put(TelephonyManager.NETWORK_TYPE_1xRTT, SINGLE_CARRIER_RTT);
-      put(TelephonyManager.NETWORK_TYPE_CDMA, CODE_DIVISION_MULTIPLE_ACCESS);
-      put(TelephonyManager.NETWORK_TYPE_EDGE, ENHANCED_DATA_GSM_EVOLUTION);
-      put(TelephonyManager.NETWORK_TYPE_EHRPD, ENHANCED_HIGH_RATE_PACKET_DATA);
-      put(TelephonyManager.NETWORK_TYPE_EVDO_0, EVOLUTION_DATA_OPTIMIZED_0);
-      put(TelephonyManager.NETWORK_TYPE_EVDO_A, EVOLUTION_DATA_OPTIMIZED_A);
-      put(TelephonyManager.NETWORK_TYPE_EVDO_B, EVOLUTION_DATA_OPTIMIZED_B);
-      put(TelephonyManager.NETWORK_TYPE_GPRS, GENERAL_PACKET_RADIO_SERVICE);
-      put(TelephonyManager.NETWORK_TYPE_HSDPA, HIGH_SPEED_DOWNLINK_PACKET_ACCESS);
-      put(TelephonyManager.NETWORK_TYPE_HSPA, HIGH_SPEED_PACKET_ACCESS);
-      put(TelephonyManager.NETWORK_TYPE_HSPAP, HIGH_SPEED_PACKET_ACCESS_PLUS);
-      put(TelephonyManager.NETWORK_TYPE_HSUPA, HIGH_SPEED_UNLINK_PACKET_ACCESS);
-      put(TelephonyManager.NETWORK_TYPE_IDEN, INTEGRATED_DIGITAL_ENHANCED_NETWORK);
-      put(TelephonyManager.NETWORK_TYPE_LTE, LONG_TERM_EVOLUTION);
-      put(TelephonyManager.NETWORK_TYPE_UMTS, UNIVERSAL_MOBILE_TELCO_SERVICE);
-      put(TelephonyManager.NETWORK_TYPE_UNKNOWN, UNKNOWN);
-    }
-  };
   private static final Map<Integer, String> ORIENTATIONS = new HashMap<Integer, String>() {
     {
       put(Configuration.ORIENTATION_LANDSCAPE, LANDSCAPE);
@@ -107,9 +68,6 @@ public class MapEventFactory {
 
     mapClickEvent.setOrientation(obtainOrientation(MapboxTelemetry.applicationContext));
     mapClickEvent.setCarrier(obtainCellularCarrier(MapboxTelemetry.applicationContext));
-    mapClickEvent.setCellularNetworkType(obtainCellularNetworkType(MapboxTelemetry.applicationContext));
-    mapClickEvent.setBatteryLevel(obtainBatteryLevel());
-    mapClickEvent.setPluggedIn(isPluggedIn());
     mapClickEvent.setWifi(obtainConnectedToWifi(MapboxTelemetry.applicationContext));
 
     return mapClickEvent;
@@ -120,9 +78,6 @@ public class MapEventFactory {
 
     mapDragendEvent.setOrientation(obtainOrientation(MapboxTelemetry.applicationContext));
     mapDragendEvent.setCarrier(obtainCellularCarrier(MapboxTelemetry.applicationContext));
-    mapDragendEvent.setCellularNetworkType(obtainCellularNetworkType(MapboxTelemetry.applicationContext));
-    mapDragendEvent.setBatteryLevel(obtainBatteryLevel());
-    mapDragendEvent.setPluggedIn(isPluggedIn());
     mapDragendEvent.setWifi(obtainConnectedToWifi(MapboxTelemetry.applicationContext));
 
     return mapDragendEvent;
@@ -147,11 +102,6 @@ public class MapEventFactory {
     return carrierName;
   }
 
-  private String obtainCellularNetworkType(Context context) {
-    TelephonyManager manager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-    return NETWORKS.get(manager.getNetworkType());
-  }
-
   private float obtainDisplayDensity(Context context) {
     DisplayMetrics displayMetrics = new DisplayMetrics();
     ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(displayMetrics);
@@ -159,30 +109,9 @@ public class MapEventFactory {
     return displayMetrics.density;
   }
 
-  private int obtainBatteryLevel() {
-    Intent batteryStatus = registerBatteryUpdates(MapboxTelemetry.applicationContext);
-
-    if (batteryStatus == null) {
-      return UNAVAILABLE_BATTERY_LEVEL;
-    }
-
-    int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, DEFAULT_BATTERY_LEVEL);
-    int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, DEFAULT_BATTERY_LEVEL);
-    return Math.round((level / (float) scale) * 100);
-  }
-
   private Intent registerBatteryUpdates(Context context) {
     IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
     return context.registerReceiver(null, filter);
-  }
-
-  private boolean isPluggedIn() {
-    Intent batteryStatus = registerBatteryUpdates(MapboxTelemetry.applicationContext);
-    int chargePlug = batteryStatus.getIntExtra(BatteryManager.EXTRA_PLUGGED, DEFAULT_BATTERY_LEVEL);
-    final boolean pluggedIntoUSB = chargePlug == BatteryManager.BATTERY_PLUGGED_USB;
-    final boolean pluggedIntoAC = chargePlug == BatteryManager.BATTERY_PLUGGED_AC;
-
-    return pluggedIntoUSB || pluggedIntoAC;
   }
 
   private Boolean obtainConnectedToWifi(Context context) {
@@ -219,10 +148,7 @@ public class MapEventFactory {
     mapLoadEvent.setOrientation(obtainOrientation(MapboxTelemetry.applicationContext));
     mapLoadEvent.setAccessibilityFontScale(obtainAccessibilityFontScaleSize(MapboxTelemetry.applicationContext));
     mapLoadEvent.setCarrier(obtainCellularCarrier(MapboxTelemetry.applicationContext));
-    mapLoadEvent.setCellularNetworkType(obtainCellularNetworkType(MapboxTelemetry.applicationContext));
     mapLoadEvent.setResolution(obtainDisplayDensity(MapboxTelemetry.applicationContext));
-    mapLoadEvent.setBatteryLevel(obtainBatteryLevel());
-    mapLoadEvent.setPluggedIn(isPluggedIn());
     mapLoadEvent.setWifi(obtainConnectedToWifi(MapboxTelemetry.applicationContext));
 
     return mapLoadEvent;

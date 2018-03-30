@@ -1,14 +1,30 @@
 package com.mapbox.android.telemetry;
 
+import android.content.Context;
+import android.media.AudioManager;
+import android.telephony.TelephonyManager;
+
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 
 public class NavigationEventFactoryTest {
+
+  @Before
+  public void setupMapboxTelemetry() {
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    MapboxTelemetry.applicationContext = mockedContext;
+    AudioManager mockedAudioManager = mock(AudioManager.class, RETURNS_DEEP_STUBS);
+    NavigationUtils.audioManager = mockedAudioManager;
+    TelephonyManager mockedTelephonyManager = mock(TelephonyManager.class, RETURNS_DEEP_STUBS);
+    TelemetryUtils.telephonyManager = mockedTelephonyManager;
+  }
 
   @Test
   public void checksNavigationDepartEvent() throws Exception {
