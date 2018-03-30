@@ -43,7 +43,7 @@ public class NavigationMetadata implements Parcelable {
   private Integer screenBrightness = null;
   private String applicationState = null;
   private Boolean batteryPluggedIn = null;
-  private Integer batteryLevel = null;
+  private Integer batteryLevel = 100;
   private String connectivity = null;
 
   public NavigationMetadata(Date startTimestamp, int distanceCompleted, int distanceRemaining, int durationRemaining,
@@ -74,6 +74,7 @@ public class NavigationMetadata implements Parcelable {
     this.batteryPluggedIn = TelemetryUtils.isPluggedIn();
     this.connectivity = TelemetryUtils.getCellularNetworkType();
     this.audioType = NavigationUtils.obtainAudioType();
+    this.applicationState = TelemetryUtils.getApplicationState();
   }
 
   String getStartTimestamp() {
@@ -247,10 +248,6 @@ public class NavigationMetadata implements Parcelable {
 
   String getApplicationState() {
     return applicationState;
-  }
-
-  public void setApplicationState(String applicationState) {
-    this.applicationState = applicationState;
   }
 
   Boolean isBatteryPluggedIn() {

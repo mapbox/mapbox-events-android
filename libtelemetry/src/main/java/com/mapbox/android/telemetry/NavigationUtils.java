@@ -1,11 +1,8 @@
 package com.mapbox.android.telemetry;
 
-import android.app.ActivityManager;
 import android.content.Context;
 import android.media.AudioManager;
 import android.provider.Settings;
-
-import java.util.List;
 
 class NavigationUtils {
   static  AudioManager audioManager = null;
@@ -33,24 +30,6 @@ class NavigationUtils {
     }
 
     return screenBrightness;
-  }
-
-  static String getApplicationState(Context context) {
-    ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-    List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
-    if (appProcesses == null) {
-      return "";
-    }
-
-    String packageName = context.getPackageName();
-    for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
-      if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
-        && appProcess.processName.equals(packageName)) {
-        return "Foreground";
-      }
-    }
-
-    return "Background";
   }
 
   static String obtainAudioType() {

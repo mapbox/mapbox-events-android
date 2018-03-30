@@ -1,5 +1,6 @@
 package com.mapbox.android.telemetry;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.location.Location;
 import android.media.AudioManager;
@@ -28,6 +29,8 @@ public class SerializerTest {
     NavigationUtils.audioManager = mockedAudioManager;
     TelephonyManager mockedTelephonyManager = mock(TelephonyManager.class, RETURNS_DEEP_STUBS);
     TelemetryUtils.telephonyManager = mockedTelephonyManager;
+    ActivityManager mockedActivityManager = mock(ActivityManager.class, RETURNS_DEEP_STUBS);
+    TelemetryUtils.activityManager = mockedActivityManager;
   }
 
   @Test
@@ -54,7 +57,8 @@ public class SerializerTest {
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
       + "\"audioType\":\"unknown\",\"locationEngine\":\"AndroidLocationEngine\",\"volumeLevel\":0,"
-      + "\"screenBrightness\":0,\"batteryPluggedIn\":false,\"batteryLevel\":0,\"connectivity\":\"Unknown\"}";
+      + "\"screenBrightness\":0,\"applicationState\":\"Background\",\"batteryPluggedIn\":false,\"batteryLevel\":100,"
+      + "\"connectivity\":\"Unknown\"}";
 
     assertEquals(expectedJson, payload);
   }
@@ -84,8 +88,8 @@ public class SerializerTest {
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
       + "\"audioType\":\"unknown\",\"locationEngine\":\"AndroidLocationEngine\",\"volumeLevel\":0,"
-      + "\"screenBrightness\":0,\"batteryPluggedIn\":false,\"batteryLevel\":0,\"connectivity\":\"Unknown\","
-      + "\"event\":\"navigation.depart\"}";
+      + "\"screenBrightness\":0,\"applicationState\":\"Background\",\"batteryPluggedIn\":false,\"batteryLevel\":100,"
+      + "\"connectivity\":\"Unknown\",\"event\":\"navigation.depart\"}";
 
     assertEquals(expectedJson, payload);
   }
@@ -126,7 +130,8 @@ public class SerializerTest {
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
       + "\"audioType\":\"unknown\",\"locationEngine\":\"AndroidLocationEngine\",\"volumeLevel\":0,"
-      + "\"screenBrightness\":0,\"batteryPluggedIn\":false,\"batteryLevel\":0,\"connectivity\":\"Unknown\"}";
+      + "\"screenBrightness\":0,\"applicationState\":\"Background\",\"batteryPluggedIn\":false,\"batteryLevel\":100,"
+      + "\"connectivity\":\"Unknown\"}";
 
     assertEquals(expectedJson, payload);
   }
@@ -168,9 +173,10 @@ public class SerializerTest {
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
       + "\"audioType\":\"unknown\",\"locationEngine\":\"AndroidLocationEngine\",\"volumeLevel\":0,"
-      + "\"screenBrightness\":0,\"batteryPluggedIn\":false,\"batteryLevel\":0,\"connectivity\":\"Unknown\","
-      + "\"userId\":\"userId\",\"feedbackType\":\"general\",\"source\":\"unknown\",\"audio\":\"audio\","
-      + "\"locationsBefore\":[{}],\"locationsAfter\":[{}],\"feedbackId\":\"" + feedbackData.getFeedbackId() + "\"}";
+      + "\"screenBrightness\":0,\"applicationState\":\"Background\",\"batteryPluggedIn\":false,\"batteryLevel\":100,"
+      + "\"connectivity\":\"Unknown\",\"userId\":\"userId\",\"feedbackType\":\"general\",\"source\":\"unknown\","
+      + "\"audio\":\"audio\",\"locationsBefore\":[{}],\"locationsAfter\":[{}],\"feedbackId\":\""
+      + feedbackData.getFeedbackId() + "\"}";
 
     assertEquals(expectedJson, payload);
   }
@@ -231,12 +237,12 @@ public class SerializerTest {
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":true,"
       + "\"audioType\":\"unknown\",\"locationEngine\":\"MockLocationEngine\",\"volumeLevel\":0,\"screenBrightness\":0,"
-      + "\"batteryPluggedIn\":false,\"batteryLevel\":0,\"connectivity\":\"Unknown\",\"navigationNewData\":"
-      + "{\"newDistanceRemaining\":100,\"newDurationRemaining\":750,\"newGeometry\":\"mewGeometry\"},"
-      + "\"secondsSinceLastReroute\":12000,\"locationsBefore\":[null],\"locationsAfter\":[null],"
-      + "\"feedbackId\":\"" + feedbackData.getFeedbackId() + "\",\"screenshot\":\"screenshot\",\"step\":"
-      + "{\"upcomingInstruction\":\"upcomingInstruction\",\"upcomingType\":\"upcomingType\","
-      + "\"upcomingModifier\":\"upcomingModifier\",\"upcomingName\":\"upcomingName\","
+      + "\"applicationState\":\"Background\",\"batteryPluggedIn\":false,\"batteryLevel\":100,"
+      + "\"connectivity\":\"Unknown\",\"navigationNewData\":{\"newDistanceRemaining\":100,\"newDurationRemaining\":750,"
+      + "\"newGeometry\":\"mewGeometry\"},\"secondsSinceLastReroute\":12000,\"locationsBefore\":[null],"
+      + "\"locationsAfter\":[null],\"feedbackId\":\"" + feedbackData.getFeedbackId() + "\","
+      + "\"screenshot\":\"screenshot\",\"step\":{\"upcomingInstruction\":\"upcomingInstruction\","
+      + "\"upcomingType\":\"upcomingType\",\"upcomingModifier\":\"upcomingModifier\",\"upcomingName\":\"upcomingName\","
       + "\"previousInstruction\":\"previousInstruction\",\"previousType\":\"previousType\","
       + "\"previousModifier\":\"previousModifier\",\"previousName\":\"previousName\",\"distance\":100,"
       + "\"duration\":1200,\"distanceRemaining\":250,\"durationRemaining\":2200}}";
@@ -291,7 +297,8 @@ public class SerializerTest {
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":true,"
       + "\"audioType\":\"unknown\",\"locationEngine\":\"MockLocationEngine\",\"volumeLevel\":0,\"screenBrightness\":0,"
-      + "\"batteryPluggedIn\":false,\"batteryLevel\":0,\"connectivity\":\"Unknown\",\"newDistanceRemaining\":100,"
+      + "\"applicationState\":\"Background\",\"batteryPluggedIn\":false,\"batteryLevel\":100,"
+      + "\"connectivity\":\"Unknown\",\"newDistanceRemaining\":100,"
       + "\"newDurationRemaining\":750,\"newGeometry\":\"mewGeometry\",\"step\":"
       + "{\"upcomingInstruction\":\"upcomingInstruction\",\"upcomingType\":\"upcomingType\","
       + "\"upcomingModifier\":\"upcomingModifier\",\"upcomingName\":\"upcomingName\",\"previousInstruction\":"

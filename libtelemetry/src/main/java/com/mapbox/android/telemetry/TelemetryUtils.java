@@ -28,6 +28,7 @@ public class TelemetryUtils {
   private static final Locale DEFAULT_LOCALE = Locale.US;
   private static final int UNAVAILABLE_BATTERY_LEVEL = 100;
   static TelephonyManager telephonyManager = null;
+  static ActivityManager activityManager = null;
 
 
   public static String toHumanReadableAscii(String s) {
@@ -48,14 +49,17 @@ public class TelemetryUtils {
     return s;
   }
 
-  static String getApplicationState(Context context) {
-    ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+  static String getApplicationState() {
+    if (activityManager == null) {
+      activityManager = (ActivityManager) MapboxTelemetry.applicationContext.getSystemService(Context.ACTIVITY_SERVICE);
+    }
+
     List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
     if (appProcesses == null) {
       return "";
     }
 
-    String packageName = context.getPackageName();
+    String packageName = MapboxTelemetry.applicationContext.getPackageName();
     for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
       if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
         && appProcess.processName.equals(packageName)) {
