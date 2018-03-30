@@ -261,7 +261,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
     Date aDate = new Date();
     NavigationState navigationState = obtainDefaultNavigationState(aDate);
     NavigationCancelData navigationCancelData =
-      new NavigationCancelData(TelemetryUtils.generateCreateDateFormatted(aDate));
+      new NavigationCancelData();
     navigationState.setNavigationCancelData(navigationCancelData);
     Event cancelEvent = navigationEventFactory.createNavigationEvent(Event.Type.NAV_CANCEL, navigationState);
     return cancelEvent;

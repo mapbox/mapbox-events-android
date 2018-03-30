@@ -105,7 +105,7 @@ public class SerializerTest {
     metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
 
     NavigationCancelData navigationCancelData =
-      new NavigationCancelData(TelemetryUtils.generateCreateDateFormatted(testDate));
+      new NavigationCancelData();
     navigationCancelData.setComment("Test");
     navigationCancelData.setRating(75);
 
@@ -121,8 +121,7 @@ public class SerializerTest {
     Gson customGson = gsonBuilder.create();
     String payload = customGson.toJson(navigationCancelEvent);
 
-    String expectedJson = "{\"event\":\"navigation.cancel\",\"arrivalTimestamp\":\""
-      + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"rating\":75,\"comment\":\"Test\","
+    String expectedJson = "{\"event\":\"navigation.cancel\",\"rating\":75,\"comment\":\"Test\","
       + "\"absoluteDistanceToDestination\":50,\"startTimestamp\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"distanceCompleted\":13,\"distanceRemaining\":22,"
       + "\"durationRemaining\":180,\"operatingSystem\":\"Android - null\",\"eventVersion\":3,"
