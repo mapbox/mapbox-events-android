@@ -49,13 +49,13 @@ public class TelemetryUtils {
     return s;
   }
 
-  public static int getVolumeLevel(Context context) {
+  static int getVolumeLevel(Context context) {
     AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
     return (int) Math.floor(100.0 * audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
       / audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
   }
 
-  public static int getScreenBrightness(Context context) {
+  static int getScreenBrightness(Context context) {
     int screenBrightness;
     try {
       screenBrightness = android.provider.Settings.System.getInt(
@@ -71,7 +71,7 @@ public class TelemetryUtils {
     return screenBrightness;
   }
 
-  public static String getApplicationState(Context context) {
+  static String getApplicationState(Context context) {
     ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
     List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
     if (appProcesses == null) {
@@ -89,7 +89,7 @@ public class TelemetryUtils {
     return "Background";
   }
 
-  public static int getBatteryLevel() {
+  static int getBatteryLevel() {
     Intent batteryStatus = MapboxTelemetry.batteryStatus;
 
     if (batteryStatus != null) {
@@ -101,7 +101,7 @@ public class TelemetryUtils {
     }
   }
 
-  public static boolean isPluggedIn() {
+  static boolean isPluggedIn() {
     Intent batteryStatus = MapboxTelemetry.batteryStatus;
 
     if (batteryStatus != null) {
@@ -114,7 +114,7 @@ public class TelemetryUtils {
     return false;
   }
 
-  public static String getCellularNetworkType(Context context) {
+  static String getCellularNetworkType(Context context) {
     TelephonyManager manager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
     switch (manager.getNetworkType()) {
       case TelephonyManager.NETWORK_TYPE_1xRTT:
@@ -152,10 +152,6 @@ public class TelemetryUtils {
       default:
         return "";
     }
-  }
-
-  public static String buildUUID() {
-    return UUID.randomUUID().toString();
   }
 
   static String obtainCurrentDate() {

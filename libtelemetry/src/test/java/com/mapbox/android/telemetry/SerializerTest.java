@@ -19,7 +19,7 @@ public class SerializerTest {
   public void checkArriveSerializing() throws Exception {
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22, 180, "sdkIdentifier", "sdkVersion",
-      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "device", "AndroidLocationEngine", 50);
+      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "AndroidLocationEngine", 50);
     metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
     NavigationState navigationState = new NavigationState(metadata);
 
@@ -38,7 +38,7 @@ public class SerializerTest {
       + "\"sdKIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
-      + "\"device\":\"device\",\"locationEngine\":\"AndroidLocationEngine\"}";
+      + "\"locationEngine\":\"AndroidLocationEngine\"}";
 
     assertEquals(expectedJson, payload);
   }
@@ -47,7 +47,7 @@ public class SerializerTest {
   public void checkDepartSerializing() throws Exception {
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22, 180, "sdkIdentifier", "sdkVersion",
-      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "device", "AndroidLocationEngine", 50);
+      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "AndroidLocationEngine", 50);
     metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
     NavigationState navigationState = new NavigationState(metadata);
 
@@ -67,7 +67,7 @@ public class SerializerTest {
       + "\"sdKIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
-      + "\"device\":\"device\",\"locationEngine\":\"AndroidLocationEngine\",\"event\":\"navigation.depart\"}";
+      + "\"locationEngine\":\"AndroidLocationEngine\",\"event\":\"navigation.depart\"}";
 
     assertEquals(expectedJson, payload);
   }
@@ -78,7 +78,7 @@ public class SerializerTest {
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22,
       180, "sdkIdentifier", "sdkVersion", 3, "sessionID", 10.5,
-      15.67, "geometry", "profile", false, "device",
+      15.67, "geometry", "profile", false,
       "AndroidLocationEngine", 50);
     metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
 
@@ -107,7 +107,7 @@ public class SerializerTest {
       + "\"sdKIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
-      + "\"device\":\"device\",\"locationEngine\":\"AndroidLocationEngine\"}";
+      + "\"locationEngine\":\"AndroidLocationEngine\"}";
 
     assertEquals(expectedJson, payload);
   }
@@ -116,11 +116,11 @@ public class SerializerTest {
   public void checkFeedbackSerializing() throws Exception {
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22, 180, "sdkIdentifier", "sdkVersion",
-      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "device", "AndroidLocationEngine", 50);
+      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "AndroidLocationEngine", 50);
     metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
     FeedbackEventData navigationFeedbackData = new FeedbackEventData("userId", "general",
       "unknown", "audio");
-    FeedbackData feedbackData = new FeedbackData("feedbackId");
+    FeedbackData feedbackData = new FeedbackData();
     Location[] locationsBefore = new Location[1];
     locationsBefore[0] = mock(Location.class);
     Location[] locationsAfter = new Location[1];
@@ -148,9 +148,9 @@ public class SerializerTest {
       + "\"sdKIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
-      + "\"device\":\"device\",\"locationEngine\":\"AndroidLocationEngine\",\"userId\":\"userId\","
+      + "\"locationEngine\":\"AndroidLocationEngine\",\"userId\":\"userId\","
       + "\"feedbackType\":\"general\",\"source\":\"unknown\",\"audio\":\"audio\",\"locationsBefore\":[{}],"
-      + "\"locationsAfter\":[{}],\"feedbackId\":\"feedbackId\"}";
+      + "\"locationsAfter\":[{}],\"feedbackId\":\"" + feedbackData.getFeedbackId() + "\"}";
 
     assertEquals(expectedJson, payload);
   }
@@ -160,14 +160,14 @@ public class SerializerTest {
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22,
       180, "sdkIdent", "sdkversion", 3, "sessionID", 10.5,
-      15.67, "geometry", "profile", true, "device",
+      15.67, "geometry", "profile", true,
       "MockLocationEngine", 1300);
     metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
 
     NavigationNewData navigationNewData = new NavigationNewData(100, 750,
       "mewGeometry");
     NavigationRerouteData navigationRerouteData = new NavigationRerouteData(navigationNewData, 12000);
-    FeedbackData feedbackData = new FeedbackData("feedbackId");
+    FeedbackData feedbackData = new FeedbackData();
     feedbackData.setScreenshot("screenshot");
 
     NavigationStepMetadata navigationStepMetadata = new NavigationStepMetadata();
@@ -210,10 +210,10 @@ public class SerializerTest {
       + "\"sdKIdentifier\":\"sdkIdent\",\"sdkVersion\":\"sdkversion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":true,"
-      + "\"device\":\"device\",\"locationEngine\":\"MockLocationEngine\",\"navigationNewData\":"
+      + "\"locationEngine\":\"MockLocationEngine\",\"navigationNewData\":"
       + "{\"newDistanceRemaining\":100,\"newDurationRemaining\":750,\"newGeometry\":\"mewGeometry\"},"
       + "\"secondsSinceLastReroute\":12000,\"locationsBefore\":[null],\"locationsAfter\":[null],"
-      + "\"feedbackId\":\"feedbackId\",\"screenshot\":\"screenshot\",\"step\":"
+      + "\"feedbackId\":\"" + feedbackData.getFeedbackId() + "\",\"screenshot\":\"screenshot\",\"step\":"
       + "{\"upcomingInstruction\":\"upcomingInstruction\",\"upcomingType\":\"upcomingType\","
       + "\"upcomingModifier\":\"upcomingModifier\",\"upcomingName\":\"upcomingName\","
       + "\"previousInstruction\":\"previousInstruction\",\"previousType\":\"previousType\","
@@ -228,7 +228,7 @@ public class SerializerTest {
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22,
       180, "sdkIdent", "sdkversion", 3, "sessionID", 10.5,
-      15.67, "geometry", "profile", true, "device",
+      15.67, "geometry", "profile", true,
       "MockLocationEngine", 1300);
     metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
     NavigationNewData navigationNewData = new NavigationNewData(100, 750,
@@ -269,7 +269,7 @@ public class SerializerTest {
       + "\"sdKIdentifier\":\"sdkIdent\",\"sdkVersion\":\"sdkversion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":true,"
-      + "\"device\":\"device\",\"locationEngine\":\"MockLocationEngine\",\"newDistanceRemaining\":100,"
+      + "\"locationEngine\":\"MockLocationEngine\",\"newDistanceRemaining\":100,"
       + "\"newDurationRemaining\":750,\"newGeometry\":\"mewGeometry\",\"step\":"
       + "{\"upcomingInstruction\":\"upcomingInstruction\",\"upcomingType\":\"upcomingType\","
       + "\"upcomingModifier\":\"upcomingModifier\",\"upcomingName\":\"upcomingName\",\"previousInstruction\":"
