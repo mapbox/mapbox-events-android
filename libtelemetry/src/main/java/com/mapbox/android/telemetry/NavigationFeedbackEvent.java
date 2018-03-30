@@ -17,7 +17,6 @@ class NavigationFeedbackEvent extends Event implements Parcelable {
   @JsonAdapter(FeedbackDataSerializer.class)
   private FeedbackData feedbackData;
   private NavigationStepMetadata step = null;
-  private String created;
 
   NavigationFeedbackEvent(NavigationState navigationState) {
     this.event = NAVIGATION_FEEDBACK;
@@ -94,8 +93,4 @@ class NavigationFeedbackEvent extends Event implements Parcelable {
         return new NavigationFeedbackEvent[size];
       }
     };
-
-  public void setCreated(String created) {
-    this.created = created;
-  }
 }

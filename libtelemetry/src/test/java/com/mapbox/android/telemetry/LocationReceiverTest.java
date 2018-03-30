@@ -1,5 +1,6 @@
 package com.mapbox.android.telemetry;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -10,6 +11,7 @@ import org.junit.Test;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -23,6 +25,8 @@ public class LocationReceiverTest {
     Context mockedContext = mock(Context.class);
     Intent mockedIntent = mock(Intent.class);
     when(mockedIntent.getStringExtra(eq("location_received"))).thenReturn("onLocation");
+    ActivityManager mockedActivityManager = mock(ActivityManager.class, RETURNS_DEEP_STUBS);
+    TelemetryUtils.activityManager = mockedActivityManager;
     Bundle mockedBundle = mock(Bundle.class);
     when(mockedIntent.getExtras()).thenReturn(mockedBundle);
     Location mockedLocation = mock(Location.class);

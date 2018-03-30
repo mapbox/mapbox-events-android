@@ -1,5 +1,6 @@
 package com.mapbox.android.telemetry;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.media.AudioManager;
 import android.telephony.TelephonyManager;
@@ -128,6 +129,8 @@ public class NavigationEventFactoryTest {
 
   @Test
   public void checksNavigationFasterRouteEvent() throws Exception {
+    ActivityManager mockedActivityManager = mock(ActivityManager.class, RETURNS_DEEP_STUBS);
+    TelemetryUtils.activityManager = mockedActivityManager;
     NavigationEventFactory navigationEventFactory = new NavigationEventFactory();
     NavigationState aValidNavigationState = obtainAValidNavigationState();
     NavigationRerouteData mockedNavigationRerouteData = mock(NavigationRerouteData.class);
@@ -142,6 +145,8 @@ public class NavigationEventFactoryTest {
 
   @Test
   public void checksFasterRouteType() throws Exception {
+    ActivityManager mockedActivityManager = mock(ActivityManager.class, RETURNS_DEEP_STUBS);
+    TelemetryUtils.activityManager = mockedActivityManager;
     NavigationEventFactory navigationEventFactory = new NavigationEventFactory();
     NavigationState aValidNavigationState = obtainAValidNavigationState();
     NavigationRerouteData mockedNavigationRerouteData = mock(NavigationRerouteData.class);
@@ -173,6 +178,8 @@ public class NavigationEventFactoryTest {
 
   @Test
   public void checksValidNavigationState() throws Exception {
+    ActivityManager mockedActivityManager = mock(ActivityManager.class, RETURNS_DEEP_STUBS);
+    TelemetryUtils.activityManager = mockedActivityManager;
     NavigationEventFactory navigationEventFactory = new NavigationEventFactory();
     Event.Type aNavFeedbackEventType = Event.Type.NAV_FEEDBACK;
     NavigationState aValidNavigationState = obtainAValidNavigationState();

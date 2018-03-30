@@ -1,11 +1,16 @@
 package com.mapbox.android.telemetry;
 
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.location.Location;
+import android.media.AudioManager;
+import android.telephony.TelephonyManager;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSerializer;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Date;
@@ -15,6 +20,7 @@ import java.util.Map;
 
 import okhttp3.Callback;
 
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 
 public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
@@ -100,6 +106,18 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
         });
       }
     };
+
+  @Before
+  public void setupMapboxTelemetry() {
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    MapboxTelemetry.applicationContext = mockedContext;
+    AudioManager mockedAudioManager = mock(AudioManager.class, RETURNS_DEEP_STUBS);
+    NavigationUtils.audioManager = mockedAudioManager;
+    TelephonyManager mockedTelephonyManager = mock(TelephonyManager.class, RETURNS_DEEP_STUBS);
+    TelemetryUtils.telephonyManager = mockedTelephonyManager;
+    ActivityManager mockedActivityManager = mock(ActivityManager.class, RETURNS_DEEP_STUBS);
+    TelemetryUtils.activityManager = mockedActivityManager;
+  }
 
   @Test
   public void sendsTheCorrectBodyPostingAppUserTurnstileEvent() throws Exception {
@@ -272,7 +290,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
     Date aDate = new Date();
     NavigationState navigationState = obtainDefaultNavigationState(aDate);
     FeedbackEventData navigationFeedbackData = new FeedbackEventData("anyUserId", "general",
-      "unknown", "audio");
+      "unknown");
     FeedbackData feedbackData = obtainFeedbackData();
     NavigationLocationData navigationLocationData = obtainLocationData();
     navigationState.setNavigationLocationData(navigationLocationData);

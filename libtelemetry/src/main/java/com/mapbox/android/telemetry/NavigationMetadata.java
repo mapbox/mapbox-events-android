@@ -77,6 +77,14 @@ public class NavigationMetadata implements Parcelable {
     this.applicationState = TelemetryUtils.getApplicationState();
   }
 
+  public void setCreated(String created) {
+    this.created = created;
+  }
+
+  String getCreated() {
+    return created;
+  }
+
   String getStartTimestamp() {
     return startTimestamp;
   }
@@ -123,15 +131,6 @@ public class NavigationMetadata implements Parcelable {
 
   String getGeometry() {
     return geometry;
-  }
-
-  String getCreated() {
-    return created;
-  }
-
-  // For testing only
-  void setCreated(String created) {
-    this.created = created;
   }
 
   String getProfile() {
@@ -252,6 +251,11 @@ public class NavigationMetadata implements Parcelable {
 
   Boolean isBatteryPluggedIn() {
     return batteryPluggedIn;
+  }
+
+  //for testing
+  void setBatteryLevel(Integer batteryLevel) {
+    this.batteryLevel = batteryLevel;
   }
 
   Integer getBatteryLevel() {
