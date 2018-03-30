@@ -1,6 +1,7 @@
-package com.mapbox.android.telemetry.navigation.utils;
+package com.mapbox.android.telemetry;
 
 import android.content.Context;
+import android.media.AudioManager;
 
 class UnknownAudioType implements AudioTypeResolver {
   private static final String UNKNOWN = "unknown";
@@ -10,7 +11,7 @@ class UnknownAudioType implements AudioTypeResolver {
   }
 
   @Override
-  public String obtainAudioType(Context context) {
+  public String obtainAudioType(Context context, AudioManager audioManager) {
     return UNKNOWN;
   }
 }

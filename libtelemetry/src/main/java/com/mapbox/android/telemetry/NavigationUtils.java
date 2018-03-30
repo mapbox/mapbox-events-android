@@ -52,4 +52,11 @@ class NavigationUtils {
 
     return "Background";
   }
+
+  static String obtainAudioType() {
+    AudioTypeChain audioTypeChain = new AudioTypeChain();
+    AudioTypeResolver setupChain = audioTypeChain.setup();
+
+    return setupChain.obtainAudioType(MapboxTelemetry.applicationContext, audioManager);
+  }
 }

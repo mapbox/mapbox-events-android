@@ -73,6 +73,7 @@ public class NavigationMetadata implements Parcelable {
     this.screenBrightness = NavigationUtils.getScreenBrightness();
     this.batteryPluggedIn = TelemetryUtils.isPluggedIn();
     this.connectivity = TelemetryUtils.getCellularNetworkType();
+    this.audioType = NavigationUtils.obtainAudioType();
   }
 
   String getStartTimestamp() {

@@ -1,4 +1,4 @@
-package com.mapbox.android.telemetry.navigation.utils;
+package com.mapbox.android.telemetry;
 
 import android.content.Context;
 import android.media.AudioManager;
@@ -13,12 +13,11 @@ class SpeakerAudioType implements AudioTypeResolver {
   }
 
   @Override
-  public String obtainAudioType(Context context) {
-    AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+  public String obtainAudioType(Context context, AudioManager audioManager) {
     if (audioManager.isSpeakerphoneOn()) {
       return SPEAKER;
     } else {
-      return chain.obtainAudioType(context);
+      return chain.obtainAudioType(context, audioManager);
     }
   }
 }

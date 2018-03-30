@@ -53,8 +53,8 @@ public class SerializerTest {
       + "\"sdKIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
-      + "\"locationEngine\":\"AndroidLocationEngine\",\"volumeLevel\":0,\"screenBrightness\":0,"
-      + "\"batteryPluggedIn\":false,\"batteryLevel\":100,\"connectivity\":\"Unknown\"}";
+      + "\"audioType\":\"unknown\",\"locationEngine\":\"AndroidLocationEngine\",\"volumeLevel\":0,"
+      + "\"screenBrightness\":0,\"batteryPluggedIn\":false,\"batteryLevel\":0,\"connectivity\":\"Unknown\"}";
 
     assertEquals(expectedJson, payload);
   }
@@ -83,8 +83,9 @@ public class SerializerTest {
       + "\"sdKIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
-      + "\"locationEngine\":\"AndroidLocationEngine\",\"volumeLevel\":0,\"screenBrightness\":0,"
-      + "\"batteryPluggedIn\":false,\"batteryLevel\":100,\"connectivity\":\"Unknown\",\"event\":\"navigation.depart\"}";
+      + "\"audioType\":\"unknown\",\"locationEngine\":\"AndroidLocationEngine\",\"volumeLevel\":0,"
+      + "\"screenBrightness\":0,\"batteryPluggedIn\":false,\"batteryLevel\":0,\"connectivity\":\"Unknown\","
+      + "\"event\":\"navigation.depart\"}";
 
     assertEquals(expectedJson, payload);
   }
@@ -124,8 +125,8 @@ public class SerializerTest {
       + "\"sdKIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
-      + "\"locationEngine\":\"AndroidLocationEngine\",\"volumeLevel\":0,\"screenBrightness\":0,"
-      + "\"batteryPluggedIn\":false,\"batteryLevel\":100,\"connectivity\":\"Unknown\"}";
+      + "\"audioType\":\"unknown\",\"locationEngine\":\"AndroidLocationEngine\",\"volumeLevel\":0,"
+      + "\"screenBrightness\":0,\"batteryPluggedIn\":false,\"batteryLevel\":0,\"connectivity\":\"Unknown\"}";
 
     assertEquals(expectedJson, payload);
   }
@@ -166,10 +167,10 @@ public class SerializerTest {
       + "\"sdKIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
-      + "\"locationEngine\":\"AndroidLocationEngine\",\"volumeLevel\":0,\"screenBrightness\":0,"
-      + "\"batteryPluggedIn\":false,\"batteryLevel\":100,\"connectivity\":\"Unknown\",\"userId\":\"userId\","
-      + "\"feedbackType\":\"general\",\"source\":\"unknown\",\"audio\":\"audio\",\"locationsBefore\":[{}],"
-      + "\"locationsAfter\":[{}],\"feedbackId\":\"" + feedbackData.getFeedbackId() + "\"}";
+      + "\"audioType\":\"unknown\",\"locationEngine\":\"AndroidLocationEngine\",\"volumeLevel\":0,"
+      + "\"screenBrightness\":0,\"batteryPluggedIn\":false,\"batteryLevel\":0,\"connectivity\":\"Unknown\","
+      + "\"userId\":\"userId\",\"feedbackType\":\"general\",\"source\":\"unknown\",\"audio\":\"audio\","
+      + "\"locationsBefore\":[{}],\"locationsAfter\":[{}],\"feedbackId\":\"" + feedbackData.getFeedbackId() + "\"}";
 
     assertEquals(expectedJson, payload);
   }
@@ -229,8 +230,8 @@ public class SerializerTest {
       + "\"sdKIdentifier\":\"sdkIdent\",\"sdkVersion\":\"sdkversion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":true,"
-      + "\"locationEngine\":\"MockLocationEngine\",\"volumeLevel\":0,\"screenBrightness\":0,"
-      + "\"batteryPluggedIn\":false,\"batteryLevel\":100,\"connectivity\":\"Unknown\",\"navigationNewData\":"
+      + "\"audioType\":\"unknown\",\"locationEngine\":\"MockLocationEngine\",\"volumeLevel\":0,\"screenBrightness\":0,"
+      + "\"batteryPluggedIn\":false,\"batteryLevel\":0,\"connectivity\":\"Unknown\",\"navigationNewData\":"
       + "{\"newDistanceRemaining\":100,\"newDurationRemaining\":750,\"newGeometry\":\"mewGeometry\"},"
       + "\"secondsSinceLastReroute\":12000,\"locationsBefore\":[null],\"locationsAfter\":[null],"
       + "\"feedbackId\":\"" + feedbackData.getFeedbackId() + "\",\"screenshot\":\"screenshot\",\"step\":"
@@ -289,8 +290,8 @@ public class SerializerTest {
       + "\"sdKIdentifier\":\"sdkIdent\",\"sdkVersion\":\"sdkversion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":true,"
-      + "\"locationEngine\":\"MockLocationEngine\",\"volumeLevel\":0,\"screenBrightness\":0,"
-      + "\"batteryPluggedIn\":false,\"batteryLevel\":100,\"connectivity\":\"Unknown\",\"newDistanceRemaining\":100,"
+      + "\"audioType\":\"unknown\",\"locationEngine\":\"MockLocationEngine\",\"volumeLevel\":0,\"screenBrightness\":0,"
+      + "\"batteryPluggedIn\":false,\"batteryLevel\":0,\"connectivity\":\"Unknown\",\"newDistanceRemaining\":100,"
       + "\"newDurationRemaining\":750,\"newGeometry\":\"mewGeometry\",\"step\":"
       + "{\"upcomingInstruction\":\"upcomingInstruction\",\"upcomingType\":\"upcomingType\","
       + "\"upcomingModifier\":\"upcomingModifier\",\"upcomingName\":\"upcomingName\",\"previousInstruction\":"
