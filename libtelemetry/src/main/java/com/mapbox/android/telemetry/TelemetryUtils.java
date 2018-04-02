@@ -3,6 +3,7 @@ package com.mapbox.android.telemetry;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.os.BatteryManager;
@@ -71,7 +72,7 @@ public class TelemetryUtils {
   }
 
   static int getBatteryLevel() {
-    Intent batteryStatus = MapboxTelemetry.batteryStatus;
+    Intent batteryStatus = registerBatteryUpdates(MapboxTelemetry.applicationContext);
 
     if (batteryStatus != null) {
       int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
@@ -83,7 +84,7 @@ public class TelemetryUtils {
   }
 
   static boolean isPluggedIn() {
-    Intent batteryStatus = MapboxTelemetry.batteryStatus;
+    Intent batteryStatus = registerBatteryUpdates(MapboxTelemetry.applicationContext);
 
     if (batteryStatus != null) {
       int chargePlug = batteryStatus.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
@@ -206,5 +207,10 @@ public class TelemetryUtils {
     } catch (Exception exception) {
       return EMPTY_STRING;
     }
+  }
+
+  private static Intent registerBatteryUpdates(Context context) {
+    IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+    return context.registerReceiver(null, filter);
   }
 }

@@ -8,8 +8,6 @@ public class NavigationCancelData implements Parcelable {
   private Integer rating = null;
   private String comment = null;
 
-  public NavigationCancelData() {}
-
   public void setArrivalTimestamp(String arrivalTimestamp) {
     this.arrivalTimestamp = arrivalTimestamp;
   }

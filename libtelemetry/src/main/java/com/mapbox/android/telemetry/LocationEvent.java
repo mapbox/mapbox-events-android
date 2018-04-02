@@ -29,7 +29,7 @@ class LocationEvent extends Event implements Parcelable {
   @SerializedName("operatingSystem")
   private String operatingSystem;
   @SerializedName("applicationState")
-  private String applicationState = null;
+  private String applicationState;
   @SerializedName("horizontalAccuracy")
   private Float accuracy = null;
 

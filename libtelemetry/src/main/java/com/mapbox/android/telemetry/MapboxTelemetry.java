@@ -56,7 +56,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private boolean isServiceBound = false;
   private PermissionCheckRunnable permissionCheckRunnable = null;
   private CopyOnWriteArraySet<TelemetryListener> telemetryListeners = null;
-  static Intent batteryStatus = null;
   static Context applicationContext = null;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
@@ -71,7 +70,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     this.telemetryLocationEnabler = new TelemetryLocationEnabler(true);
     initializeTelemetryListeners();
     initializeTelemetryLocationState();
-    registerBatteryUpdates();
   }
 
   // For testing only
@@ -90,7 +88,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     this.telemetryLocationEnabler = telemetryLocationEnabler;
     this.isServiceBound = isServiceBound;
     initializeTelemetryListeners();
-    registerBatteryUpdates();
   }
 
   @Override
@@ -223,10 +220,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
       }
     }
     return isLocationOpted;
-  }
-
-  Intent getBatteryStatus() {
-    return batteryStatus;
   }
 
   private void startTelemetryService() {
@@ -525,10 +518,5 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   private void stopLocation() {
     applicationContext.stopService(obtainLocationServiceIntent());
-  }
-
-  private void registerBatteryUpdates() {
-    IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-    batteryStatus = applicationContext.registerReceiver(null, filter);
   }
 }

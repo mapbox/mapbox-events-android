@@ -7,7 +7,7 @@ public class FeedbackEventData implements Parcelable {
   private String userId;
   private String feedbackType;
   private String source;
-  private String audio;
+  private String audio = null;
   private String description = null;
 
   public FeedbackEventData(String userId, String feedbackType, String source) {

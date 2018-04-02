@@ -109,11 +109,6 @@ public class MapEventFactory {
     return displayMetrics.density;
   }
 
-  private Intent registerBatteryUpdates(Context context) {
-    IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-    return context.registerReceiver(null, filter);
-  }
-
   private Boolean obtainConnectedToWifi(Context context) {
     return isConnectedToWifi(context);
   }
