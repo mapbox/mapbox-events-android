@@ -34,17 +34,17 @@ public class NavigationMetadata implements Parcelable {
   private String originalGeometry = null;
   private Integer originalEstimatedDistance = null;
   private Integer originalEstimatedDuration = null;
-  private String audioType = null;
+  private String audioType;
   private Integer stepCount = null;
   private Integer originalStepCount = null;
   private String device;
   private String locationEngine;
   private Integer volumeLevel;
-  private Integer screenBrightness = null;
-  private String applicationState = null;
-  private Boolean batteryPluggedIn = null;
+  private Integer screenBrightness;
+  private String applicationState;
+  private Boolean batteryPluggedIn;
   private Integer batteryLevel;
-  private String connectivity = null;
+  private String connectivity;
 
   public NavigationMetadata(Date startTimestamp, int distanceCompleted, int distanceRemaining, int durationRemaining,
                             String sdKIdentifier, String sdkVersion, int eventVersion, String sessionIdentifier,
@@ -68,9 +68,9 @@ public class NavigationMetadata implements Parcelable {
     this.device = Build.MODEL;
     this.locationEngine = locationEngine;
     this.absoluteDistanceToDestination = absoluteDistanceToDestination;
-    this.volumeLevel = NavigationUtils.getVolumeLevel();
+    this.volumeLevel = NavigationUtils.obtainVolumeLevel();
     this.batteryLevel = TelemetryUtils.getBatteryLevel();
-    this.screenBrightness = NavigationUtils.getScreenBrightness();
+    this.screenBrightness = NavigationUtils.obtainScreenBrightness();
     this.batteryPluggedIn = TelemetryUtils.isPluggedIn();
     this.connectivity = TelemetryUtils.getCellularNetworkType();
     this.audioType = NavigationUtils.obtainAudioType();

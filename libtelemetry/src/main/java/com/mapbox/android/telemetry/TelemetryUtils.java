@@ -28,8 +28,6 @@ public class TelemetryUtils {
   private static final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_AND_TIME_PATTERN, Locale.US);
   private static final Locale DEFAULT_LOCALE = Locale.US;
   private static final int UNAVAILABLE_BATTERY_LEVEL = 100;
-  static TelephonyManager telephonyManager = null;
-  static ActivityManager activityManager = null;
 
 
   public static String toHumanReadableAscii(String s) {
@@ -51,9 +49,8 @@ public class TelemetryUtils {
   }
 
   static String getApplicationState() {
-    if (activityManager == null) {
-      activityManager = (ActivityManager) MapboxTelemetry.applicationContext.getSystemService(Context.ACTIVITY_SERVICE);
-    }
+    ActivityManager activityManager = (ActivityManager) MapboxTelemetry.applicationContext
+      .getSystemService(Context.ACTIVITY_SERVICE);
 
     List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
     if (appProcesses == null) {
@@ -97,10 +94,8 @@ public class TelemetryUtils {
   }
 
   static String getCellularNetworkType() {
-    if (telephonyManager == null) {
-      telephonyManager = (TelephonyManager) MapboxTelemetry.applicationContext
+    TelephonyManager telephonyManager = (TelephonyManager) MapboxTelemetry.applicationContext
         .getSystemService(Context.TELEPHONY_SERVICE);
-    }
 
     switch (telephonyManager.getNetworkType()) {
       case TelephonyManager.NETWORK_TYPE_1xRTT:

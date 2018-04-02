@@ -18,6 +18,7 @@ import java.util.Date;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class SerializerTest {
 
@@ -26,11 +27,11 @@ public class SerializerTest {
     Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     MapboxTelemetry.applicationContext = mockedContext;
     AudioManager mockedAudioManager = mock(AudioManager.class, RETURNS_DEEP_STUBS);
-    NavigationUtils.audioManager = mockedAudioManager;
+    when(mockedContext.getSystemService(Context.AUDIO_SERVICE)).thenReturn(mockedAudioManager);
     TelephonyManager mockedTelephonyManager = mock(TelephonyManager.class, RETURNS_DEEP_STUBS);
-    TelemetryUtils.telephonyManager = mockedTelephonyManager;
+    when(mockedContext.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(mockedTelephonyManager);
     ActivityManager mockedActivityManager = mock(ActivityManager.class, RETURNS_DEEP_STUBS);
-    TelemetryUtils.activityManager = mockedActivityManager;
+    when(mockedContext.getSystemService(Context.ACTIVITY_SERVICE)).thenReturn(mockedActivityManager);
   }
 
   @Test
@@ -107,8 +108,7 @@ public class SerializerTest {
     metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
     metadata.setBatteryLevel(50);
 
-    NavigationCancelData navigationCancelData =
-      new NavigationCancelData();
+    NavigationCancelData navigationCancelData = new NavigationCancelData();
     navigationCancelData.setComment("Test");
     navigationCancelData.setRating(75);
 

@@ -22,6 +22,7 @@ import okhttp3.Callback;
 
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
@@ -112,11 +113,11 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
     Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     MapboxTelemetry.applicationContext = mockedContext;
     AudioManager mockedAudioManager = mock(AudioManager.class, RETURNS_DEEP_STUBS);
-    NavigationUtils.audioManager = mockedAudioManager;
+    when(mockedContext.getSystemService(Context.AUDIO_SERVICE)).thenReturn(mockedAudioManager);
     TelephonyManager mockedTelephonyManager = mock(TelephonyManager.class, RETURNS_DEEP_STUBS);
-    TelemetryUtils.telephonyManager = mockedTelephonyManager;
+    when(mockedContext.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(mockedTelephonyManager);
     ActivityManager mockedActivityManager = mock(ActivityManager.class, RETURNS_DEEP_STUBS);
-    TelemetryUtils.activityManager = mockedActivityManager;
+    when(mockedContext.getSystemService(Context.ACTIVITY_SERVICE)).thenReturn(mockedActivityManager);
   }
 
   @Test
@@ -278,8 +279,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
     NavigationEventFactory navigationEventFactory = new NavigationEventFactory();
     Date aDate = new Date();
     NavigationState navigationState = obtainDefaultNavigationState(aDate);
-    NavigationCancelData navigationCancelData =
-      new NavigationCancelData();
+    NavigationCancelData navigationCancelData = new NavigationCancelData();
     navigationState.setNavigationCancelData(navigationCancelData);
     Event cancelEvent = navigationEventFactory.createNavigationEvent(Event.Type.NAV_CANCEL, navigationState);
     return cancelEvent;

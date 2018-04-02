@@ -23,10 +23,11 @@ public class LocationReceiverTest {
   @Test
   public void checksSendEventCalled() throws Exception {
     Context mockedContext = mock(Context.class);
+    MapboxTelemetry.applicationContext = mockedContext;
     Intent mockedIntent = mock(Intent.class);
     when(mockedIntent.getStringExtra(eq("location_received"))).thenReturn("onLocation");
     ActivityManager mockedActivityManager = mock(ActivityManager.class, RETURNS_DEEP_STUBS);
-    TelemetryUtils.activityManager = mockedActivityManager;
+    when(mockedContext.getSystemService(Context.ACTIVITY_SERVICE)).thenReturn(mockedActivityManager);
     Bundle mockedBundle = mock(Bundle.class);
     when(mockedIntent.getExtras()).thenReturn(mockedBundle);
     Location mockedLocation = mock(Location.class);

@@ -1,15 +1,27 @@
 package com.mapbox.android.telemetry;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.location.Location;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class LocationMapperTest {
+
+  @Before
+  public void test() {
+    Context mockedContext = mock(Context.class);
+    MapboxTelemetry.applicationContext = mockedContext;
+    ActivityManager mockedActivityManager = mock(ActivityManager.class, RETURNS_DEEP_STUBS);
+    when(mockedContext.getSystemService(Context.ACTIVITY_SERVICE)).thenReturn(mockedActivityManager);
+  }
 
   @Test
   public void checksLocationEventNameMapping() throws Exception {
