@@ -43,9 +43,9 @@ class MapLoadEvent extends Event implements Parcelable {
     this.operatingSystem = OPERATING_SYSTEM;
     this.created = TelemetryUtils.obtainCurrentDate();
     this.userId = userId;
-    this.batteryLevel = TelemetryUtils.getBatteryLevel();
+    this.batteryLevel = TelemetryUtils.obtainBatteryLevel();
     this.pluggedIn = TelemetryUtils.isPluggedIn();
-    this.cellularNetworkType = TelemetryUtils.getCellularNetworkType();
+    this.cellularNetworkType = TelemetryUtils.obtainCellularNetworkType();
   }
 
   @Override

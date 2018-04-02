@@ -41,7 +41,7 @@ class LocationEvent extends Event implements Parcelable {
     this.latitude = latitude;
     this.longitude = longitude;
     this.operatingSystem = OPERATING_SYSTEM;
-    this.applicationState = TelemetryUtils.getApplicationState();
+    this.applicationState = TelemetryUtils.obtainApplicationState();
   }
 
   @Override

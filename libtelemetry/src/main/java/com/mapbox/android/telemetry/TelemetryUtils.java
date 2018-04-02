@@ -12,8 +12,10 @@ import android.text.TextUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 import okio.Buffer;
@@ -27,8 +29,46 @@ public class TelemetryUtils {
   private static final String THREE_STRING_FORMAT = "%s/%s/%s";
   private static final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_AND_TIME_PATTERN, Locale.US);
   private static final Locale DEFAULT_LOCALE = Locale.US;
-  private static final int UNAVAILABLE_BATTERY_LEVEL = 100;
-
+  private static final int UNAVAILABLE_BATTERY_LEVEL = -1;
+  private static final int DEFAULT_BATTERY_LEVEL = -1;
+  private static final String FOREGROUND = "Foreground";
+  private static final String BACKGROUND = "Background";
+  private static final String SINGLE_CARRIER_RTT = "1xRTT";
+  private static final String CODE_DIVISION_MULTIPLE_ACCESS = "CDMA";
+  private static final String ENHANCED_DATA_GSM_EVOLUTION = "EDGE";
+  private static final String ENHANCED_HIGH_RATE_PACKET_DATA = "EHRPD";
+  private static final String EVOLUTION_DATA_OPTIMIZED_0 = "EVDO_0";
+  private static final String EVOLUTION_DATA_OPTIMIZED_A = "EVDO_A";
+  private static final String EVOLUTION_DATA_OPTIMIZED_B = "EVDO_B";
+  private static final String GENERAL_PACKET_RADIO_SERVICE = "GPRS";
+  private static final String HIGH_SPEED_DOWNLINK_PACKET_ACCESS = "HSDPA";
+  private static final String HIGH_SPEED_PACKET_ACCESS = "HSPA";
+  private static final String HIGH_SPEED_PACKET_ACCESS_PLUS = "HSPAP";
+  private static final String HIGH_SPEED_UNLINK_PACKET_ACCESS = "HSUPA";
+  private static final String INTEGRATED_DIGITAL_ENHANCED_NETWORK = "IDEN";
+  private static final String LONG_TERM_EVOLUTION = "LTE";
+  private static final String UNIVERSAL_MOBILE_TELCO_SERVICE = "UMTS";
+  private static final String UNKNOWN = "Unknown";
+  private static final Map<Integer, String> NETWORKS = new HashMap<Integer, String>() {
+    {
+      put(TelephonyManager.NETWORK_TYPE_1xRTT, SINGLE_CARRIER_RTT);
+      put(TelephonyManager.NETWORK_TYPE_CDMA, CODE_DIVISION_MULTIPLE_ACCESS);
+      put(TelephonyManager.NETWORK_TYPE_EDGE, ENHANCED_DATA_GSM_EVOLUTION);
+      put(TelephonyManager.NETWORK_TYPE_EHRPD, ENHANCED_HIGH_RATE_PACKET_DATA);
+      put(TelephonyManager.NETWORK_TYPE_EVDO_0, EVOLUTION_DATA_OPTIMIZED_0);
+      put(TelephonyManager.NETWORK_TYPE_EVDO_A, EVOLUTION_DATA_OPTIMIZED_A);
+      put(TelephonyManager.NETWORK_TYPE_EVDO_B, EVOLUTION_DATA_OPTIMIZED_B);
+      put(TelephonyManager.NETWORK_TYPE_GPRS, GENERAL_PACKET_RADIO_SERVICE);
+      put(TelephonyManager.NETWORK_TYPE_HSDPA, HIGH_SPEED_DOWNLINK_PACKET_ACCESS);
+      put(TelephonyManager.NETWORK_TYPE_HSPA, HIGH_SPEED_PACKET_ACCESS);
+      put(TelephonyManager.NETWORK_TYPE_HSPAP, HIGH_SPEED_PACKET_ACCESS_PLUS);
+      put(TelephonyManager.NETWORK_TYPE_HSUPA, HIGH_SPEED_UNLINK_PACKET_ACCESS);
+      put(TelephonyManager.NETWORK_TYPE_IDEN, INTEGRATED_DIGITAL_ENHANCED_NETWORK);
+      put(TelephonyManager.NETWORK_TYPE_LTE, LONG_TERM_EVOLUTION);
+      put(TelephonyManager.NETWORK_TYPE_UMTS, UNIVERSAL_MOBILE_TELCO_SERVICE);
+      put(TelephonyManager.NETWORK_TYPE_UNKNOWN, UNKNOWN);
+    }
+  };
 
   public static String toHumanReadableAscii(String s) {
     for (int i = 0, length = s.length(), c; i < length; i += Character.charCount(c)) {
@@ -48,7 +88,7 @@ public class TelemetryUtils {
     return s;
   }
 
-  static String getApplicationState() {
+  static String obtainApplicationState() {
     ActivityManager activityManager = (ActivityManager) MapboxTelemetry.applicationContext
       .getSystemService(Context.ACTIVITY_SERVICE);
 
@@ -61,78 +101,44 @@ public class TelemetryUtils {
     for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
       if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
         && appProcess.processName.equals(packageName)) {
-        return "Foreground";
+        return FOREGROUND;
       }
     }
 
-    return "Background";
+    return BACKGROUND;
   }
 
-  static int getBatteryLevel() {
+  static int obtainBatteryLevel() {
     Intent batteryStatus = registerBatteryUpdates(MapboxTelemetry.applicationContext);
 
-    if (batteryStatus != null) {
-      int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-      int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-      return Math.round((level / (float) scale) * 100);
-    } else {
+    if (batteryStatus == null) {
       return UNAVAILABLE_BATTERY_LEVEL;
     }
+
+    int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, DEFAULT_BATTERY_LEVEL);
+    int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, DEFAULT_BATTERY_LEVEL);
+    return Math.round((level / (float) scale) * 100);
   }
 
   static boolean isPluggedIn() {
     Intent batteryStatus = registerBatteryUpdates(MapboxTelemetry.applicationContext);
 
-    if (batteryStatus != null) {
-      int chargePlug = batteryStatus.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
-      if (chargePlug == BatteryManager.BATTERY_PLUGGED_USB
-        || chargePlug == BatteryManager.BATTERY_PLUGGED_AC) {
-        return true;
-      }
+    if (batteryStatus == null) {
+      return false;
     }
-    return false;
+
+    int chargePlug = batteryStatus.getIntExtra(BatteryManager.EXTRA_PLUGGED, DEFAULT_BATTERY_LEVEL);
+    final boolean pluggedIntoUSB = chargePlug == BatteryManager.BATTERY_PLUGGED_USB;
+    final boolean pluggedIntoAC = chargePlug == BatteryManager.BATTERY_PLUGGED_AC;
+
+    return pluggedIntoUSB || pluggedIntoAC;
   }
 
-  static String getCellularNetworkType() {
+  static String obtainCellularNetworkType() {
     TelephonyManager telephonyManager = (TelephonyManager) MapboxTelemetry.applicationContext
         .getSystemService(Context.TELEPHONY_SERVICE);
 
-    switch (telephonyManager.getNetworkType()) {
-      case TelephonyManager.NETWORK_TYPE_1xRTT:
-        return "1xRTT";
-      case TelephonyManager.NETWORK_TYPE_CDMA:
-        return "CDMA";
-      case TelephonyManager.NETWORK_TYPE_EDGE:
-        return "EDGE";
-      case TelephonyManager.NETWORK_TYPE_EHRPD:
-        return "EHRPD";
-      case TelephonyManager.NETWORK_TYPE_EVDO_0:
-        return "EVDO_0";
-      case TelephonyManager.NETWORK_TYPE_EVDO_A:
-        return "EVDO_A";
-      case TelephonyManager.NETWORK_TYPE_EVDO_B:
-        return "EVDO_B";
-      case TelephonyManager.NETWORK_TYPE_GPRS:
-        return "GPRS";
-      case TelephonyManager.NETWORK_TYPE_HSDPA:
-        return "HSDPA";
-      case TelephonyManager.NETWORK_TYPE_HSPA:
-        return "HSPA";
-      case TelephonyManager.NETWORK_TYPE_HSPAP:
-        return "HSPAP";
-      case TelephonyManager.NETWORK_TYPE_HSUPA:
-        return "HSUPA";
-      case TelephonyManager.NETWORK_TYPE_IDEN:
-        return "IDEN";
-      case TelephonyManager.NETWORK_TYPE_LTE:
-        return "LTE";
-      case TelephonyManager.NETWORK_TYPE_UMTS:
-        return "UMTS";
-      case TelephonyManager.NETWORK_TYPE_UNKNOWN:
-        return "Unknown";
-      default:
-        return "";
-    }
+    return NETWORKS.get(telephonyManager.getNetworkType());
   }
 
   static String obtainCurrentDate() {

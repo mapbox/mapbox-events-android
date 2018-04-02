@@ -5,9 +5,9 @@ import android.media.AudioManager;
 import android.provider.Settings;
 
 class NavigationUtils {
-  private static double PERCENT_NORMALIZER = 100.0;
-  private static double SCREEN_BRIGHTNESS_MAX = 255.0;
-  private static int BRIGHTNESS_EXCEPTION_VALUE = -1;
+  private static final double PERCENT_NORMALIZER = 100.0;
+  private static final double SCREEN_BRIGHTNESS_MAX = 255.0;
+  private static final int BRIGHTNESS_EXCEPTION_VALUE = -1;
 
   static int obtainVolumeLevel() {
     AudioManager audioManager = (AudioManager) MapboxTelemetry.applicationContext

@@ -69,12 +69,12 @@ public class NavigationMetadata implements Parcelable {
     this.locationEngine = locationEngine;
     this.absoluteDistanceToDestination = absoluteDistanceToDestination;
     this.volumeLevel = NavigationUtils.obtainVolumeLevel();
-    this.batteryLevel = TelemetryUtils.getBatteryLevel();
+    this.batteryLevel = TelemetryUtils.obtainBatteryLevel();
     this.screenBrightness = NavigationUtils.obtainScreenBrightness();
     this.batteryPluggedIn = TelemetryUtils.isPluggedIn();
-    this.connectivity = TelemetryUtils.getCellularNetworkType();
+    this.connectivity = TelemetryUtils.obtainCellularNetworkType();
     this.audioType = NavigationUtils.obtainAudioType();
-    this.applicationState = TelemetryUtils.getApplicationState();
+    this.applicationState = TelemetryUtils.obtainApplicationState();
   }
 
   public void setCreated(String created) {

@@ -149,7 +149,6 @@ public class NavigationEventFactoryTest {
     NavigationRerouteData mockedNavigationRerouteData = mock(NavigationRerouteData.class);
     aValidNavigationState.setNavigationRerouteData(mockedNavigationRerouteData);
 
-
     Event fasterRouteEvent = navigationEventFactory.createNavigationEvent(Event.Type.NAV_FASTER_ROUTE,
       aValidNavigationState);
 

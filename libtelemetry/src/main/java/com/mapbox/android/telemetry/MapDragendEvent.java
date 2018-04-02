@@ -37,9 +37,9 @@ class MapDragendEvent extends Event implements Parcelable {
     this.longitude = mapState.getLongitude();
     this.zoom = mapState.getZoom();
     this.created = TelemetryUtils.obtainCurrentDate();
-    this.batteryLevel = TelemetryUtils.getBatteryLevel();
+    this.batteryLevel = TelemetryUtils.obtainBatteryLevel();
     this.pluggedIn = TelemetryUtils.isPluggedIn();
-    this.cellularNetworkType = TelemetryUtils.getCellularNetworkType();
+    this.cellularNetworkType = TelemetryUtils.obtainCellularNetworkType();
   }
 
   @Override
