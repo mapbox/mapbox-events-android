@@ -23,7 +23,7 @@ public class SerializerTest {
 
   @Test
   public void checkArriveSerializing() throws Exception {
-    obtainMockedContext();
+    setupMockedContext();
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22, 180, "sdkIdentifier", "sdkVersion",
       3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "AndroidLocationEngine", 50);
@@ -55,7 +55,7 @@ public class SerializerTest {
 
   @Test
   public void checkDepartSerializing() throws Exception {
-    obtainMockedContext();
+    setupMockedContext();
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22, 180, "sdkIdentifier", "sdkVersion",
       3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "AndroidLocationEngine", 50);
@@ -89,7 +89,7 @@ public class SerializerTest {
 
   @Test
   public void checkCancelSerializing() throws Exception {
-    obtainMockedContext();
+    setupMockedContext();
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22,
       180, "sdkIdentifier", "sdkVersion", 3, "sessionID", 10.5,
@@ -130,7 +130,7 @@ public class SerializerTest {
 
   @Test
   public void checkFeedbackSerializing() throws Exception {
-    obtainMockedContext();
+    setupMockedContext();
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22, 180, "sdkIdentifier", "sdkVersion",
       3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "AndroidLocationEngine", 50);
@@ -177,7 +177,7 @@ public class SerializerTest {
 
   @Test
   public void checkRerouteSerializing() throws Exception {
-    obtainMockedContext();
+    setupMockedContext();
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22,
       180, "sdkIdent", "sdkversion", 3, "sessionID", 10.5,
@@ -247,7 +247,7 @@ public class SerializerTest {
 
   @Test
   public void checkFasterRouteSerializing() throws Exception {
-    obtainMockedContext();
+    setupMockedContext();
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22,
       180, "sdkIdent", "sdkversion", 3, "sessionID", 10.5,
@@ -306,7 +306,7 @@ public class SerializerTest {
     assertEquals(expectedJson, payload);
   }
 
-  private void obtainMockedContext() {
+  private void setupMockedContext() {
     Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     MapboxTelemetry.applicationContext = mockedContext;
     AudioManager mockedAudioManager = mock(AudioManager.class, RETURNS_DEEP_STUBS);

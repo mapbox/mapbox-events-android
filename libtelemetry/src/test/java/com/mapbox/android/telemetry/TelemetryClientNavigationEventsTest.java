@@ -109,7 +109,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
   @Test
   public void sendsTheCorrectBodyPostingAppUserTurnstileEvent() throws Exception {
-    obtainMockedContext();
+    setupMockedContext();
     TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event anAppUserTurnstile = new AppUserTurnstile("anySdkIdentifier", "anySdkVersion", false);
     List<Event> theAppUserTurnstile = obtainEvents(anAppUserTurnstile);
@@ -124,7 +124,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
   @Test
   public void sendsTheCorrectBodyPostingNavigationArriveEvent() throws Exception {
-    obtainMockedContext();
+    setupMockedContext();
     TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type arrive = Event.Type.NAV_ARRIVE;
     Event anArriveEvent = obtainNavigationEvent(arrive);
@@ -141,7 +141,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
   @Test
   public void sendsTheCorrectBodyPostingNavigationDepartEvent() throws Exception {
-    obtainMockedContext();
+    setupMockedContext();
     TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type depart = Event.Type.NAV_DEPART;
     Event aDepartEvent = obtainNavigationEvent(depart);
@@ -158,7 +158,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
   @Test
   public void sendsTheCorrectBodyPostingNavigationCancelEvent() throws Exception {
-    obtainMockedContext();
+    setupMockedContext();
     TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type cancel = Event.Type.NAV_CANCEL;
     Event aCancelEvent = obtainNavigationEvent(cancel);
@@ -175,7 +175,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
   @Test
   public void sendsTheCorrectBodyPostingNavigationFeedbackEvent() throws Exception {
-    obtainMockedContext();
+    setupMockedContext();
     TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type feedback = Event.Type.NAV_FEEDBACK;
     Event aFeedbackEvent = obtainNavigationEvent(feedback);
@@ -192,7 +192,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
   @Test
   public void sendsTheCorrectBodyPostingNavigationRerouteEvent() throws Exception {
-    obtainMockedContext();
+    setupMockedContext();
     TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type reroute = Event.Type.NAV_REROUTE;
     Event aRerouteEvent = obtainNavigationEvent(reroute);
@@ -209,7 +209,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
   @Test
   public void sendsTheCorrectBodyPostingNavigationFasterRouteEvent() throws Exception {
-    obtainMockedContext();
+    setupMockedContext();
     TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type fasterRoute = Event.Type.NAV_FASTER_ROUTE;
     Event aFasterRouteEvent = obtainNavigationEvent(fasterRoute);
@@ -226,7 +226,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
   @Test
   public void sendsTheCorrectBodyPostingMultipleEvents() throws Exception {
-    obtainMockedContext();
+    setupMockedContext();
     TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type reroute = Event.Type.NAV_REROUTE;
     Event rerouteEvent = obtainNavigationEvent(reroute);
@@ -387,7 +387,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
     GsonBuilder configure(GsonBuilder gsonBuilder);
   }
 
-  private void obtainMockedContext() {
+  private void setupMockedContext() {
     Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     MapboxTelemetry.applicationContext = mockedContext;
     AudioManager mockedAudioManager = mock(AudioManager.class, RETURNS_DEEP_STUBS);

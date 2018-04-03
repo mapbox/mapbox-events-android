@@ -15,7 +15,7 @@ public class LocationEventTest {
 
   @Test
   public void checksLocationEvent() throws Exception {
-    obtainMockedContext();
+    setupMockedContext();
     Event aLocationEvent = obtainALocationEvent();
 
     assertTrue(aLocationEvent instanceof LocationEvent);
@@ -23,7 +23,7 @@ public class LocationEventTest {
 
   @Test
   public void checksLocationType() throws Exception {
-    obtainMockedContext();
+    setupMockedContext();
     Event aLocationEvent = obtainALocationEvent();
 
     assertEquals(Event.Type.LOCATION, aLocationEvent.obtainType());
@@ -35,7 +35,7 @@ public class LocationEventTest {
     return new LocationEvent("anySessionId", aLatitude, aLongitude);
   }
 
-  private void obtainMockedContext() {
+  private void setupMockedContext() {
     Context mockedContext = mock(Context.class);
     MapboxTelemetry.applicationContext = mockedContext;
     ActivityManager mockedActivityManager = mock(ActivityManager.class, RETURNS_DEEP_STUBS);
