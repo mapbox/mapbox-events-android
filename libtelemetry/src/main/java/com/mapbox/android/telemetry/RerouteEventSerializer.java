@@ -20,7 +20,6 @@ class RerouteEventSerializer implements JsonSerializer<NavigationRerouteEvent> {
     serializeRerouteData(src, context, rerouteEvent);
     serializeLocationData(src, context, rerouteEvent);
     serializeFeedbackData(src, context, rerouteEvent);
-    serializeVoiceData(src, context, rerouteEvent);
     serializeStep(src, context, rerouteEvent);
     return rerouteEvent;
   }
@@ -53,14 +52,6 @@ class RerouteEventSerializer implements JsonSerializer<NavigationRerouteEvent> {
                                      JsonObject feedbackEvent) {
     JsonObject feedbackData = context.serialize(src.getFeedbackData()).getAsJsonObject();
     for (Map.Entry<String, JsonElement> e : feedbackData.entrySet()) {
-      feedbackEvent.add(e.getKey(), e.getValue());
-    }
-  }
-
-  private void serializeVoiceData(NavigationRerouteEvent src, JsonSerializationContext context,
-                                  JsonObject feedbackEvent) {
-    JsonObject voiceData = context.serialize(src.getVoiceData()).getAsJsonObject();
-    for (Map.Entry<String, JsonElement> e : voiceData.entrySet()) {
       feedbackEvent.add(e.getKey(), e.getValue());
     }
   }

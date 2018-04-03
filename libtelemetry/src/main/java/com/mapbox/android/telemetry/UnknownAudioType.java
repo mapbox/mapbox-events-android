@@ -1,4 +1,4 @@
-package com.mapbox.android.telemetry.navigation.utils;
+package com.mapbox.android.telemetry;
 
 import android.content.Context;
 

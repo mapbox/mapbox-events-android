@@ -29,7 +29,7 @@ class LocationEvent extends Event implements Parcelable {
   @SerializedName("operatingSystem")
   private String operatingSystem;
   @SerializedName("applicationState")
-  private String applicationState = null;
+  private String applicationState;
   @SerializedName("horizontalAccuracy")
   private Float accuracy = null;
 
@@ -41,6 +41,7 @@ class LocationEvent extends Event implements Parcelable {
     this.latitude = latitude;
     this.longitude = longitude;
     this.operatingSystem = OPERATING_SYSTEM;
+    this.applicationState = TelemetryUtils.obtainApplicationState();
   }
 
   @Override
@@ -74,14 +75,6 @@ class LocationEvent extends Event implements Parcelable {
 
   String getOperatingSystem() {
     return operatingSystem;
-  }
-
-  public void setOperatingSystem(String operatingSystem) {
-    this.operatingSystem = operatingSystem;
-  }
-
-  public void setApplicationState(String applicationState) {
-    this.applicationState = applicationState;
   }
 
   Float getAccuracy() {

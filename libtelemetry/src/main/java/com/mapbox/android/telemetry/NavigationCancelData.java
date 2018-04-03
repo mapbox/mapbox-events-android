@@ -4,11 +4,13 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class NavigationCancelData implements Parcelable {
-  private String arrivalTimestamp;
+  private String arrivalTimestamp = null;
   private Integer rating = null;
   private String comment = null;
 
-  public NavigationCancelData(String arrivalTimestamp) {
+  public NavigationCancelData() {}
+
+  public void setArrivalTimestamp(String arrivalTimestamp) {
     this.arrivalTimestamp = arrivalTimestamp;
   }
 
@@ -69,4 +71,3 @@ public class NavigationCancelData implements Parcelable {
       }
     };
 }
-

@@ -16,14 +16,11 @@ class NavigationRerouteEvent extends Event implements Parcelable {
   private NavigationLocationData navigationLocationData;
   @JsonAdapter(FeedbackDataSerializer.class)
   private FeedbackData feedbackData;
-  @JsonAdapter(VoiceDataSerializer.class)
-  private NavigationVoiceData voiceData;
   private NavigationStepMetadata step = null;
 
   NavigationRerouteEvent(NavigationState navigationState) {
     this.event = NAVIGATION_REROUTE;
     this.feedbackData = navigationState.getFeedbackData();
-    this.voiceData = navigationState.getNavigationVoiceData();
     this.navigationMetadata = navigationState.getNavigationMetadata();
     this.navigationRerouteData = navigationState.getNavigationRerouteData();
     this.navigationLocationData = navigationState.getNavigationLocationData();
@@ -51,10 +48,6 @@ class NavigationRerouteEvent extends Event implements Parcelable {
     return step;
   }
 
-  NavigationVoiceData getVoiceData() {
-    return voiceData;
-  }
-
   FeedbackData getFeedbackData() {
     return feedbackData;
   }
@@ -68,7 +61,6 @@ class NavigationRerouteEvent extends Event implements Parcelable {
     navigationMetadata = in.readParcelable(NavigationMetadata.class.getClassLoader());
     navigationLocationData = in.readParcelable(NavigationLocationData.class.getClassLoader());
     feedbackData = in.readParcelable(FeedbackData.class.getClassLoader());
-    voiceData = in.readParcelable(NavigationVoiceData.class.getClassLoader());
     step = in.readParcelable(NavigationStepMetadata.class.getClassLoader());
   }
 
@@ -78,7 +70,6 @@ class NavigationRerouteEvent extends Event implements Parcelable {
     dest.writeParcelable(navigationMetadata, flags);
     dest.writeParcelable(navigationLocationData, flags);
     dest.writeParcelable(feedbackData, flags);
-    dest.writeParcelable(voiceData, flags);
     dest.writeParcelable(step, flags);
   }
 
