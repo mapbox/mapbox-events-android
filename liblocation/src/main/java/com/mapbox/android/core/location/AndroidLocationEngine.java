@@ -56,7 +56,7 @@ class AndroidLocationEngine extends LocationEngine implements LocationListener {
       }
     };
 
-  AndroidLocationEngine(Context context) {
+  private AndroidLocationEngine(Context context) {
     super();
 
     this.context = new WeakReference<>(context);
