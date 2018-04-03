@@ -23,7 +23,9 @@ public class LocationEngineProvider {
   }
 
   /**
-   * Returns a unique instance of LocationEngine every time method is called.
+   * Get the best location engine, given the current permissions and included libraries
+   *
+   * @return a unique instance of {@link LocationEngine} every time method is called.
    */
   @NonNull
   public LocationEngine obtainBestLocationEngineAvailable() {
@@ -31,7 +33,10 @@ public class LocationEngineProvider {
   }
 
   /**
-   * Returns a unique instance of LocationEngine every time method is called.
+   * Get a location engine of desired type
+   *
+   * @param type {@link LocationEngine.Type}
+   * @return a unique instance of {@link LocationEngine} every time method is called.
    */
   @Nullable
   public LocationEngine obtainLocationEngineBy(LocationEngine.Type type) {
