@@ -46,7 +46,7 @@ public class LocationEngineProvider {
       }
     }
     Log.e("dropped-location", "locationEngineDictionary: " + locationEngineDictionary);
-}
+  }
 
   private Map<LocationEngine.Type, LocationEngineSupplier> obtainDefaultLocationEnginesDictionary() {
     ClasspathChecker classpathChecker = new ClasspathChecker();

@@ -54,7 +54,7 @@ class AndroidLocationEngine extends LocationEngine implements LocationListener {
           }
         });
       }
-    };
+  };
 
   private AndroidLocationEngine(Context context) {
     super();
