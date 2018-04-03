@@ -4,6 +4,7 @@ package com.mapbox.android.core.location;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,7 +45,8 @@ public class LocationEngineProvider {
         locationEngineDictionary.put(entry.getKey(), available);
       }
     }
-  }
+    Log.e("dropped-location", "locationEngineDictionary: " + locationEngineDictionary);
+}
 
   private Map<LocationEngine.Type, LocationEngineSupplier> obtainDefaultLocationEnginesDictionary() {
     ClasspathChecker classpathChecker = new ClasspathChecker();
@@ -52,17 +54,21 @@ public class LocationEngineProvider {
     locationSources.put(LocationEngine.Type.GOOGLE_PLAY_SERVICES, new GoogleLocationEngineFactory(classpathChecker));
     locationSources.put(LocationEngine.Type.ANDROID, new AndroidLocationEngineFactory());
 
+    Log.e("dropped-location", "locationSources: " + locationSources);
     return locationSources;
   }
 
   private LocationEngine obtainBestLocationEngine() {
     LocationEngine androidLocationEngine = locationEngineDictionary.get(LocationEngine.Type.ANDROID);
+
     for (LocationEngine.Type type : OPTIONAL_LOCATION_ENGINES) {
       LocationEngine bestLocationEngine = locationEngineDictionary.get(type);
       if (bestLocationEngine != null) {
+        Log.e("dropped-location", "return best engine: " + bestLocationEngine);
         return bestLocationEngine;
       }
     }
+    Log.e("dropped-location", "return android engine: " + androidLocationEngine);
     return androidLocationEngine;
   }
 }

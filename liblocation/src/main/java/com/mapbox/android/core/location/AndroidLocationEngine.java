@@ -67,9 +67,9 @@ public class AndroidLocationEngine extends LocationEngine implements LocationLis
   }
 
   static synchronized LocationEngine getLocationEngine(Context context) {
-    if (instance == null) {
+//    if (instance == null) {
       instance = new AndroidLocationEngine(context.getApplicationContext());
-    }
+//    }
 
     return instance;
   }

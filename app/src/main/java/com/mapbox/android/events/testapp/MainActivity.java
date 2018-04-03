@@ -14,6 +14,7 @@ import com.mapbox.android.core.location.AndroidLocationEngine;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineListener;
 import com.mapbox.android.core.location.LocationEnginePriority;
+import com.mapbox.android.core.location.LocationEngineProvider;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.android.telemetry.MapboxTelemetry;
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
   private PermissionsManager permissionsManager;
   private LocationManager locationManager;
   private LocationEngine locationEngine;
+  private LocationEngine locationEngine2;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -83,11 +85,25 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
   @SuppressLint("MissingPermission")
   private void startLocationTracking() {
 
-    locationEngine = new AndroidLocationEngine(this);
+    locationEngine = new LocationEngineProvider(this).obtainBestLocationEngineAvailable();
+//    locationEngine = new AndroidLocationEngine(this);
     locationEngine.addLocationEngineListener(this);
     locationEngine.activate();
     locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
     locationEngine.requestLocationUpdates();
+
+    locationEngine2 = new LocationEngineProvider(this).obtainBestLocationEngineAvailable();
+//    locationEngine2 = new AndroidLocationEngine(this);
+    locationEngine2.addLocationEngineListener(this);
+    locationEngine2.activate();
+    locationEngine2.setPriority(LocationEnginePriority.HIGH_ACCURACY);
+    locationEngine2.requestLocationUpdates();
+
+    if (locationEngine == locationEngine2) {
+      Log.e("dropped-location", "Same Location Engine!!!");
+    } else {
+      Log.e("dropped-location", "Different Location Engine!!!");
+    }
 
     startDisableTimer();
   }
@@ -100,8 +116,11 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
       }
 
       public void onFinish() {
-        Log.v("dropped-location", "disable fired");
-        mapboxTelemetry.disable();
+        Log.e("dropped-location", "disable fired");
+//        mapboxTelemetry.disable();
+        locationEngine2.removeLocationEngineListener(null);
+        locationEngine2.removeLocationUpdates();
+        locationEngine2.deactivate();
       }
     }.start();
   }
