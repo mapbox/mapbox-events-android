@@ -21,8 +21,6 @@ class AndroidLocationEngine extends LocationEngine implements LocationListener {
 
   private static final String DEFAULT_PROVIDER = LocationManager.PASSIVE_PROVIDER;
 
-  private static AndroidLocationEngine instance;
-
   private WeakReference<Context> context;
   private LocationManager locationManager;
   private String currentProvider = null;
@@ -54,7 +52,7 @@ class AndroidLocationEngine extends LocationEngine implements LocationListener {
           }
         });
       }
-    };
+  };
 
   private AndroidLocationEngine(Context context) {
     super();
@@ -65,11 +63,9 @@ class AndroidLocationEngine extends LocationEngine implements LocationListener {
   }
 
   static synchronized LocationEngine getLocationEngine(Context context) {
-    if (instance == null) {
-      instance = new AndroidLocationEngine(context.getApplicationContext());
-    }
+    AndroidLocationEngine androidLocationEngine = new AndroidLocationEngine(context.getApplicationContext());
 
-    return instance;
+    return androidLocationEngine;
   }
 
   @Override

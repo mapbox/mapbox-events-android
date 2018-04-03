@@ -22,11 +22,22 @@ public class LocationEngineProvider {
     initAvailableLocationEngines(context);
   }
 
+  /**
+   * Get the best location engine, given the included libraries
+   *
+   * @return a unique instance of {@link LocationEngine} every time method is called.
+   */
   @NonNull
   public LocationEngine obtainBestLocationEngineAvailable() {
     return obtainBestLocationEngine();
   }
 
+  /**
+   * Get a location engine of desired type
+   *
+   * @param type {@link LocationEngine.Type}
+   * @return a unique instance of {@link LocationEngine} every time method is called.
+   */
   @Nullable
   public LocationEngine obtainLocationEngineBy(LocationEngine.Type type) {
     LocationEngine locationEngine = locationEngineDictionary.get(type);
