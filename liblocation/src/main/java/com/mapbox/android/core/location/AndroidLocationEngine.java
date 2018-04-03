@@ -20,8 +20,6 @@ import java.util.Map;
 class AndroidLocationEngine extends LocationEngine implements LocationListener {
 
   private static final String DEFAULT_PROVIDER = LocationManager.PASSIVE_PROVIDER;
-  private static final long DEFAULT_MIN_TIME = 0;
-  private static final float DEFAULT_MIN_DISTANCE = 0;
 
   private WeakReference<Context> context;
   private LocationManager locationManager;
@@ -102,7 +100,7 @@ class AndroidLocationEngine extends LocationEngine implements LocationListener {
   public void requestLocationUpdates() {
     if (!TextUtils.isEmpty(currentProvider)) {
       //noinspection MissingPermission
-      locationManager.requestLocationUpdates(currentProvider, DEFAULT_MIN_TIME, DEFAULT_MIN_DISTANCE, this);
+      locationManager.requestLocationUpdates(currentProvider, fastestInterval, smallestDisplacement, this);
     }
   }
 
