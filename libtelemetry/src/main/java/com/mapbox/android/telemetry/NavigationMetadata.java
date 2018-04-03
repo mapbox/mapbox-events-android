@@ -318,12 +318,11 @@ public class NavigationMetadata implements Parcelable {
     originalStepCount = in.readByte() == 0x00 ? null : in.readInt();
     device = in.readString();
     locationEngine = in.readString();
-    volumeLevel = in.readByte() == 0x00 ? null : in.readInt();
-    screenBrightness = in.readByte() == 0x00 ? null : in.readInt();
+    volumeLevel = in.readInt();
+    screenBrightness = in.readInt();
     applicationState = in.readString();
-    byte batteryPluggedInVal = in.readByte();
-    batteryPluggedIn = batteryPluggedInVal == 0x02 ? null : batteryPluggedInVal != 0x00;
-    batteryLevel = in.readByte() == 0x00 ? null : in.readInt();
+    batteryPluggedIn = in.readByte() != 0x00;
+    batteryLevel = in.readInt();
     connectivity = in.readString();
   }
 
@@ -410,30 +409,11 @@ public class NavigationMetadata implements Parcelable {
     }
     dest.writeString(device);
     dest.writeString(locationEngine);
-    if (volumeLevel == null) {
-      dest.writeByte((byte) (0x00));
-    } else {
-      dest.writeByte((byte) (0x01));
-      dest.writeInt(volumeLevel);
-    }
-    if (screenBrightness == null) {
-      dest.writeByte((byte) (0x00));
-    } else {
-      dest.writeByte((byte) (0x01));
-      dest.writeInt(screenBrightness);
-    }
+    dest.writeInt(volumeLevel);
+    dest.writeInt(screenBrightness);
     dest.writeString(applicationState);
-    if (batteryPluggedIn == null) {
-      dest.writeByte((byte) (0x02));
-    } else {
-      dest.writeByte((byte) (batteryPluggedIn ? 0x01 : 0x00));
-    }
-    if (batteryLevel == null) {
-      dest.writeByte((byte) (0x00));
-    } else {
-      dest.writeByte((byte) (0x01));
-      dest.writeInt(batteryLevel);
-    }
+    dest.writeByte((byte) (batteryPluggedIn ? 0x01 : 0x00));
+    dest.writeInt(batteryLevel);
     dest.writeString(connectivity);
   }
 

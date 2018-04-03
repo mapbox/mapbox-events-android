@@ -31,8 +31,10 @@ public class TelemetryUtils {
   private static final Locale DEFAULT_LOCALE = Locale.US;
   private static final int UNAVAILABLE_BATTERY_LEVEL = -1;
   private static final int DEFAULT_BATTERY_LEVEL = -1;
+  private static final int PERCENT_SCALE = 100;
   private static final String FOREGROUND = "Foreground";
   private static final String BACKGROUND = "Background";
+  private static final String NO_STATE = "";
   private static final String SINGLE_CARRIER_RTT = "1xRTT";
   private static final String CODE_DIVISION_MULTIPLE_ACCESS = "CDMA";
   private static final String ENHANCED_DATA_GSM_EVOLUTION = "EDGE";
@@ -94,7 +96,7 @@ public class TelemetryUtils {
 
     List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
     if (appProcesses == null) {
-      return "";
+      return NO_STATE;
     }
 
     String packageName = MapboxTelemetry.applicationContext.getPackageName();
@@ -117,7 +119,7 @@ public class TelemetryUtils {
 
     int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, DEFAULT_BATTERY_LEVEL);
     int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, DEFAULT_BATTERY_LEVEL);
-    return Math.round((level / (float) scale) * 100);
+    return Math.round((level / (float) scale) * PERCENT_SCALE);
   }
 
   static boolean isPluggedIn() {

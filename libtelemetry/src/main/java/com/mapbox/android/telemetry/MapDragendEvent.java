@@ -23,11 +23,11 @@ class MapDragendEvent extends Event implements Parcelable {
   @SerializedName("batteryLevel")
   private Integer batteryLevel;
   @SerializedName("pluggedIn")
-  private Boolean pluggedIn = null;
+  private Boolean pluggedIn;
   @SerializedName("carrier")
   private String carrier = null;
   @SerializedName("cellularNetworkType")
-  private String cellularNetworkType = null;
+  private String cellularNetworkType;
   @SerializedName("wifi")
   private Boolean wifi = null;
 
@@ -66,9 +66,8 @@ class MapDragendEvent extends Event implements Parcelable {
     longitude = in.readDouble();
     zoom = in.readDouble();
     orientation = in.readString();
-    batteryLevel = in.readByte() == 0x00 ? null : in.readInt();
-    byte pluggedInVal = in.readByte();
-    pluggedIn = pluggedInVal == 0x02 ? null : pluggedInVal != 0x00;
+    batteryLevel = in.readInt();
+    pluggedIn = in.readByte() != 0x00;
     carrier = in.readString();
     cellularNetworkType = in.readString();
     byte wifiVal = in.readByte();
@@ -88,17 +87,8 @@ class MapDragendEvent extends Event implements Parcelable {
     dest.writeDouble(longitude);
     dest.writeDouble(zoom);
     dest.writeString(orientation);
-    if (batteryLevel == null) {
-      dest.writeByte((byte) (0x00));
-    } else {
-      dest.writeByte((byte) (0x01));
-      dest.writeInt(batteryLevel);
-    }
-    if (pluggedIn == null) {
-      dest.writeByte((byte) (0x02));
-    } else {
-      dest.writeByte((byte) (pluggedIn ? 0x01 : 0x00));
-    }
+    dest.writeInt(batteryLevel);
+    dest.writeByte((byte) (pluggedIn ? 0x01 : 0x00));
     dest.writeString(carrier);
     dest.writeString(cellularNetworkType);
     if (wifi == null) {
