@@ -65,7 +65,7 @@ class GoogleLocationEngine extends LocationEngine implements
   }
 
   static synchronized LocationEngine getLocationEngine(Context context) {
-    LocationEngine googleLocationEngine= new GoogleLocationEngine(context.getApplicationContext());
+    LocationEngine googleLocationEngine = new GoogleLocationEngine(context.getApplicationContext());
 
     return googleLocationEngine;
   }
