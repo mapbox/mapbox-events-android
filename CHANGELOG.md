@@ -4,6 +4,11 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v3.0.0-beta.4
+- Integration Changes for Navigation Events and Metrics - [#99](https://github.com/mapbox/mapbox-events-android/pull/99)
+- Sticky Service Crash Fix - [#98](https://github.com/mapbox/mapbox-events-android/pull/98)
+- Save and Restore Circle-Ci Dependencies - [#96](https://github.com/mapbox/mapbox-events-android/pull/96)
+
 ### v3.0.0-beta.3
 - Correct UserAgent - [#92](https://github.com/mapbox/mapbox-events-android/pull/92)
 - Metadata tag optional - [#91](https://github.com/mapbox/mapbox-events-android/pull/91)
@@ -43,6 +48,9 @@ Mapbox welcomes participation and contributions from everyone.
 - Port Location Code from MAS - [#6](https://github.com/mapbox/mapbox-events-android/pull/6)
 
 ## Mapbox Android Core
+
+### v0.2.0-beta.4
+- LocationEngine Singleton Bug - [#100](https://github.com/mapbox/mapbox-events-android/pull/100)
 
 ### v0.2.0-beta.3
 - Set fastestInterval and smallestDisplacement in AndroidLocationEngine - [#93](https://github.com/mapbox/mapbox-events-android/pull/93)
