@@ -4,8 +4,12 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
-### v3.0.0-beta.2
+### v3.0.0-beta.3
+- Correct UserAgent - [#92](https://github.com/mapbox/mapbox-events-android/pull/92)
+- Metadata tag optional - [#91](https://github.com/mapbox/mapbox-events-android/pull/91)
+- Adjust header titles in javadoc - [#89](https://github.com/mapbox/mapbox-events-android/pull/89)
 
+### v3.0.0-beta.2
 - Fix Duplicate Location Data - [#80](https://github.com/mapbox/mapbox-events-android/pull/80)
 - Fix Overwritten Alarm - [#79](https://github.com/mapbox/mapbox-events-android/pull/79)
 - Enable Telemetry Manifest Tag - [#77](https://github.com/mapbox/mapbox-events-android/pull/77)
@@ -14,7 +18,6 @@ Mapbox welcomes participation and contributions from everyone.
 - Repo Refactoring - [#67](https://github.com/mapbox/mapbox-events-android/pull/67)
 
 ### v3.0.0-beta.1
-
 - Environment Enum now package-private - [#62](https://github.com/mapbox/mapbox-events-android/pull/62)
 - SessionId rotation interval time in correct range - [#53](https://github.com/mapbox/mapbox-events-android/pull/53)
 - Lazy token initialization - [#52](https://github.com/mapbox/mapbox-events-android/pull/52)
@@ -41,11 +44,13 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Core
 
-### v0.2.0-beta.2
+### v0.2.0-beta.3
+- Set fastestInterval and smallestDisplacement in AndroidLocationEngine - [#93](https://github.com/mapbox/mapbox-events-android/pull/93)
+- Adjust header titles in javadoc - [#89](https://github.com/mapbox/mapbox-events-android/pull/89)
 
+### v0.2.0-beta.2
 - Update Proguard Rules - [#81](https://github.com/mapbox/mapbox-events-android/pull/81)
 
 ### v0.2.0-beta.1
-
 - Remove LOST from LocationEngineProvider - [#58](https://github.com/mapbox/mapbox-events-android/pull/58)
 - Make permissions listener public - [#29](https://github.com/mapbox/mapbox-events-android/pull/29)
