@@ -23,7 +23,7 @@ public class LocationEngineProvider {
   }
 
   /**
-   * Get the best location engine, given the current permissions and included libraries
+   * Get the best location engine, given the included libraries
    *
    * @return a unique instance of {@link LocationEngine} every time method is called.
    */
