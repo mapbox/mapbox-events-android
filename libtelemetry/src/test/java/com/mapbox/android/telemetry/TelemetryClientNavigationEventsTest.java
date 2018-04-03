@@ -284,8 +284,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
     NavigationEventFactory navigationEventFactory = new NavigationEventFactory();
     Date aDate = new Date();
     NavigationState navigationState = obtainDefaultNavigationState(aDate);
-    FeedbackEventData navigationFeedbackData = new FeedbackEventData("anyUserId", "general",
-      "unknown");
+    FeedbackEventData navigationFeedbackData = new FeedbackEventData("anyUserId", "general", "unknown");
     FeedbackData feedbackData = obtainFeedbackData();
     NavigationLocationData navigationLocationData = obtainLocationData();
     navigationState.setNavigationLocationData(navigationLocationData);
