@@ -22,11 +22,17 @@ public class LocationEngineProvider {
     initAvailableLocationEngines(context);
   }
 
+  /**
+   * Returns a unique instance of LocationEngine every time method is called.
+   */
   @NonNull
   public LocationEngine obtainBestLocationEngineAvailable() {
     return obtainBestLocationEngine();
   }
 
+  /**
+   * Returns a unique instance of LocationEngine every time method is called.
+   */
   @Nullable
   public LocationEngine obtainLocationEngineBy(LocationEngine.Type type) {
     LocationEngine locationEngine = locationEngineDictionary.get(type);
@@ -57,7 +63,6 @@ public class LocationEngineProvider {
 
   private LocationEngine obtainBestLocationEngine() {
     LocationEngine androidLocationEngine = locationEngineDictionary.get(LocationEngine.Type.ANDROID);
-
     for (LocationEngine.Type type : OPTIONAL_LOCATION_ENGINES) {
       LocationEngine bestLocationEngine = locationEngineDictionary.get(type);
       if (bestLocationEngine != null) {
