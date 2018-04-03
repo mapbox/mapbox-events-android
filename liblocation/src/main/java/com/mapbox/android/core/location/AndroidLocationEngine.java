@@ -23,8 +23,6 @@ public class AndroidLocationEngine extends LocationEngine implements LocationLis
   private static final long DEFAULT_MIN_TIME = 0;
   private static final float DEFAULT_MIN_DISTANCE = 0;
 
-  private static AndroidLocationEngine instance;
-
   private WeakReference<Context> context;
   private LocationManager locationManager;
   private String currentProvider = null;
@@ -67,11 +65,9 @@ public class AndroidLocationEngine extends LocationEngine implements LocationLis
   }
 
   static synchronized LocationEngine getLocationEngine(Context context) {
-//    if (instance == null) {
-      instance = new AndroidLocationEngine(context.getApplicationContext());
-//    }
+    AndroidLocationEngine androidLocationEngine = new AndroidLocationEngine(context.getApplicationContext());
 
-    return instance;
+    return androidLocationEngine;
   }
 
   @Override

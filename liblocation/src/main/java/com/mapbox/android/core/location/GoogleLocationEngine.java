@@ -22,8 +22,6 @@ import java.util.Map;
 class GoogleLocationEngine extends LocationEngine implements
   GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
-  private static LocationEngine instance;
-
   private WeakReference<Context> context;
   private GoogleApiClient googleApiClient;
   private final Map<LocationEnginePriority, UpdateGoogleRequestPriority> REQUEST_PRIORITY = new
@@ -67,11 +65,9 @@ class GoogleLocationEngine extends LocationEngine implements
   }
 
   static synchronized LocationEngine getLocationEngine(Context context) {
-    if (instance == null) {
-      instance = new GoogleLocationEngine(context.getApplicationContext());
-    }
+    LocationEngine googleLocationEngine= new GoogleLocationEngine(context.getApplicationContext());
 
-    return instance;
+    return googleLocationEngine;
   }
 
   @Override
