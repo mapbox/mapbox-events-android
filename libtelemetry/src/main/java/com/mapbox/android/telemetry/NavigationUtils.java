@@ -33,12 +33,10 @@ class NavigationUtils {
   }
 
   static String obtainAudioType() {
-    AudioManager audioManager = (AudioManager) MapboxTelemetry.applicationContext
-      .getSystemService(Context.AUDIO_SERVICE);
     AudioTypeChain audioTypeChain = new AudioTypeChain();
     AudioTypeResolver setupChain = audioTypeChain.setup();
 
-    return setupChain.obtainAudioType(MapboxTelemetry.applicationContext, audioManager);
+    return setupChain.obtainAudioType(MapboxTelemetry.applicationContext);
   }
 
   private static int calculateScreenBrightnessPercentage(int screenBrightness) {
