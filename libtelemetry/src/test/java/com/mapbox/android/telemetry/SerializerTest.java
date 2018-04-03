@@ -10,7 +10,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSerializer;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Date;
@@ -22,20 +21,9 @@ import static org.mockito.Mockito.when;
 
 public class SerializerTest {
 
-  @Before
-  public void setupMapboxTelemetry() {
-    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
-    MapboxTelemetry.applicationContext = mockedContext;
-    AudioManager mockedAudioManager = mock(AudioManager.class, RETURNS_DEEP_STUBS);
-    when(mockedContext.getSystemService(Context.AUDIO_SERVICE)).thenReturn(mockedAudioManager);
-    TelephonyManager mockedTelephonyManager = mock(TelephonyManager.class, RETURNS_DEEP_STUBS);
-    when(mockedContext.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(mockedTelephonyManager);
-    ActivityManager mockedActivityManager = mock(ActivityManager.class, RETURNS_DEEP_STUBS);
-    when(mockedContext.getSystemService(Context.ACTIVITY_SERVICE)).thenReturn(mockedActivityManager);
-  }
-
   @Test
   public void checkArriveSerializing() throws Exception {
+    obtainMockedContext();
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22, 180, "sdkIdentifier", "sdkVersion",
       3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "AndroidLocationEngine", 50);
@@ -67,6 +55,7 @@ public class SerializerTest {
 
   @Test
   public void checkDepartSerializing() throws Exception {
+    obtainMockedContext();
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22, 180, "sdkIdentifier", "sdkVersion",
       3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "AndroidLocationEngine", 50);
@@ -100,6 +89,7 @@ public class SerializerTest {
 
   @Test
   public void checkCancelSerializing() throws Exception {
+    obtainMockedContext();
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22,
       180, "sdkIdentifier", "sdkVersion", 3, "sessionID", 10.5,
@@ -140,6 +130,7 @@ public class SerializerTest {
 
   @Test
   public void checkFeedbackSerializing() throws Exception {
+    obtainMockedContext();
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22, 180, "sdkIdentifier", "sdkVersion",
       3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "AndroidLocationEngine", 50);
@@ -186,6 +177,7 @@ public class SerializerTest {
 
   @Test
   public void checkRerouteSerializing() throws Exception {
+    obtainMockedContext();
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22,
       180, "sdkIdent", "sdkversion", 3, "sessionID", 10.5,
@@ -255,6 +247,7 @@ public class SerializerTest {
 
   @Test
   public void checkFasterRouteSerializing() throws Exception {
+    obtainMockedContext();
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22,
       180, "sdkIdent", "sdkversion", 3, "sessionID", 10.5,
@@ -311,5 +304,16 @@ public class SerializerTest {
       + "\"durationRemaining\":2200}}";
 
     assertEquals(expectedJson, payload);
+  }
+
+  private void obtainMockedContext() {
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    MapboxTelemetry.applicationContext = mockedContext;
+    AudioManager mockedAudioManager = mock(AudioManager.class, RETURNS_DEEP_STUBS);
+    when(mockedContext.getSystemService(Context.AUDIO_SERVICE)).thenReturn(mockedAudioManager);
+    TelephonyManager mockedTelephonyManager = mock(TelephonyManager.class, RETURNS_DEEP_STUBS);
+    when(mockedContext.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(mockedTelephonyManager);
+    ActivityManager mockedActivityManager = mock(ActivityManager.class, RETURNS_DEEP_STUBS);
+    when(mockedContext.getSystemService(Context.ACTIVITY_SERVICE)).thenReturn(mockedActivityManager);
   }
 }

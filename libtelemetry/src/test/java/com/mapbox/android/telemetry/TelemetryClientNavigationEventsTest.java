@@ -10,7 +10,6 @@ import android.telephony.TelephonyManager;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSerializer;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Date;
@@ -108,20 +107,9 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
       }
     };
 
-  @Before
-  public void setupMapboxTelemetry() {
-    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
-    MapboxTelemetry.applicationContext = mockedContext;
-    AudioManager mockedAudioManager = mock(AudioManager.class, RETURNS_DEEP_STUBS);
-    when(mockedContext.getSystemService(Context.AUDIO_SERVICE)).thenReturn(mockedAudioManager);
-    TelephonyManager mockedTelephonyManager = mock(TelephonyManager.class, RETURNS_DEEP_STUBS);
-    when(mockedContext.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(mockedTelephonyManager);
-    ActivityManager mockedActivityManager = mock(ActivityManager.class, RETURNS_DEEP_STUBS);
-    when(mockedContext.getSystemService(Context.ACTIVITY_SERVICE)).thenReturn(mockedActivityManager);
-  }
-
   @Test
   public void sendsTheCorrectBodyPostingAppUserTurnstileEvent() throws Exception {
+    obtainMockedContext();
     TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event anAppUserTurnstile = new AppUserTurnstile("anySdkIdentifier", "anySdkVersion", false);
     List<Event> theAppUserTurnstile = obtainEvents(anAppUserTurnstile);
@@ -136,6 +124,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
   @Test
   public void sendsTheCorrectBodyPostingNavigationArriveEvent() throws Exception {
+    obtainMockedContext();
     TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type arrive = Event.Type.NAV_ARRIVE;
     Event anArriveEvent = obtainNavigationEvent(arrive);
@@ -152,6 +141,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
   @Test
   public void sendsTheCorrectBodyPostingNavigationDepartEvent() throws Exception {
+    obtainMockedContext();
     TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type depart = Event.Type.NAV_DEPART;
     Event aDepartEvent = obtainNavigationEvent(depart);
@@ -168,6 +158,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
   @Test
   public void sendsTheCorrectBodyPostingNavigationCancelEvent() throws Exception {
+    obtainMockedContext();
     TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type cancel = Event.Type.NAV_CANCEL;
     Event aCancelEvent = obtainNavigationEvent(cancel);
@@ -184,6 +175,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
   @Test
   public void sendsTheCorrectBodyPostingNavigationFeedbackEvent() throws Exception {
+    obtainMockedContext();
     TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type feedback = Event.Type.NAV_FEEDBACK;
     Event aFeedbackEvent = obtainNavigationEvent(feedback);
@@ -200,6 +192,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
   @Test
   public void sendsTheCorrectBodyPostingNavigationRerouteEvent() throws Exception {
+    obtainMockedContext();
     TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type reroute = Event.Type.NAV_REROUTE;
     Event aRerouteEvent = obtainNavigationEvent(reroute);
@@ -216,6 +209,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
   @Test
   public void sendsTheCorrectBodyPostingNavigationFasterRouteEvent() throws Exception {
+    obtainMockedContext();
     TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type fasterRoute = Event.Type.NAV_FASTER_ROUTE;
     Event aFasterRouteEvent = obtainNavigationEvent(fasterRoute);
@@ -232,6 +226,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
   @Test
   public void sendsTheCorrectBodyPostingMultipleEvents() throws Exception {
+    obtainMockedContext();
     TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type reroute = Event.Type.NAV_REROUTE;
     Event rerouteEvent = obtainNavigationEvent(reroute);
@@ -390,5 +385,16 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
   interface ConfigureTypeAdapter {
     GsonBuilder configure(GsonBuilder gsonBuilder);
+  }
+
+  private void obtainMockedContext() {
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    MapboxTelemetry.applicationContext = mockedContext;
+    AudioManager mockedAudioManager = mock(AudioManager.class, RETURNS_DEEP_STUBS);
+    when(mockedContext.getSystemService(Context.AUDIO_SERVICE)).thenReturn(mockedAudioManager);
+    TelephonyManager mockedTelephonyManager = mock(TelephonyManager.class, RETURNS_DEEP_STUBS);
+    when(mockedContext.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(mockedTelephonyManager);
+    ActivityManager mockedActivityManager = mock(ActivityManager.class, RETURNS_DEEP_STUBS);
+    when(mockedContext.getSystemService(Context.ACTIVITY_SERVICE)).thenReturn(mockedActivityManager);
   }
 }
