@@ -18,7 +18,6 @@ The Mapbox Core Library for Android is a set of utilities that help you with per
 - Check for and respond to a change in the device's internet connectivity status.
 - Retrieve a device's real-time location.
 
-
 ## Getting Started
 
 If you are looking to include the Core Library inside of your project, please take a look at [the detailed instructions](https://www.mapbox.com/android-docs/core/overview/) found in our docs. If you are interested in building from source, read the contributing guide inside of this project.
