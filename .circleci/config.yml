@@ -41,6 +41,9 @@ jobs:
             ./gradlew accessToken
             ./gradlew app:assembleDebug
       - run:
+          name: Build release to test ProGuard rules
+          command: ./gradlew app:assembleRelease
+      - run:
           name: Build libtelemetry test APK
           command: ./gradlew libtelemetry:assembleDebugAndroidTest
       - run:
