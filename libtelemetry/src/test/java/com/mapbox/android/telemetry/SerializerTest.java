@@ -27,7 +27,7 @@ public class SerializerTest {
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22, 180, "sdkIdentifier", "sdkVersion",
       3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "AndroidLocationEngine", 50);
-    metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
+    metadata.setCreated(testDate);
     metadata.setBatteryLevel(50);
     NavigationState navigationState = new NavigationState(metadata);
 
@@ -59,7 +59,7 @@ public class SerializerTest {
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22, 180, "sdkIdentifier", "sdkVersion",
       3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "AndroidLocationEngine", 50);
-    metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
+    metadata.setCreated(testDate);
     metadata.setBatteryLevel(50);
     NavigationState navigationState = new NavigationState(metadata);
 
@@ -95,7 +95,7 @@ public class SerializerTest {
       180, "sdkIdentifier", "sdkVersion", 3, "sessionID", 10.5,
       15.67, "geometry", "profile", false,
       "AndroidLocationEngine", 50);
-    metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
+    metadata.setCreated(testDate);
     metadata.setBatteryLevel(50);
 
     NavigationCancelData navigationCancelData = new NavigationCancelData();
@@ -134,7 +134,7 @@ public class SerializerTest {
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22, 180, "sdkIdentifier", "sdkVersion",
       3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "AndroidLocationEngine", 50);
-    metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
+    metadata.setCreated(testDate);
     metadata.setBatteryLevel(50);
     FeedbackEventData navigationFeedbackData = new FeedbackEventData("userId", "general",
       "unknown");
@@ -183,7 +183,7 @@ public class SerializerTest {
       180, "sdkIdent", "sdkversion", 3, "sessionID", 10.5,
       15.67, "geometry", "profile", true,
       "MockLocationEngine", 1300);
-    metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
+    metadata.setCreated(testDate);
     metadata.setBatteryLevel(50);
     NavigationNewData navigationNewData = new NavigationNewData(100, 750,
       "mewGeometry");
@@ -253,7 +253,7 @@ public class SerializerTest {
       180, "sdkIdent", "sdkversion", 3, "sessionID", 10.5,
       15.67, "geometry", "profile", true,
       "MockLocationEngine", 1300);
-    metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
+    metadata.setCreated(testDate);
     metadata.setBatteryLevel(50);
     NavigationNewData navigationNewData = new NavigationNewData(100, 750,
       "mewGeometry");
