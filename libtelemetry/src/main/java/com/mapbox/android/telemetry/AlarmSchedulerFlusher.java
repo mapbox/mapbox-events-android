@@ -44,7 +44,12 @@ class AlarmSchedulerFlusher implements SchedulerFlusher {
   @Override
   public void unregister() {
     manager.cancel(pendingIntent);
-    context.unregisterReceiver(receiver);
+    try {
+      context.unregisterReceiver(receiver);
+    } catch (IllegalArgumentException exception) {
+      // No op for the cases in which the OS has unexpectedly unregistered the alarm
+      // Shouldn't happen but seen crashes in Samsung devices
+    }
   }
 
   PendingIntent obtainPendingIntent() {
