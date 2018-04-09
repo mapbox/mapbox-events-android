@@ -77,8 +77,8 @@ public class NavigationMetadata implements Parcelable {
     this.applicationState = TelemetryUtils.obtainApplicationState();
   }
 
-  public void setCreated(String created) {
-    this.created = created;
+  public void setCreated(Date created) {
+    this.created = TelemetryUtils.generateCreateDateFormatted(created);
   }
 
   String getCreated() {
