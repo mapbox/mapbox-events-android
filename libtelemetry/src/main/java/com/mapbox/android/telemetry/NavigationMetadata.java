@@ -209,10 +209,6 @@ public class NavigationMetadata implements Parcelable {
     return audioType;
   }
 
-  public void setAudioType(String audioType) {
-    this.audioType = audioType;
-  }
-
   Integer getStepCount() {
     return stepCount;
   }
