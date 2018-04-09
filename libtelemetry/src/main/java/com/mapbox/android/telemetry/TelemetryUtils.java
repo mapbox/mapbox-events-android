@@ -90,6 +90,11 @@ public class TelemetryUtils {
     return s;
   }
 
+  public static String obtainUniversalUniqueIdentifier() {
+    String universalUniqueIdentifier = UUID.randomUUID().toString();
+    return universalUniqueIdentifier;
+  }
+
   static String obtainApplicationState() {
     ActivityManager activityManager = (ActivityManager) MapboxTelemetry.applicationContext
       .getSystemService(Context.ACTIVITY_SERVICE);
@@ -149,11 +154,6 @@ public class TelemetryUtils {
 
   static String generateCreateDateFormatted(Date date) {
     return dateFormat.format(date);
-  }
-
-  static String obtainUniversalUniqueIdentifier() {
-    String universalUniqueIdentifier = UUID.randomUUID().toString();
-    return universalUniqueIdentifier;
   }
 
   static String createFullUserAgent(String userAgent, Context context) {
