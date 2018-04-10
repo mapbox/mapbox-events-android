@@ -153,8 +153,8 @@ public abstract class LocationEngine {
    * Set the fastest rate in milliseconds at which your application can handle location updates. You need to set
    * this rate because other apps also affect the rate at which updates are sent. If this rate is faster than your app
    * can handle, you may encounter problems with UI flicker or data overflow. To prevent this, use this method to set
-   * an upper limit to the update rate. When using <tt>AndroidLocationEngine</tt>, fastestInterval correlates to minTime, by
-   * setting the minimum time it would take to get a location update.
+   * an upper limit to the update rate. When using <tt>AndroidLocationEngine</tt>, fastestInterval correlates to
+   * minTime, by setting the minimum time it would take to get a location update.
    *
    * @param fastestInterval in milliseconds at which your app can handle location updates.
    * @since 2.1.0
