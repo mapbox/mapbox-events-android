@@ -4,6 +4,14 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v3.0.0
+- Add Alarm unregistering safe check - [#110](https://github.com/mapbox/mapbox-events-android/pull/110)
+- Fix Proguard issues - [#109](https://github.com/mapbox/mapbox-events-android/pull/109)
+- Generate user id from feedback event data internally - [#108](https://github.com/mapbox/mapbox-events-android/pull/108)
+- Fix date fields - [#107](https://github.com/mapbox/mapbox-events-android/pull/107)
+- Expose obtain universal unique identifier method publicly - [#106](https://github.com/mapbox/mapbox-events-android/pull/106)
+- Remove unnecessary audio type setter from navigation metadata - [#105](https://github.com/mapbox/mapbox-events-android/pull/105)
+
 ### v3.0.0-beta.4
 - Integration Changes for Navigation Events and Metrics - [#99](https://github.com/mapbox/mapbox-events-android/pull/99)
 - Sticky Service Crash Fix - [#98](https://github.com/mapbox/mapbox-events-android/pull/98)
@@ -48,6 +56,9 @@ Mapbox welcomes participation and contributions from everyone.
 - Port Location Code from MAS - [#6](https://github.com/mapbox/mapbox-events-android/pull/6)
 
 ## Mapbox Android Core
+
+### v0.2.0
+- FastestInterval Documentation Update - [#111](https://github.com/mapbox/mapbox-events-android/pull/111)
 
 ### v0.2.0-beta.4
 - LocationEngine Singleton Bug - [#100](https://github.com/mapbox/mapbox-events-android/pull/100)
