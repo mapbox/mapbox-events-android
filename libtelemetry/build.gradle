@@ -27,6 +27,7 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
     }
+    buildToolsVersion '26.0.2'
 }
 
 dependencies {
@@ -50,4 +51,4 @@ dependencies {
 apply from: 'javadoc.gradle'
 apply from: "${rootDir}/gradle/mvn-push-android.gradle"
 apply from: "${rootDir}/gradle/checkstyle.gradle"
-apply from: "${rootDir}/gradle/gradle-dependencies-graph.gradle"
+apply from: "${rootDir}/gradle/dependencies-graph.gradle"

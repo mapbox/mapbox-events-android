@@ -22,9 +22,6 @@ publish-local:
 	export IS_LOCAL_DEVELOPMENT=true; ./gradlew :libcore:uploadArchives
 	export IS_LOCAL_DEVELOPMENT=true; ./gradlew :libtelemetry:uploadArchives
 
-# Creates a dependency graph using Graphviz
-MBLIB_ANDROID_GRADLE = ./gradlew --parallel --max-workers=$(JOBS) -Pmapbox.buildtype=$(buildtype)
-
-.PHONY: android-graph
-android-graph:
-        cd libtelemetry && $(MBLIB_ANDROID_GRADLE) -Pmapbox.abis=none :libtelemetry:generateDependencyGraphMapboxLibraries
+graphs:
+    ./gradlew :libcore:generateDependencyGraphMapboxLibraries
+    ./gradlew :libtelemetry:generateDependencyGraphMapboxLibraries

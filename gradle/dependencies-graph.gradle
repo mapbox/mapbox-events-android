@@ -4,7 +4,7 @@ buildscript {
     }
 
     dependencies {
-        classpath "com.vanniktech:gradle-dependency-graph-generator-plugin:0.3.0"
+        classpath dependenciesList.dependencyGraph
     }
 }
 
@@ -25,5 +25,5 @@ def mapboxGenerator = new Generator(
 )
 
 dependencyGraphGenerator {
-    generators = [mapboxGenerator]
+    generators = [ mapboxGenerator ]
 }

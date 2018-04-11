@@ -17,12 +17,12 @@ ext {
             testRunnerVersion: '1.0.1',
             okhttp3          : '3.10.0',
             gson             : '2.8.2',
-            espressoVersion  : '3.0.1'
-    ]
+            espressoVersion  : '3.0.1',
+            dependencyGraph  : '0.3.0']
 
     pluginVersion = [
             checkstyle: '8.4',
-            gradle    : '2.3.3'
+            gradle    : '3.0.1'
     ]
 
     dependenciesList = [
@@ -60,7 +60,10 @@ ext {
             // unit test
             junit                  : "junit:junit:${version.junit}",
             mockito                : "org.mockito:mockito-core:${version.mockito}",
-            mockitoAndroid         : "org.mockito:mockito-android:${version.mockito}"
+            mockitoAndroid         : "org.mockito:mockito-android:${version.mockito}",
+
+            //dependency graph
+            dependencyGraph: "com.vanniktech:gradle-dependency-graph-generator-plugin:${version.dependencyGraph}"
     ]
 
     pluginDependencies = [
