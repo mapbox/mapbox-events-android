@@ -23,5 +23,5 @@ publish-local:
 	export IS_LOCAL_DEVELOPMENT=true; ./gradlew :libtelemetry:uploadArchives
 
 graphs:
-    ./gradlew :libcore:generateDependencyGraphMapboxLibraries
-    ./gradlew :libtelemetry:generateDependencyGraphMapboxLibraries
+    ./gradlew:libcore:generateDependencyGraphMapboxLibraries
+    ./gradlew:libtelemetry:generateDependencyGraphMapboxLibraries
