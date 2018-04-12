@@ -4,7 +4,7 @@ ext {
             minSdkVersion    : 14,
             targetSdkVersion : 25,
             compileSdkVersion: 25,
-            buildToolsVersion: '25.0.3'
+            buildToolsVersion: '27.0.2'
     ]
 
     version = [
@@ -17,12 +17,13 @@ ext {
             testRunnerVersion: '1.0.1',
             okhttp3          : '3.10.0',
             gson             : '2.8.2',
-            espressoVersion  : '3.0.1',
-            dependencyGraph  : '0.3.0']
+            espressoVersion  : '3.0.1'
+    ]
 
     pluginVersion = [
-            checkstyle: '8.4',
-            gradle    : '3.0.1'
+            checkstyle     : '8.4',
+            gradle         : '3.0.1',
+            dependencyGraph: '0.3.0'
     ]
 
     dependenciesList = [
@@ -60,14 +61,12 @@ ext {
             // unit test
             junit                  : "junit:junit:${version.junit}",
             mockito                : "org.mockito:mockito-core:${version.mockito}",
-            mockitoAndroid         : "org.mockito:mockito-android:${version.mockito}",
-
-            //dependency graph
-            dependencyGraph: "com.vanniktech:gradle-dependency-graph-generator-plugin:${version.dependencyGraph}"
+            mockitoAndroid         : "org.mockito:mockito-android:${version.mockito}"
     ]
 
     pluginDependencies = [
-            gradle    : "com.android.tools.build:gradle:${pluginVersion.gradle}",
-            checkstyle: "com.puppycrawl.tools:checkstyle:${pluginVersion.checkstyle}"
+            gradle         : "com.android.tools.build:gradle:${pluginVersion.gradle}",
+            checkstyle     : "com.puppycrawl.tools:checkstyle:${pluginVersion.checkstyle}",
+            dependencyGraph: "com.vanniktech:gradle-dependency-graph-generator-plugin:${pluginVersion.dependencyGraph}"
     ]
 }

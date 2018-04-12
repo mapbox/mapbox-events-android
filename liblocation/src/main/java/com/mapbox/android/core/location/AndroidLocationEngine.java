@@ -52,7 +52,7 @@ class AndroidLocationEngine extends LocationEngine implements LocationListener {
           }
         });
       }
-  };
+    };
 
   private AndroidLocationEngine(Context context) {
     super();
@@ -93,6 +93,7 @@ class AndroidLocationEngine extends LocationEngine implements LocationListener {
       return locationManager.getLastKnownLocation(currentProvider);
     }
 
+    //noinspection MissingPermission
     return null;
   }
 

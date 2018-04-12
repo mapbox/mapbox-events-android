@@ -20,7 +20,6 @@ android {
             java.srcDirs = ['src/main/java', '../liblocation/src/main/java']
         }
     }
-    buildToolsVersion '26.0.2'
 }
 
 dependencies {
