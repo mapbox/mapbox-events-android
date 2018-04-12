@@ -36,6 +36,7 @@ public class LocationJobService extends JobService implements LocationListener, 
   private LocationManager locationManager;
   private JobParameters currentParams;
   private ArrayList<Location> gpsLocations;
+  private ArrayList<Location> wifiLocations;
   private boolean gpsOn;
   private String accessToken;
   private String userAgent;
@@ -64,6 +65,7 @@ public class LocationJobService extends JobService implements LocationListener, 
   public boolean onStartJob(JobParameters params) {
     currentParams = params;
     gpsLocations = new ArrayList<Location>();
+    wifiLocations = new ArrayList<Location>();
     gpsOn = true;
     userAgent = params.getExtras().getString("userAgent");
     accessToken = params.getExtras().getString("accessToken");
@@ -80,7 +82,7 @@ public class LocationJobService extends JobService implements LocationListener, 
       locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0.0f, this);
     }
 
-    new CountDownTimer(20000, 1000) {
+    new CountDownTimer(25000, 1000) {
       public void onTick(long millisUntilFinished) {
 
       }
@@ -121,8 +123,12 @@ public class LocationJobService extends JobService implements LocationListener, 
         return;
       }
 
-      locationManager.removeUpdates(this);
-      sendLocation(Arrays.asList(location));
+      wifiLocations.add(location);
+
+      if (wifiLocations.size() == 5) {
+        locationManager.removeUpdates(this);
+        sendLocation(wifiLocations);
+      }
     }
   }
 
