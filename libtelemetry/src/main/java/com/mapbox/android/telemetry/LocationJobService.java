@@ -34,8 +34,7 @@ public class LocationJobService extends JobService implements LocationListener, 
   private static final int FIVE_MIN = 60 * 1000 * 5;
   private LocationManager locationManager;
   private JobParameters currentParams;
-  private ArrayList<Location> gpsLocations;
-  private ArrayList<Location> wifiLocations;
+  private ArrayList<Location> locations;
   private boolean gpsOn;
   private String accessToken;
   private String userAgent;
@@ -63,8 +62,7 @@ public class LocationJobService extends JobService implements LocationListener, 
   @Override
   public boolean onStartJob(JobParameters params) {
     currentParams = params;
-    gpsLocations = new ArrayList<Location>();
-    wifiLocations = new ArrayList<Location>();
+    locations = new ArrayList<Location>();
     gpsOn = true;
     userAgent = params.getExtras().getString("userAgent");
     accessToken = params.getExtras().getString("accessToken");
@@ -81,21 +79,40 @@ public class LocationJobService extends JobService implements LocationListener, 
       locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0.0f, this);
     }
 
-    new CountDownTimer(25000, 1000) {
+    startGpsTimer(locationListener);
+
+    return true;
+  }
+
+  @SuppressLint("MissingPermission")
+  private void startGpsTimer(final LocationListener locationListener) {
+    new CountDownTimer(20000, 1000) {
       public void onTick(long millisUntilFinished) {
 
       }
 
       public void onFinish() {
-        if (gpsOn) {
-          locationManager.removeUpdates(locationListener);
-          gpsOn = false;
-          locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0.0f, locationListener);
-        }
+        locationManager.removeUpdates(locationListener);
+        startWifiListener(locationListener);
       }
     }.start();
+  }
 
-    return true;
+  @SuppressLint("MissingPermission")
+  private void startWifiListener(final LocationListener locationListener) {
+    gpsOn = false;
+    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0.0f, locationListener);
+
+    new CountDownTimer(20000, 1000) {
+      public void onTick(long millisUntilFinished) {
+
+      }
+
+      public void onFinish() {
+        locationManager.removeUpdates(locationListener);
+        sendLocation(locations);
+      }
+    }.start();
   }
 
   @Override
@@ -110,25 +127,11 @@ public class LocationJobService extends JobService implements LocationListener, 
   public void onLocationChanged(Location location) {
     Log.d(LOG_TAG,location.getLatitude() + ", " + location.getLongitude());
 
-    if (gpsOn) {
-      gpsLocations.add(location);
-
-      if (gpsLocations.size() == 5) {
-        locationManager.removeUpdates(this);
-        sendLocation(gpsLocations);
-      }
-    } else {
-      if (location.getAccuracy() > 50) {
-        return;
-      }
-
-      wifiLocations.add(location);
-
-      if (wifiLocations.size() == 5) {
-        locationManager.removeUpdates(this);
-        sendLocation(wifiLocations);
-      }
+    if (!gpsOn && location.getAccuracy() > 50) {
+      return;
     }
+
+    locations.add(location);
   }
 
   @Override
