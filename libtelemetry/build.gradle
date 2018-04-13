@@ -29,6 +29,8 @@ android {
     }
 }
 
+apply from: "${rootDir}/gradle/fat-aar.gradle"
+
 dependencies {
     embedded project(':libcore')
     compile dependenciesList.okhttp3
@@ -51,5 +53,3 @@ apply from: 'javadoc.gradle'
 apply from: "${rootDir}/gradle/mvn-push-android.gradle"
 apply from: "${rootDir}/gradle/checkstyle.gradle"
 apply from: "${rootDir}/gradle/dependencies-graph.gradle"
-apply from: "${rootDir}/gradle/fat-aar.gradle"
-//apply plugin: 'me.vigi.fat-aar'
