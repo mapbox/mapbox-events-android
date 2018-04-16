@@ -420,8 +420,10 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   private void unregisterTelemetry() {
     stopAlarm();
-    unbindTelemetryService();
-    stopTelemetryService();
+    if (isMyServiceRunning(TelemetryService.class)) {
+      unbindTelemetryService();
+      stopTelemetryService();
+    }
   }
 
   private void stopAlarm() {
