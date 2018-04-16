@@ -10,7 +10,6 @@ release:
 	./gradlew :libtelemetry:assembleRelease
 
 javadoc:
-	./gradlew :libcore:javadocrelease
 	./gradlew :libtelemetry:javadocrelease
 
 publish:
