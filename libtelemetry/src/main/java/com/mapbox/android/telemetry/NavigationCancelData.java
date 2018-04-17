@@ -3,13 +3,18 @@ package com.mapbox.android.telemetry;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Date;
+
 public class NavigationCancelData implements Parcelable {
-  private String arrivalTimestamp;
+  private String arrivalTimestamp = null;
   private Integer rating = null;
   private String comment = null;
 
-  public NavigationCancelData(String arrivalTimestamp) {
-    this.arrivalTimestamp = arrivalTimestamp;
+  public NavigationCancelData() {
+  }
+
+  public void setArrivalTimestamp(Date arrivalTimestamp) {
+    this.arrivalTimestamp = TelemetryUtils.generateCreateDateFormatted(arrivalTimestamp);
   }
 
   String getArrivalTimestamp() {
@@ -69,4 +74,3 @@ public class NavigationCancelData implements Parcelable {
       }
     };
 }
-

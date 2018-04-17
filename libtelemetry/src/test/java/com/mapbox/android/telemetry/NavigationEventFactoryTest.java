@@ -1,12 +1,19 @@
 package com.mapbox.android.telemetry;
 
+import android.app.ActivityManager;
+import android.content.Context;
+import android.media.AudioManager;
+import android.telephony.TelephonyManager;
+
 import org.junit.Test;
 
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class NavigationEventFactoryTest {
 
@@ -112,6 +119,9 @@ public class NavigationEventFactoryTest {
 
   @Test
   public void checksNavigationFasterRouteEvent() throws Exception {
+    Context mockedContext = mock(Context.class);
+    ActivityManager mockedActivityManager = mock(ActivityManager.class, RETURNS_DEEP_STUBS);
+    when(mockedContext.getSystemService(Context.ACTIVITY_SERVICE)).thenReturn(mockedActivityManager);
     NavigationEventFactory navigationEventFactory = new NavigationEventFactory();
     NavigationState aValidNavigationState = obtainAValidNavigationState();
     NavigationRerouteData mockedNavigationRerouteData = mock(NavigationRerouteData.class);
@@ -126,11 +136,18 @@ public class NavigationEventFactoryTest {
 
   @Test
   public void checksFasterRouteType() throws Exception {
+    Context mockedContext = mock(Context.class);
+    MapboxTelemetry.applicationContext = mockedContext;
+    ActivityManager mockedActivityManager = mock(ActivityManager.class, RETURNS_DEEP_STUBS);
+    when(mockedContext.getSystemService(Context.ACTIVITY_SERVICE)).thenReturn(mockedActivityManager);
+    AudioManager mockedAudioManager = mock(AudioManager.class, RETURNS_DEEP_STUBS);
+    when(mockedContext.getSystemService(Context.AUDIO_SERVICE)).thenReturn(mockedAudioManager);
+    TelephonyManager mockedTelephonyManager = mock(TelephonyManager.class, RETURNS_DEEP_STUBS);
+    when(mockedContext.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(mockedTelephonyManager);
     NavigationEventFactory navigationEventFactory = new NavigationEventFactory();
     NavigationState aValidNavigationState = obtainAValidNavigationState();
     NavigationRerouteData mockedNavigationRerouteData = mock(NavigationRerouteData.class);
     aValidNavigationState.setNavigationRerouteData(mockedNavigationRerouteData);
-
 
     Event fasterRouteEvent = navigationEventFactory.createNavigationEvent(Event.Type.NAV_FASTER_ROUTE,
       aValidNavigationState);
@@ -157,6 +174,9 @@ public class NavigationEventFactoryTest {
 
   @Test
   public void checksValidNavigationState() throws Exception {
+    Context mockedContext = mock(Context.class);
+    ActivityManager mockedActivityManager = mock(ActivityManager.class, RETURNS_DEEP_STUBS);
+    when(mockedContext.getSystemService(Context.ACTIVITY_SERVICE)).thenReturn(mockedActivityManager);
     NavigationEventFactory navigationEventFactory = new NavigationEventFactory();
     Event.Type aNavFeedbackEventType = Event.Type.NAV_FEEDBACK;
     NavigationState aValidNavigationState = obtainAValidNavigationState();
@@ -178,7 +198,7 @@ public class NavigationEventFactoryTest {
 
   private NavigationState obtainAValidNavigationState() {
     NavigationMetadata metadata = new NavigationMetadata(new Date(), 13, 22, 180, "sdkIdentifier", "sdkVersion",
-      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "device", "AndroidLocationEngine", 50);
+      3, "sessionID", 10.5, 15.67, "geometry", "profile", false,  "AndroidLocationEngine", 50);
     return new NavigationState(metadata);
   }
 }

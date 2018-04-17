@@ -1,8 +1,11 @@
 package com.mapbox.android.telemetry;
 
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.location.Location;
+import android.media.AudioManager;
+import android.telephony.TelephonyManager;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSerializer;
@@ -18,6 +21,7 @@ import okhttp3.Callback;
 
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
@@ -105,8 +109,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
   @Test
   public void sendsTheCorrectBodyPostingAppUserTurnstileEvent() throws Exception {
-    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
-    MapboxTelemetry.applicationContext = mockedContext;
+    setupMockedContext();
     TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event anAppUserTurnstile = new AppUserTurnstile("anySdkIdentifier", "anySdkVersion", false);
     List<Event> theAppUserTurnstile = obtainEvents(anAppUserTurnstile);
@@ -121,6 +124,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
   @Test
   public void sendsTheCorrectBodyPostingNavigationArriveEvent() throws Exception {
+    setupMockedContext();
     TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type arrive = Event.Type.NAV_ARRIVE;
     Event anArriveEvent = obtainNavigationEvent(arrive);
@@ -137,6 +141,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
   @Test
   public void sendsTheCorrectBodyPostingNavigationDepartEvent() throws Exception {
+    setupMockedContext();
     TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type depart = Event.Type.NAV_DEPART;
     Event aDepartEvent = obtainNavigationEvent(depart);
@@ -153,6 +158,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
   @Test
   public void sendsTheCorrectBodyPostingNavigationCancelEvent() throws Exception {
+    setupMockedContext();
     TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type cancel = Event.Type.NAV_CANCEL;
     Event aCancelEvent = obtainNavigationEvent(cancel);
@@ -169,6 +175,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
   @Test
   public void sendsTheCorrectBodyPostingNavigationFeedbackEvent() throws Exception {
+    setupMockedContext();
     TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type feedback = Event.Type.NAV_FEEDBACK;
     Event aFeedbackEvent = obtainNavigationEvent(feedback);
@@ -185,6 +192,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
   @Test
   public void sendsTheCorrectBodyPostingNavigationRerouteEvent() throws Exception {
+    setupMockedContext();
     TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type reroute = Event.Type.NAV_REROUTE;
     Event aRerouteEvent = obtainNavigationEvent(reroute);
@@ -201,6 +209,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
   @Test
   public void sendsTheCorrectBodyPostingNavigationFasterRouteEvent() throws Exception {
+    setupMockedContext();
     TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type fasterRoute = Event.Type.NAV_FASTER_ROUTE;
     Event aFasterRouteEvent = obtainNavigationEvent(fasterRoute);
@@ -217,6 +226,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
   @Test
   public void sendsTheCorrectBodyPostingMultipleEvents() throws Exception {
+    setupMockedContext();
     TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
     Event.Type reroute = Event.Type.NAV_REROUTE;
     Event rerouteEvent = obtainNavigationEvent(reroute);
@@ -236,7 +246,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
   private NavigationState obtainDefaultNavigationState(Date date) {
     NavigationMetadata metadata = new NavigationMetadata(date, 13, 22, 180, "sdkIdentifier", "sdkVersion",
-      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "device", "AndroidLocationEngine", 50);
+      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "AndroidLocationEngine", 50);
     return new NavigationState(metadata);
   }
 
@@ -264,8 +274,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
     NavigationEventFactory navigationEventFactory = new NavigationEventFactory();
     Date aDate = new Date();
     NavigationState navigationState = obtainDefaultNavigationState(aDate);
-    NavigationCancelData navigationCancelData =
-      new NavigationCancelData(TelemetryUtils.generateCreateDateFormatted(aDate));
+    NavigationCancelData navigationCancelData = new NavigationCancelData();
     navigationState.setNavigationCancelData(navigationCancelData);
     Event cancelEvent = navigationEventFactory.createNavigationEvent(Event.Type.NAV_CANCEL, navigationState);
     return cancelEvent;
@@ -275,15 +284,11 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
     NavigationEventFactory navigationEventFactory = new NavigationEventFactory();
     Date aDate = new Date();
     NavigationState navigationState = obtainDefaultNavigationState(aDate);
-    FeedbackEventData navigationFeedbackData = new FeedbackEventData("anyUserId", "general",
-      "unknown", "audio");
+    FeedbackEventData navigationFeedbackData = new FeedbackEventData("anyUserId", "general", "unknown");
     FeedbackData feedbackData = obtainFeedbackData();
-    NavigationVoiceData navigationVoiceData = new NavigationVoiceData("voiceInstruction",
-      TelemetryUtils.generateCreateDateFormatted(aDate));
     NavigationLocationData navigationLocationData = obtainLocationData();
     navigationState.setNavigationLocationData(navigationLocationData);
     navigationState.setFeedbackEventData(navigationFeedbackData);
-    navigationState.setNavigationVoiceData(navigationVoiceData);
     navigationState.setFeedbackData(feedbackData);
     Event feedbackEvent = navigationEventFactory.createNavigationEvent(Event.Type.NAV_FEEDBACK, navigationState);
     return feedbackEvent;
@@ -301,14 +306,11 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
     NavigationState navigationState = obtainDefaultNavigationState(aDate);
     NavigationNewData navigationNewData = obtainNewData();
     NavigationRerouteData navigationRerouteData = new NavigationRerouteData(navigationNewData, 12000);
-    NavigationVoiceData navigationVoiceData = new NavigationVoiceData("voiceInstruction",
-      TelemetryUtils.generateCreateDateFormatted(aDate));
     FeedbackData feedbackData = obtainFeedbackData();
     NavigationStepMetadata navigationStepMetadata = new NavigationStepMetadata();
     NavigationLocationData navigationLocationData = obtainLocationData();
     navigationState.setNavigationLocationData(navigationLocationData);
     navigationState.setNavigationRerouteData(navigationRerouteData);
-    navigationState.setNavigationVoiceData(navigationVoiceData);
     navigationState.setFeedbackData(feedbackData);
     navigationState.setNavigationStepMetadata(navigationStepMetadata);
     Event rerouteEvent = navigationEventFactory.createNavigationEvent(Event.Type.NAV_REROUTE, navigationState);
@@ -316,7 +318,7 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
   }
 
   private FeedbackData obtainFeedbackData() {
-    return new FeedbackData("feedbackId");
+    return new FeedbackData();
   }
 
   private NavigationNewData obtainNewData() {
@@ -382,5 +384,16 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
   interface ConfigureTypeAdapter {
     GsonBuilder configure(GsonBuilder gsonBuilder);
+  }
+
+  private void setupMockedContext() {
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    MapboxTelemetry.applicationContext = mockedContext;
+    AudioManager mockedAudioManager = mock(AudioManager.class, RETURNS_DEEP_STUBS);
+    when(mockedContext.getSystemService(Context.AUDIO_SERVICE)).thenReturn(mockedAudioManager);
+    TelephonyManager mockedTelephonyManager = mock(TelephonyManager.class, RETURNS_DEEP_STUBS);
+    when(mockedContext.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(mockedTelephonyManager);
+    ActivityManager mockedActivityManager = mock(ActivityManager.class, RETURNS_DEEP_STUBS);
+    when(mockedContext.getSystemService(Context.ACTIVITY_SERVICE)).thenReturn(mockedActivityManager);
   }
 }
