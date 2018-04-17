@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
     setContentView(R.layout.activity_main);
 
     String accessTokenTelemetry = obtainAccessToken();
-    String userAgentTelemetry = "MapboxEventsAndroid/3.1.0/7-gps20-wifi20";
+    String userAgentTelemetry = "MapboxEventsAndroid/3.1.0/7-passive2020";
     mapboxTelemetry = new MapboxTelemetry(this, accessTokenTelemetry, userAgentTelemetry);
 
     checkPermissions();

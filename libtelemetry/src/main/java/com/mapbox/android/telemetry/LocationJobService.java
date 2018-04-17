@@ -33,6 +33,7 @@ public class LocationJobService extends JobService implements LocationListener, 
   private static final int JOB_ID = 1;
   private static final int FIVE_MIN = 60 * 1000 * 5;
   private LocationManager locationManager;
+  private LocationManager passiveManager;
   private JobParameters currentParams;
   private ArrayList<Location> locations;
   private boolean gpsOn;
@@ -79,6 +80,12 @@ public class LocationJobService extends JobService implements LocationListener, 
       locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0.0f, this);
     }
 
+    passiveManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+    if (passiveManager != null) {
+      passiveManager.getBestProvider(criteria, true);
+      passiveManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 1000, 0.0f, this);
+    }
+
     startGpsTimer(locationListener);
 
     return true;
@@ -110,6 +117,7 @@ public class LocationJobService extends JobService implements LocationListener, 
 
       public void onFinish() {
         locationManager.removeUpdates(locationListener);
+        passiveManager.removeUpdates(locationListener);
         sendLocation(locations);
       }
     }.start();
