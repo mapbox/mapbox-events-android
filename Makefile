@@ -6,10 +6,10 @@ test:
 	./gradlew :libtelemetry:test
 
 release:
-	./gradlew :libcore:assembleRelease
 	./gradlew :libtelemetry:assembleRelease
 
 javadoc:
+	./gradlew :libcore:javadocrelease
 	./gradlew :libtelemetry:javadocrelease
 
 publish:
