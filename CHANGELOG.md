@@ -4,6 +4,9 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v3.0.2
+- Make `Mapbox-Android-Core` dependency `0.2.0` instead of the current snapshot
+
 ### v3.0.1
 - Add service running check - [#117](https://github.com/mapbox/mapbox-events-android/pull/117)
 
