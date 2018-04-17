@@ -7,7 +7,6 @@ public class NavigationState {
   private NavigationLocationData navigationLocationData;
   private NavigationRerouteData navigationRerouteData;
   private FeedbackEventData feedbackEventData;
-  private NavigationVoiceData navigationVoiceData;
   private FeedbackData feedbackData;
 
   public NavigationState(NavigationMetadata navigationMetadata) {
@@ -56,14 +55,6 @@ public class NavigationState {
 
   public void setFeedbackEventData(FeedbackEventData feedbackEventData) {
     this.feedbackEventData = feedbackEventData;
-  }
-
-  NavigationVoiceData getNavigationVoiceData() {
-    return navigationVoiceData;
-  }
-
-  public void setNavigationVoiceData(NavigationVoiceData navigationVoiceData) {
-    this.navigationVoiceData = navigationVoiceData;
   }
 
   FeedbackData getFeedbackData() {

@@ -7,14 +7,20 @@ public class FeedbackEventData implements Parcelable {
   private String userId;
   private String feedbackType;
   private String source;
-  private String audio;
+  private String audio = null;
   private String description = null;
 
-  public FeedbackEventData(String userId, String feedbackType, String source, String audio) {
+  public FeedbackEventData(String feedbackType, String source) {
+    this.userId = TelemetryUtils.retrieveVendorId();
+    this.feedbackType = feedbackType;
+    this.source = source;
+  }
+
+  // For testing only
+  FeedbackEventData(String userId, String feedbackType, String source) {
     this.userId = userId;
     this.feedbackType = feedbackType;
     this.source = source;
-    this.audio = audio;
   }
 
   String getUserId() {
@@ -31,6 +37,10 @@ public class FeedbackEventData implements Parcelable {
 
   String getAudio() {
     return audio;
+  }
+
+  public void setAudio(String audio) {
+    this.audio = audio;
   }
 
   String getDescription() {

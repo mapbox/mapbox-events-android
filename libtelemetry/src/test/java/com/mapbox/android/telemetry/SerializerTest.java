@@ -1,6 +1,10 @@
 package com.mapbox.android.telemetry;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.location.Location;
+import android.media.AudioManager;
+import android.telephony.TelephonyManager;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -11,16 +15,20 @@ import org.junit.Test;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class SerializerTest {
 
   @Test
   public void checkArriveSerializing() throws Exception {
+    setupMockedContext();
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22, 180, "sdkIdentifier", "sdkVersion",
-      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "device", "AndroidLocationEngine", 50);
-    metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
+      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "AndroidLocationEngine", 50);
+    metadata.setCreated(testDate);
+    metadata.setBatteryLevel(50);
     NavigationState navigationState = new NavigationState(metadata);
 
     NavigationArriveEvent navigationArriveEvent = new NavigationArriveEvent(navigationState);
@@ -38,17 +46,21 @@ public class SerializerTest {
       + "\"sdKIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
-      + "\"device\":\"device\",\"locationEngine\":\"AndroidLocationEngine\"}";
+      + "\"audioType\":\"unknown\",\"locationEngine\":\"AndroidLocationEngine\",\"volumeLevel\":0,"
+      + "\"screenBrightness\":0,\"applicationState\":\"Background\",\"batteryPluggedIn\":false,\"batteryLevel\":50,"
+      + "\"connectivity\":\"Unknown\"}";
 
     assertEquals(expectedJson, payload);
   }
 
   @Test
   public void checkDepartSerializing() throws Exception {
+    setupMockedContext();
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22, 180, "sdkIdentifier", "sdkVersion",
-      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "device", "AndroidLocationEngine", 50);
-    metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
+      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "AndroidLocationEngine", 50);
+    metadata.setCreated(testDate);
+    metadata.setBatteryLevel(50);
     NavigationState navigationState = new NavigationState(metadata);
 
     NavigationDepartEvent navigationDepartEvent = new NavigationDepartEvent(navigationState);
@@ -67,7 +79,9 @@ public class SerializerTest {
       + "\"sdKIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
-      + "\"device\":\"device\",\"locationEngine\":\"AndroidLocationEngine\",\"event\":\"navigation.depart\"}";
+      + "\"audioType\":\"unknown\",\"locationEngine\":\"AndroidLocationEngine\",\"volumeLevel\":0,"
+      + "\"screenBrightness\":0,\"applicationState\":\"Background\",\"batteryPluggedIn\":false,\"batteryLevel\":50,"
+      + "\"connectivity\":\"Unknown\",\"event\":\"navigation.depart\"}";
 
     assertEquals(expectedJson, payload);
   }
@@ -75,15 +89,16 @@ public class SerializerTest {
 
   @Test
   public void checkCancelSerializing() throws Exception {
+    setupMockedContext();
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22,
       180, "sdkIdentifier", "sdkVersion", 3, "sessionID", 10.5,
-      15.67, "geometry", "profile", false, "device",
+      15.67, "geometry", "profile", false,
       "AndroidLocationEngine", 50);
-    metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
+    metadata.setCreated(testDate);
+    metadata.setBatteryLevel(50);
 
-    NavigationCancelData navigationCancelData =
-      new NavigationCancelData(TelemetryUtils.generateCreateDateFormatted(testDate));
+    NavigationCancelData navigationCancelData = new NavigationCancelData();
     navigationCancelData.setComment("Test");
     navigationCancelData.setRating(75);
 
@@ -99,30 +114,31 @@ public class SerializerTest {
     Gson customGson = gsonBuilder.create();
     String payload = customGson.toJson(navigationCancelEvent);
 
-    String expectedJson = "{\"event\":\"navigation.cancel\",\"arrivalTimestamp\":\""
-      + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"rating\":75,\"comment\":\"Test\","
+    String expectedJson = "{\"event\":\"navigation.cancel\",\"rating\":75,\"comment\":\"Test\","
       + "\"absoluteDistanceToDestination\":50,\"startTimestamp\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"distanceCompleted\":13,\"distanceRemaining\":22,"
       + "\"durationRemaining\":180,\"operatingSystem\":\"Android - null\",\"eventVersion\":3,"
       + "\"sdKIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
-      + "\"device\":\"device\",\"locationEngine\":\"AndroidLocationEngine\"}";
+      + "\"audioType\":\"unknown\",\"locationEngine\":\"AndroidLocationEngine\",\"volumeLevel\":0,"
+      + "\"screenBrightness\":0,\"applicationState\":\"Background\",\"batteryPluggedIn\":false,\"batteryLevel\":50,"
+      + "\"connectivity\":\"Unknown\"}";
 
     assertEquals(expectedJson, payload);
   }
 
   @Test
   public void checkFeedbackSerializing() throws Exception {
+    setupMockedContext();
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22, 180, "sdkIdentifier", "sdkVersion",
-      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "device", "AndroidLocationEngine", 50);
-    metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
+      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "AndroidLocationEngine", 50);
+    metadata.setCreated(testDate);
+    metadata.setBatteryLevel(50);
     FeedbackEventData navigationFeedbackData = new FeedbackEventData("userId", "general",
-      "unknown", "audio");
-    FeedbackData feedbackData = new FeedbackData("feedbackId");
-    NavigationVoiceData navigationVoiceData = new NavigationVoiceData("voiceInstruction",
-      TelemetryUtils.generateCreateDateFormatted(testDate));
+      "unknown");
+    FeedbackData feedbackData = new FeedbackData();
     Location[] locationsBefore = new Location[1];
     locationsBefore[0] = mock(Location.class);
     Location[] locationsAfter = new Location[1];
@@ -132,7 +148,6 @@ public class SerializerTest {
     NavigationState navigationState = new NavigationState(metadata);
     navigationState.setNavigationLocationData(navigationLocationData);
     navigationState.setFeedbackEventData(navigationFeedbackData);
-    navigationState.setNavigationVoiceData(navigationVoiceData);
     navigationState.setFeedbackData(feedbackData);
 
     NavigationFeedbackEvent navigationFeedbackEvent = new NavigationFeedbackEvent(navigationState);
@@ -151,28 +166,29 @@ public class SerializerTest {
       + "\"sdKIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
-      + "\"device\":\"device\",\"locationEngine\":\"AndroidLocationEngine\",\"userId\":\"userId\","
-      + "\"feedbackType\":\"general\",\"source\":\"unknown\",\"audio\":\"audio\",\"locationsBefore\":[{}],"
-      + "\"locationsAfter\":[{}],\"feedbackId\":\"feedbackId\"}";
+      + "\"audioType\":\"unknown\",\"locationEngine\":\"AndroidLocationEngine\",\"volumeLevel\":0,"
+      + "\"screenBrightness\":0,\"applicationState\":\"Background\",\"batteryPluggedIn\":false,\"batteryLevel\":50,"
+      + "\"connectivity\":\"Unknown\",\"userId\":\"userId\",\"feedbackType\":\"general\",\"source\":\"unknown\","
+      + "\"locationsBefore\":[{}],\"locationsAfter\":[{}],\"feedbackId\":\""
+      + feedbackData.getFeedbackId() + "\"}";
 
     assertEquals(expectedJson, payload);
   }
 
   @Test
   public void checkRerouteSerializing() throws Exception {
+    setupMockedContext();
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22,
       180, "sdkIdent", "sdkversion", 3, "sessionID", 10.5,
-      15.67, "geometry", "profile", true, "device",
+      15.67, "geometry", "profile", true,
       "MockLocationEngine", 1300);
-    metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
-
+    metadata.setCreated(testDate);
+    metadata.setBatteryLevel(50);
     NavigationNewData navigationNewData = new NavigationNewData(100, 750,
       "mewGeometry");
     NavigationRerouteData navigationRerouteData = new NavigationRerouteData(navigationNewData, 12000);
-    NavigationVoiceData navigationVoiceData = new NavigationVoiceData("voiceInstruction",
-      TelemetryUtils.generateCreateDateFormatted(testDate));
-    FeedbackData feedbackData = new FeedbackData("feedbackId");
+    FeedbackData feedbackData = new FeedbackData();
     feedbackData.setScreenshot("screenshot");
 
     NavigationStepMetadata navigationStepMetadata = new NavigationStepMetadata();
@@ -196,7 +212,6 @@ public class SerializerTest {
     NavigationState navigationState = new NavigationState(metadata);
     navigationState.setNavigationLocationData(navigationLocationData);
     navigationState.setNavigationRerouteData(navigationRerouteData);
-    navigationState.setNavigationVoiceData(navigationVoiceData);
     navigationState.setFeedbackData(feedbackData);
     navigationState.setNavigationStepMetadata(navigationStepMetadata);
 
@@ -216,14 +231,13 @@ public class SerializerTest {
       + "\"sdKIdentifier\":\"sdkIdent\",\"sdkVersion\":\"sdkversion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":true,"
-      + "\"device\":\"device\",\"locationEngine\":\"MockLocationEngine\",\"navigationNewData\":"
-      + "{\"newDistanceRemaining\":100,\"newDurationRemaining\":750,\"newGeometry\":\"mewGeometry\"},"
-      + "\"secondsSinceLastReroute\":12000,\"locationsBefore\":[null],\"locationsAfter\":[null],"
-      + "\"feedbackId\":\"feedbackId\",\"screenshot\":\"screenshot\",\"voiceInstruction\":\"voiceInstruction\","
-      + "\"voiceInstructionTimestamp\":\""
-      + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"step\":"
-      + "{\"upcomingInstruction\":\"upcomingInstruction\",\"upcomingType\":\"upcomingType\","
-      + "\"upcomingModifier\":\"upcomingModifier\",\"upcomingName\":\"upcomingName\","
+      + "\"audioType\":\"unknown\",\"locationEngine\":\"MockLocationEngine\",\"volumeLevel\":0,\"screenBrightness\":0,"
+      + "\"applicationState\":\"Background\",\"batteryPluggedIn\":false,\"batteryLevel\":50,"
+      + "\"connectivity\":\"Unknown\",\"navigationNewData\":{\"newDistanceRemaining\":100,\"newDurationRemaining\":750,"
+      + "\"newGeometry\":\"mewGeometry\"},\"secondsSinceLastReroute\":12000,\"locationsBefore\":[null],"
+      + "\"locationsAfter\":[null],\"feedbackId\":\"" + feedbackData.getFeedbackId() + "\","
+      + "\"screenshot\":\"screenshot\",\"step\":{\"upcomingInstruction\":\"upcomingInstruction\","
+      + "\"upcomingType\":\"upcomingType\",\"upcomingModifier\":\"upcomingModifier\",\"upcomingName\":\"upcomingName\","
       + "\"previousInstruction\":\"previousInstruction\",\"previousType\":\"previousType\","
       + "\"previousModifier\":\"previousModifier\",\"previousName\":\"previousName\",\"distance\":100,"
       + "\"duration\":1200,\"distanceRemaining\":250,\"durationRemaining\":2200}}";
@@ -233,12 +247,14 @@ public class SerializerTest {
 
   @Test
   public void checkFasterRouteSerializing() throws Exception {
+    setupMockedContext();
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22,
       180, "sdkIdent", "sdkversion", 3, "sessionID", 10.5,
-      15.67, "geometry", "profile", true, "device",
+      15.67, "geometry", "profile", true,
       "MockLocationEngine", 1300);
-    metadata.setCreated(TelemetryUtils.generateCreateDateFormatted(testDate));
+    metadata.setCreated(testDate);
+    metadata.setBatteryLevel(50);
     NavigationNewData navigationNewData = new NavigationNewData(100, 750,
       "mewGeometry");
     NavigationRerouteData navigationRerouteData = new NavigationRerouteData(navigationNewData, 12000);
@@ -277,7 +293,9 @@ public class SerializerTest {
       + "\"sdKIdentifier\":\"sdkIdent\",\"sdkVersion\":\"sdkversion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":true,"
-      + "\"device\":\"device\",\"locationEngine\":\"MockLocationEngine\",\"newDistanceRemaining\":100,"
+      + "\"audioType\":\"unknown\",\"locationEngine\":\"MockLocationEngine\",\"volumeLevel\":0,\"screenBrightness\":0,"
+      + "\"applicationState\":\"Background\",\"batteryPluggedIn\":false,\"batteryLevel\":50,"
+      + "\"connectivity\":\"Unknown\",\"newDistanceRemaining\":100,"
       + "\"newDurationRemaining\":750,\"newGeometry\":\"mewGeometry\",\"step\":"
       + "{\"upcomingInstruction\":\"upcomingInstruction\",\"upcomingType\":\"upcomingType\","
       + "\"upcomingModifier\":\"upcomingModifier\",\"upcomingName\":\"upcomingName\",\"previousInstruction\":"
@@ -286,5 +304,16 @@ public class SerializerTest {
       + "\"durationRemaining\":2200}}";
 
     assertEquals(expectedJson, payload);
+  }
+
+  private void setupMockedContext() {
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    MapboxTelemetry.applicationContext = mockedContext;
+    AudioManager mockedAudioManager = mock(AudioManager.class, RETURNS_DEEP_STUBS);
+    when(mockedContext.getSystemService(Context.AUDIO_SERVICE)).thenReturn(mockedAudioManager);
+    TelephonyManager mockedTelephonyManager = mock(TelephonyManager.class, RETURNS_DEEP_STUBS);
+    when(mockedContext.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(mockedTelephonyManager);
+    ActivityManager mockedActivityManager = mock(ActivityManager.class, RETURNS_DEEP_STUBS);
+    when(mockedContext.getSystemService(Context.ACTIVITY_SERVICE)).thenReturn(mockedActivityManager);
   }
 }

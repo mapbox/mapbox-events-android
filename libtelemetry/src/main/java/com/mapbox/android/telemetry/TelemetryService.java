@@ -46,7 +46,7 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {
     enableTelemetryLocationState(intent);
-    return START_STICKY;
+    return START_NOT_STICKY;
   }
 
   @Nullable

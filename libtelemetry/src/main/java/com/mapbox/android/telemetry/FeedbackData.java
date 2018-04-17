@@ -8,8 +8,8 @@ public class FeedbackData implements Parcelable {
   private String feedbackId;
   private String screenshot = null;
 
-  public FeedbackData(String feedbackId) {
-    this.feedbackId = feedbackId;
+  public FeedbackData() {
+    this.feedbackId = TelemetryUtils.obtainUniversalUniqueIdentifier();
   }
 
   String getFeedbackId() {

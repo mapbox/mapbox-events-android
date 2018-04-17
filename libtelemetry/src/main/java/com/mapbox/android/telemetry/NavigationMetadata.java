@@ -34,22 +34,22 @@ public class NavigationMetadata implements Parcelable {
   private String originalGeometry = null;
   private Integer originalEstimatedDistance = null;
   private Integer originalEstimatedDuration = null;
-  private String audioType = null;
+  private String audioType;
   private Integer stepCount = null;
   private Integer originalStepCount = null;
   private String device;
   private String locationEngine;
-  private Integer volumeLevel = null;
-  private Integer screenBrightness = null;
-  private String applicationState = null;
-  private Boolean batteryPluggedIn = null;
-  private Integer batteryLevel = null;
-  private String connectivity = null;
+  private Integer volumeLevel;
+  private Integer screenBrightness;
+  private String applicationState;
+  private Boolean batteryPluggedIn;
+  private Integer batteryLevel;
+  private String connectivity;
 
   public NavigationMetadata(Date startTimestamp, int distanceCompleted, int distanceRemaining, int durationRemaining,
                             String sdKIdentifier, String sdkVersion, int eventVersion, String sessionIdentifier,
                             double lat, double lng, String geometry, String profile, boolean isSimulation,
-                            String device, String locationEngine, int absoluteDistanceToDestination) {
+                            String locationEngine, int absoluteDistanceToDestination) {
     this.startTimestamp = TelemetryUtils.generateCreateDateFormatted(startTimestamp);
     this.distanceCompleted = distanceCompleted;
     this.distanceRemaining = distanceRemaining;
@@ -65,9 +65,24 @@ public class NavigationMetadata implements Parcelable {
     this.created = TelemetryUtils.obtainCurrentDate();
     this.profile = profile;
     this.simulation = isSimulation;
-    this.device = device;
+    this.device = Build.MODEL;
     this.locationEngine = locationEngine;
     this.absoluteDistanceToDestination = absoluteDistanceToDestination;
+    this.volumeLevel = NavigationUtils.obtainVolumeLevel();
+    this.batteryLevel = TelemetryUtils.obtainBatteryLevel();
+    this.screenBrightness = NavigationUtils.obtainScreenBrightness();
+    this.batteryPluggedIn = TelemetryUtils.isPluggedIn();
+    this.connectivity = TelemetryUtils.obtainCellularNetworkType();
+    this.audioType = NavigationUtils.obtainAudioType();
+    this.applicationState = TelemetryUtils.obtainApplicationState();
+  }
+
+  public void setCreated(Date created) {
+    this.created = TelemetryUtils.generateCreateDateFormatted(created);
+  }
+
+  String getCreated() {
+    return created;
   }
 
   String getStartTimestamp() {
@@ -116,15 +131,6 @@ public class NavigationMetadata implements Parcelable {
 
   String getGeometry() {
     return geometry;
-  }
-
-  String getCreated() {
-    return created;
-  }
-
-  // For testing only
-  void setCreated(String created) {
-    this.created = created;
   }
 
   String getProfile() {
@@ -203,10 +209,6 @@ public class NavigationMetadata implements Parcelable {
     return audioType;
   }
 
-  public void setAudioType(String audioType) {
-    this.audioType = audioType;
-  }
-
   Integer getStepCount() {
     return stepCount;
   }
@@ -235,48 +237,29 @@ public class NavigationMetadata implements Parcelable {
     return volumeLevel;
   }
 
-  public void setVolumeLevel(Integer volumeLevel) {
-    this.volumeLevel = volumeLevel;
-  }
-
   Integer getScreenBrightness() {
     return screenBrightness;
-  }
-
-  public void setScreenBrightness(Integer screenBrightness) {
-    this.screenBrightness = screenBrightness;
   }
 
   String getApplicationState() {
     return applicationState;
   }
 
-  public void setApplicationState(String applicationState) {
-    this.applicationState = applicationState;
-  }
-
   Boolean isBatteryPluggedIn() {
     return batteryPluggedIn;
   }
 
-  public void setBatteryPluggedIn(Boolean batteryPluggedIn) {
-    this.batteryPluggedIn = batteryPluggedIn;
+  //for testing
+  void setBatteryLevel(Integer batteryLevel) {
+    this.batteryLevel = batteryLevel;
   }
 
   Integer getBatteryLevel() {
     return batteryLevel;
   }
 
-  public void setBatteryLevel(Integer batteryLevel) {
-    this.batteryLevel = batteryLevel;
-  }
-
   String getConnectivity() {
     return connectivity;
-  }
-
-  public void setConnectivity(String connectivity) {
-    this.connectivity = connectivity;
   }
 
   int getAbsoluteDistanceToDestination() {
@@ -331,12 +314,11 @@ public class NavigationMetadata implements Parcelable {
     originalStepCount = in.readByte() == 0x00 ? null : in.readInt();
     device = in.readString();
     locationEngine = in.readString();
-    volumeLevel = in.readByte() == 0x00 ? null : in.readInt();
-    screenBrightness = in.readByte() == 0x00 ? null : in.readInt();
+    volumeLevel = in.readInt();
+    screenBrightness = in.readInt();
     applicationState = in.readString();
-    byte batteryPluggedInVal = in.readByte();
-    batteryPluggedIn = batteryPluggedInVal == 0x02 ? null : batteryPluggedInVal != 0x00;
-    batteryLevel = in.readByte() == 0x00 ? null : in.readInt();
+    batteryPluggedIn = in.readByte() != 0x00;
+    batteryLevel = in.readInt();
     connectivity = in.readString();
   }
 
@@ -423,30 +405,11 @@ public class NavigationMetadata implements Parcelable {
     }
     dest.writeString(device);
     dest.writeString(locationEngine);
-    if (volumeLevel == null) {
-      dest.writeByte((byte) (0x00));
-    } else {
-      dest.writeByte((byte) (0x01));
-      dest.writeInt(volumeLevel);
-    }
-    if (screenBrightness == null) {
-      dest.writeByte((byte) (0x00));
-    } else {
-      dest.writeByte((byte) (0x01));
-      dest.writeInt(screenBrightness);
-    }
+    dest.writeInt(volumeLevel);
+    dest.writeInt(screenBrightness);
     dest.writeString(applicationState);
-    if (batteryPluggedIn == null) {
-      dest.writeByte((byte) (0x02));
-    } else {
-      dest.writeByte((byte) (batteryPluggedIn ? 0x01 : 0x00));
-    }
-    if (batteryLevel == null) {
-      dest.writeByte((byte) (0x00));
-    } else {
-      dest.writeByte((byte) (0x01));
-      dest.writeInt(batteryLevel);
-    }
+    dest.writeByte((byte) (batteryPluggedIn ? 0x01 : 0x00));
+    dest.writeInt(batteryLevel);
     dest.writeString(connectivity);
   }
 
