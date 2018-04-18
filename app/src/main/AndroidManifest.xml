@@ -21,14 +21,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
-
-        <meta-data
-            android:name="com.mapbox.TestEventsServer"
-            android:value="api-events-staging.tilestream.net"/>
-        <meta-data
-            android:name="com.mapbox.TestEventsAccessToken"
-            android:value="@string/test_events_access_token"/>
     </application>
 
 </manifest>
