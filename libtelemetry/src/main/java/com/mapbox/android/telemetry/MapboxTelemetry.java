@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.IBinder;
 
 import com.mapbox.android.core.location.LocationEnginePriority;
@@ -135,6 +136,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     if (TelemetryEnabler.isEventsEnabled(applicationContext)) {
       telemetryEnabler.updateTelemetryState(TelemetryEnabler.State.ENABLED);
       startTelemetry();
+      startBackgroundLocation();
       return true;
     }
 
@@ -464,6 +466,12 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
       return true;
     }
     return false;
+  }
+
+  private void startBackgroundLocation() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+      LocationJobService.schedule(applicationContext, userAgent, accessToken);
+    }
   }
 
   private boolean checkLocationPermission() {
