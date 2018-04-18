@@ -28,7 +28,7 @@
             android:value="api-events-staging.tilestream.net"/>
         <meta-data
             android:name="com.mapbox.TestEventsAccessToken"
-            android:value="pk.eyJ1IjoiZWxlY3Ryb3N0YXQtdGVzdCIsImEiOiJjamRhaHBhejkydXhlMnhvNmZhZTk3cjI1In0.9I3NYZF29F-XQHW1JIzIPg"/>
+            android:value="@string/test_events_access_token"/>
     </application>
 
 </manifest>
