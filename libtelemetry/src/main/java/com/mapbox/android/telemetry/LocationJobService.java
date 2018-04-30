@@ -169,6 +169,8 @@ public class LocationJobService extends JobService implements LocationListener, 
   }
 
   private LocationEvent createLocationEvent(Location location) {
+    MapboxTelemetry.applicationContext = getApplicationContext();
+
     double latitudeScaled = round(location.getLatitude());
     double longitudeScaled = round(location.getLongitude());
     double longitudeWrapped = wrapLongitude(longitudeScaled);
