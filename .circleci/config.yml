@@ -15,7 +15,7 @@ jobs:
       JVM_OPTS: -Xmx3200m
       BUILDTYPE: Debug
       IS_LOCAL_DEVELOPMENT: false
-      OK_TO_RELEASE_CORE: true
+      OK_TO_RELEASE_CORE: false
       OK_TO_RELEASE_TELEM: true
     steps:
       - checkout
@@ -78,7 +78,7 @@ jobs:
     environment:
       BUILDTYPE: Release
       IS_LOCAL_DEVELOPMENT: false
-      OK_TO_RELEASE_CORE: true
+      OK_TO_RELEASE_CORE: false
       OK_TO_RELEASE_TELEM: true
     steps:
       - checkout

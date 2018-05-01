@@ -51,19 +51,19 @@ def getRepositoryPassword() {
 }
 
 def okToReleaseTelemetry() {
+    println "OK_TO_RELEASE_TELEM: " + System.getenv('OK_TO_RELEASE_TELEM')
     if (System.getenv('OK_TO_RELEASE_TELEM') != null) {
         return System.getenv('OK_TO_RELEASE_TELEM').toBoolean()
     }
     return true
-    println "OK_TO_RELEASE_TELEM: " + System.getenv('OK_TO_RELEASE_TELEM')
 }
 
 def okToReleaseCore() {
+    println "OK_TO_RELEASE_CORE: " + System.getenv('OK_TO_RELEASE_CORE')
     if (System.getenv('OK_TO_RELEASE_CORE') != null) {
         return System.getenv('OK_TO_RELEASE_CORE').toBoolean()
     }
     return true
-    println "OK_TO_RELEASE_CORE: " + System.getenv('OK_TO_RELEASE_CORE')
 }
 
 
