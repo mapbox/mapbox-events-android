@@ -97,10 +97,10 @@ jobs:
           name: Publish to Maven Central
           command: |
             if [ "${CIRCLE_BRANCH}" == "aa-decouple-releases" ]; then
-              if [ OK_TO_RELEASE_CORE ]; then
+              if [ echo $OK_TO_RELEASE_CORE ]; then
                 make publish-core ;
               fi
-              if [ OK_TO_RELEASE_TELEM ]; then
+              if [ echo $OK_TO_RELEASE_TELEM ]; then
                 make publish-telem ;
               fi
             fi
