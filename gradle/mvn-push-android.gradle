@@ -83,7 +83,7 @@ afterEvaluate { project ->
             mavenDeployer {
 
                 if (abortRelease()) {
-                    return
+                    throw new GradleException('Do Not release artifact')
                 }
 
                 beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
@@ -135,6 +135,9 @@ afterEvaluate { project ->
     }
 
     signing {
+        if (abortRelease()) {
+            throw new GradleException('Do Not release artifact')
+        }
         required { isReleaseBuild() && gradle.taskGraph.hasTask("uploadArchives") }
         sign configurations.archives
     }
