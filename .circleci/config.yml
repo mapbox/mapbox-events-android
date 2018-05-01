@@ -15,8 +15,6 @@ jobs:
       JVM_OPTS: -Xmx3200m
       BUILDTYPE: Debug
       IS_LOCAL_DEVELOPMENT: false
-      OK_TO_RELEASE_CORE: false
-      OK_TO_RELEASE_TELEM: true
     steps:
       - checkout
       - restore_cache:
@@ -99,7 +97,13 @@ jobs:
           name: Publish to Maven Central
           command: |
             if [ "${CIRCLE_BRANCH}" == "aa-decouple-releases" ]; then
-            make publish ;
+              if [ OK_TO_RELEASE_CORE ]; then
+                make publish-core ;
+              fi
+              if [ OK_TO_RELEASE_TELEM ]; then
+                make publish-telem ;
+              fi
+#            make publish ;
             fi
       - store_artifacts:
           path: app/build/reports

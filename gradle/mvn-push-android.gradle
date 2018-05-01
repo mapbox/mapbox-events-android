@@ -131,9 +131,9 @@ afterEvaluate { project ->
     }
 
     signing {
-        if (abortRelease()) {
-            throw new StopActionException('Do Not release artifact - signing')
-        }
+//        if (abortRelease()) {
+//            throw new StopActionException('Do Not release artifact - signing')
+//        }
         required { isReleaseBuild() && gradle.taskGraph.hasTask("uploadArchives") }
         sign configurations.archives
     }
