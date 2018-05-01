@@ -82,10 +82,6 @@ afterEvaluate { project ->
         repositories {
             mavenDeployer {
 
-                if (abortRelease()) {
-                    throw new StopActionException('Do Not release artifact - upload')
-                }
-
                 beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
                 pom.groupId = GROUP
