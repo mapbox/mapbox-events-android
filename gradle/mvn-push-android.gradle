@@ -50,33 +50,6 @@ def getRepositoryPassword() {
     return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
 }
 
-def okToReleaseTelemetry() {
-    println "OK_TO_RELEASE_TELEM: " + System.getenv('OK_TO_RELEASE_TELEM')
-    if (System.getenv('OK_TO_RELEASE_TELEM') != null) {
-        return System.getenv('OK_TO_RELEASE_TELEM').toBoolean()
-    }
-    return true
-}
-
-def okToReleaseCore() {
-    println "OK_TO_RELEASE_CORE: " + System.getenv('OK_TO_RELEASE_CORE')
-    if (System.getenv('OK_TO_RELEASE_CORE') != null) {
-        return System.getenv('OK_TO_RELEASE_CORE').toBoolean()
-    }
-    return true
-}
-
-def abortRelease() {
-    if (POM_ARTIFACT_ID == "mapbox-android-core"  && !okToReleaseCore()) {
-        return true
-    } else if (POM_ARTIFACT_ID== "mapbox-android-telemetry" && !okToReleaseTelemetry()) {
-        return true
-    } else {
-        return false
-    }
-}
-
-
 afterEvaluate { project ->
     uploadArchives {
         repositories {
@@ -131,9 +104,6 @@ afterEvaluate { project ->
     }
 
     signing {
-//        if (abortRelease()) {
-//            throw new StopActionException('Do Not release artifact - signing')
-//        }
         required { isReleaseBuild() && gradle.taskGraph.hasTask("uploadArchives") }
         sign configurations.archives
     }
