@@ -50,10 +50,23 @@ def getRepositoryPassword() {
     return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
 }
 
+def okToReleaseTelemetry() {
+    println "OK_TO_RELEASE_TELEM: " + System.getenv('OK_TO_RELEASE_TELEM')
+}
+
+def okToReleaseCore() {
+    println "OK_TO_RELEASE_CORE: " + System.getenv('OK_TO_RELEASE_CORE')
+}
+
+
 afterEvaluate { project ->
     uploadArchives {
         repositories {
             mavenDeployer {
+
+                okToReleaseTelemetry()
+                okToReleaseCore()
+
                 beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
                 pom.groupId = GROUP
