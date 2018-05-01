@@ -66,11 +66,25 @@ def okToReleaseCore() {
     return true
 }
 
+def abortRelease() {
+    if (POM_ARTIFACT_ID == "mapbox-android-core"  && !okToReleaseCore()) {
+        return true
+    } else if (POM_ARTIFACT_ID== "mapbox-android-telemetry" && !okToReleaseTelemetry()) {
+        return true
+    } else {
+        return false
+    }
+}
+
 
 afterEvaluate { project ->
     uploadArchives {
         repositories {
             mavenDeployer {
+
+                if (abortRelease()) {
+                    return
+                }
 
                 beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
@@ -81,23 +95,11 @@ afterEvaluate { project ->
                 if (isLocalBuild()) {
                     repository(url: obtainMavenLocalUrl())
                 } else {
-
-                    if (pom.artifactId == "mapbox-android-core" && okToReleaseCore()) {
-                        repository(url: getReleaseRepositoryUrl()) {
-                            authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
-                        }
-                        snapshotRepository(url: getSnapshotRepositoryUrl()) {
-                            authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
-                        }
+                    repository(url: getReleaseRepositoryUrl()) {
+                        authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
                     }
-
-                    if (pom.artifactId == "mapbox-android-telemetry" && okToReleaseTelemetry()) {
-                        repository(url: getReleaseRepositoryUrl()) {
-                            authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
-                        }
-                        snapshotRepository(url: getSnapshotRepositoryUrl()) {
-                            authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
-                        }
+                    snapshotRepository(url: getSnapshotRepositoryUrl()) {
+                        authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
                     }
                 }
 
