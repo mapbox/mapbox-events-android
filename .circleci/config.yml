@@ -98,7 +98,7 @@ jobs:
       - deploy:
           name: Publish to Maven Central
           command: |
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+            if [ "${CIRCLE_BRANCH}" == "aa-decouple-releases" ]; then
             make publish ;
             fi
       - store_artifacts:
