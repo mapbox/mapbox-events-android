@@ -103,7 +103,6 @@ jobs:
               if [ OK_TO_RELEASE_TELEM ]; then
                 make publish-telem ;
               fi
-#            make publish ;
             fi
       - store_artifacts:
           path: app/build/reports
