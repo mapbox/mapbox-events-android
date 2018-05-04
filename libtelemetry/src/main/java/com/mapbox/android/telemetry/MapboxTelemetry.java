@@ -134,7 +134,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   public boolean enable() {
     if (TelemetryEnabler.isEventsEnabled(applicationContext)) {
-      telemetryEnabler.updateTelemetryState(TelemetryEnabler.State.ENABLED);
       startTelemetry();
       startBackgroundLocation();
       return true;
@@ -146,7 +145,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   public boolean disable() {
     if (TelemetryEnabler.isEventsEnabled(applicationContext)) {
       stopTelemetry();
-      telemetryEnabler.updateTelemetryState(TelemetryEnabler.State.DISABLED);
       return true;
     }
 

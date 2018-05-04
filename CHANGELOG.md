@@ -4,6 +4,9 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v3.0.3
+- Remove unnecessary update telemetry state from enable and disable methods - [#126](https://github.com/mapbox/mapbox-events-android/pull/126)
+
 ### v3.0.2
 - Make `Mapbox-Android-Core` dependency `0.2.0` instead of the current snapshot
 
