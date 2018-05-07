@@ -8,7 +8,9 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.IBinder;
+import android.support.v4.content.ContextCompat;
 
 import com.mapbox.android.core.location.LocationEnginePriority;
 import com.mapbox.android.core.permissions.PermissionsManager;
@@ -487,7 +489,11 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   private void startLocation() {
-    applicationContext.startService(obtainLocationServiceIntent());
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      applicationContext.startForegroundService(obtainLocationServiceIntent());
+    } else {
+      applicationContext.startService(obtainLocationServiceIntent());
+    }
   }
 
   private void startAlarm() {
