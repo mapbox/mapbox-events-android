@@ -257,4 +257,9 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
     Notification notification = new Notification();
     startForeground(1375, notification);
   }
+
+  private void stopForegroundService() {
+    stopForeground(true);
+    stopSelf();
+  }
 }
