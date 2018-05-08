@@ -495,7 +495,11 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   private void startLocation() {
-    applicationContext.startService(obtainLocationServiceIntent());
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      applicationContext.startForegroundService(obtainLocationServiceIntent());
+    } else {
+      applicationContext.startService(obtainLocationServiceIntent());
+    }
   }
 
   private void startAlarm() {
