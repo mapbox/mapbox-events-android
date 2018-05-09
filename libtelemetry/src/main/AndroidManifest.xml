@@ -5,6 +5,7 @@
 
     <application>
         <service android:name="com.mapbox.android.telemetry.TelemetryService"/>
+        <service android:name=".GeofenceIntentService"/>
     </application>
     <!--TODO Remove comment after analyzing the impact on the performance when adding SchedulerFlusherJobService-->
     <!--<application>-->
