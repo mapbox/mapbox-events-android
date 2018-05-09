@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineListener;
@@ -256,9 +257,11 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   private void initiateForegroundService() {
     Notification notification = new Notification();
     startForeground(1375, notification);
+
+    ApplicationLifecycleObserver.setTelemetryService(this);
   }
 
-  private void stopForegroundService() {
+  void stopForegroundService() {
     stopForeground(true);
     stopSelf();
   }
