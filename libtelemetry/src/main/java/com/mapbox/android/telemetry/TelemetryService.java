@@ -1,11 +1,13 @@
 package com.mapbox.android.telemetry;
 
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Location;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
@@ -41,6 +43,10 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
     createLocationReceiver();
     createTelemetryReceiver();
     createServiceTaskCallbacks();
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      initiateForegroundService();
+    }
   }
 
   @Override
@@ -245,5 +251,17 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
     TelemetryService obtainService() {
       return TelemetryService.this;
     }
+  }
+
+  private void initiateForegroundService() {
+    Notification notification = new Notification();
+    startForeground(1375, notification);
+
+    ApplicationLifecycleObserver.setTelemetryService(this);
+  }
+
+  void stopForegroundService() {
+    stopForeground(true);
+    stopSelf();
   }
 }
