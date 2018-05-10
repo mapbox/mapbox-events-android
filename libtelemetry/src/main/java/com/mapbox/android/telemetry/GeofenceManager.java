@@ -43,6 +43,7 @@ public class GeofenceManager {
       )
       .setExpirationDuration(3600000)
       .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL | Geofence.GEOFENCE_TRANSITION_EXIT)
+      .setLoiteringDelay(15000)
       .build()
     );
 

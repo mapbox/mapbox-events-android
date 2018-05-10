@@ -1,6 +1,7 @@
 package com.mapbox.android.telemetry;
 
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.arch.lifecycle.ProcessLifecycleOwner;
@@ -8,11 +9,16 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.mapbox.android.core.location.LocationEnginePriority;
 import com.mapbox.android.core.permissions.PermissionsManager;
 
@@ -20,6 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.Executor;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -60,6 +67,8 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private CopyOnWriteArraySet<TelemetryListener> telemetryListeners = null;
   static Context applicationContext = null;
   private Activity activity;
+  private GeofenceManager geofenceManager;
+  private FusedLocationProviderClient fusedLocationClient;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
@@ -388,7 +397,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
         telemetryService.bindInstance();
         isServiceBound = true;
 
-        telemetryService.startGeofenceTracking(activity);
+        startGeofenceTracking(activity);
       }
 
       @Override
@@ -544,5 +553,23 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private void initializeLifecycleMonitor() {
     ApplicationLifecycleObserver applicationLifecycleMonitor = new ApplicationLifecycleObserver(applicationContext);
     ProcessLifecycleOwner.get().getLifecycle().addObserver(applicationLifecycleMonitor);
+  }
+
+  @SuppressLint("MissingPermission")
+  void startGeofenceTracking(Activity activity) {
+    geofenceManager = new GeofenceManager(applicationContext, activity);
+
+    fusedLocationClient = LocationServices.getFusedLocationProviderClient(applicationContext);
+
+    fusedLocationClient.getLastLocation().addOnSuccessListener(activity, new OnSuccessListener<Location>() {
+      @Override
+      public void onSuccess(Location location) {
+        // Got last known location. In some rare situations this can be null.
+        if (location != null) {
+          Log.e("MapboxTelemetry", "start location: " + location);
+          geofenceManager.addGeofence(location);
+        }
+      }
+    });
   }
 }
