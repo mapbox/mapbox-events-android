@@ -207,12 +207,12 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
       telemetryService.removeServiceTask(this);
       if (telemetryService.obtainBoundInstances() == 0
         && TelemetryLocationEnabler.LocationState.ENABLED.equals(telemetryLocationState)) {
-        applicationContext.unbindService(serviceConnection);
+        unbindServiceConnection();
         isServiceBound = false;
         stopLocation();
         isLocationOpted = false;
       } else {
-        applicationContext.unbindService(serviceConnection);
+        unbindServiceConnection();
         isServiceBound = false;
       }
     }
@@ -431,7 +431,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private void unbindTelemetryService() {
     if (isServiceBound) {
       telemetryService.unbindInstance();
-      applicationContext.unbindService(serviceConnection);
+      unbindServiceConnection();
     }
   }
 
@@ -517,5 +517,14 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   private void stopLocation() {
     applicationContext.stopService(obtainLocationServiceIntent());
+  }
+
+  private boolean unbindServiceConnection() {
+    if (TelemetryUtils.isServiceRunning(TelemetryService.class)) {
+      applicationContext.unbindService(serviceConnection);
+      return true;
+    }
+
+    return false;
   }
 }

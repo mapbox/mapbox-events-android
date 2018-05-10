@@ -1,5 +1,6 @@
 package com.mapbox.android.telemetry;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -212,6 +213,9 @@ public class MapboxTelemetryTest {
     TelemetryService mockedTelemetryService = mock(TelemetryService.class);
     MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext, serviceBound, mockedTelemetryService,
       TelemetryLocationEnabler.LocationState.ENABLED);
+    ActivityManager mockedActivityManager = mock(ActivityManager.class);
+    when(mockedContext.getSystemService(Context.ACTIVITY_SERVICE))
+      .thenReturn(mockedActivityManager);
 
     theMapboxTelemetry.disable();
 
