@@ -44,6 +44,8 @@ public class GeofenceManager {
       .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL | Geofence.GEOFENCE_TRANSITION_EXIT)
       .build()
     );
+
+    trackGeofence();
   }
 
   private GeofencingRequest getGeofencingRequest() {

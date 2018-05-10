@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineListener;
@@ -32,6 +33,7 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   private LocationEnginePriority locationPriority = LocationEnginePriority.NO_POWER;
   private CopyOnWriteArraySet<ServiceTaskCallback> serviceTaskCallbacks = null;
   private TelemetryLocationEnabler telemetryLocationEnabler;
+  private GeofenceManager geofenceManager;
   // For testing only:
   private boolean isLocationEnablerFromPreferences = true;
   private boolean isLocationReceiverRegistered = false;
@@ -39,6 +41,7 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
 
   @Override
   public void onCreate() {
+    Log.e("TelemetryService", "TelemService Started");
     super.onCreate();
     createLocationReceiver();
     createTelemetryReceiver();
@@ -172,6 +175,7 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   }
 
   private void connectLocationEngine() {
+    Log.e("TelemetryService", "connectLocationEngine");
     obtainLocationEngine();
     setupLocationEngine();
     activateLocationEngine();
@@ -263,5 +267,9 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   void stopForegroundService() {
     stopForeground(true);
     stopSelf();
+  }
+
+  private void startGeofenceTracking() {
+
   }
 }
