@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
     String accessTokenTelemetry = obtainAccessToken();
     String userAgentTelemetry = "MapboxEventsAndroid/3.1.0/oreo";
     mapboxTelemetry = new MapboxTelemetry(this, accessTokenTelemetry, userAgentTelemetry);
+    mapboxTelemetry.setActivity(this);
 
     checkPermissions();
   }

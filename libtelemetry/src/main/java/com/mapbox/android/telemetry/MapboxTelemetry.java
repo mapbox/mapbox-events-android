@@ -1,6 +1,7 @@
 package com.mapbox.android.telemetry;
 
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.arch.lifecycle.ProcessLifecycleOwner;
 import android.content.ComponentName;
@@ -58,6 +59,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private PermissionCheckRunnable permissionCheckRunnable = null;
   private CopyOnWriteArraySet<TelemetryListener> telemetryListeners = null;
   static Context applicationContext = null;
+  private Activity activity;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
@@ -194,6 +196,10 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   public boolean removeTelemetryListener(TelemetryListener listener) {
     return telemetryListeners.remove(listener);
+  }
+
+  public void setActivity(Activity activity) {
+    this.activity = activity;
   }
 
   boolean optLocationIn() {
@@ -381,6 +387,8 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
         }
         telemetryService.bindInstance();
         isServiceBound = true;
+
+        telemetryService.startGeofenceTracking(activity);
       }
 
       @Override

@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
@@ -73,13 +74,13 @@ public class GeofenceManager {
       .addOnSuccessListener(activity, new OnSuccessListener<Void>() {
         @Override
         public void onSuccess(Void aVoid) {
-
+          Log.e("GeofenceManager", "trackGeofence Success: " + aVoid);
         }
       })
       .addOnFailureListener(activity, new OnFailureListener() {
         @Override
         public void onFailure(@NonNull Exception e) {
-
+          Log.e("GeofenceManager", "trackGeofence onFailure: " + e);
         }
       });
   }

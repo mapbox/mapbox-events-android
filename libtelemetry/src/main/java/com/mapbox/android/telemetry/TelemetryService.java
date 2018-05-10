@@ -1,6 +1,8 @@
 package com.mapbox.android.telemetry;
 
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
@@ -13,12 +15,16 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineListener;
 import com.mapbox.android.core.location.LocationEnginePriority;
 import com.mapbox.android.core.location.LocationEngineProvider;
 
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.Executor;
 
 import static com.mapbox.android.telemetry.LocationReceiver.LOCATION_RECEIVER_INTENT;
 import static com.mapbox.android.telemetry.TelemetryReceiver.TELEMETRY_RECEIVER_INTENT;
@@ -34,6 +40,8 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   private CopyOnWriteArraySet<ServiceTaskCallback> serviceTaskCallbacks = null;
   private TelemetryLocationEnabler telemetryLocationEnabler;
   private GeofenceManager geofenceManager;
+  private FusedLocationProviderClient fusedLocationClient;
+
   // For testing only:
   private boolean isLocationEnablerFromPreferences = true;
   private boolean isLocationReceiverRegistered = false;
@@ -162,6 +170,24 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
     return isTelemetryReceiverRegistered;
   }
 
+  @SuppressLint("MissingPermission")
+  void startGeofenceTracking(Activity activity) {
+    geofenceManager = new GeofenceManager(this, activity);
+
+    fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+    fusedLocationClient.getLastLocation()
+      .addOnSuccessListener((Executor) this, new OnSuccessListener<Location>() {
+        @Override
+        public void onSuccess(Location location) {
+          // Got last known location. In some rare situations this can be null.
+          if (location != null) {
+            geofenceManager.addGeofence(location);
+          }
+        }
+      });
+  }
+
   private void createLocationReceiver() {
     locationReceiver = new LocationReceiver(this);
     registerLocationReceiver();
@@ -267,9 +293,5 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   void stopForegroundService() {
     stopForeground(true);
     stopSelf();
-  }
-
-  private void startGeofenceTracking() {
-
   }
 }
