@@ -20,7 +20,6 @@ import java.util.Map;
 class AndroidLocationEngine extends LocationEngine implements LocationListener {
 
   private static final String DEFAULT_PROVIDER = LocationManager.PASSIVE_PROVIDER;
-
   private WeakReference<Context> context;
   private LocationManager locationManager;
   private String currentProvider = null;

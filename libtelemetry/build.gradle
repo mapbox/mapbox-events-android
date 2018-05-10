@@ -35,6 +35,8 @@ dependencies {
     compile dependenciesList.gson
     compile dependenciesList.supportAppcompatV7
     compile dependenciesList.gmsLocation
+    compile dependenciesList.archLifecycleExtensions
+    annotationProcessor dependenciesList.archLifecycleCompiler
 
     testCompile dependenciesList.junit
     testCompile dependenciesList.mockito

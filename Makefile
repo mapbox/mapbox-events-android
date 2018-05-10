@@ -13,8 +13,10 @@ javadoc:
 	./gradlew :libcore:javadocrelease
 	./gradlew :libtelemetry:javadocrelease
 
-publish:
+publish-core:
 	export IS_LOCAL_DEVELOPMENT=false; ./gradlew :libcore:uploadArchives
+
+publish-telem:
 	export IS_LOCAL_DEVELOPMENT=false; ./gradlew :libtelemetry:uploadArchives
 
 publish-local:

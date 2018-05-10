@@ -76,6 +76,8 @@ jobs:
     environment:
       BUILDTYPE: Release
       IS_LOCAL_DEVELOPMENT: false
+      OK_TO_RELEASE_CORE: true
+      OK_TO_RELEASE_TELEM: true
     steps:
       - checkout
       - run:
@@ -95,7 +97,12 @@ jobs:
           name: Publish to Maven Central
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
-            make publish ;
+              if [ "$OK_TO_RELEASE_CORE" == true ]; then
+                make publish-core ;
+              fi
+              if [ "$OK_TO_RELEASE_TELEM" == true ]; then
+                make publish-telem ;
+              fi
             fi
       - store_artifacts:
           path: app/build/reports

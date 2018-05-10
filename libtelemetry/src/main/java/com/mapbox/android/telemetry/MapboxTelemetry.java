@@ -2,12 +2,14 @@ package com.mapbox.android.telemetry;
 
 
 import android.app.ActivityManager;
+import android.arch.lifecycle.ProcessLifecycleOwner;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.IBinder;
 
 import com.mapbox.android.core.location.LocationEnginePriority;
@@ -133,8 +135,8 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   public boolean enable() {
     if (TelemetryEnabler.isEventsEnabled(applicationContext)) {
-      telemetryEnabler.updateTelemetryState(TelemetryEnabler.State.ENABLED);
       startTelemetry();
+      startBackgroundLocation();
       return true;
     }
 
@@ -144,7 +146,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   public boolean disable() {
     if (TelemetryEnabler.isEventsEnabled(applicationContext)) {
       stopTelemetry();
-      telemetryEnabler.updateTelemetryState(TelemetryEnabler.State.DISABLED);
       return true;
     }
 
@@ -466,6 +467,12 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     return false;
   }
 
+  private void startBackgroundLocation() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+      LocationJobService.schedule(applicationContext, userAgent, accessToken);
+    }
+  }
+
   private boolean checkLocationPermission() {
     if (PermissionsManager.areLocationPermissionsGranted(applicationContext)) {
       return true;
@@ -489,7 +496,12 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   private void startLocation() {
-    applicationContext.startService(obtainLocationServiceIntent());
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      applicationContext.startForegroundService(obtainLocationServiceIntent());
+      initializeLifecycleMonitor();
+    } else {
+      applicationContext.startService(obtainLocationServiceIntent());
+    }
   }
 
   private void startAlarm() {
@@ -519,5 +531,10 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   private void stopLocation() {
     applicationContext.stopService(obtainLocationServiceIntent());
+  }
+
+  private void initializeLifecycleMonitor() {
+    ApplicationLifecycleObserver applicationLifecycleMonitor = new ApplicationLifecycleObserver(applicationContext);
+    ProcessLifecycleOwner.get().getLifecycle().addObserver(applicationLifecycleMonitor);
   }
 }
