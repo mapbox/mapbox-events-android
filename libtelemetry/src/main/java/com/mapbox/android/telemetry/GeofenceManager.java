@@ -39,7 +39,7 @@ public class GeofenceManager {
       .setCircularRegion(
         location.getLatitude(),
         location.getLongitude(),
-        50
+        100
       )
       .setExpirationDuration(3600000)
       .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL | Geofence.GEOFENCE_TRANSITION_EXIT)

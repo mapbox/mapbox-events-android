@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
     setContentView(R.layout.activity_main);
 
     String accessTokenTelemetry = obtainAccessToken();
-    String userAgentTelemetry = "MapboxEventsAndroid/3.1.0/oreo";
+    String userAgentTelemetry = "MapboxEventsAndroid/3.1.0/geofence";
     mapboxTelemetry = new MapboxTelemetry(this, accessTokenTelemetry, userAgentTelemetry);
     mapboxTelemetry.setActivity(this);
 
