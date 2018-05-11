@@ -81,6 +81,8 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     this.telemetryLocationEnabler = new TelemetryLocationEnabler(true);
     initializeTelemetryListeners();
     initializeTelemetryLocationState();
+
+    activity = (Activity) context;
   }
 
   // For testing only
@@ -204,10 +206,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   public boolean removeTelemetryListener(TelemetryListener listener) {
     return telemetryListeners.remove(listener);
-  }
-
-  public void setActivity(Activity activity) {
-    this.activity = activity;
   }
 
   boolean optLocationIn() {
@@ -566,6 +564,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
         // Got last known location. In some rare situations this can be null.
         if (location != null) {
           Log.e("MapboxTelemetry", "start location: " + location);
+          geofenceManager.setTelemParameters(accessToken, userAgent);
           geofenceManager.addGeofence(location);
         }
       }

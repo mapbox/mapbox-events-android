@@ -19,11 +19,14 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.ArrayList;
 
 public class GeofenceManager {
+  private final int TWELVE_HOURS = 43200000;
   private GeofencingClient geofencingClient;
   private ArrayList<Geofence> geofenceList;
   private PendingIntent geofencePendingIntent;
   private Context context;
   private Activity activity;
+  private String userAgent;
+  private String accessToken;
 
   GeofenceManager(Context context, Activity activity) {
     this.context = context;
@@ -41,13 +44,18 @@ public class GeofenceManager {
         location.getLongitude(),
         100
       )
-      .setExpirationDuration(3600000)
+      .setExpirationDuration(TWELVE_HOURS)
       .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL | Geofence.GEOFENCE_TRANSITION_EXIT)
-      .setLoiteringDelay(15000)
+      .setLoiteringDelay(150000)
       .build()
     );
 
     trackGeofence();
+  }
+
+  void setTelemParameters(String accessToken, String userAgent) {
+    this.accessToken = accessToken;
+    this.userAgent = userAgent;
   }
 
   private GeofencingRequest getGeofencingRequest() {
@@ -63,6 +71,8 @@ public class GeofenceManager {
       return geofencePendingIntent;
     }
     Intent intent = new Intent(context, GeofenceIntentService.class);
+    intent.putExtra("userAgent", userAgent);
+    intent.putExtra("accessToken", accessToken);
     // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when
     // calling addGeofences() and removeGeofences().
     geofencePendingIntent = PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -75,13 +85,29 @@ public class GeofenceManager {
       .addOnSuccessListener(activity, new OnSuccessListener<Void>() {
         @Override
         public void onSuccess(Void aVoid) {
-          Log.e("GeofenceManager", "trackGeofence Success: " + aVoid);
+          Log.e("GeofenceManager", "trackGeofence Success");
         }
       })
       .addOnFailureListener(activity, new OnFailureListener() {
         @Override
         public void onFailure(@NonNull Exception e) {
           Log.e("GeofenceManager", "trackGeofence onFailure: " + e);
+        }
+      });
+  }
+
+  void stopGeofenceMonitoring() {
+    geofencingClient.removeGeofences(getGeofencePendingIntent())
+      .addOnSuccessListener(activity, new OnSuccessListener<Void>() {
+        @Override
+        public void onSuccess(Void aVoid) {
+          Log.e("GeofenceManager", "geofences removed");
+        }
+      })
+      .addOnFailureListener(activity, new OnFailureListener() {
+        @Override
+        public void onFailure(@NonNull Exception e) {
+          Log.e("GeofenceManager", "removeGeofences onFailure: " + e);
         }
       });
   }
