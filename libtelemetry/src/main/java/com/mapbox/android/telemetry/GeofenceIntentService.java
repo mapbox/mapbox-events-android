@@ -47,6 +47,7 @@ public class GeofenceIntentService extends IntentService implements Callback {
   @SuppressLint("MissingPermission")
   @Override
   protected void onHandleIntent(@Nullable Intent intent) {
+    Log.e("Geofence Intent", "Geofence triggered");
     GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
     accessToken = intent.getStringExtra("accessToken");
     userAgent = intent.getStringExtra("userAgent");
@@ -63,10 +64,10 @@ public class GeofenceIntentService extends IntentService implements Callback {
     List<Geofence> triggeredGeofences = geofencingEvent.getTriggeringGeofences();
 
     if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
+      Log.e("Geofence Intent", "Geofence exit transition");
       //kill old geofence
       Activity activity = new Activity();
       geofenceManager = new GeofenceManager(getApplicationContext(), activity);
-//      geofenceManager.stopGeofenceMonitoring();
 
       //start location collection
       locations = new ArrayList<Location>();
@@ -79,6 +80,7 @@ public class GeofenceIntentService extends IntentService implements Callback {
             return;
           }
           for (Location location : locationResult.getLocations()) {
+            Log.e("Geofence Intent", "Location received: " + location);
             locations.add(location);
 
             if (!locationOn) {
@@ -108,6 +110,7 @@ public class GeofenceIntentService extends IntentService implements Callback {
 
         @Override
         public void onFinish() {
+          Log.e("Geofence Intent", "timer finished");
           locationOn = false;
           fusedLocationClient.removeLocationUpdates(locationCallback);
         }
@@ -117,6 +120,7 @@ public class GeofenceIntentService extends IntentService implements Callback {
   }
 
   private void sendLocation(List<Location> locations) {
+    Log.e("Geofence Intent", "send location");
     final List<Event> events = new ArrayList<>(locations.size());
 
     for (Location location : locations) {
@@ -183,6 +187,6 @@ public class GeofenceIntentService extends IntentService implements Callback {
 
   @Override
   public void onResponse(Call call, Response response) throws IOException {
-
+    Log.e("Geofence Intent", "Response: " + response);
   }
 }
