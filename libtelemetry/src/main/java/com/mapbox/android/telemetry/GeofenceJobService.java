@@ -73,21 +73,22 @@ public class GeofenceJobService extends JobService implements Callback {
     final LocationCallback locationCallback = new LocationCallback() {
       @Override
       public void onLocationResult(LocationResult locationResult) {
-        Log.e("Geofence Intent", "onLocationResult");
+        Log.e(LOG_TAG, "onLocationResult");
         if (locationResult == null) {
           return;
         }
         for (Location location : locationResult.getLocations()) {
-          Log.e("Geofence Intent", "Location received: " + location);
+          Log.e(LOG_TAG, "Location received: " + location);
           locations.add(location);
 
           if (!locationOn) {
             fusedLocationClient.removeLocationUpdates(this);
-            sendLocation(locations);
 
             //generate new geofence
-            Log.e("Geofence Intent", "add geofence");
+            Log.e(LOG_TAG, "add geofence");
             geofenceManager.addGeofence(location);
+
+            sendLocation(locations);
           }
         }
       }
@@ -122,14 +123,14 @@ public class GeofenceJobService extends JobService implements Callback {
 
       @Override
       public void onFinish() {
-        Log.e("Geofence Intent", "timer finished");
+        Log.e(LOG_TAG, "timer finished");
         locationOn = false;
       }
-    };
+    }.start();
   }
 
   private void sendLocation(List<Location> locations) {
-    Log.e("Geofence Intent", "send location");
+    Log.e(LOG_TAG, "send location");
     final List<Event> events = new ArrayList<>(locations.size());
 
     for (Location location : locations) {
@@ -154,7 +155,7 @@ public class GeofenceJobService extends JobService implements Callback {
     double longitudeScaled = round(location.getLongitude());
     double longitudeWrapped = wrapLongitude(longitudeScaled);
 
-    LocationEvent locationEvent = new LocationEvent("Geofence", latitudeScaled, longitudeWrapped);
+    LocationEvent locationEvent = new LocationEvent("test-1-Geofence", latitudeScaled, longitudeWrapped);
     locationEvent.setAccuracy((float) Math.round(location.getAccuracy()));
     locationEvent.setAltitude((double) Math.round(location.getAltitude()));
 
@@ -183,7 +184,8 @@ public class GeofenceJobService extends JobService implements Callback {
   }
 
   private TelemetryClient createTelemetryClient() {
-    TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(accessToken, userAgent,
+    String userAgentTelemetry = "MapboxEventsAndroid/3.1.0/geofence";
+    TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(accessToken, userAgentTelemetry,
       new Logger());
     TelemetryClient telemetryClient = telemetryClientFactory.obtainTelemetryClient(getApplicationContext());
     return telemetryClient;
@@ -191,11 +193,13 @@ public class GeofenceJobService extends JobService implements Callback {
 
   @Override
   public void onFailure(Call call, IOException e) {
-
+    Log.d(LOG_TAG,"call failed: " + e);
+    jobFinished(currentParams, false);
   }
 
   @Override
   public void onResponse(Call call, Response response) throws IOException {
-
+    Log.d(LOG_TAG,"job finished: " + response);
+    jobFinished(currentParams, false);
   }
 }
