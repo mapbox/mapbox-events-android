@@ -31,7 +31,7 @@ import okhttp3.Response;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class GeofenceJobService extends JobService implements Callback {
-  private final String LOG_TAG = "GeofenceJob";
+  private static final String LOG_TAG = "GeofenceJob";
   private static final int JOB_ID = 2;
   private JobParameters currentParams;
   private ArrayList<Location> locations;
@@ -43,6 +43,7 @@ public class GeofenceJobService extends JobService implements Callback {
 
   @RequiresApi(api = Build.VERSION_CODES.N)
   public static void schedule(Context context, String userAgent, String accessToken) {
+    Log.e(LOG_TAG, "userAgent5: " + userAgent);
     PersistableBundle bundle = new PersistableBundle();
     bundle.putString("userAgent", userAgent);
     bundle.putString("accessToken", accessToken);
@@ -66,6 +67,8 @@ public class GeofenceJobService extends JobService implements Callback {
     locations = new ArrayList<Location>();
     userAgent = params.getExtras().getString("userAgent");
     accessToken = params.getExtras().getString("accessToken");
+
+    Log.e(LOG_TAG, "userAgent6: " + userAgent);
 
     locationOn = true;
     geofenceManager = new GeofenceManager(getApplicationContext());
@@ -184,6 +187,7 @@ public class GeofenceJobService extends JobService implements Callback {
   }
 
   private TelemetryClient createTelemetryClient() {
+    Log.e(LOG_TAG, "userAgent7: " + userAgent);
     String userAgentTelemetry = "MapboxEventsAndroid/3.1.0/geofence";
     TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(accessToken, userAgentTelemetry,
       new Logger());
@@ -193,13 +197,13 @@ public class GeofenceJobService extends JobService implements Callback {
 
   @Override
   public void onFailure(Call call, IOException e) {
-    Log.d(LOG_TAG,"call failed: " + e);
+    Log.e(LOG_TAG,"call failed: " + e);
     jobFinished(currentParams, false);
   }
 
   @Override
   public void onResponse(Call call, Response response) throws IOException {
-    Log.d(LOG_TAG,"job finished: " + response);
+    Log.e(LOG_TAG,"job finished: " + response);
     jobFinished(currentParams, false);
   }
 }

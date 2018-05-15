@@ -32,6 +32,7 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 public class MapboxTelemetry implements FullQueueCallback, EventCallback, ServiceTaskCallback, Callback {
+  private final String LOG_TAG = "MapboxTelemetry";
   private static final String EVENTS_USER_AGENT = "MapboxEventsAndroid/";
   private static final String TELEMETRY_USER_AGENT = "MapboxTelemetryAndroid/";
   private static final String UNITY_USER_AGENT = "MapboxEventsUnityAndroid/";
@@ -553,6 +554,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   @SuppressLint("MissingPermission")
   void startGeofenceTracking(Activity activity) {
+    Log.e(LOG_TAG, "userAgent0: " + userAgent);
     geofenceManager = new GeofenceManager(applicationContext);
 
     fusedLocationClient = LocationServices.getFusedLocationProviderClient(applicationContext);
@@ -562,7 +564,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
       public void onSuccess(Location location) {
         // Got last known location. In some rare situations this can be null.
         if (location != null) {
-          Log.e("MapboxTelemetry", "start location: " + location);
+          Log.e(LOG_TAG, "start location: " + location);
           geofenceManager.setTelemParameters(accessToken, userAgent);
           geofenceManager.addGeofence(location);
         }

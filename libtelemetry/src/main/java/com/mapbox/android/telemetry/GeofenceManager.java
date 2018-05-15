@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.util.Log;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GeofenceManager {
+  private final String LOG_TAG = "GeofenceManager";
   private final int TWELVE_HOURS = 43200000;
   private GeofencingClient geofencingClient;
   private ArrayList<Geofence> geofenceList;
@@ -30,13 +32,18 @@ public class GeofenceManager {
   }
 
   void addGeofence(Location location) {
+    //remove existing geofence
+    List<String> toRemove = new ArrayList<>();
+    toRemove.add("currentGeofence");
+    removeGeofence(toRemove);
+
     geofenceList.add(new Geofence.Builder()
       .setRequestId("currentGeofence")
 
       .setCircularRegion(
         location.getLatitude(),
         location.getLongitude(),
-        25
+        100
       )
       .setExpirationDuration(TWELVE_HOURS)
       .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL | Geofence.GEOFENCE_TRANSITION_EXIT)
@@ -48,6 +55,7 @@ public class GeofenceManager {
   }
 
   void setTelemParameters(String accessToken, String userAgent) {
+    Log.e(LOG_TAG, "userAgent1: " + userAgent);
     this.accessToken = accessToken;
     this.userAgent = userAgent;
   }
@@ -63,6 +71,8 @@ public class GeofenceManager {
     if (geofencePendingIntent != null) {
       return geofencePendingIntent;
     }
+
+    Log.e(LOG_TAG, "userAgent2: " + userAgent);
     Intent intent = new Intent(context, GeofenceIntentService.class);
     intent.putExtra("userAgent", userAgent);
     intent.putExtra("accessToken", accessToken);
