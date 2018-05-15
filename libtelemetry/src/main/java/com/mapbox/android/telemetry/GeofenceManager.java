@@ -17,6 +17,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class GeofenceManager {
   private final int TWELVE_HOURS = 43200000;
@@ -42,7 +43,7 @@ public class GeofenceManager {
       .setCircularRegion(
         location.getLatitude(),
         location.getLongitude(),
-        100
+        25
       )
       .setExpirationDuration(TWELVE_HOURS)
       .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL | Geofence.GEOFENCE_TRANSITION_EXIT)
@@ -60,7 +61,7 @@ public class GeofenceManager {
 
   private GeofencingRequest getGeofencingRequest() {
     GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
-    builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
+    builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_EXIT);
     builder.addGeofences(geofenceList);
     return builder.build();
   }
@@ -94,6 +95,10 @@ public class GeofenceManager {
           Log.e("GeofenceManager", "trackGeofence onFailure: " + e);
         }
       });
+  }
+
+  void removeGeofence(List<String> geofenceList) {
+    geofencingClient.removeGeofences(geofenceList);
   }
 
   void stopGeofenceMonitoring() {

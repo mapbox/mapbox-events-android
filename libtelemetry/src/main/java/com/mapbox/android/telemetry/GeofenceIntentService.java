@@ -34,9 +34,6 @@ public class GeofenceIntentService extends IntentService implements Callback {
   private GeofenceManager geofenceManager;
   private FusedLocationProviderClient fusedLocationClient;
 
-  /**
-   * Creates an IntentService.  Invoked by your subclass's constructor.
-   */
   public GeofenceIntentService() {
     super("GeofenceService");
   }
@@ -61,13 +58,19 @@ public class GeofenceIntentService extends IntentService implements Callback {
     // Get the transition type.
     int geofenceTransition = geofencingEvent.getGeofenceTransition();
     Location geofenceLocation = geofencingEvent.getTriggeringLocation();
-    List<Geofence> triggeredGeofences = geofencingEvent.getTriggeringGeofences();
 
     if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
       Log.e("Geofence Intent", "Geofence exit transition");
-      //kill old geofence
-      Activity activity = new Activity();
+      Activity activity = (Activity) getBaseContext();
       geofenceManager = new GeofenceManager(getApplicationContext(), activity);
+
+      //kill old geofence
+      List<Geofence> triggeredGeofences = geofencingEvent.getTriggeringGeofences();
+      List<String> toRemove = new ArrayList<>();
+      for (Geofence geofence : triggeredGeofences) {
+        toRemove.add(geofence.getRequestId());
+      }
+      geofenceManager.removeGeofence(toRemove);
 
       //start location collection
       locations = new ArrayList<Location>();
@@ -145,7 +148,7 @@ public class GeofenceIntentService extends IntentService implements Callback {
     double longitudeScaled = round(location.getLongitude());
     double longitudeWrapped = wrapLongitude(longitudeScaled);
 
-    LocationEvent locationEvent = new LocationEvent("JobScheduler", latitudeScaled, longitudeWrapped);
+    LocationEvent locationEvent = new LocationEvent("Geofence", latitudeScaled, longitudeWrapped);
     locationEvent.setAccuracy((float) Math.round(location.getAccuracy()));
     locationEvent.setAltitude((double) Math.round(location.getAltitude()));
 
