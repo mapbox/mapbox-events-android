@@ -554,7 +554,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   @SuppressLint("MissingPermission")
   void startGeofenceTracking(Activity activity) {
-    geofenceManager = new GeofenceManager(applicationContext, activity);
+    geofenceManager = new GeofenceManager(applicationContext);
 
     fusedLocationClient = LocationServices.getFusedLocationProviderClient(applicationContext);
 

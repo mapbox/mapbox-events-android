@@ -1,20 +1,15 @@
 package com.mapbox.android.telemetry;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
-import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,13 +20,11 @@ public class GeofenceManager {
   private ArrayList<Geofence> geofenceList;
   private PendingIntent geofencePendingIntent;
   private Context context;
-  private Activity activity;
   private String userAgent;
   private String accessToken;
 
-  GeofenceManager(Context context, Activity activity) {
+  GeofenceManager(Context context) {
     this.context = context;
-    this.activity = activity;
     geofencingClient = LocationServices.getGeofencingClient(context);
     geofenceList = new ArrayList<>();
   }
@@ -67,34 +60,20 @@ public class GeofenceManager {
   }
 
   private PendingIntent getGeofencePendingIntent() {
-    // Reuse the PendingIntent if we already have it.
     if (geofencePendingIntent != null) {
       return geofencePendingIntent;
     }
     Intent intent = new Intent(context, GeofenceIntentService.class);
     intent.putExtra("userAgent", userAgent);
     intent.putExtra("accessToken", accessToken);
-    // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when
-    // calling addGeofences() and removeGeofences().
+
     geofencePendingIntent = PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     return geofencePendingIntent;
   }
 
   @SuppressLint("MissingPermission")
   private void trackGeofence() {
-    geofencingClient.addGeofences(getGeofencingRequest(), getGeofencePendingIntent())
-      .addOnSuccessListener(activity, new OnSuccessListener<Void>() {
-        @Override
-        public void onSuccess(Void aVoid) {
-          Log.e("GeofenceManager", "trackGeofence Success");
-        }
-      })
-      .addOnFailureListener(activity, new OnFailureListener() {
-        @Override
-        public void onFailure(@NonNull Exception e) {
-          Log.e("GeofenceManager", "trackGeofence onFailure: " + e);
-        }
-      });
+    geofencingClient.addGeofences(getGeofencingRequest(), getGeofencePendingIntent());
   }
 
   void removeGeofence(List<String> geofenceList) {
@@ -102,18 +81,6 @@ public class GeofenceManager {
   }
 
   void stopGeofenceMonitoring() {
-    geofencingClient.removeGeofences(getGeofencePendingIntent())
-      .addOnSuccessListener(activity, new OnSuccessListener<Void>() {
-        @Override
-        public void onSuccess(Void aVoid) {
-          Log.e("GeofenceManager", "geofences removed");
-        }
-      })
-      .addOnFailureListener(activity, new OnFailureListener() {
-        @Override
-        public void onFailure(@NonNull Exception e) {
-          Log.e("GeofenceManager", "removeGeofences onFailure: " + e);
-        }
-      });
+    geofencingClient.removeGeofences(getGeofencePendingIntent());
   }
 }
