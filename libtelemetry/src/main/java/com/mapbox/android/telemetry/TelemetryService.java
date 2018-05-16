@@ -95,6 +95,7 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
 
   @Override
   public void onLocationChanged(Location location) {
+    checkApplicationContext();
     LocalBroadcastManager.getInstance(this).sendBroadcast(LocationReceiver.supplyIntent(location));
   }
 
@@ -238,6 +239,12 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   private void disableTelemetryLocationState() {
     if (isLocationEnablerFromPreferences) {
       telemetryLocationEnabler.updateTelemetryLocationState(TelemetryLocationEnabler.LocationState.DISABLED);
+    }
+  }
+
+  private void checkApplicationContext() {
+    if (MapboxTelemetry.applicationContext == null) {
+      MapboxTelemetry.applicationContext = getApplicationContext();
     }
   }
 
