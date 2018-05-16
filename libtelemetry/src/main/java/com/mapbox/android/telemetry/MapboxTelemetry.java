@@ -566,7 +566,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
         if (location != null) {
           Log.e(LOG_TAG, "start location: " + location);
           geofenceManager.setTelemParameters(accessToken, userAgent);
-          geofenceManager.addGeofence(location);
+          geofenceManager.addGeofence(location, 25);
         }
       }
     });

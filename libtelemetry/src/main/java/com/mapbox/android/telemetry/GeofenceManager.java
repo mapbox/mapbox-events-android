@@ -31,7 +31,8 @@ public class GeofenceManager {
     geofenceList = new ArrayList<>();
   }
 
-  void addGeofence(Location location) {
+  void addGeofence(Location location, int radius) {
+    Log.e(LOG_TAG, "addGeofence - location: " + location + ", radius " + radius);
     //remove existing geofence
     List<String> toRemove = new ArrayList<>();
     toRemove.add("currentGeofence");
@@ -43,7 +44,7 @@ public class GeofenceManager {
       .setCircularRegion(
         location.getLatitude(),
         location.getLongitude(),
-        100
+        radius
       )
       .setExpirationDuration(TWELVE_HOURS)
       .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL | Geofence.GEOFENCE_TRANSITION_EXIT)
@@ -62,7 +63,7 @@ public class GeofenceManager {
 
   private GeofencingRequest getGeofencingRequest() {
     GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
-    builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_EXIT);
+    builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
     builder.addGeofences(geofenceList);
     return builder.build();
   }

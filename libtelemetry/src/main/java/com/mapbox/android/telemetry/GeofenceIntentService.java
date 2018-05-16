@@ -52,16 +52,6 @@ public class GeofenceIntentService extends IntentService {
       Log.e(LOG_TAG, "Geofence exit transition");
       geofenceManager = new GeofenceManager(getApplicationContext());
 
-//      //kill old geofence
-//      Log.e("Geofence Intent", "Kill Old Geofence");
-//      List<Geofence> triggeredGeofences = geofencingEvent.getTriggeringGeofences();
-//      List<String> toRemove = new ArrayList<>();
-//      for (Geofence geofence : triggeredGeofences) {
-//        toRemove.add(geofence.getRequestId());
-//      }
-//      Log.e("Geofence Intent", "toRemove: " + toRemove);
-//      geofenceManager.removeGeofence(toRemove);
-
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         Log.e(LOG_TAG, "userAgent4: " + userAgent);
         GeofenceJobService.schedule(getApplicationContext(), userAgent, accessToken);
