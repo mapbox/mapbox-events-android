@@ -1,15 +1,20 @@
 package com.mapbox.android.telemetry;
 
 
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.arch.lifecycle.ProcessLifecycleOwner;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.IBinder;
 
 import com.mapbox.android.core.location.LocationEnginePriority;
@@ -467,9 +472,38 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     return false;
   }
 
+  @SuppressLint("MissingPermission")
   private void startBackgroundLocation() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-      LocationJobService.schedule(applicationContext, userAgent, accessToken);
+      final LocationManager locationManager = (LocationManager) applicationContext
+        .getSystemService(Context.LOCATION_SERVICE);
+
+      LocationListener locationListener = new LocationListener() {
+        @SuppressLint("NewApi")
+        @Override
+        public void onLocationChanged(Location location) {
+          locationManager.removeUpdates(this);
+
+          LocationJobService.schedule(applicationContext, userAgent, accessToken, location);
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+      };
+
+      locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0.0f, locationListener);
     }
   }
 
