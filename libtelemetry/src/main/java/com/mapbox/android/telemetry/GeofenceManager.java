@@ -34,9 +34,10 @@ public class GeofenceManager {
   void addGeofence(Location location, int radius) {
     Log.e(LOG_TAG, "addGeofence - location: " + location + ", radius " + radius);
     //remove existing geofence
-    List<String> toRemove = new ArrayList<>();
-    toRemove.add("currentGeofence");
-    removeGeofence(toRemove);
+//    geofencingClient.removeGeofences(getGeofencePendingIntent());
+//    List<String> toRemove = new ArrayList<>();
+//    toRemove.add("currentGeofence");
+//    removeGeofence(toRemove);
 
     geofenceList.add(new Geofence.Builder()
       .setRequestId("currentGeofence")
@@ -47,7 +48,7 @@ public class GeofenceManager {
         radius
       )
       .setExpirationDuration(TWELVE_HOURS)
-      .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL | Geofence.GEOFENCE_TRANSITION_EXIT)
+      .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL | Geofence.GEOFENCE_TRANSITION_DWELL | Geofence.GEOFENCE_TRANSITION_EXIT)
       .setLoiteringDelay(150000)
       .build()
     );
@@ -56,7 +57,7 @@ public class GeofenceManager {
   }
 
   void setTelemParameters(String accessToken, String userAgent) {
-    Log.e(LOG_TAG, "userAgent1: " + userAgent);
+    Log.e(LOG_TAG, "setTelem Params: " + accessToken + ", " + userAgent);
     this.accessToken = accessToken;
     this.userAgent = userAgent;
   }
@@ -73,7 +74,6 @@ public class GeofenceManager {
       return geofencePendingIntent;
     }
 
-    Log.e(LOG_TAG, "userAgent2: " + userAgent);
     Intent intent = new Intent(context, GeofenceIntentService.class);
     intent.putExtra("userAgent", userAgent);
     intent.putExtra("accessToken", accessToken);

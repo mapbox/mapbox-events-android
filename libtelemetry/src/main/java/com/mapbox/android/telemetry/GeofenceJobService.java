@@ -7,19 +7,19 @@ import android.app.job.JobScheduler;
 import android.app.job.JobService;
 import android.content.ComponentName;
 import android.content.Context;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.PersistableBundle;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -31,7 +31,7 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-public class GeofenceJobService extends JobService implements Callback, LocationListener {
+public class GeofenceJobService extends JobService implements Callback {
   private static final String LOG_TAG = "GeofenceJob";
   private static final int JOB_ID = 2;
   private JobParameters currentParams;
@@ -42,10 +42,10 @@ public class GeofenceJobService extends JobService implements Callback, Location
   private String userAgent;
   private LocationManager gpsLocationManager;
   private LocationManager wifiLocationManager;
+  private FusedLocationProviderClient fusedLocationClient;
 
   @RequiresApi(api = Build.VERSION_CODES.N)
   public static void schedule(Context context, String userAgent, String accessToken) {
-    Log.e(LOG_TAG, "userAgent5: " + userAgent);
     PersistableBundle bundle = new PersistableBundle();
     bundle.putString("userAgent", userAgent);
     bundle.putString("accessToken", accessToken);
@@ -70,11 +70,8 @@ public class GeofenceJobService extends JobService implements Callback, Location
     userAgent = params.getExtras().getString("userAgent");
     accessToken = params.getExtras().getString("accessToken");
 
-    Log.e(LOG_TAG, "userAgent6: " + userAgent);
 
     locationOn = true;
-    final LocationListener locationListener = this;
-
     geofenceManager = new GeofenceManager(getApplicationContext());
     geofenceManager.setTelemParameters(accessToken, userAgent);
 
@@ -90,8 +87,7 @@ public class GeofenceJobService extends JobService implements Callback, Location
           locations.add(location);
 
           if (!locationOn) {
-            gpsLocationManager.removeUpdates(locationListener);
-            wifiLocationManager.removeUpdates(locationListener);
+            fusedLocationClient.removeLocationUpdates(this);
 
             int radius = 25;
 
@@ -100,7 +96,6 @@ public class GeofenceJobService extends JobService implements Callback, Location
             }
 
             //generate new geofence
-            Log.e(LOG_TAG, "add geofence");
             geofenceManager.addGeofence(location, radius);
 
             sendLocation(locations);
@@ -110,19 +105,13 @@ public class GeofenceJobService extends JobService implements Callback, Location
     };
 
     Log.e(LOG_TAG, "request location");
+    fusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplicationContext());
+    LocationRequest locationRequest = LocationRequest.create();
+    locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    locationRequest.setInterval(1000);
+    locationRequest.setFastestInterval(1000);
 
-    Criteria criteria = new Criteria();
-    criteria.setHorizontalAccuracy(Criteria.ACCURACY_HIGH);
-    criteria.setPowerRequirement(Criteria.POWER_HIGH);
-
-    gpsLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-    if (gpsLocationManager != null) {
-      gpsLocationManager.getBestProvider(criteria, true);
-      gpsLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0.0f, locationListener);
-    }
-
-    wifiLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-    wifiLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0.0f, locationListener);
+    fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
 
     startTimer();
 
@@ -176,7 +165,7 @@ public class GeofenceJobService extends JobService implements Callback, Location
     double longitudeScaled = round(location.getLongitude());
     double longitudeWrapped = wrapLongitude(longitudeScaled);
 
-    LocationEvent locationEvent = new LocationEvent("Geofence", latitudeScaled, longitudeWrapped);
+    LocationEvent locationEvent = new LocationEvent("Geofence-4", latitudeScaled, longitudeWrapped);
     locationEvent.setAccuracy((float) Math.round(location.getAccuracy()));
     locationEvent.setAltitude((double) Math.round(location.getAltitude()));
 
@@ -205,7 +194,6 @@ public class GeofenceJobService extends JobService implements Callback, Location
   }
 
   private TelemetryClient createTelemetryClient() {
-    Log.e(LOG_TAG, "userAgent7: " + userAgent);
     String userAgentTelemetry = "MapboxEventsAndroid/3.1.0/geofence";
     TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(accessToken, userAgentTelemetry,
       new Logger());
@@ -223,25 +211,5 @@ public class GeofenceJobService extends JobService implements Callback, Location
   public void onResponse(Call call, Response response) throws IOException {
     Log.e(LOG_TAG,"job finished: " + response);
     jobFinished(currentParams, false);
-  }
-
-  @Override
-  public void onLocationChanged(Location location) {
-
-  }
-
-  @Override
-  public void onStatusChanged(String provider, int status, Bundle extras) {
-
-  }
-
-  @Override
-  public void onProviderEnabled(String provider) {
-
-  }
-
-  @Override
-  public void onProviderDisabled(String provider) {
-
   }
 }

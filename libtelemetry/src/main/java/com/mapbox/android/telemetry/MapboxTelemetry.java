@@ -17,8 +17,10 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.mapbox.android.core.location.LocationEnginePriority;
 import com.mapbox.android.core.permissions.PermissionsManager;
 
@@ -481,6 +483,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   private void startBackgroundLocation() {
+    Log.e(LOG_TAG, "startBackgroundLocation");
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
       LocationJobService.schedule(applicationContext, userAgent, accessToken);
       startGeofenceTracking(activity);
@@ -554,21 +557,33 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   @SuppressLint("MissingPermission")
   void startGeofenceTracking(Activity activity) {
-    Log.e(LOG_TAG, "userAgent0: " + userAgent);
+    Log.e(LOG_TAG, "startGeofenceTracking");
     geofenceManager = new GeofenceManager(applicationContext);
 
     fusedLocationClient = LocationServices.getFusedLocationProviderClient(applicationContext);
 
-    fusedLocationClient.getLastLocation().addOnSuccessListener(activity, new OnSuccessListener<Location>() {
+    LocationRequest locationRequest = LocationRequest.create();
+    locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+    locationRequest.setInterval(1000);
+    locationRequest.setFastestInterval(1000);
+
+    LocationCallback locationCallback = new LocationCallback() {
       @Override
-      public void onSuccess(Location location) {
-        // Got last known location. In some rare situations this can be null.
-        if (location != null) {
-          Log.e(LOG_TAG, "start location: " + location);
+      public void onLocationResult(LocationResult locationResult) {
+        if (locationResult == null) {
+          return;
+        }
+
+        for (Location location : locationResult.getLocations()) {
+          Log.e(LOG_TAG, "Location received: " + location);
+          fusedLocationClient.removeLocationUpdates(this);
+
           geofenceManager.setTelemParameters(accessToken, userAgent);
           geofenceManager.addGeofence(location, 25);
         }
       }
-    });
+    };
+
+    fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
   }
 }
