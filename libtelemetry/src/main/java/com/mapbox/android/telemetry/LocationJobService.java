@@ -37,10 +37,10 @@ public class LocationJobService extends JobService implements LocationListener, 
   private JobParameters currentParams;
   private ArrayList<Location> locations;
   private boolean gpsOn;
-  private boolean firstRun;
   private String accessToken;
   private String userAgent;
   private Location lastLocation;
+  private int radius;
 
   @RequiresApi(api = Build.VERSION_CODES.N)
   public static void schedule(Context context, String userAgent, String accessToken, Location lastLocation) {
@@ -62,28 +62,61 @@ public class LocationJobService extends JobService implements LocationListener, 
     }
   }
 
-  @SuppressLint("MissingPermission")
   @Override
   public boolean onStartJob(JobParameters params) {
     currentParams = params;
     locations = new ArrayList<Location>();
     gpsOn = true;
-    firstRun = true;
+    radius = 50;
     userAgent = params.getExtras().getString("userAgent");
     accessToken = params.getExtras().getString("accessToken");
     lastLocation = new Location("lastLoc");
     lastLocation.setLatitude(params.getExtras().getDouble("latitude"));
     lastLocation.setLongitude(params.getExtras().getDouble("longitude"));
 
-    Log.d(LOG_TAG,"lastLocation: " + lastLocation);
-
     final LocationListener locationListener = this;
     Log.d(LOG_TAG,"start job");
 
-    startGps(locationListener, 20000);
-    startWifiListener(locationListener);
+    checkDistanceFromLastLocation(locationListener);
 
     return true;
+  }
+
+  @SuppressLint("MissingPermission")
+  private void checkDistanceFromLastLocation(final LocationListener locationListener) {
+
+    LocationListener initialListener = new LocationListener() {
+      @SuppressLint("NewApi")
+      @Override
+      public void onLocationChanged(Location location) {
+        wifiLocationManager.removeUpdates(this);
+
+        float distance = lastLocation.distanceTo(location);
+
+          Log.d(LOG_TAG,"collect Location Data");
+          startGps(locationListener, 20000);
+          startWifiListener(locationListener);
+
+      }
+
+      @Override
+      public void onStatusChanged(String provider, int status, Bundle extras) {
+
+      }
+
+      @Override
+      public void onProviderEnabled(String provider) {
+
+      }
+
+      @Override
+      public void onProviderDisabled(String provider) {
+
+      }
+    };
+
+    wifiLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+    wifiLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0.0f, initialListener);
   }
 
   @SuppressLint("MissingPermission")
@@ -95,7 +128,7 @@ public class LocationJobService extends JobService implements LocationListener, 
     gpsLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
     if (gpsLocationManager != null) {
       gpsLocationManager.getBestProvider(criteria, true);
-      gpsLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0.0f, this);
+      gpsLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0.0f, locationListener);
     }
 
     new CountDownTimer(gpsMillis, 1000) {
@@ -117,6 +150,9 @@ public class LocationJobService extends JobService implements LocationListener, 
 
     new CountDownTimer(120000, 10000) {
       public void onTick(long millisUntilFinished) {
+        if (checkGpsBurst(millisUntilFinished)) {
+          startGps(locationListener, 10000);
+        }
       }
 
       public void onFinish() {
@@ -130,7 +166,7 @@ public class LocationJobService extends JobService implements LocationListener, 
   @Override
   public boolean onStopJob(JobParameters params) {
     Log.d(LOG_TAG,"stop job");
-    jobFinished(currentParams, true);
+    //    jobFinished(currentParams, true);
     return false;
   }
 
@@ -238,5 +274,17 @@ public class LocationJobService extends JobService implements LocationListener, 
         telemetryClient.sendEvents(events, callback);
       }
     }).start();
+  }
+
+  private boolean checkGpsBurst(long millis) {
+    if (millis < 85 && millis > 75) {
+      return  true;
+    } else if (millis < 45 && millis > 35) {
+      return true;
+    } else if (millis < 15 && millis > 5) {
+      return true;
+    }
+
+    return false;
   }
 }
