@@ -4,6 +4,11 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v3.1.1
+- Missing Application Context - [#144](https://github.com/mapbox/mapbox-events-android/pull/144)
+- Close Okhttp Response - [#139](https://github.com/mapbox/mapbox-events-android/pull/139)
+- Fix for attempting to unbind an unregistered service - [#136](https://github.com/mapbox/mapbox-events-android/pull/136)
+
 ### v3.1.0
 - New China Certificate Hashes - [#133](https://github.com/mapbox/mapbox-events-android/pull/133)
 - Decouple Core and Telemetry Releases - [#131](https://github.com/mapbox/mapbox-events-android/pull/131)
