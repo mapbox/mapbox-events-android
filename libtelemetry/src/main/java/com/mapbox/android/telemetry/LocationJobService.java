@@ -36,11 +36,11 @@ public class LocationJobService extends JobService implements LocationListener, 
   private LocationManager wifiLocationManager;
   private JobParameters currentParams;
   private ArrayList<Location> locations;
-  private boolean gpsOn;
   private String accessToken;
   private String userAgent;
   private Location lastLocation;
   private int radius;
+  private int gpsCount;
 
   @RequiresApi(api = Build.VERSION_CODES.N)
   public static void schedule(Context context, String userAgent, String accessToken, Location lastLocation) {
@@ -66,24 +66,23 @@ public class LocationJobService extends JobService implements LocationListener, 
   public boolean onStartJob(JobParameters params) {
     currentParams = params;
     locations = new ArrayList<Location>();
-    gpsOn = true;
     radius = 50;
+    gpsCount = 0;
     userAgent = params.getExtras().getString("userAgent");
     accessToken = params.getExtras().getString("accessToken");
     lastLocation = new Location("lastLoc");
     lastLocation.setLatitude(params.getExtras().getDouble("latitude"));
     lastLocation.setLongitude(params.getExtras().getDouble("longitude"));
 
-    final LocationListener locationListener = this;
     Log.d(LOG_TAG,"start job");
 
-    checkDistanceFromLastLocation(locationListener);
+    checkDistanceFromLastLocation();
 
     return true;
   }
 
   @SuppressLint("MissingPermission")
-  private void checkDistanceFromLastLocation(final LocationListener locationListener) {
+  private void checkDistanceFromLastLocation() {
 
     LocationListener initialListener = new LocationListener() {
       @SuppressLint("NewApi")
@@ -93,10 +92,14 @@ public class LocationJobService extends JobService implements LocationListener, 
 
         float distance = lastLocation.distanceTo(location);
 
+        if (distance >= radius) {
           Log.d(LOG_TAG,"collect Location Data");
-          startGps(locationListener, 20000);
-          startWifiListener(locationListener);
-
+          startGps(20000);
+        } else {
+          Log.d(LOG_TAG,"distance to close, reschedule job, stop current one");
+          LocationJobService.schedule(getApplicationContext(), userAgent, accessToken, lastLocation);
+          jobFinished(currentParams, false);
+        }
       }
 
       @Override
@@ -120,45 +123,54 @@ public class LocationJobService extends JobService implements LocationListener, 
   }
 
   @SuppressLint("MissingPermission")
-  private void startGps(final LocationListener locationListener, long gpsMillis) {
+  private void startGps(long gpsMillis) {
+    Log.d(LOG_TAG,"startGPS");
     Criteria criteria = new Criteria();
     criteria.setHorizontalAccuracy(Criteria.ACCURACY_HIGH);
     criteria.setPowerRequirement(Criteria.POWER_HIGH);
 
     gpsLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
     if (gpsLocationManager != null) {
-      gpsLocationManager.getBestProvider(criteria, true);
-      gpsLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0.0f, locationListener);
+      gpsLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0.0f, this);
     }
+
+    final LocationListener locationListener = this;
 
     new CountDownTimer(gpsMillis, 1000) {
       public void onTick(long millisUntilFinished) {
 
       }
 
+      @RequiresApi(api = Build.VERSION_CODES.N)
       public void onFinish() {
+        Log.d(LOG_TAG,"gpsTimer finished");
         gpsLocationManager.removeUpdates(locationListener);
+        gpsCount++;
+
+        if (gpsCount == 4) {
+          sendLocation(locations);
+        } else {
+          startWifiListener();
+        }
       }
     }.start();
   }
 
   @SuppressLint("MissingPermission")
-  private void startWifiListener(final LocationListener locationListener) {
-    gpsOn = false;
+  private void startWifiListener() {
     wifiLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-    wifiLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0.0f, locationListener);
+    wifiLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0.0f, this);
 
-    new CountDownTimer(120000, 10000) {
+    final LocationListener locationListener = this;
+
+    new CountDownTimer(25000, 10000) {
       public void onTick(long millisUntilFinished) {
-        if (checkGpsBurst(millisUntilFinished)) {
-          startGps(locationListener, 10000);
-        }
+
       }
 
       public void onFinish() {
-        gpsLocationManager.removeUpdates(locationListener);
         wifiLocationManager.removeUpdates(locationListener);
-        sendLocation(locations);
+        startGps(10000);
       }
     }.start();
   }
@@ -166,7 +178,6 @@ public class LocationJobService extends JobService implements LocationListener, 
   @Override
   public boolean onStopJob(JobParameters params) {
     Log.d(LOG_TAG,"stop job");
-    //    jobFinished(currentParams, true);
     return false;
   }
 
@@ -174,10 +185,6 @@ public class LocationJobService extends JobService implements LocationListener, 
   @Override
   public void onLocationChanged(Location location) {
     Log.d(LOG_TAG,"location: " + location);
-
-    if (!gpsOn && location.getAccuracy() > 50) {
-      return;
-    }
 
     locations.add(location);
   }
@@ -253,8 +260,8 @@ public class LocationJobService extends JobService implements LocationListener, 
     return secondMod + min;
   }
 
+  @RequiresApi(api = Build.VERSION_CODES.N)
   private void sendLocation(List<Location> locations) {
-    gpsOn = false;
 
     final List<Event> events = new ArrayList<>(locations.size());
 
@@ -263,28 +270,19 @@ public class LocationJobService extends JobService implements LocationListener, 
       events.add(locationEvent);
     }
 
-    //set last location
-    lastLocation = locations.get(locations.size() - 1);
+    if (events.size() > 0) {
+      lastLocation = locations.get(locations.size() - 1);
+      final Callback callback = this;
 
-    final Callback callback = this;
-
-    new Thread(new Runnable() {
-      public void run() {
-        TelemetryClient telemetryClient = createTelemetryClient();
-        telemetryClient.sendEvents(events, callback);
-      }
-    }).start();
-  }
-
-  private boolean checkGpsBurst(long millis) {
-    if (millis < 85 && millis > 75) {
-      return  true;
-    } else if (millis < 45 && millis > 35) {
-      return true;
-    } else if (millis < 15 && millis > 5) {
-      return true;
+      new Thread(new Runnable() {
+        public void run() {
+          TelemetryClient telemetryClient = createTelemetryClient();
+          telemetryClient.sendEvents(events, callback);
+        }
+      }).start();
+    } else {
+      LocationJobService.schedule(getApplicationContext(), userAgent, accessToken, lastLocation);
+      jobFinished(currentParams, false);
     }
-
-    return false;
   }
 }
