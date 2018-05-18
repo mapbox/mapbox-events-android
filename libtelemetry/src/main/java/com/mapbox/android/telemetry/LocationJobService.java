@@ -32,10 +32,12 @@ public class LocationJobService extends JobService implements LocationListener, 
   private final String LOG_TAG = "JobService";
   private static final int JOB_ID = 1;
   private static final int FIVE_MIN = 60 * 1000 * 2;
-  private LocationManager locationManager;
+  private LocationManager gpsLocationManager;
+  private LocationManager wifiLocationManager;
   private JobParameters currentParams;
   private ArrayList<Location> locations;
   private boolean gpsOn;
+  private boolean firstRun;
   private String accessToken;
   private String userAgent;
   private Location lastLocation;
@@ -66,6 +68,7 @@ public class LocationJobService extends JobService implements LocationListener, 
     currentParams = params;
     locations = new ArrayList<Location>();
     gpsOn = true;
+    firstRun = true;
     userAgent = params.getExtras().getString("userAgent");
     accessToken = params.getExtras().getString("accessToken");
     lastLocation = new Location("lastLoc");
@@ -76,31 +79,32 @@ public class LocationJobService extends JobService implements LocationListener, 
 
     final LocationListener locationListener = this;
     Log.d(LOG_TAG,"start job");
-    Criteria criteria = new Criteria();
-    criteria.setHorizontalAccuracy(Criteria.ACCURACY_HIGH);
-    criteria.setPowerRequirement(Criteria.POWER_HIGH);
 
-    locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-    if (locationManager != null) {
-      locationManager.getBestProvider(criteria, true);
-      locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0.0f, this);
-    }
-
-    startGpsTimer(locationListener);
+    startGps(locationListener, 20000);
+    startWifiListener(locationListener);
 
     return true;
   }
 
   @SuppressLint("MissingPermission")
-  private void startGpsTimer(final LocationListener locationListener) {
-    new CountDownTimer(20000, 1000) {
+  private void startGps(final LocationListener locationListener, long gpsMillis) {
+    Criteria criteria = new Criteria();
+    criteria.setHorizontalAccuracy(Criteria.ACCURACY_HIGH);
+    criteria.setPowerRequirement(Criteria.POWER_HIGH);
+
+    gpsLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+    if (gpsLocationManager != null) {
+      gpsLocationManager.getBestProvider(criteria, true);
+      gpsLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0.0f, this);
+    }
+
+    new CountDownTimer(gpsMillis, 1000) {
       public void onTick(long millisUntilFinished) {
 
       }
 
       public void onFinish() {
-        locationManager.removeUpdates(locationListener);
-        startWifiListener(locationListener);
+        gpsLocationManager.removeUpdates(locationListener);
       }
     }.start();
   }
@@ -108,15 +112,16 @@ public class LocationJobService extends JobService implements LocationListener, 
   @SuppressLint("MissingPermission")
   private void startWifiListener(final LocationListener locationListener) {
     gpsOn = false;
-    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0.0f, locationListener);
+    wifiLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+    wifiLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0.0f, locationListener);
 
-    new CountDownTimer(90000, 1000) {
+    new CountDownTimer(120000, 10000) {
       public void onTick(long millisUntilFinished) {
-
       }
 
       public void onFinish() {
-        locationManager.removeUpdates(locationListener);
+        gpsLocationManager.removeUpdates(locationListener);
+        wifiLocationManager.removeUpdates(locationListener);
         sendLocation(locations);
       }
     }.start();
@@ -132,7 +137,7 @@ public class LocationJobService extends JobService implements LocationListener, 
   @SuppressLint("MissingPermission")
   @Override
   public void onLocationChanged(Location location) {
-    Log.d(LOG_TAG,location.getLatitude() + ", " + location.getLongitude());
+    Log.d(LOG_TAG,"location: " + location);
 
     if (!gpsOn && location.getAccuracy() > 50) {
       return;
