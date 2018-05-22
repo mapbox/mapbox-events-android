@@ -4,6 +4,9 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v3.1.2
+- Service Stability Fix - [#152](https://github.com/mapbox/mapbox-events-android/pull/152)
+
 ### v3.1.1
 - Missing Application Context - [#144](https://github.com/mapbox/mapbox-events-android/pull/144)
 - Close Okhttp Response - [#139](https://github.com/mapbox/mapbox-events-android/pull/139)
