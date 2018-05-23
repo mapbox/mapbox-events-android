@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Date;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -26,18 +27,35 @@ public class CertificateBlacklist implements Callback {
   }
 
   ArrayList<String> retrieveBlackList() {
-
     File directory = context.getFilesDir();
     File file = new File(directory, "MapboxBlacklist");
 
     ArrayList<String> blacklist = null;
     try {
       blacklist = getBlacklistContents(file);
+      blacklist.remove(0);
     } catch (IOException exception) {
       exception.printStackTrace();
     }
 
+    Log.e("CertificateBlacklist", "blacklist: " + blacklist);
     return blacklist;
+  }
+
+  long retrievLastUpdateTime() {
+    File directory = context.getFilesDir();
+    File file = new File(directory, "MapboxBlacklist");
+
+    long lastUpdateTime = 0;
+    try {
+      ArrayList<String> blacklist = getBlacklistContents(file);
+      lastUpdateTime = Long.valueOf(blacklist.get(0));
+    } catch (IOException exception) {
+      exception.printStackTrace();
+    }
+
+    Log.e("CertificateBlacklist", "time: " + lastUpdateTime);
+    return lastUpdateTime;
   }
 
   void updateBlacklist() {
@@ -87,7 +105,9 @@ public class CertificateBlacklist implements Callback {
   }
 
   private String createListContent(ArrayList<String> revokedKeys) {
-    String content = "";
+    Date date = new Date();
+
+    String content = "" + date.getTime() + "\n";
 
     for (String key: revokedKeys) {
       content = content + key + "\n";
@@ -96,7 +116,7 @@ public class CertificateBlacklist implements Callback {
     return content;
   }
 
-  public static ArrayList<String> getBlacklistContents(final File file) throws IOException {
+  private static ArrayList<String> getBlacklistContents(final File file) throws IOException {
     final InputStream inputStream = new FileInputStream(file);
     final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 
