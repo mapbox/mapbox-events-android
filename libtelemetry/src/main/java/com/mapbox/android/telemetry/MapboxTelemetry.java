@@ -69,6 +69,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     this.telemetryLocationEnabler = new TelemetryLocationEnabler(true);
     initializeTelemetryListeners();
     initializeTelemetryLocationState();
+    checkBlacklist();
   }
 
   // For testing only
@@ -527,5 +528,11 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     }
 
     return false;
+  }
+
+  private void checkBlacklist() {
+    CertificateBlacklist certificateBlacklist = new CertificateBlacklist(applicationContext);
+
+    certificateBlacklist.updateBlacklist();
   }
 }
