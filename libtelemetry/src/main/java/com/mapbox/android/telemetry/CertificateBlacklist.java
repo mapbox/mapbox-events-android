@@ -1,6 +1,8 @@
 package com.mapbox.android.telemetry;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -12,6 +14,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -20,6 +24,15 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class CertificateBlacklist implements Callback {
+  private final long DAY_IN_MILLISECONDS = 86400000;
+  private static final String COM_CONFIG_ENDPOINT = "https://config.mapbox.com";
+  private static final String CHINA_CONFIG_ENDPOINT = "https://config.mapbox.cn";
+  private static final Map<Environment, String> ENDPOINTS = new HashMap<Environment, String>() {
+    {
+      put(Environment.COM, COM_CONFIG_ENDPOINT);
+      put(Environment.CHINA, CHINA_CONFIG_ENDPOINT);
+    }
+  };
   private Context context;
 
   CertificateBlacklist(Context context) {
@@ -43,17 +56,12 @@ public class CertificateBlacklist implements Callback {
   }
 
   boolean daySinceLastUpdate() {
-    long lastMillis = retrievLastUpdateTime();
-    long millisecondDiff = System.currentTimeMillis() - lastMillis;
+    long millisecondDiff = System.currentTimeMillis() - retriveLastUpdateTime();
 
-    if (millisecondDiff >= 86400000) {
-      return true;
-    }
-
-    return false;
+    return millisecondDiff >= DAY_IN_MILLISECONDS;
   }
 
-  private long retrievLastUpdateTime() {
+  private long retriveLastUpdateTime() {
     File directory = context.getFilesDir();
     File file = new File(directory, "MapboxBlacklist");
 
@@ -70,7 +78,7 @@ public class CertificateBlacklist implements Callback {
 
   void updateBlacklist() {
     Request request = new Request.Builder()
-      .url("https://config.mapbox.com")
+      .url(determineConfigEndpoint())
       .build();
 
     OkHttpClient client = new OkHttpClient();
@@ -147,5 +155,24 @@ public class CertificateBlacklist implements Callback {
     inputStream.close();
 
     return blacklist;
+  }
+
+  private String determineConfigEndpoint() {
+    EnvironmentChain environmentChain = new EnvironmentChain();
+    EnvironmentResolver setupChain = environmentChain.setup();
+    ServerInformation serverInformation;
+    try {
+      ApplicationInfo appInformation = context.getPackageManager().getApplicationInfo(context.getPackageName(),
+        PackageManager.GET_META_DATA);
+
+      if (appInformation != null && appInformation.metaData != null) {
+        serverInformation = setupChain.obtainServerInformation(appInformation.metaData);
+        return ENDPOINTS.get(serverInformation.getEnvironment());
+      }
+    } catch (Exception exception) {
+      Log.e("CertificateBlacklist", String.valueOf(exception));
+    }
+
+    return null;
   }
 }
