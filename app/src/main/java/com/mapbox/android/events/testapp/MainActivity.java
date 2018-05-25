@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
+import com.mapbox.android.telemetry.AppUserTurnstile;
 import com.mapbox.android.telemetry.MapboxTelemetry;
 
 import java.util.List;
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
 
     if (permissionsGranted) {
       mapboxTelemetry.enable();
+      sendTurnstile();
     } else {
       permissionsManager = new PermissionsManager(this);
       permissionsManager.requestLocationPermissions(this);
@@ -62,6 +64,12 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
   public void onPermissionResult(boolean granted) {
     if (granted) {
       mapboxTelemetry.enable();
+      sendTurnstile();
     }
+  }
+
+  private void sendTurnstile() {
+    AppUserTurnstile appUserTurnstile = new AppUserTurnstile("sdkIdentifier", "sdkVersion");
+    mapboxTelemetry.push(appUserTurnstile);
   }
 }

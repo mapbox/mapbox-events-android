@@ -51,7 +51,6 @@ public class CertificateBlacklist implements Callback {
       exception.printStackTrace();
     }
 
-    Log.e("CertificateBlacklist", "blacklist: " + blacklist);
     return blacklist;
   }
 
@@ -103,9 +102,9 @@ public class CertificateBlacklist implements Callback {
   public void onFailure(Call call, IOException e) {
     Log.e("CertificateBlacklist", "failure: " + e);
     ArrayList<String> revokedKeys = new ArrayList<>();
-    revokedKeys.add("test1");
-    revokedKeys.add("test2");
-    revokedKeys.add("test3");
+    revokedKeys.add("sha256/test1");
+    revokedKeys.add("sha256/test2");
+    revokedKeys.add("sha256/test3");
 
     saveBlackList(revokedKeys);
   }
@@ -114,10 +113,11 @@ public class CertificateBlacklist implements Callback {
   public void onResponse(Call call, Response response) throws IOException {
     Log.e("CertificateBlacklist", "response: " + response);
 
+    //be sure to add sha256/ to returned hashes
     ArrayList<String> revokedKeys = new ArrayList<>();
-    revokedKeys.add("test1");
-    revokedKeys.add("test2");
-    revokedKeys.add("test3");
+    revokedKeys.add("sha256/test1");
+    revokedKeys.add("sha256/test2");
+    revokedKeys.add("sha256/test3");
 
     saveBlackList(revokedKeys);
   }
