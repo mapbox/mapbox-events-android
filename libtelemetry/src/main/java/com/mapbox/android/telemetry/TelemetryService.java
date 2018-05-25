@@ -239,6 +239,10 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
 
   private void disableTelemetryLocationState() {
     if (isLocationEnablerFromPreferences) {
+      if (telemetryLocationEnabler == null) {
+        telemetryLocationEnabler = new TelemetryLocationEnabler(true);
+      }
+
       telemetryLocationEnabler.updateTelemetryLocationState(TelemetryLocationEnabler.LocationState.DISABLED);
     }
   }
