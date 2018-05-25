@@ -533,6 +533,8 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private void checkBlacklist() {
     CertificateBlacklist certificateBlacklist = new CertificateBlacklist(applicationContext);
 
-    certificateBlacklist.updateBlacklist();
+    if (certificateBlacklist.daySinceLastUpdate()) {
+      certificateBlacklist.updateBlacklist();
+    }
   }
 }

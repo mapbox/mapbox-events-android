@@ -42,7 +42,18 @@ public class CertificateBlacklist implements Callback {
     return blacklist;
   }
 
-  long retrievLastUpdateTime() {
+  boolean daySinceLastUpdate() {
+    long lastMillis = retrievLastUpdateTime();
+    long millisecondDiff = System.currentTimeMillis() - lastMillis;
+
+    if (millisecondDiff >= 86400000) {
+      return true;
+    }
+
+    return false;
+  }
+
+  private long retrievLastUpdateTime() {
     File directory = context.getFilesDir();
     File file = new File(directory, "MapboxBlacklist");
 
@@ -54,7 +65,6 @@ public class CertificateBlacklist implements Callback {
       exception.printStackTrace();
     }
 
-    Log.e("CertificateBlacklist", "time: " + lastUpdateTime);
     return lastUpdateTime;
   }
 
