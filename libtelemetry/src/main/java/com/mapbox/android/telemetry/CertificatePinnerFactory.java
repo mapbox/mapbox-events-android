@@ -63,7 +63,7 @@ class CertificatePinnerFactory {
 
     ArrayList blackList = certificateBlacklist.retrieveBlackList();
 
-    for(String hash: new ArrayList<String>(hashList)) {
+    for (String hash: new ArrayList<>(hashList)) {
       if (blackList.contains(hash)) {
         hashList.remove(hash);
       }
