@@ -42,7 +42,7 @@ class CertificatePinnerFactory {
   }
 
   private void addCertificatesPins(Map<String, List<String>> pins, CertificatePinner.Builder builder, Environment environment) {
-    removeBlacklistedPins(pins, environment);
+    pins = removeBlacklistedPins(pins, environment);
 
     for (Map.Entry<String, List<String>> entry : pins.entrySet()) {
       for (String pin : entry.getValue()) {
@@ -59,23 +59,18 @@ class CertificatePinnerFactory {
     }
 
     List<String> hashList = pins.get(key);
-    List<String> tempList = pins.get(key);
     CertificateBlacklist certificateBlacklist = new CertificateBlacklist(MapboxTelemetry.applicationContext);
 
     ArrayList blackList = certificateBlacklist.retrieveBlackList();
-    //    blackList.add("sha256/BhynraKizavqoC5U26qgYuxLZst6pCu9J5stfL6RSYY=");
 
-    Log.e("PinnerFactory", "pre hashList: " + hashList);
-
-
-    for(String hash: hashList) {
+    for(String hash: new ArrayList<String>(hashList)) {
       if (blackList.contains(hash)) {
-        tempList.remove(hash);
+        hashList.remove(hash);
       }
     }
 
-    Log.e("PinnerFactory", "post hashList: " + tempList);
+    pins.put(key, hashList);
 
-    return null;
+    return pins;
   }
 }
