@@ -41,7 +41,8 @@ class CertificatePinnerFactory {
     return CERTIFICATES_PINS.get(environment);
   }
 
-  private void addCertificatesPins(Map<String, List<String>> pins, CertificatePinner.Builder builder, Environment environment) {
+  private void addCertificatesPins(Map<String, List<String>> pins, CertificatePinner.Builder builder,
+                                   Environment environment) {
     pins = removeBlacklistedPins(pins, environment);
 
     for (Map.Entry<String, List<String>> entry : pins.entrySet()) {
