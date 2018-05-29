@@ -1,8 +1,6 @@
 package com.mapbox.android.telemetry;
 
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
