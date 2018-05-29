@@ -41,14 +41,17 @@ public class CertificateBlacklist implements Callback {
 
   ArrayList<String> retrieveBlackList() {
     File directory = context.getFilesDir();
-    File file = new File(directory, "MapboxBlacklist");
-
     ArrayList<String> blacklist = null;
-    try {
-      blacklist = getBlacklistContents(file);
-      blacklist.remove(0);
-    } catch (IOException exception) {
-      exception.printStackTrace();
+
+    if (directory.isDirectory()) {
+      File file = new File(directory, "MapboxBlacklist");
+
+      try {
+        blacklist = getBlacklistContents(file);
+        blacklist.remove(0);
+      } catch (IOException exception) {
+        exception.printStackTrace();
+      }
     }
 
     return blacklist;
