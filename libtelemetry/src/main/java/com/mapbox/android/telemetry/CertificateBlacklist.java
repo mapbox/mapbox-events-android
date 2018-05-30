@@ -5,6 +5,10 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,9 +28,12 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class CertificateBlacklist implements Callback {
+  private static final String LOG_TAG = "MapboxBlacklist";
   private final long DAY_IN_MILLISECONDS = 86400000;
-  private static final String COM_CONFIG_ENDPOINT = "https://config.mapbox.com";
-  private static final String CHINA_CONFIG_ENDPOINT = "https://config.mapbox.cn";
+  private static final String BLACKLIST_FILE = "MapboxBlacklist";
+  private static final String SHA256 = "sha256/";
+  private static final String COM_CONFIG_ENDPOINT = "http://config.mapbox.com";
+  private static final String CHINA_CONFIG_ENDPOINT = "http://config.mapbox.cn";
   private static final Map<Environment, String> ENDPOINTS = new HashMap<Environment, String>() {
     {
       put(Environment.COM, COM_CONFIG_ENDPOINT);
@@ -44,7 +51,7 @@ public class CertificateBlacklist implements Callback {
     ArrayList<String> blacklist = null;
 
     if (directory.isDirectory()) {
-      File file = new File(directory, "MapboxBlacklist");
+      File file = new File(directory, BLACKLIST_FILE);
 
       try {
         blacklist = getBlacklistContents(file);
@@ -65,7 +72,7 @@ public class CertificateBlacklist implements Callback {
 
   private long retriveLastUpdateTime() {
     File directory = context.getFilesDir();
-    File file = new File(directory, "MapboxBlacklist");
+    File file = new File(directory, BLACKLIST_FILE);
 
     long lastUpdateTime = 0;
     try {
@@ -88,7 +95,7 @@ public class CertificateBlacklist implements Callback {
   }
 
   private void saveBlackList(ArrayList<String> revokedKeys) {
-    String filename = "MapboxBlacklist";
+    String filename = BLACKLIST_FILE;
     String fileContents = createListContent(revokedKeys);
     FileOutputStream outputStream;
 
@@ -103,24 +110,12 @@ public class CertificateBlacklist implements Callback {
 
   @Override
   public void onFailure(Call call, IOException e) {
-    Log.e("CertificateBlacklist", "failure: " + e);
-    ArrayList<String> revokedKeys = new ArrayList<>();
-    revokedKeys.add("sha256/test1");
-    revokedKeys.add("sha256/test2");
-    revokedKeys.add("sha256/test3");
-
-    saveBlackList(revokedKeys);
   }
 
   @Override
   public void onResponse(Call call, Response response) throws IOException {
-    Log.e("CertificateBlacklist", "response: " + response);
 
-    //be sure to add sha256/ to returned hashes
-    ArrayList<String> revokedKeys = new ArrayList<>();
-    revokedKeys.add("sha256/test1");
-    revokedKeys.add("sha256/test2");
-    revokedKeys.add("sha256/test3");
+    ArrayList<String> revokedKeys = extractResponse(response);
 
     saveBlackList(revokedKeys);
   }
@@ -128,13 +123,13 @@ public class CertificateBlacklist implements Callback {
   private String createListContent(ArrayList<String> revokedKeys) {
     Date date = new Date();
 
-    String content = "" + date.getTime() + "\n";
+    StringBuilder content = new StringBuilder("" + date.getTime() + "\n");
 
     for (String key: revokedKeys) {
-      content = content + key + "\n";
+      content.append(SHA256).append(key).append("\n");
     }
 
-    return content;
+    return content.toString();
   }
 
   private static ArrayList<String> getBlacklistContents(final File file) throws IOException {
@@ -173,9 +168,29 @@ public class CertificateBlacklist implements Callback {
         return ENDPOINTS.get(serverInformation.getEnvironment());
       }
     } catch (Exception exception) {
-      Log.e("CertificateBlacklist", String.valueOf(exception));
+      Log.e(LOG_TAG, String.valueOf(exception));
     }
 
     return null;
+  }
+
+  private ArrayList<String> extractResponse(Response response) throws IOException {
+    String responseData = response.body().string();
+
+    ArrayList<String> revokedKeys = new ArrayList<>();
+
+    try {
+      JSONObject jsonObject = new JSONObject(responseData);
+      JSONArray jsonArray = jsonObject.getJSONArray("RevokedCertKeys");
+
+      for (int i = 0; i < jsonArray.length(); i++) {
+        revokedKeys.add(jsonArray.getString(i));
+      }
+
+    } catch (JSONException exception) {
+      Log.e(LOG_TAG, String.valueOf(exception));
+    }
+
+    return revokedKeys;
   }
 }
