@@ -53,11 +53,13 @@ public class CertificateBlacklist implements Callback {
     if (directory.isDirectory()) {
       File file = new File(directory, BLACKLIST_FILE);
 
-      try {
-        blacklist = getBlacklistContents(file);
-        blacklist.remove(0);
-      } catch (IOException exception) {
-        exception.printStackTrace();
+      if (file.exists()) {
+        try {
+          blacklist = getBlacklistContents(file);
+          blacklist.remove(0);
+        } catch (IOException exception) {
+          exception.printStackTrace();
+        }
       }
     }
 
@@ -75,11 +77,14 @@ public class CertificateBlacklist implements Callback {
     File file = new File(directory, BLACKLIST_FILE);
 
     long lastUpdateTime = 0;
-    try {
-      ArrayList<String> blacklist = getBlacklistContents(file);
-      lastUpdateTime = Long.valueOf(blacklist.get(0));
-    } catch (IOException exception) {
-      exception.printStackTrace();
+
+    if (file.exists()) {
+      try {
+        ArrayList<String> blacklist = getBlacklistContents(file);
+        lastUpdateTime = Long.valueOf(blacklist.get(0));
+      } catch (IOException exception) {
+        exception.printStackTrace();
+      }
     }
 
     return lastUpdateTime;
