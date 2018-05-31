@@ -31,7 +31,7 @@ import okhttp3.Response;
 public class LocationJobService extends JobService implements LocationListener, Callback {
   private final String LOG_TAG = "JobService";
   private static final int JOB_ID = 1;
-  private static final int FIVE_MIN = 60 * 1000 * 2;
+  private static final int FIVE_MIN = 60 * 1000 * 5;
   private LocationManager gpsLocationManager;
   private LocationManager wifiLocationManager;
   private JobParameters currentParams;
@@ -66,7 +66,7 @@ public class LocationJobService extends JobService implements LocationListener, 
   public boolean onStartJob(JobParameters params) {
     currentParams = params;
     locations = new ArrayList<Location>();
-    radius = 50;
+    radius = 100;
     gpsCount = 0;
     userAgent = params.getExtras().getString("userAgent");
     accessToken = params.getExtras().getString("accessToken");
@@ -83,6 +83,7 @@ public class LocationJobService extends JobService implements LocationListener, 
 
   @SuppressLint("MissingPermission")
   private void checkDistanceFromLastLocation() {
+    Log.d(LOG_TAG,"checkDistanceFromLastLocation");
 
     LocationListener initialListener = new LocationListener() {
       @SuppressLint("NewApi")
@@ -96,7 +97,7 @@ public class LocationJobService extends JobService implements LocationListener, 
           Log.d(LOG_TAG,"collect Location Data");
           startGps(20000);
         } else {
-          Log.d(LOG_TAG,"distance to close, reschedule job, stop current one");
+          Log.d(LOG_TAG,"distance too close, reschedule job, stop current one");
           LocationJobService.schedule(getApplicationContext(), userAgent, accessToken, lastLocation);
           jobFinished(currentParams, false);
         }
@@ -147,7 +148,7 @@ public class LocationJobService extends JobService implements LocationListener, 
         gpsLocationManager.removeUpdates(locationListener);
         gpsCount++;
 
-        if (gpsCount == 4) {
+        if (gpsCount == 2) {
           sendLocation(locations);
         } else {
           startWifiListener();
