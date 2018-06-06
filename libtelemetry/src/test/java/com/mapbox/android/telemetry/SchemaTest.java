@@ -11,7 +11,10 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.GZIPInputStream;
@@ -23,7 +26,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class SchemaTest {
-  private static final String APPUSERTURNSTILE = "appUserTurnstile";
+  private static final String APP_USER_TURNSTILE = "appUserTurnstile";
   private ArrayList<JsonObject> schemaArray;
 
 
@@ -45,9 +48,11 @@ public class SchemaTest {
 
   @Test
   public void checkTurnstileEvent() throws Exception {
-    JsonObject schema = grabSchema(APPUSERTURNSTILE);
+    JsonObject schema = grabSchema(APP_USER_TURNSTILE);
 
     System.out.println("schema: " + schema);
+
+    System.out.println("fields: " + grabClassFields(AppUserTurnstile.class));
   }
 
   private void unpackSchemas(Response responseData) throws IOException, JSONException {
@@ -73,11 +78,23 @@ public class SchemaTest {
       System.out.println("name: " + name);
 
       if (name.equalsIgnoreCase(eventName)) {
-        return thisSchema;
+        return thisSchema.get("properties").getAsJsonObject();
       }
     }
 
     return null;
+  }
+
+  private List<Field> grabClassFields(Class aClass) {
+    List<Field> fields = new ArrayList<>();
+    Field[] allFields = aClass.getDeclaredFields();
+    for (Field field : allFields) {
+      if (Modifier.isPrivate(field.getModifiers()) && !Modifier.isStatic(field.getModifiers())) {
+        fields.add(field);
+      }
+    }
+
+    return fields;
   }
 
   private Callback provideACallback(final CountDownLatch latch, final AtomicBoolean failureRef) {
