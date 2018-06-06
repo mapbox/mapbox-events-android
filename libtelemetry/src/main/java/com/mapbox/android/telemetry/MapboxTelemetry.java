@@ -14,6 +14,7 @@ import com.mapbox.android.core.location.LocationEnginePriority;
 import com.mapbox.android.core.permissions.PermissionsManager;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -39,7 +40,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   };
   private static final String NON_NULL_APPLICATION_CONTEXT_REQUIRED = "Non-null application context required.";
   private static final int NO_FLAGS = 0;
-  private String accessToken;
+  static String accessToken;
   private String userAgent;
   private EventsQueue queue;
   private TelemetryClient telemetryClient;
@@ -531,10 +532,14 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   private void checkBlacklist() {
-    CertificateBlacklist certificateBlacklist = new CertificateBlacklist(applicationContext);
+    CertificateBlacklist certificateBlacklist = new CertificateBlacklist(applicationContext, accessToken);
 
     if (certificateBlacklist.daySinceLastUpdate()) {
-      certificateBlacklist.updateBlacklist();
+      try {
+        certificateBlacklist.updateBlacklist();
+      } catch (MalformedURLException exception) {
+        exception.printStackTrace();
+      }
     }
   }
 }

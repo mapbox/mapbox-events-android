@@ -58,7 +58,8 @@ class CertificatePinnerFactory {
     }
 
     List<String> hashList = pins.get(key);
-    CertificateBlacklist certificateBlacklist = new CertificateBlacklist(MapboxTelemetry.applicationContext);
+    CertificateBlacklist certificateBlacklist = new CertificateBlacklist(MapboxTelemetry.applicationContext,
+      MapboxTelemetry.accessToken);
 
     ArrayList blackList = certificateBlacklist.retrieveBlackList();
 

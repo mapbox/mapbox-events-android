@@ -16,6 +16,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ public class CertificateBlacklist implements Callback {
   private static final String SHA256 = "sha256/";
   private static final String COM_CONFIG_ENDPOINT = "http://config.mapbox.com";
   private static final String CHINA_CONFIG_ENDPOINT = "http://config.mapbox.cn";
+  private static final String ACCESS_TOKEN_QUERY_PARAMETER = "access_token";
   private static final Map<Environment, String> ENDPOINTS = new HashMap<Environment, String>() {
     {
       put(Environment.COM, COM_CONFIG_ENDPOINT);
@@ -41,9 +43,11 @@ public class CertificateBlacklist implements Callback {
     }
   };
   private Context context;
+  private String accessToken;
 
-  CertificateBlacklist(Context context) {
+  CertificateBlacklist(Context context, String accessToken) {
     this.context = context;
+    this.accessToken = accessToken;
   }
 
   ArrayList<String> retrieveBlackList() {
@@ -90,9 +94,9 @@ public class CertificateBlacklist implements Callback {
     return lastUpdateTime;
   }
 
-  void updateBlacklist() {
+  void updateBlacklist() throws MalformedURLException {
     Request request = new Request.Builder()
-      .url(determineConfigEndpoint())
+      .url(determineConfigEndpoint() + "?" + ACCESS_TOKEN_QUERY_PARAMETER + "=" + accessToken)
       .build();
 
     OkHttpClient client = new OkHttpClient();
@@ -114,12 +118,11 @@ public class CertificateBlacklist implements Callback {
   }
 
   @Override
-  public void onFailure(Call call, IOException e) {
+  public void onFailure(Call call, IOException exception) {
   }
 
   @Override
   public void onResponse(Call call, Response response) throws IOException {
-
     ArrayList<String> revokedKeys = extractResponse(response);
 
     saveBlackList(revokedKeys);
