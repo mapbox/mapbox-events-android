@@ -1,7 +1,9 @@
 package com.mapbox.android.telemetry;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -9,9 +11,9 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.zip.GZIPInputStream;
 
 import okhttp3.Call;
@@ -21,14 +23,15 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class SchemaTest {
+  private static final String APPUSERTURNSTILE = "appUserTurnstile";
+  private ArrayList<JsonObject> schemaArray;
+
 
   @Before
   public void downloadSchema() throws Exception {
-
     final CountDownLatch latch = new CountDownLatch(1);
-    final AtomicReference<String> bodyRef = new AtomicReference<>();
     final AtomicBoolean failureRef = new AtomicBoolean();
-    Callback callback = provideACallback(latch, bodyRef, failureRef);
+    Callback callback = provideACallback(latch, failureRef);
 
     Request request = new Request.Builder()
       .url("https://mapbox.s3.amazonaws.com/mapbox-gl-native/event-schema/mobile-event-schemas.jsonl.gz")
@@ -41,13 +44,44 @@ public class SchemaTest {
   }
 
   @Test
-  public void checkArriveSerializing() throws Exception {
+  public void checkTurnstileEvent() throws Exception {
+    JsonObject schema = grabSchema(APPUSERTURNSTILE);
 
+    System.out.println("schema: " + schema);
   }
 
-  private Callback provideACallback(final CountDownLatch latch, final AtomicReference<String> bodyRef,
-                                    final AtomicBoolean failureRef) {
-    Callback aCallback = new Callback() {
+  private void unpackSchemas(Response responseData) throws IOException, JSONException {
+    ByteArrayInputStream bais = new ByteArrayInputStream(responseData.body().bytes());
+    GZIPInputStream gzis = new GZIPInputStream(bais);
+    InputStreamReader reader = new InputStreamReader(gzis);
+    BufferedReader in = new BufferedReader(reader);
+
+    schemaArray = new ArrayList<>();
+
+    String readed;
+    while ((readed = in.readLine()) != null) {
+      JsonParser jsonParser = new JsonParser();
+      JsonObject schema = (JsonObject)jsonParser.parse(readed);
+
+      schemaArray.add(schema);
+    }
+  }
+
+  private JsonObject grabSchema(String eventName) {
+    for (JsonObject thisSchema: schemaArray) {
+      String name = thisSchema.get("name").getAsString();
+      System.out.println("name: " + name);
+
+      if (name.equalsIgnoreCase(eventName)) {
+        return thisSchema;
+      }
+    }
+
+    return null;
+  }
+
+  private Callback provideACallback(final CountDownLatch latch, final AtomicBoolean failureRef) {
+    Callback callback = new Callback() {
       @Override
       public void onFailure(Call call, IOException exception) {
         System.out.println("fail: " + exception.getMessage());
@@ -68,20 +102,6 @@ public class SchemaTest {
         }
       }
     };
-    return aCallback;
-  }
-
-  private void unpackSchemas(Response responseData) throws IOException, JSONException {
-    ByteArrayInputStream bais = new ByteArrayInputStream(responseData.body().bytes());
-    GZIPInputStream gzis = new GZIPInputStream(bais);
-    InputStreamReader reader = new InputStreamReader(gzis);
-    BufferedReader in = new BufferedReader(reader);
-
-    String readed;
-    while ((readed = in.readLine()) != null) {
-      JSONObject jsonObject = new JSONObject(readed);
-      System.out.println("string: " + readed);
-      System.out.println("JsonObject: " + jsonObject.toString());
-    }
+    return callback;
   }
 }
