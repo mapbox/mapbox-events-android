@@ -1,5 +1,7 @@
 package com.mapbox.android.telemetry;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,13 +19,11 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okio.Buffer;
-import okio.GzipSource;
 
 public class SchemaTest {
 
   @Before
-  public void setUp() throws Exception {
+  public void downloadSchema() throws Exception {
 
     final CountDownLatch latch = new CountDownLatch(1);
     final AtomicReference<String> bodyRef = new AtomicReference<>();
@@ -61,6 +61,8 @@ public class SchemaTest {
           unpackSchemas(response);
         } catch (IOException exception) {
           throw exception;
+        } catch (JSONException exception) {
+          exception.printStackTrace();
         } finally {
           latch.countDown();
         }
@@ -69,9 +71,7 @@ public class SchemaTest {
     return aCallback;
   }
 
-  private void unpackSchemas(Response responseData) throws IOException {
-    System.out.println("response: " + responseData);
-
+  private void unpackSchemas(Response responseData) throws IOException, JSONException {
     ByteArrayInputStream bais = new ByteArrayInputStream(responseData.body().bytes());
     GZIPInputStream gzis = new GZIPInputStream(bais);
     InputStreamReader reader = new InputStreamReader(gzis);
@@ -79,15 +79,9 @@ public class SchemaTest {
 
     String readed;
     while ((readed = in.readLine()) != null) {
-      System.out.println(readed);
+      JSONObject jsonObject = new JSONObject(readed);
+      System.out.println("string: " + readed);
+      System.out.println("JsonObject: " + jsonObject.toString());
     }
-  }
-
-  private Buffer gunzip(Buffer gzipped) throws IOException {
-    Buffer result = new Buffer();
-    GzipSource source = new GzipSource(gzipped);
-    while (source.read(result, Integer.MAX_VALUE) != -1) {
-    }
-    return result;
   }
 }
