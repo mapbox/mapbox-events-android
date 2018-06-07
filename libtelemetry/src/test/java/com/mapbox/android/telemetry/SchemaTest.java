@@ -35,6 +35,11 @@ import static org.junit.Assert.assertTrue;
 
 public class SchemaTest {
   private static final String APP_USER_TURNSTILE = "appUserTurnstile";
+  private static final String LOCATION = "location";
+  private static final String MAP_CLICK = "map.click";
+  private static final String MAP_DRAG = "map.dragend";
+  private static final String MAP_LOAD = "map.load";
+  private static final String NAVIGATION_ARRIVE = "navigation.arrive";
   private ArrayList<JsonObject> schemaArray;
 
 
@@ -58,6 +63,71 @@ public class SchemaTest {
   public void checkAppUserTurnstileEvent() throws Exception {
     JsonObject schema = grabSchema(APP_USER_TURNSTILE);
     List<Field> fields = grabClassFields(AppUserTurnstile.class);
+
+    System.out.println("schema: " + schema);
+    System.out.println("fields: " + fields);
+
+    assertEquals(schema.size(), fields.size());
+
+    schemaContainsFields(schema, fields);
+  }
+
+  @Test
+  public void checkLocationEvent() throws Exception {
+    JsonObject schema = grabSchema(LOCATION);
+    List<Field> fields = grabClassFields(LocationEvent.class);
+
+    System.out.println("schema: " + schema);
+    System.out.println("fields: " + fields);
+
+    assertEquals(schema.size(), fields.size());
+
+    schemaContainsFields(schema, fields);
+  }
+
+  @Test
+  public void checkMapClickEvent() throws Exception {
+    JsonObject schema = grabSchema(MAP_CLICK);
+    List<Field> fields = grabClassFields(MapClickEvent.class);
+
+    System.out.println("schema: " + schema);
+    System.out.println("fields: " + fields);
+
+    assertEquals(schema.size(), fields.size());
+
+    schemaContainsFields(schema, fields);
+  }
+
+  @Test
+  public void checkMapDragEndEvent() throws Exception {
+    JsonObject schema = grabSchema(MAP_DRAG);
+    List<Field> fields = grabClassFields(MapDragendEvent.class);
+
+    System.out.println("schema: " + schema);
+    System.out.println("fields: " + fields);
+
+    assertEquals(schema.size(), fields.size());
+
+    schemaContainsFields(schema, fields);
+  }
+
+  @Test
+  public void checkMapLoadEvent() throws Exception {
+    JsonObject schema = grabSchema(MAP_LOAD);
+    List<Field> fields = grabClassFields(MapLoadEvent.class);
+
+    System.out.println("schema: " + schema);
+    System.out.println("fields: " + fields);
+
+    assertEquals(schema.size(), fields.size());
+
+    schemaContainsFields(schema, fields);
+  }
+
+  @Test
+  public void checkNavigationArriveEvent() throws Exception {
+    JsonObject schema = grabSchema(NAVIGATION_ARRIVE);
+    List<Field> fields = grabClassFields(NavigationArriveEvent.class);
 
     System.out.println("schema: " + schema);
     System.out.println("fields: " + fields);
@@ -94,9 +164,12 @@ public class SchemaTest {
 
     if (typeClass == JsonPrimitive.class) {
       JsonElement typePrimitive = schema.get("type");
+
+      System.out.println(typePrimitive + ": " + jsonElement);
       assertTrue(typePrimitive.equals(jsonElement));
     } else {
       JsonArray arrayOfTypes = schema.getAsJsonArray("type");
+      System.out.println(arrayOfTypes + ": " + jsonElement);
       assertTrue(arrayOfTypes.contains(jsonElement));
     }
   }
