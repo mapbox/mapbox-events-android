@@ -5,8 +5,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import com.google.gson.annotations.SerializedName;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Test;
@@ -62,40 +62,42 @@ public class SchemaTest {
     System.out.println("schema: " + schema);
     System.out.println("fields: " + fields);
 
-    assertEquals(fields.size(), schema.size());
+    assertEquals(schema.size(), fields.size());
 
+    schemaContainsFields(schema, fields);
+  }
+
+  private void schemaContainsFields(JsonObject schema, List<Field> fields) {
     for (int i = 0; i < fields.size(); i++) {
       String thisField = String.valueOf(fields.get(i));
       String[] fieldArray = thisField.split(" ");
-      String[] nameArray = fieldArray[fieldArray.length -1].split("\\.");
-      String[] typeArray = fieldArray[fieldArray.length -2].split("\\.");
-      String field = nameArray[nameArray.length - 1];
+      String[] typeArray = fieldArray[fieldArray.length - 2].split("\\.");
       String type = typeArray[typeArray.length - 1];
 
-      JsonObject thisSchema = schema.getAsJsonObject(field);
+      SerializedName fieldName = fields.get(i).getAnnotation(SerializedName.class);
+      JsonObject thisSchema = schema.getAsJsonObject(fieldName.value());
 
-      assertNotNull(schema.get(field));
+      System.out.println("fieldName: " + fieldName.value());
+      System.out.println("thisSchema: " + thisSchema);
+
+      assertNotNull(schema.get(fieldName.value()));
 
       if (thisSchema.has("type")) {
-        Class<? extends JsonElement> typeClass = thisSchema.get("type").getClass();
-
-        System.out.println("typeClass: " + typeClass);
-
-        JsonElement jsonElement = new JsonParser().parse(type.toLowerCase());
-        System.out.println("jsonElement: " + jsonElement);
-
-        if (typeClass == JsonPrimitive.class) {
-          JsonElement typePrimitive = thisSchema.get("type");
-          
-          assertTrue(typePrimitive.equals(jsonElement));
-          System.out.println(jsonElement + " == " + typePrimitive);
-        } else {
-          JsonArray arrayOfTypes = thisSchema.getAsJsonArray("type");
-
-          assertTrue(arrayOfTypes.contains(jsonElement));
-          System.out.println(jsonElement + " == " + arrayOfTypes);
-        }
+        typesMatch(thisSchema, type);
       }
+    }
+  }
+
+  private void typesMatch(JsonObject schema, String type) {
+    Class<? extends JsonElement> typeClass = schema.get("type").getClass();
+    JsonElement jsonElement = new JsonParser().parse(type.toLowerCase());
+
+    if (typeClass == JsonPrimitive.class) {
+      JsonElement typePrimitive = schema.get("type");
+      assertTrue(typePrimitive.equals(jsonElement));
+    } else {
+      JsonArray arrayOfTypes = schema.getAsJsonArray("type");
+      assertTrue(arrayOfTypes.contains(jsonElement));
     }
   }
 
