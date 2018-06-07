@@ -1,8 +1,12 @@
 package com.mapbox.android.telemetry;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,6 +28,10 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class SchemaTest {
   private static final String APP_USER_TURNSTILE = "appUserTurnstile";
@@ -47,12 +55,48 @@ public class SchemaTest {
   }
 
   @Test
-  public void checkTurnstileEvent() throws Exception {
+  public void checkAppUserTurnstileEvent() throws Exception {
     JsonObject schema = grabSchema(APP_USER_TURNSTILE);
+    List<Field> fields = grabClassFields(AppUserTurnstile.class);
 
     System.out.println("schema: " + schema);
+    System.out.println("fields: " + fields);
 
-    System.out.println("fields: " + grabClassFields(AppUserTurnstile.class));
+    assertEquals(fields.size(), schema.size());
+
+    for (int i = 0; i < fields.size(); i++) {
+      String thisField = String.valueOf(fields.get(i));
+      String[] fieldArray = thisField.split(" ");
+      String[] nameArray = fieldArray[fieldArray.length -1].split("\\.");
+      String[] typeArray = fieldArray[fieldArray.length -2].split("\\.");
+      String field = nameArray[nameArray.length - 1];
+      String type = typeArray[typeArray.length - 1];
+
+      JsonObject thisSchema = schema.getAsJsonObject(field);
+
+      assertNotNull(schema.get(field));
+
+      if (thisSchema.has("type")) {
+        Class<? extends JsonElement> typeClass = thisSchema.get("type").getClass();
+
+        System.out.println("typeClass: " + typeClass);
+
+        JsonElement jsonElement = new JsonParser().parse(type.toLowerCase());
+        System.out.println("jsonElement: " + jsonElement);
+
+        if (typeClass == JsonPrimitive.class) {
+          JsonElement typePrimitive = thisSchema.get("type");
+          
+          assertTrue(typePrimitive.equals(jsonElement));
+          System.out.println(jsonElement + " == " + typePrimitive);
+        } else {
+          JsonArray arrayOfTypes = thisSchema.getAsJsonArray("type");
+
+          assertTrue(arrayOfTypes.contains(jsonElement));
+          System.out.println(jsonElement + " == " + arrayOfTypes);
+        }
+      }
+    }
   }
 
   private void unpackSchemas(Response responseData) throws IOException, JSONException {
