@@ -2,6 +2,7 @@ package com.mapbox.android.telemetry;
 
 
 import android.app.ActivityManager;
+import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.ProcessLifecycleOwner;
 import android.content.ComponentName;
 import android.content.Context;
@@ -491,8 +492,10 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   private void startLocation() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      applicationContext.startForegroundService(obtainLocationServiceIntent());
-      initializeLifecycleMonitor();
+      if (ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+        applicationContext.startForegroundService(obtainLocationServiceIntent());
+        initializeLifecycleMonitor();
+      }
     } else {
       applicationContext.startService(obtainLocationServiceIntent());
     }
