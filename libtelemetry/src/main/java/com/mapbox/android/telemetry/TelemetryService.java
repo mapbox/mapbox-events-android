@@ -205,7 +205,7 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
     isLocationEnablerFromPreferences = intent.getBooleanExtra(IS_LOCATION_ENABLER_FROM_PREFERENCES, true);
 
     if (isLocationEnablerFromPreferences) {
-      telemetryLocationEnabler = new TelemetryLocationEnabler(true);
+      createLocationEnabler();
       telemetryLocationEnabler.updateTelemetryLocationState(TelemetryLocationEnabler.LocationState.ENABLED);
     }
   }
@@ -239,6 +239,7 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
 
   private void disableTelemetryLocationState() {
     if (isLocationEnablerFromPreferences) {
+      createLocationEnabler();
       telemetryLocationEnabler.updateTelemetryLocationState(TelemetryLocationEnabler.LocationState.DISABLED);
     }
   }
@@ -246,6 +247,12 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   private void checkApplicationContext() {
     if (MapboxTelemetry.applicationContext == null) {
       MapboxTelemetry.applicationContext = getApplicationContext();
+    }
+  }
+
+  private void createLocationEnabler() {
+    if (telemetryLocationEnabler == null) {
+      telemetryLocationEnabler = new TelemetryLocationEnabler(true);
     }
   }
 
