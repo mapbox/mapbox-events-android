@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Build;
 import android.os.IBinder;
 
 import com.mapbox.android.core.location.LocationEnginePriority;
@@ -491,12 +490,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   private void startLocation() {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      if (ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
-        applicationContext.startForegroundService(obtainLocationServiceIntent());
-        initializeLifecycleMonitor();
-      }
-    } else {
+    if (ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
       applicationContext.startService(obtainLocationServiceIntent());
     }
   }
@@ -537,10 +531,5 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     }
 
     return false;
-  }
-
-  private void initializeLifecycleMonitor() {
-    ApplicationLifecycleObserver applicationLifecycleMonitor = new ApplicationLifecycleObserver(applicationContext);
-    ProcessLifecycleOwner.get().getLifecycle().addObserver(applicationLifecycleMonitor);
   }
 }
