@@ -40,6 +40,15 @@ public class SchemaTest {
   private static final String MAP_DRAG = "map.dragend";
   private static final String MAP_LOAD = "map.load";
   private static final String NAVIGATION_ARRIVE = "navigation.arrive";
+  private static final String NAVIGATION_CANCEL = "navigation.cancel";
+  private static final String NAVIGATION_DEPART = "navigation.depart";
+  private static final String NAVIGATION_FASTER_ROUTE = "navigation.fasterRoute";
+  private static final String NAVIGATION_FEEDBACK = "navigation.feedback";
+  private static final String NAVIGATION_OVERLAPPING_AUDIO = "navigation.overlappingAudio";
+  private static final String NAVIGATION_REROUTE = "navigation.reroute";
+  private static final String NAVIGATION_SIGNIFICANT_SPEED_DIFFERENCE = "navigation.significantSpeedDifference";
+  private static final String NAVIGATION_TURNSTIL = "navigation.turnstile";
+  private static final String VISIT = "visit";
   private ArrayList<JsonObject> schemaArray;
 
 
@@ -128,6 +137,58 @@ public class SchemaTest {
   public void checkNavigationArriveEvent() throws Exception {
     JsonObject schema = grabSchema(NAVIGATION_ARRIVE);
     List<Field> fields = grabClassFields(NavigationArriveEvent.class);
+
+    System.out.println("schema: " + schema);
+    System.out.println("fields: " + fields);
+
+    assertEquals(schema.size(), fields.size());
+
+    schemaContainsFields(schema, fields);
+  }
+
+  @Test
+  public void checkNavigationCancelEvent() throws Exception {
+    JsonObject schema = grabSchema(NAVIGATION_CANCEL);
+    List<Field> fields = grabClassFields(NavigationCancelEvent.class);
+
+    System.out.println("schema: " + schema);
+    System.out.println("fields: " + fields);
+
+    assertEquals(schema.size(), fields.size());
+
+    schemaContainsFields(schema, fields);
+  }
+
+  @Test
+  public void checkNavigationDepartEvent() throws Exception {
+    JsonObject schema = grabSchema(NAVIGATION_DEPART);
+    List<Field> fields = grabClassFields(NavigationDepartEvent.class);
+
+    System.out.println("schema: " + schema);
+    System.out.println("fields: " + fields);
+
+    assertEquals(schema.size(), fields.size());
+
+    schemaContainsFields(schema, fields);
+  }
+
+  @Test
+  public void checkNavigationFeedbackEvent() throws Exception {
+    JsonObject schema = grabSchema(NAVIGATION_FEEDBACK);
+    List<Field> fields = grabClassFields(NavigationFeedbackEvent.class);
+
+    System.out.println("schema: " + schema);
+    System.out.println("fields: " + fields);
+
+    assertEquals(schema.size(), fields.size());
+
+    schemaContainsFields(schema, fields);
+  }
+
+  @Test
+  public void checkNavigationRerouteEvent() throws Exception {
+    JsonObject schema = grabSchema(NAVIGATION_REROUTE);
+    List<Field> fields = grabClassFields(NavigationRerouteEvent.class);
 
     System.out.println("schema: " + schema);
     System.out.println("fields: " + fields);
