@@ -47,7 +47,7 @@ public class SchemaTest {
   private static final String NAVIGATION_OVERLAPPING_AUDIO = "navigation.overlappingAudio";
   private static final String NAVIGATION_REROUTE = "navigation.reroute";
   private static final String NAVIGATION_SIGNIFICANT_SPEED_DIFFERENCE = "navigation.significantSpeedDifference";
-  private static final String NAVIGATION_TURNSTIL = "navigation.turnstile";
+  private static final String NAVIGATION_TURNSTILE = "navigation.turnstile";
   private static final String VISIT = "visit";
   private ArrayList<JsonObject> schemaArray;
 
@@ -176,6 +176,9 @@ public class SchemaTest {
   public void checkNavigationFasterRouteEvent() throws Exception {
     JsonObject schema = grabSchema(NAVIGATION_FASTER_ROUTE);
     List<Field> fields = grabClassFields(NavigationFasterRouteEvent.class);
+    fields = addNavigationMetadata(fields);
+    fields = addNavigationStepData(fields);
+    fields = addNavigationNewData(fields);
 
     System.out.println("schema: " + schema);
     System.out.println("fields: " + fields);
@@ -218,13 +221,24 @@ public class SchemaTest {
       String[] typeArray = fieldArray[fieldArray.length - 2].split("\\.");
       String type = typeArray[typeArray.length - 1];
 
-      SerializedName fieldName = fields.get(i).getAnnotation(SerializedName.class);
-      JsonObject thisSchema = schema.getAsJsonObject(fieldName.value());
+      String[] nameArray = fieldArray[fieldArray.length - 1].split("\\.");
+      String field = nameArray[nameArray.length - 1];
 
-      System.out.println("fieldName: " + fieldName.value());
+      System.out.println("fieldName: " + field);
+      System.out.println("schema: " + schema);
+
+      //^
+      //issue regarding serialized vs non-serialized for fields, may be related to navigation vs non-nav
+      //need to look into and compensate for to get working tests
+      //V
+
+      SerializedName fieldName = fields.get(i).getAnnotation(SerializedName.class);
+      JsonObject thisSchema = schema.getAsJsonObject(field);
+
+
       System.out.println("thisSchema: " + thisSchema);
 
-      assertNotNull(schema.get(fieldName.value()));
+      assertNotNull(schema.get(field));
 
       if (thisSchema.has("type")) {
         typesMatch(thisSchema, type);
@@ -273,6 +287,7 @@ public class SchemaTest {
         System.out.println("name: " + name);
         JsonObject schema = thisSchema.get("properties").getAsJsonObject();
         schema.remove("userAgent");
+        schema.remove("received");
         return schema;
       }
     }
@@ -286,6 +301,58 @@ public class SchemaTest {
     for (Field field : allFields) {
       if (Modifier.isPrivate(field.getModifiers()) && !Modifier.isStatic(field.getModifiers())) {
         fields.add(field);
+      }
+    }
+
+    return fields;
+  }
+
+  private List<Field> addNavigationMetadata(List<Field> fields) {
+    fields = removeField(fields, "metadata");
+
+    Field[] navMetadataFields = NavigationMetadata.class.getDeclaredFields();
+    for (Field field : navMetadataFields) {
+      if (Modifier.isPrivate(field.getModifiers()) && !Modifier.isStatic(field.getModifiers())) {
+        fields.add(field);
+      }
+    }
+
+    return fields;
+  }
+
+  private List<Field> addNavigationStepData(List<Field> fields) {
+    fields = removeField(fields, "step");
+
+    Field[] navMetadataFields = NavigationStepMetadata.class.getDeclaredFields();
+    for (Field field : navMetadataFields) {
+      if (Modifier.isPrivate(field.getModifiers()) && !Modifier.isStatic(field.getModifiers())) {
+        fields.add(field);
+      }
+    }
+
+    return fields;
+  }
+
+  private List<Field> addNavigationNewData(List<Field> fields) {
+    fields = removeField(fields, "navigationNewData");
+
+    Field[] navMetadataFields = NavigationNewData.class.getDeclaredFields();
+    for (Field field : navMetadataFields) {
+      if (Modifier.isPrivate(field.getModifiers()) && !Modifier.isStatic(field.getModifiers())) {
+        fields.add(field);
+      }
+    }
+
+    return fields;
+  }
+
+  private List<Field> removeField(List<Field> fields, String fieldName) {
+    for (Field field : new ArrayList<>(fields)) {
+      String thisField = String.valueOf(field);
+      String[] fieldArray = thisField.split("\\.");
+      String simpleField = fieldArray[fieldArray.length - 1];
+      if (simpleField.equalsIgnoreCase(fieldName)) {
+        fields.remove(field);
       }
     }
 
