@@ -173,6 +173,19 @@ public class SchemaTest {
   }
 
   @Test
+  public void checkNavigationFasterRouteEvent() throws Exception {
+    JsonObject schema = grabSchema(NAVIGATION_FASTER_ROUTE);
+    List<Field> fields = grabClassFields(NavigationFasterRouteEvent.class);
+
+    System.out.println("schema: " + schema);
+    System.out.println("fields: " + fields);
+
+    assertEquals(schema.size(), fields.size());
+
+    schemaContainsFields(schema, fields);
+  }
+
+  @Test
   public void checkNavigationFeedbackEvent() throws Exception {
     JsonObject schema = grabSchema(NAVIGATION_FEEDBACK);
     List<Field> fields = grabClassFields(NavigationFeedbackEvent.class);
@@ -255,10 +268,12 @@ public class SchemaTest {
   private JsonObject grabSchema(String eventName) {
     for (JsonObject thisSchema: schemaArray) {
       String name = thisSchema.get("name").getAsString();
-      System.out.println("name: " + name);
 
       if (name.equalsIgnoreCase(eventName)) {
-        return thisSchema.get("properties").getAsJsonObject();
+        System.out.println("name: " + name);
+        JsonObject schema = thisSchema.get("properties").getAsJsonObject();
+        schema.remove("userAgent");
+        return schema;
       }
     }
 
