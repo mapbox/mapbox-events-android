@@ -17,7 +17,7 @@ public class NavigationMetadata implements Parcelable {
   private int durationRemaining;
   private String operatingSystem;
   private int eventVersion;
-  private String sdKIdentifier;
+  private String sdkIdentifier;
   private String sdkVersion;
   private String sessionIdentifier;
   private double lat;
@@ -55,7 +55,7 @@ public class NavigationMetadata implements Parcelable {
     this.distanceRemaining = distanceRemaining;
     this.durationRemaining = durationRemaining;
     this.operatingSystem = OPERATING_SYSTEM;
-    this.sdKIdentifier = sdKIdentifier;
+    this.sdkIdentifier = sdKIdentifier;
     this.sdkVersion = sdkVersion;
     this.eventVersion = eventVersion;
     this.sessionIdentifier = sessionIdentifier;
@@ -110,7 +110,7 @@ public class NavigationMetadata implements Parcelable {
   }
 
   String getSdKIdentifier() {
-    return sdKIdentifier;
+    return sdkIdentifier;
   }
 
   String getSdkVersion() {
@@ -292,7 +292,7 @@ public class NavigationMetadata implements Parcelable {
     durationRemaining = in.readInt();
     operatingSystem = in.readString();
     eventVersion = in.readInt();
-    sdKIdentifier = in.readString();
+    sdkIdentifier = in.readString();
     sdkVersion = in.readString();
     sessionIdentifier = in.readString();
     lat = in.readDouble();
@@ -348,7 +348,7 @@ public class NavigationMetadata implements Parcelable {
     dest.writeInt(durationRemaining);
     dest.writeString(operatingSystem);
     dest.writeInt(eventVersion);
-    dest.writeString(sdKIdentifier);
+    dest.writeString(sdkIdentifier);
     dest.writeString(sdkVersion);
     dest.writeString(sessionIdentifier);
     dest.writeDouble(lat);

@@ -225,20 +225,17 @@ public class SchemaTest {
       String field = nameArray[nameArray.length - 1];
 
       System.out.println("fieldName: " + field);
-      System.out.println("schema: " + schema);
 
-      //^
-      //issue regarding serialized vs non-serialized for fields, may be related to navigation vs non-nav
-      //need to look into and compensate for to get working tests
-      //V
+      SerializedName serializedName = fields.get(i).getAnnotation(SerializedName.class);
 
-      SerializedName fieldName = fields.get(i).getAnnotation(SerializedName.class);
-      JsonObject thisSchema = schema.getAsJsonObject(field);
+      if (serializedName != null) {
+        field = serializedName.value();
+      }
 
-
+      JsonObject thisSchema = findSchema(schema, field);
       System.out.println("thisSchema: " + thisSchema);
 
-      assertNotNull(schema.get(field));
+      assertNotNull(thisSchema);
 
       if (thisSchema.has("type")) {
         typesMatch(thisSchema, type);
@@ -246,7 +243,24 @@ public class SchemaTest {
     }
   }
 
+  private JsonObject findSchema(JsonObject schema, String field) {
+    JsonObject thisSchema = schema.getAsJsonObject(field);
+
+    if (thisSchema == null) {
+      JsonObject step = schema.getAsJsonObject("step");
+      JsonObject properties = step.getAsJsonObject("properties");
+      thisSchema = properties.getAsJsonObject(field);
+    }
+
+    return thisSchema;
+  }
+
   private void typesMatch(JsonObject schema, String type) {
+    if (type.equalsIgnoreCase("int") || type.equalsIgnoreCase("integer")
+      || type.equalsIgnoreCase("double") || type.equalsIgnoreCase("float")) {
+      type = "number";
+    }
+
     Class<? extends JsonElement> typeClass = schema.get("type").getClass();
     JsonElement jsonElement = new JsonParser().parse(type.toLowerCase());
 
