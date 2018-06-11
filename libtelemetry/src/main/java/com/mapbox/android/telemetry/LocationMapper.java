@@ -31,7 +31,6 @@ class LocationMapper {
     double longitudeWrapped = wrapLongitude(longitudeScaled);
     LocationEvent locationEvent = new LocationEvent(sessionId, latitudeScaled, longitudeWrapped);
     addAltitudeIfPresent(location, locationEvent);
-    addAccuracyIfPresent(location, locationEvent);
     return locationEvent;
   }
 
@@ -60,13 +59,6 @@ class LocationMapper {
     if (location.hasAltitude()) {
       double altitudeRounded = Math.round(location.getAltitude());
       locationEvent.setAltitude(altitudeRounded);
-    }
-  }
-
-  private void addAccuracyIfPresent(Location location, LocationEvent locationEvent) {
-    if (location.hasAccuracy()) {
-      float accuracyRounded = Math.round(location.getAccuracy());
-      locationEvent.setAccuracy(accuracyRounded);
     }
   }
 }

@@ -137,6 +137,7 @@ public class SchemaTest {
   public void checkNavigationArriveEvent() throws Exception {
     JsonObject schema = grabSchema(NAVIGATION_ARRIVE);
     List<Field> fields = grabClassFields(NavigationArriveEvent.class);
+    fields = addNavigationMetadata(fields);
 
     System.out.println("schema: " + schema);
     System.out.println("fields: " + fields);
@@ -150,6 +151,8 @@ public class SchemaTest {
   public void checkNavigationCancelEvent() throws Exception {
     JsonObject schema = grabSchema(NAVIGATION_CANCEL);
     List<Field> fields = grabClassFields(NavigationCancelEvent.class);
+    fields = addNavigationMetadata(fields);
+    fields = addNavigationCancelData(fields);
 
     System.out.println("schema: " + schema);
     System.out.println("fields: " + fields);
@@ -163,6 +166,7 @@ public class SchemaTest {
   public void checkNavigationDepartEvent() throws Exception {
     JsonObject schema = grabSchema(NAVIGATION_DEPART);
     List<Field> fields = grabClassFields(NavigationDepartEvent.class);
+    fields = addNavigationMetadata(fields);
 
     System.out.println("schema: " + schema);
     System.out.println("fields: " + fields);
@@ -192,6 +196,11 @@ public class SchemaTest {
   public void checkNavigationFeedbackEvent() throws Exception {
     JsonObject schema = grabSchema(NAVIGATION_FEEDBACK);
     List<Field> fields = grabClassFields(NavigationFeedbackEvent.class);
+    fields = addNavigationMetadata(fields);
+    fields = addNavigationStepData(fields);
+    fields = addNavigationFeedbackData(fields);
+    fields = addNavigationLocationData(fields);
+    fields = addFeedbackEventData(fields);
 
     System.out.println("schema: " + schema);
     System.out.println("fields: " + fields);
@@ -205,6 +214,11 @@ public class SchemaTest {
   public void checkNavigationRerouteEvent() throws Exception {
     JsonObject schema = grabSchema(NAVIGATION_REROUTE);
     List<Field> fields = grabClassFields(NavigationRerouteEvent.class);
+    fields = addNavigationMetadata(fields);
+    fields = addNavigationStepData(fields);
+    fields = addNavigationFeedbackData(fields);
+    fields = addNavigationRerouteData(fields);
+    fields = addNavigationLocationData(fields);
 
     System.out.println("schema: " + schema);
     System.out.println("fields: " + fields);
@@ -229,6 +243,7 @@ public class SchemaTest {
       SerializedName serializedName = fields.get(i).getAnnotation(SerializedName.class);
 
       if (serializedName != null) {
+        System.out.println("serialized");
         field = serializedName.value();
       }
 
@@ -302,6 +317,7 @@ public class SchemaTest {
         JsonObject schema = thisSchema.get("properties").getAsJsonObject();
         schema.remove("userAgent");
         schema.remove("received");
+        schema.remove("token");
         return schema;
       }
     }
@@ -351,6 +367,71 @@ public class SchemaTest {
     fields = removeField(fields, "navigationNewData");
 
     Field[] navMetadataFields = NavigationNewData.class.getDeclaredFields();
+    for (Field field : navMetadataFields) {
+      if (Modifier.isPrivate(field.getModifiers()) && !Modifier.isStatic(field.getModifiers())) {
+        fields.add(field);
+      }
+    }
+
+    return fields;
+  }
+
+  private List<Field> addNavigationCancelData(List<Field> fields) {
+    fields = removeField(fields, "cancelData");
+
+    Field[] navMetadataFields = NavigationCancelData.class.getDeclaredFields();
+    for (Field field : navMetadataFields) {
+      if (Modifier.isPrivate(field.getModifiers()) && !Modifier.isStatic(field.getModifiers())) {
+        fields.add(field);
+      }
+    }
+
+    return fields;
+  }
+
+  private List<Field> addNavigationFeedbackData(List<Field> fields) {
+    fields = removeField(fields, "feedbackData");
+
+    Field[] navMetadataFields = FeedbackData.class.getDeclaredFields();
+    for (Field field : navMetadataFields) {
+      if (Modifier.isPrivate(field.getModifiers()) && !Modifier.isStatic(field.getModifiers())) {
+        fields.add(field);
+      }
+    }
+
+    return fields;
+  }
+
+  private List<Field> addNavigationRerouteData(List<Field> fields) {
+    fields = removeField(fields, "navigationRerouteData");
+
+    Field[] navMetadataFields = NavigationRerouteData.class.getDeclaredFields();
+    for (Field field : navMetadataFields) {
+      if (Modifier.isPrivate(field.getModifiers()) && !Modifier.isStatic(field.getModifiers())) {
+        fields.add(field);
+      }
+    }
+
+    return fields;
+  }
+
+  private List<Field> addNavigationLocationData(List<Field> fields) {
+    fields = removeField(fields, "navigationLocationData");
+
+    Field[] navMetadataFields = NavigationLocationData.class.getDeclaredFields();
+    for (Field field : navMetadataFields) {
+      if (Modifier.isPrivate(field.getModifiers()) && !Modifier.isStatic(field.getModifiers())) {
+        fields.add(field);
+      }
+    }
+
+    return fields;
+  }
+
+  private List<Field> addFeedbackEventData(List<Field> fields) {
+    fields = removeField(fields, "feedbackEventData");
+
+    Field[] navMetadataFields = FeedbackEventData.class.getDeclaredFields();
     for (Field field : navMetadataFields) {
       if (Modifier.isPrivate(field.getModifiers()) && !Modifier.isStatic(field.getModifiers())) {
         fields.add(field);

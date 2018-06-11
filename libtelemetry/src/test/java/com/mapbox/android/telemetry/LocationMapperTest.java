@@ -85,19 +85,6 @@ public class LocationMapperTest {
   }
 
   @Test
-  public void checksLocationEventWithAccuracyMapping() throws Exception {
-    setupMockedContext();
-    Location mockedLocation = mock(Location.class);
-    when(mockedLocation.hasAccuracy()).thenReturn(true);
-    when(mockedLocation.getAccuracy()).thenReturn(1.9f);
-    LocationMapper obtainLocationEvent = new LocationMapper();
-
-    LocationEvent actualLocationEvent = obtainLocationEvent.from(mockedLocation);
-
-    assertEquals(2.0, actualLocationEvent.getAccuracy(), 0);
-  }
-
-  @Test
   public void checksLocationEventWithOverMaxLongitudeMapping() throws Exception {
     setupMockedContext();
     Location mockedLocation = mock(Location.class);

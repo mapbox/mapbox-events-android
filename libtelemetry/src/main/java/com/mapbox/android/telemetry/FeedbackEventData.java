@@ -7,7 +7,6 @@ public class FeedbackEventData implements Parcelable {
   private String userId;
   private String feedbackType;
   private String source;
-  private String audio = null;
   private String description = null;
 
   public FeedbackEventData(String feedbackType, String source) {
@@ -35,14 +34,6 @@ public class FeedbackEventData implements Parcelable {
     return source;
   }
 
-  String getAudio() {
-    return audio;
-  }
-
-  public void setAudio(String audio) {
-    this.audio = audio;
-  }
-
   String getDescription() {
     return description;
   }
@@ -55,7 +46,6 @@ public class FeedbackEventData implements Parcelable {
     userId = in.readString();
     feedbackType = in.readString();
     source = in.readString();
-    audio = in.readString();
     description = in.readString();
   }
 
@@ -69,7 +59,6 @@ public class FeedbackEventData implements Parcelable {
     dest.writeString(userId);
     dest.writeString(feedbackType);
     dest.writeString(source);
-    dest.writeString(audio);
     dest.writeString(description);
   }
 
