@@ -318,6 +318,10 @@ public class SchemaTest {
         schema.remove("userAgent");
         schema.remove("received");
         schema.remove("token");
+        schema.remove("authorization");
+        schema.remove("owner");
+        //temporary need to work out a solution to include this data
+        schema.remove("platform");
         return schema;
       }
     }
@@ -339,6 +343,7 @@ public class SchemaTest {
 
   private List<Field> addNavigationMetadata(List<Field> fields) {
     fields = removeField(fields, "metadata");
+    fields = removeField(fields, "navigationMetadata");
 
     Field[] navMetadataFields = NavigationMetadata.class.getDeclaredFields();
     for (Field field : navMetadataFields) {

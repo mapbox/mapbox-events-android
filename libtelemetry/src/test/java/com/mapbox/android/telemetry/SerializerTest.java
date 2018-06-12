@@ -26,7 +26,8 @@ public class SerializerTest {
     setupMockedContext();
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22, 180, "sdkIdentifier", "sdkVersion",
-      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "AndroidLocationEngine", 50);
+      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "AndroidLocationEngine", 50,
+      "tripIdentifier", 3, 5, 2, 3, 10);
     metadata.setCreated(testDate);
     metadata.setBatteryLevel(50);
     NavigationState navigationState = new NavigationState(metadata);
@@ -43,12 +44,13 @@ public class SerializerTest {
     String expectedJson = "{\"event\":\"navigation.arrive\",\"absoluteDistanceToDestination\":50,\"startTimestamp\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"distanceCompleted\":13,\"distanceRemaining\":22,"
       + "\"durationRemaining\":180,\"operatingSystem\":\"Android - null\",\"eventVersion\":3,"
-      + "\"sdKIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
+      + "\"sdkIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
-      + "\"audioType\":\"unknown\",\"locationEngine\":\"AndroidLocationEngine\",\"volumeLevel\":0,"
+      + "\"audioType\":\"unknown\",\"stepCount\":3,\"locationEngine\":\"AndroidLocationEngine\",\"volumeLevel\":0,"
       + "\"screenBrightness\":0,\"applicationState\":\"Background\",\"batteryPluggedIn\":false,\"batteryLevel\":50,"
-      + "\"connectivity\":\"Unknown\"}";
+      + "\"connectivity\":\"Unknown\",\"tripIdentifier\":\"tripIdentifier\",\"legIndex\":3,\"legCount\":5,"
+      + "\"stepIndex\":2,\"totalStepCount\":10}";
 
     assertEquals(expectedJson, payload);
   }
@@ -58,7 +60,8 @@ public class SerializerTest {
     setupMockedContext();
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22, 180, "sdkIdentifier", "sdkVersion",
-      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "AndroidLocationEngine", 50);
+      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "AndroidLocationEngine", 50,
+      "tripIdentifier", 3, 5, 2, 3, 10);
     metadata.setCreated(testDate);
     metadata.setBatteryLevel(50);
     NavigationState navigationState = new NavigationState(metadata);
@@ -76,12 +79,13 @@ public class SerializerTest {
     String expectedJson = "{\"absoluteDistanceToDestination\":50,\"startTimestamp\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"distanceCompleted\":13,\"distanceRemaining\":22,"
       + "\"durationRemaining\":180,\"operatingSystem\":\"Android - null\",\"eventVersion\":3,"
-      + "\"sdKIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
+      + "\"sdkIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
-      + "\"audioType\":\"unknown\",\"locationEngine\":\"AndroidLocationEngine\",\"volumeLevel\":0,"
+      + "\"audioType\":\"unknown\",\"stepCount\":3,\"locationEngine\":\"AndroidLocationEngine\",\"volumeLevel\":0,"
       + "\"screenBrightness\":0,\"applicationState\":\"Background\",\"batteryPluggedIn\":false,\"batteryLevel\":50,"
-      + "\"connectivity\":\"Unknown\",\"event\":\"navigation.depart\"}";
+      + "\"connectivity\":\"Unknown\",\"tripIdentifier\":\"tripIdentifier\",\"legIndex\":3,\"legCount\":5,"
+      + "\"stepIndex\":2,\"totalStepCount\":10,\"event\":\"navigation.depart\"}";
 
     assertEquals(expectedJson, payload);
   }
@@ -94,7 +98,8 @@ public class SerializerTest {
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22,
       180, "sdkIdentifier", "sdkVersion", 3, "sessionID", 10.5,
       15.67, "geometry", "profile", false,
-      "AndroidLocationEngine", 50);
+      "AndroidLocationEngine", 50,
+      "tripIdentifier", 3, 5, 2, 3, 10);
     metadata.setCreated(testDate);
     metadata.setBatteryLevel(50);
 
@@ -118,12 +123,13 @@ public class SerializerTest {
       + "\"absoluteDistanceToDestination\":50,\"startTimestamp\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"distanceCompleted\":13,\"distanceRemaining\":22,"
       + "\"durationRemaining\":180,\"operatingSystem\":\"Android - null\",\"eventVersion\":3,"
-      + "\"sdKIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
+      + "\"sdkIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
-      + "\"audioType\":\"unknown\",\"locationEngine\":\"AndroidLocationEngine\",\"volumeLevel\":0,"
+      + "\"audioType\":\"unknown\",\"stepCount\":3,\"locationEngine\":\"AndroidLocationEngine\",\"volumeLevel\":0,"
       + "\"screenBrightness\":0,\"applicationState\":\"Background\",\"batteryPluggedIn\":false,\"batteryLevel\":50,"
-      + "\"connectivity\":\"Unknown\"}";
+      + "\"connectivity\":\"Unknown\",\"tripIdentifier\":\"tripIdentifier\",\"legIndex\":3,\"legCount\":5,"
+      + "\"stepIndex\":2,\"totalStepCount\":10}";
 
     assertEquals(expectedJson, payload);
   }
@@ -133,7 +139,8 @@ public class SerializerTest {
     setupMockedContext();
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22, 180, "sdkIdentifier", "sdkVersion",
-      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "AndroidLocationEngine", 50);
+      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "AndroidLocationEngine", 50,
+      "tripIdentifier", 3, 5, 2, 3, 10);
     metadata.setCreated(testDate);
     metadata.setBatteryLevel(50);
     FeedbackEventData navigationFeedbackData = new FeedbackEventData("userId", "general",
@@ -163,13 +170,14 @@ public class SerializerTest {
       + "\"startTimestamp\":\"" + TelemetryUtils.generateCreateDateFormatted(testDate)
       + "\",\"distanceCompleted\":13,\"distanceRemaining\":22,\"durationRemaining\":180,"
       + "\"operatingSystem\":\"Android - null\",\"eventVersion\":3,"
-      + "\"sdKIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
+      + "\"sdkIdentifier\":\"sdkIdentifier\",\"sdkVersion\":\"sdkVersion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":false,"
-      + "\"audioType\":\"unknown\",\"locationEngine\":\"AndroidLocationEngine\",\"volumeLevel\":0,"
+      + "\"audioType\":\"unknown\",\"stepCount\":3,\"locationEngine\":\"AndroidLocationEngine\",\"volumeLevel\":0,"
       + "\"screenBrightness\":0,\"applicationState\":\"Background\",\"batteryPluggedIn\":false,\"batteryLevel\":50,"
-      + "\"connectivity\":\"Unknown\",\"userId\":\"userId\",\"feedbackType\":\"general\",\"source\":\"unknown\","
-      + "\"locationsBefore\":[{}],\"locationsAfter\":[{}],\"feedbackId\":\""
+      + "\"connectivity\":\"Unknown\",\"tripIdentifier\":\"tripIdentifier\",\"legIndex\":3,\"legCount\":5,"
+      + "\"stepIndex\":2,\"totalStepCount\":10,\"userId\":\"userId\",\"feedbackType\":\"general\","
+      + "\"source\":\"unknown\",\"locationsBefore\":[{}],\"locationsAfter\":[{}],\"feedbackId\":\""
       + feedbackData.getFeedbackId() + "\"}";
 
     assertEquals(expectedJson, payload);
@@ -182,7 +190,8 @@ public class SerializerTest {
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22,
       180, "sdkIdent", "sdkversion", 3, "sessionID", 10.5,
       15.67, "geometry", "profile", true,
-      "MockLocationEngine", 1300);
+      "MockLocationEngine", 1300
+      ,"tripIdentifier", 3, 5, 2, 3, 10);
     metadata.setCreated(testDate);
     metadata.setBatteryLevel(50);
     NavigationNewData navigationNewData = new NavigationNewData(100, 750,
@@ -228,14 +237,15 @@ public class SerializerTest {
       + "\"startTimestamp\":\"" + TelemetryUtils.generateCreateDateFormatted(testDate)
       + "\",\"distanceCompleted\":13,\"distanceRemaining\":22,"
       + "\"durationRemaining\":180,\"operatingSystem\":\"Android - null\",\"eventVersion\":3,"
-      + "\"sdKIdentifier\":\"sdkIdent\",\"sdkVersion\":\"sdkversion\",\"sessionIdentifier\":\"sessionID\","
+      + "\"sdkIdentifier\":\"sdkIdent\",\"sdkVersion\":\"sdkversion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":true,"
-      + "\"audioType\":\"unknown\",\"locationEngine\":\"MockLocationEngine\",\"volumeLevel\":0,\"screenBrightness\":0,"
-      + "\"applicationState\":\"Background\",\"batteryPluggedIn\":false,\"batteryLevel\":50,"
-      + "\"connectivity\":\"Unknown\",\"navigationNewData\":{\"newDistanceRemaining\":100,\"newDurationRemaining\":750,"
-      + "\"newGeometry\":\"mewGeometry\"},\"secondsSinceLastReroute\":12000,\"locationsBefore\":[null],"
-      + "\"locationsAfter\":[null],\"feedbackId\":\"" + feedbackData.getFeedbackId() + "\","
+      + "\"audioType\":\"unknown\",\"stepCount\":3,\"locationEngine\":\"MockLocationEngine\",\"volumeLevel\":0,"
+      + "\"screenBrightness\":0,\"applicationState\":\"Background\",\"batteryPluggedIn\":false,\"batteryLevel\":50,"
+      + "\"connectivity\":\"Unknown\",\"tripIdentifier\":\"tripIdentifier\",\"legIndex\":3,\"legCount\":5,"
+      + "\"stepIndex\":2,\"totalStepCount\":10,\"navigationNewData\":{\"newDistanceRemaining\":100,"
+      + "\"newDurationRemaining\":750,\"newGeometry\":\"mewGeometry\"},\"secondsSinceLastReroute\":12000,"
+      + "\"locationsBefore\":[null],\"locationsAfter\":[null],\"feedbackId\":\"" + feedbackData.getFeedbackId() + "\","
       + "\"screenshot\":\"screenshot\",\"step\":{\"upcomingInstruction\":\"upcomingInstruction\","
       + "\"upcomingType\":\"upcomingType\",\"upcomingModifier\":\"upcomingModifier\",\"upcomingName\":\"upcomingName\","
       + "\"previousInstruction\":\"previousInstruction\",\"previousType\":\"previousType\","
@@ -252,7 +262,8 @@ public class SerializerTest {
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22,
       180, "sdkIdent", "sdkversion", 3, "sessionID", 10.5,
       15.67, "geometry", "profile", true,
-      "MockLocationEngine", 1300);
+      "MockLocationEngine", 1300,
+      "tripIdentifier", 3, 5, 2, 3, 10);
     metadata.setCreated(testDate);
     metadata.setBatteryLevel(50);
     NavigationNewData navigationNewData = new NavigationNewData(100, 750,
@@ -290,12 +301,13 @@ public class SerializerTest {
       + "\"startTimestamp\":\"" + TelemetryUtils.generateCreateDateFormatted(testDate)
       + "\",\"distanceCompleted\":13,\"distanceRemaining\":22,"
       + "\"durationRemaining\":180,\"operatingSystem\":\"Android - null\",\"eventVersion\":3,"
-      + "\"sdKIdentifier\":\"sdkIdent\",\"sdkVersion\":\"sdkversion\",\"sessionIdentifier\":\"sessionID\","
+      + "\"sdkIdentifier\":\"sdkIdent\",\"sdkVersion\":\"sdkversion\",\"sessionIdentifier\":\"sessionID\","
       + "\"lat\":10.5,\"lng\":15.67,\"geometry\":\"geometry\",\"created\":\""
       + TelemetryUtils.generateCreateDateFormatted(testDate) + "\",\"profile\":\"profile\",\"simulation\":true,"
-      + "\"audioType\":\"unknown\",\"locationEngine\":\"MockLocationEngine\",\"volumeLevel\":0,\"screenBrightness\":0,"
-      + "\"applicationState\":\"Background\",\"batteryPluggedIn\":false,\"batteryLevel\":50,"
-      + "\"connectivity\":\"Unknown\",\"newDistanceRemaining\":100,"
+      + "\"audioType\":\"unknown\",\"stepCount\":3,\"locationEngine\":\"MockLocationEngine\",\"volumeLevel\":0,"
+      + "\"screenBrightness\":0,\"applicationState\":\"Background\",\"batteryPluggedIn\":false,\"batteryLevel\":50,"
+      + "\"connectivity\":\"Unknown\",\"tripIdentifier\":\"tripIdentifier\",\"legIndex\":3,\"legCount\":5,"
+      + "\"stepIndex\":2,\"totalStepCount\":10,\"newDistanceRemaining\":100,"
       + "\"newDurationRemaining\":750,\"newGeometry\":\"mewGeometry\",\"step\":"
       + "{\"upcomingInstruction\":\"upcomingInstruction\",\"upcomingType\":\"upcomingType\","
       + "\"upcomingModifier\":\"upcomingModifier\",\"upcomingName\":\"upcomingName\",\"previousInstruction\":"

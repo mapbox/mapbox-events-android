@@ -45,11 +45,19 @@ public class NavigationMetadata implements Parcelable {
   private Boolean batteryPluggedIn;
   private Integer batteryLevel;
   private String connectivity;
+  private String tripIdentifier;
+  private Integer legIndex;
+  private Integer legCount;
+  private Integer stepIndex;
+  private Integer voiceIndex;
+  private Integer bannerIndex;
+  private Integer totalStepCount;
 
   public NavigationMetadata(Date startTimestamp, int distanceCompleted, int distanceRemaining, int durationRemaining,
                             String sdKIdentifier, String sdkVersion, int eventVersion, String sessionIdentifier,
                             double lat, double lng, String geometry, String profile, boolean isSimulation,
-                            String locationEngine, int absoluteDistanceToDestination) {
+                            String locationEngine, int absoluteDistanceToDestination, String tripIdentifier,
+                            int legIndex, int legCount, int stepIndex, int stepCount, int totalStepCount) {
     this.startTimestamp = TelemetryUtils.generateCreateDateFormatted(startTimestamp);
     this.distanceCompleted = distanceCompleted;
     this.distanceRemaining = distanceRemaining;
@@ -75,6 +83,12 @@ public class NavigationMetadata implements Parcelable {
     this.connectivity = TelemetryUtils.obtainCellularNetworkType();
     this.audioType = NavigationUtils.obtainAudioType();
     this.applicationState = TelemetryUtils.obtainApplicationState();
+    this.tripIdentifier = tripIdentifier;
+    this.legIndex = legIndex;
+    this.legCount = legCount;
+    this.stepIndex = stepIndex;
+    this.stepCount = stepCount;
+    this.totalStepCount = totalStepCount;
   }
 
   public void setCreated(Date created) {
@@ -209,14 +223,6 @@ public class NavigationMetadata implements Parcelable {
     return audioType;
   }
 
-  Integer getStepCount() {
-    return stepCount;
-  }
-
-  public void setStepCount(Integer stepCount) {
-    this.stepCount = stepCount;
-  }
-
   Integer getOriginalStepCount() {
     return originalStepCount;
   }
@@ -282,6 +288,46 @@ public class NavigationMetadata implements Parcelable {
     this.percentTimeInForeground = percentTimeInForeground;
   }
 
+  String getTripIdentifier() {
+    return tripIdentifier;
+  }
+
+  Integer getLegIndex() {
+    return legIndex;
+  }
+
+  Integer getLegCount() {
+    return legCount;
+  }
+
+  Integer getStepIndex() {
+    return stepIndex;
+  }
+
+  Integer getStepCount() {
+    return stepCount;
+  }
+
+  Integer getVoiceIndex() {
+    return voiceIndex;
+  }
+
+  void setVoiceIndex(int voiceIndex) {
+    this.voiceIndex = voiceIndex;
+  }
+
+  Integer getBannerIndex() {
+    return bannerIndex;
+  }
+
+  public void setBannerIndex(int bannerIndex) {
+    this.bannerIndex = bannerIndex;
+  }
+
+  Integer getTotalStepCount() {
+    return totalStepCount;
+  }
+
   private NavigationMetadata(Parcel in) {
     absoluteDistanceToDestination = in.readInt();
     percentTimeInPortrait = in.readByte() == 0x00 ? null : in.readInt();
@@ -310,7 +356,6 @@ public class NavigationMetadata implements Parcelable {
     originalEstimatedDistance = in.readByte() == 0x00 ? null : in.readInt();
     originalEstimatedDuration = in.readByte() == 0x00 ? null : in.readInt();
     audioType = in.readString();
-    stepCount = in.readByte() == 0x00 ? null : in.readInt();
     originalStepCount = in.readByte() == 0x00 ? null : in.readInt();
     device = in.readString();
     locationEngine = in.readString();
@@ -320,6 +365,14 @@ public class NavigationMetadata implements Parcelable {
     batteryPluggedIn = in.readByte() != 0x00;
     batteryLevel = in.readInt();
     connectivity = in.readString();
+    tripIdentifier = in.readString();
+    legIndex = in.readInt();
+    legCount = in.readInt();
+    stepIndex = in.readInt();
+    stepCount = in.readInt();
+    voiceIndex = in.readByte() == 0x00 ? null : in.readInt();
+    bannerIndex = in.readByte() == 0x00 ? null : in.readInt();
+    totalStepCount = in.readInt();
   }
 
   @Override
@@ -391,12 +444,6 @@ public class NavigationMetadata implements Parcelable {
       dest.writeInt(originalEstimatedDuration);
     }
     dest.writeString(audioType);
-    if (stepCount == null) {
-      dest.writeByte((byte) (0x00));
-    } else {
-      dest.writeByte((byte) (0x01));
-      dest.writeInt(stepCount);
-    }
     if (originalStepCount == null) {
       dest.writeByte((byte) (0x00));
     } else {
@@ -411,6 +458,24 @@ public class NavigationMetadata implements Parcelable {
     dest.writeByte((byte) (batteryPluggedIn ? 0x01 : 0x00));
     dest.writeInt(batteryLevel);
     dest.writeString(connectivity);
+    dest.writeString(tripIdentifier);
+    dest.writeInt(legIndex);
+    dest.writeInt(legCount);
+    dest.writeInt(stepIndex);
+    dest.writeInt(stepCount);
+    if (voiceIndex == null) {
+      dest.writeByte((byte) (0x00));
+    } else {
+      dest.writeByte((byte) (0x01));
+      dest.writeInt(voiceIndex);
+    }
+    if (bannerIndex == null) {
+      dest.writeByte((byte) (0x00));
+    } else {
+      dest.writeByte((byte) (0x01));
+      dest.writeInt(bannerIndex);
+    }
+    dest.writeInt(totalStepCount);
   }
 
   @SuppressWarnings("unused")
