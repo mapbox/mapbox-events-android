@@ -293,6 +293,10 @@ public class SchemaTest {
       type = "number";
     }
 
+    if (type.contains("[]")) {
+      type = "array";
+    }
+
     Class<? extends JsonElement> typeClass = schema.get("type").getClass();
     JsonElement jsonElement = new JsonParser().parse(type.toLowerCase());
 
