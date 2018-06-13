@@ -190,8 +190,8 @@ public class SerializerTest {
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22,
       180, "sdkIdent", "sdkversion", 3, "sessionID", 10.5,
       15.67, "geometry", "profile", true,
-      "MockLocationEngine", 1300
-      ,"tripIdentifier", 3, 5, 2, 3, 10);
+      "MockLocationEngine", 1300,
+      "tripIdentifier", 3, 5, 2, 3, 10);
     metadata.setCreated(testDate);
     metadata.setBatteryLevel(50);
     NavigationNewData navigationNewData = new NavigationNewData(100, 750,
