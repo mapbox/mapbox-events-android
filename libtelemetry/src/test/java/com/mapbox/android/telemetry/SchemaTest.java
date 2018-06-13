@@ -19,6 +19,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.GZIPInputStream;
@@ -34,6 +36,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class SchemaTest {
+  private static final String SCHEMA_URL = "https://mapbox.s3.amazonaws.com/mapbox-gl-native/event-schema/mobile-event-schemas.jsonl.gz";
   private static final String APP_USER_TURNSTILE = "appUserTurnstile";
   private static final String LOCATION = "location";
   private static final String MAP_CLICK = "map.click";
@@ -59,7 +62,7 @@ public class SchemaTest {
     Callback callback = provideACallback(latch, failureRef);
 
     Request request = new Request.Builder()
-      .url("https://mapbox.s3.amazonaws.com/mapbox-gl-native/event-schema/mobile-event-schemas.jsonl.gz")
+      .url(SCHEMA_URL)
       .build();
 
     OkHttpClient client = new OkHttpClient();
@@ -219,6 +222,7 @@ public class SchemaTest {
     fields = addNavigationFeedbackData(fields);
     fields = addNavigationRerouteData(fields);
     fields = addNavigationLocationData(fields);
+    fields = addNavigationNewData(fields);
 
     System.out.println("schema: " + schema);
     System.out.println("fields: " + fields);
@@ -229,6 +233,9 @@ public class SchemaTest {
   }
 
   private void schemaContainsFields(JsonObject schema, List<Field> fields) {
+    int distanceRemainingCount = 0;
+    int durationRemainingCount = 0;
+
     for (int i = 0; i < fields.size(); i++) {
       String thisField = String.valueOf(fields.get(i));
       String[] fieldArray = thisField.split(" ");
@@ -238,14 +245,30 @@ public class SchemaTest {
       String[] nameArray = fieldArray[fieldArray.length - 1].split("\\.");
       String field = nameArray[nameArray.length - 1];
 
-      System.out.println("fieldName: " + field);
-
       SerializedName serializedName = fields.get(i).getAnnotation(SerializedName.class);
 
       if (serializedName != null) {
         System.out.println("serialized");
         field = serializedName.value();
       }
+
+      if (field.equalsIgnoreCase("durationRemaining")) {
+        durationRemainingCount++;
+
+        if (durationRemainingCount > 1) {
+          field = "step" + field;
+        }
+      }
+
+      if (field.equalsIgnoreCase("distanceRemaining")) {
+        distanceRemainingCount++;
+
+        if (distanceRemainingCount > 1) {
+          field = "step" + field;
+        }
+      }
+
+      System.out.println("fieldName: " + field);
 
       JsonObject thisSchema = findSchema(schema, field);
       System.out.println("thisSchema: " + thisSchema);
@@ -260,12 +283,6 @@ public class SchemaTest {
 
   private JsonObject findSchema(JsonObject schema, String field) {
     JsonObject thisSchema = schema.getAsJsonObject(field);
-
-    if (thisSchema == null) {
-      JsonObject step = schema.getAsJsonObject("step");
-      JsonObject properties = step.getAsJsonObject("properties");
-      thisSchema = properties.getAsJsonObject(field);
-    }
 
     return thisSchema;
   }
@@ -322,6 +339,26 @@ public class SchemaTest {
         schema.remove("owner");
         //temporary need to work out a solution to include this data
         schema.remove("platform");
+
+        if (schema.has("step")) {
+          JsonObject stepJson = schema.get("step").getAsJsonObject();
+          JsonObject stepProperties = stepJson.get("properties").getAsJsonObject();
+
+          Set<Map.Entry<String, JsonElement>> entries = stepProperties.entrySet();
+          for (Map.Entry<String, JsonElement> entry: entries) {
+            String key = entry.getKey();
+
+            if (key.equalsIgnoreCase("distanceRemaining") || key.equalsIgnoreCase("durationRemaining")) {
+              StringBuilder stringBuilder = new StringBuilder(key);
+              stringBuilder.insert(0, "step");
+
+              key = stringBuilder.toString();
+            }
+            schema.add(key, entry.getValue());
+          }
+          schema.remove("step");
+        }
+
         return schema;
       }
     }
@@ -357,6 +394,7 @@ public class SchemaTest {
 
   private List<Field> addNavigationStepData(List<Field> fields) {
     fields = removeField(fields, "step");
+    fields = removeField(fields, "navigationstepmetada");
 
     Field[] navMetadataFields = NavigationStepMetadata.class.getDeclaredFields();
     for (Field field : navMetadataFields) {
