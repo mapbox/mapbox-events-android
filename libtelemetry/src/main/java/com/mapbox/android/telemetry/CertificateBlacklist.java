@@ -33,8 +33,8 @@ public class CertificateBlacklist implements Callback {
   private final long DAY_IN_MILLISECONDS = 86400000;
   private static final String BLACKLIST_FILE = "MapboxBlacklist";
   private static final String SHA256 = "sha256/";
-  private static final String COM_CONFIG_ENDPOINT = "http://config.mapbox.com";
-  private static final String CHINA_CONFIG_ENDPOINT = "http://config.mapbox.cn";
+  private static final String COM_CONFIG_ENDPOINT = "https://api.mapbox.com/events-config";
+  private static final String CHINA_CONFIG_ENDPOINT = "https://api.mapbox.cn/events-config";
   private static final String ACCESS_TOKEN_QUERY_PARAMETER = "access_token";
   private static final Map<Environment, String> ENDPOINTS = new HashMap<Environment, String>() {
     {
