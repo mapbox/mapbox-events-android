@@ -3,6 +3,8 @@ package com.mapbox.android.telemetry;
 
 import android.app.ActivityManager;
 import android.arch.lifecycle.Lifecycle;
+import android.arch.lifecycle.LifecycleObserver;
+import android.arch.lifecycle.OnLifecycleEvent;
 import android.arch.lifecycle.ProcessLifecycleOwner;
 import android.content.ComponentName;
 import android.content.Context;
@@ -25,7 +27,8 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-public class MapboxTelemetry implements FullQueueCallback, EventCallback, ServiceTaskCallback, Callback {
+public class MapboxTelemetry implements FullQueueCallback, EventCallback, ServiceTaskCallback, Callback,
+  LifecycleObserver {
   private static final String EVENTS_USER_AGENT = "MapboxEventsAndroid/";
   private static final String TELEMETRY_USER_AGENT = "MapboxTelemetryAndroid/";
   private static final String UNITY_USER_AGENT = "MapboxEventsUnityAndroid/";
@@ -494,6 +497,8 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       if (ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
         applicationContext.startService(obtainLocationServiceIntent());
+      } else {
+        ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
       }
     } else {
       applicationContext.startService(obtainLocationServiceIntent());
@@ -536,5 +541,11 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     }
 
     return false;
+  }
+
+  @OnLifecycleEvent(Lifecycle.Event.ON_START)
+  void onEnterForeground() {
+    startLocation();
+    ProcessLifecycleOwner.get().getLifecycle().removeObserver(this);
   }
 }
