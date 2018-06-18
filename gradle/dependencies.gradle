@@ -12,12 +12,13 @@ ext {
             junit               : '4.12',
             supportLibVersion   : '26.1.0',
             constraintLayout    : '1.0.2',
-            mockito             : '2.11.0',
+            mockito             : '2.18.3',
             testRunnerVersion   : '1.0.1',
             okhttp3             : '3.10.0',
             gson                : '2.8.2',
             espressoVersion     : '3.0.1',
-            archLifecycleVersion: "1.1.1"
+            archLifecycleVersion: '1.1.1',
+            robolectric         : '3.8'
     ]
 
     pluginVersion = [
@@ -62,7 +63,8 @@ ext {
             // unit test
             junit                  : "junit:junit:${version.junit}",
             mockito                : "org.mockito:mockito-core:${version.mockito}",
-            mockitoAndroid         : "org.mockito:mockito-android:${version.mockito}"
+            mockitoAndroid         : "org.mockito:mockito-android:${version.mockito}",
+            robolectric            : "org.robolectric:robolectric:${version.robolectric}"
     ]
 
     pluginDependencies = [
