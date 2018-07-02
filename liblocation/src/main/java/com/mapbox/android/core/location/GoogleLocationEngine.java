@@ -1,5 +1,6 @@
 package com.mapbox.android.core.location;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
@@ -8,22 +9,27 @@ import android.support.annotation.Nullable;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Sample LocationEngine using Google Play Services
  */
 class GoogleLocationEngine extends LocationEngine implements
-  GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+  GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
   private WeakReference<Context> context;
   private GoogleApiClient googleApiClient;
+  private FusedLocationProviderClient fusedLocationProviderClient;
   private final Map<LocationEnginePriority, UpdateGoogleRequestPriority> REQUEST_PRIORITY = new
     HashMap<LocationEnginePriority, UpdateGoogleRequestPriority>() {
       {
@@ -62,6 +68,7 @@ class GoogleLocationEngine extends LocationEngine implements
       .addOnConnectionFailedListener(this)
       .addApi(LocationServices.API)
       .build();
+    fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
   }
 
   static synchronized LocationEngine getLocationEngine(Context context) {
@@ -102,17 +109,28 @@ class GoogleLocationEngine extends LocationEngine implements
   public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
   }
 
+  @SuppressLint("MissingPermission")
   @Override
   public Location getLastLocation() {
     if (googleApiClient.isConnected()) {
+      final Location[] lastLocation = {null};
+
       //noinspection MissingPermission
-      return LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+      fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+        @Override
+        public void onSuccess(Location location) {
+          lastLocation[0] = location;
+        }
+      });
+
+      return lastLocation[0];
     }
 
     //noinspection MissingPermission
     return null;
   }
 
+  @SuppressLint("MissingPermission")
   @Override
   public void requestLocationUpdates() {
     LocationRequest request = LocationRequest.create();
@@ -131,14 +149,14 @@ class GoogleLocationEngine extends LocationEngine implements
 
     if (googleApiClient.isConnected()) {
       //noinspection MissingPermission
-      LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, request, this);
+      fusedLocationProviderClient.requestLocationUpdates(request, locationCallback,null);
     }
   }
 
   @Override
   public void removeLocationUpdates() {
     if (googleApiClient.isConnected()) {
-      LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+      fusedLocationProviderClient.removeLocationUpdates(locationCallback);
     }
   }
 
@@ -147,12 +165,19 @@ class GoogleLocationEngine extends LocationEngine implements
     return Type.GOOGLE_PLAY_SERVICES;
   }
 
-  @Override
-  public void onLocationChanged(Location location) {
-    for (LocationEngineListener listener : locationListeners) {
-      listener.onLocationChanged(location);
+  private LocationCallback locationCallback = new LocationCallback() {
+    @Override
+    public void onLocationResult(LocationResult locationResult) {
+      List<Location> locationList = locationResult.getLocations();
+      if (locationList.size() > 0) {
+        Location location = locationList.get(locationList.size() - 1);
+
+        for (LocationEngineListener listener : locationListeners) {
+          listener.onLocationChanged(location);
+        }
+      }
     }
-  }
+  };
 
   private void connect() {
     if (googleApiClient != null) {
