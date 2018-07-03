@@ -17,7 +17,8 @@ ext {
             okhttp3             : '3.10.0',
             gson                : '2.8.2',
             espressoVersion     : '3.0.1',
-            archLifecycleVersion: "1.1.1"
+            archLifecycleVersion: "1.1.1",
+            roomVersion         : "1.1.1"
     ]
 
     pluginVersion = [
@@ -37,6 +38,10 @@ ext {
             // okhttp
             okhttp3                : "com.squareup.okhttp3:okhttp:${version.okhttp3}",
             okhttp3Mockwebserver   : "com.squareup.okhttp3:mockwebserver:${version.okhttp3}",
+
+            //room
+            roomRunTime         : "android.arch.persistence.room:runtime:${version.roomVersion}",
+            roomCompile         : "android.arch.persistence.room:compiler:${version.roomVersion}",
 
             // gson
             gson                   : "com.google.code.gson:gson:${version.gson}",

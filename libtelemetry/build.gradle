@@ -37,6 +37,9 @@ dependencies {
     compile dependenciesList.archLifecycleExtensions
     annotationProcessor dependenciesList.archLifecycleCompiler
 
+    compile dependenciesList.roomRunTime
+    compile dependenciesList.roomCompile
+
     testCompile dependenciesList.junit
     testCompile dependenciesList.mockito
     testCompile dependenciesList.okhttp3Mockwebserver
