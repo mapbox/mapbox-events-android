@@ -1,7 +1,7 @@
 ext {
 
     androidVersions = [
-            minSdkVersion    : 14,
+            minSdkVersion    : 15,
             targetSdkVersion : 26,
             compileSdkVersion: 26,
             buildToolsVersion: '27.0.2'
@@ -18,7 +18,8 @@ ext {
             gson                : '2.8.2',
             espressoVersion     : '3.0.1',
             archLifecycleVersion: "1.1.1",
-            roomVersion         : "1.1.1"
+            roomVersion         : "1.1.1",
+            saferoom            : "0.4.2"
     ]
 
     pluginVersion = [
@@ -40,8 +41,9 @@ ext {
             okhttp3Mockwebserver   : "com.squareup.okhttp3:mockwebserver:${version.okhttp3}",
 
             //room
-            roomRunTime         : "android.arch.persistence.room:runtime:${version.roomVersion}",
-            roomCompile         : "android.arch.persistence.room:compiler:${version.roomVersion}",
+            roomRunTime            : "android.arch.persistence.room:runtime:${version.roomVersion}",
+            roomCompile            : "android.arch.persistence.room:compiler:${version.roomVersion}",
+            safeRoom               : "com.commonsware.cwac:saferoom:${version.saferoom}",
 
             // gson
             gson                   : "com.google.code.gson:gson:${version.gson}",

@@ -36,9 +36,9 @@ dependencies {
     compile dependenciesList.supportAppcompatV7
     compile dependenciesList.archLifecycleExtensions
     annotationProcessor dependenciesList.archLifecycleCompiler
-
     compile dependenciesList.roomRunTime
-    compile dependenciesList.roomCompile
+    annotationProcessor dependenciesList.roomCompile
+    compile dependenciesList.safeRoom
 
     testCompile dependenciesList.junit
     testCompile dependenciesList.mockito
