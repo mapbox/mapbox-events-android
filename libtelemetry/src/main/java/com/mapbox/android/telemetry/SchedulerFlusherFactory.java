@@ -5,7 +5,6 @@ import android.app.AlarmManager;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.util.Log;
 
 class SchedulerFlusherFactory {
   static final String SCHEDULER_FLUSHER_INTENT = "com.mapbox.scheduler_flusher";
@@ -37,7 +36,6 @@ class SchedulerFlusherFactory {
         PackageManager.GET_META_DATA);
       if (appInformation != null && appInformation.metaData != null) {
         boolean adjustWakeUp = appInformation.metaData.getBoolean(KEY_META_DATA_WAKE_UP, false);
-        Log.e("test", "adjustWakeUp: " + adjustWakeUp);
         if (adjustWakeUp) {
           FLUSHING_PERIOD_IN_MILLIS = 600000;
         }
