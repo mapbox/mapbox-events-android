@@ -8,7 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 
 import static android.app.PendingIntent.FLAG_CANCEL_CURRENT;
-import static com.mapbox.android.telemetry.SchedulerFlusherFactory.FLUSHING_PERIOD_IN_MILLIS;
+import static com.mapbox.android.telemetry.SchedulerFlusherFactory.flushingPeriod;
 import static com.mapbox.android.telemetry.SchedulerFlusherFactory.SCHEDULER_FLUSHER_INTENT;
 
 class AlarmSchedulerFlusher implements SchedulerFlusher {
@@ -36,9 +36,9 @@ class AlarmSchedulerFlusher implements SchedulerFlusher {
 
   @Override
   public void schedule(long elapsedRealTime) {
-    long firstFlushingInMillis = elapsedRealTime + FLUSHING_PERIOD_IN_MILLIS;
+    long firstFlushingInMillis = elapsedRealTime + flushingPeriod;
     manager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, firstFlushingInMillis,
-      FLUSHING_PERIOD_IN_MILLIS, pendingIntent);
+      flushingPeriod, pendingIntent);
   }
 
   @Override

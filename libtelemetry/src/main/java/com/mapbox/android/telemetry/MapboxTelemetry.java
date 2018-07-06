@@ -10,8 +10,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
@@ -46,7 +44,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     }
   };
   private static final String NON_NULL_APPLICATION_CONTEXT_REQUIRED = "Non-null application context required.";
-  private static final String KEY_META_DATA_WAKE_UP = "com.mapbox.AdjustWakeUp";
   private static final int NO_FLAGS = 0;
   private String accessToken;
   private String userAgent;
@@ -101,7 +98,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   @Override
   public void onFullQueue(List<Event> fullQueue) {
     TelemetryEnabler.State telemetryState = telemetryEnabler.obtainTelemetryState();
-    if (TelemetryEnabler.State.ENABLED.equals(telemetryState) && !checkWakeUp()) {
+    if (TelemetryEnabler.State.ENABLED.equals(telemetryState) && !TelemetryUtils.adjustWakeUpMode()) {
       sendEventsIfPossible(fullQueue);
     }
   }
@@ -550,21 +547,5 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   void onEnterForeground() {
     startLocation();
     ProcessLifecycleOwner.get().getLifecycle().removeObserver(this);
-  }
-
-  private boolean checkWakeUp() {
-    try {
-      ApplicationInfo appInformation = applicationContext.getPackageManager()
-        .getApplicationInfo(applicationContext.getPackageName(),
-        PackageManager.GET_META_DATA);
-      if (appInformation != null && appInformation.metaData != null) {
-        boolean adjustWakeUp = appInformation.metaData.getBoolean(KEY_META_DATA_WAKE_UP, false);
-        return adjustWakeUp;
-      }
-    } catch (PackageManager.NameNotFoundException exception) {
-      exception.printStackTrace();
-    }
-
-    return false;
   }
 }
