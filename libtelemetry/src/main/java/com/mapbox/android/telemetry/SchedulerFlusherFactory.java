@@ -6,13 +6,14 @@ import android.content.Context;
 
 class SchedulerFlusherFactory {
   static final String SCHEDULER_FLUSHER_INTENT = "com.mapbox.scheduler_flusher";
-  static final long FLUSHING_PERIOD_IN_MILLIS = 180 * 1000;
+  static long flushingPeriod = 180 * 1000;
   private final Context context;
   private final AlarmReceiver alarmReceiver;
 
   SchedulerFlusherFactory(Context context, AlarmReceiver alarmReceiver) {
     this.context = context;
     this.alarmReceiver = alarmReceiver;
+    checkUpdatePeriod();
   }
 
   SchedulerFlusher supply() {
@@ -24,5 +25,11 @@ class SchedulerFlusherFactory {
     int requestCode = (int) System.currentTimeMillis();
     return new AlarmSchedulerFlusher(context, alarmManager, alarmReceiver, requestCode);
     // }
+  }
+
+  private void checkUpdatePeriod() {
+    if (TelemetryUtils.adjustWakeUpMode()) {
+      flushingPeriod = 600 * 1000;
+    }
   }
 }

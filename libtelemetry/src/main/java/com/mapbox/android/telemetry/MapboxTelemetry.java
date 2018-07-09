@@ -98,7 +98,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   @Override
   public void onFullQueue(List<Event> fullQueue) {
     TelemetryEnabler.State telemetryState = telemetryEnabler.obtainTelemetryState();
-    if (TelemetryEnabler.State.ENABLED.equals(telemetryState)) {
+    if (TelemetryEnabler.State.ENABLED.equals(telemetryState) && !TelemetryUtils.adjustWakeUpMode()) {
       sendEventsIfPossible(fullQueue);
     }
   }

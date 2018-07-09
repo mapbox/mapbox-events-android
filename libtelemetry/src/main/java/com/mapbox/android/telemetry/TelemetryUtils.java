@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.BatteryManager;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
@@ -23,6 +25,7 @@ import okio.Buffer;
 public class TelemetryUtils {
   static final String MAPBOX_SHARED_PREFERENCES = "MapboxSharedPreferences";
   static final String MAPBOX_SHARED_PREFERENCE_KEY_VENDOR_ID = "mapboxVendorId";
+  private static final String KEY_META_DATA_WAKE_UP = "com.mapbox.AdjustWakeUp";
   private static final String DATE_AND_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
   private static final String EMPTY_STRING = "";
   private static final String TWO_STRING_FORMAT = "%s %s";
@@ -225,6 +228,22 @@ public class TelemetryUtils {
         return true;
       }
     }
+    return false;
+  }
+
+  static boolean adjustWakeUpMode() {
+    try {
+      ApplicationInfo appInformation = MapboxTelemetry.applicationContext.getPackageManager()
+        .getApplicationInfo(MapboxTelemetry.applicationContext.getPackageName(),
+          PackageManager.GET_META_DATA);
+      if (appInformation != null && appInformation.metaData != null) {
+        boolean adjustWakeUp = appInformation.metaData.getBoolean(KEY_META_DATA_WAKE_UP, false);
+        return adjustWakeUp;
+      }
+    } catch (PackageManager.NameNotFoundException exception) {
+      exception.printStackTrace();
+    }
+
     return false;
   }
 }
