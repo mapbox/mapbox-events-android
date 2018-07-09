@@ -4,6 +4,10 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v3.1.4
+- Adjust Wakeup - [#173](https://github.com/mapbox/mapbox-events-android/pull/173)
+- Remove MAS Dependency - [#164](https://github.com/mapbox/mapbox-events-android/pull/164)
+
 ### v3.1.3
 - Oreo Background Service Crash Fix - [#157](https://github.com/mapbox/mapbox-events-android/pull/157)
 - TelemetryLocationEnabler Null Bug Fix - [#156](https://github.com/mapbox/mapbox-events-android/pull/156)
