@@ -1,19 +1,16 @@
 package com.mapbox.android.core.location;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Location;
-import android.os.Bundle;
+import android.location.LocationManager;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.lang.ref.WeakReference;
@@ -24,11 +21,11 @@ import java.util.Map;
 /**
  * Sample LocationEngine using Google Play Services
  */
-class GoogleLocationEngine extends LocationEngine implements
-  GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+class GoogleLocationEngine extends LocationEngine {
+
+  private static final String DEFAULT_PRIORITY = LocationManager.PASSIVE_PROVIDER;
 
   private WeakReference<Context> context;
-  private GoogleApiClient googleApiClient;
   private FusedLocationProviderClient fusedLocationProviderClient;
   private final Map<LocationEnginePriority, UpdateGoogleRequestPriority> REQUEST_PRIORITY = new
     HashMap<LocationEnginePriority, UpdateGoogleRequestPriority>() {
@@ -63,11 +60,6 @@ class GoogleLocationEngine extends LocationEngine implements
   private GoogleLocationEngine(Context context) {
     super();
     this.context = new WeakReference<>(context);
-    googleApiClient = new GoogleApiClient.Builder(this.context.get())
-      .addConnectionCallbacks(this)
-      .addOnConnectionFailedListener(this)
-      .addApi(LocationServices.API)
-      .build();
     fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
   }
 
@@ -79,58 +71,43 @@ class GoogleLocationEngine extends LocationEngine implements
 
   @Override
   public void activate() {
-    connect();
-  }
-
-  @Override
-  public void deactivate() {
-    if (googleApiClient != null && googleApiClient.isConnected()) {
-      googleApiClient.disconnect();
-    }
-  }
-
-  @Override
-  public boolean isConnected() {
-    return googleApiClient.isConnected();
-  }
-
-  @Override
-  public void onConnected(@Nullable Bundle bundle) {
     for (LocationEngineListener listener : locationListeners) {
       listener.onConnected();
     }
   }
 
   @Override
-  public void onConnectionSuspended(int cause) {
+  public void deactivate() {
+    // No op
   }
 
   @Override
-  public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+  public boolean isConnected() {
+    return true;
   }
 
-  @SuppressLint("MissingPermission")
   @Override
-  public Location getLastLocation() {
-    if (googleApiClient.isConnected()) {
-      final Location[] lastLocation = {null};
-
+  public void getLastLocation() {
       //noinspection MissingPermission
       fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
         @Override
         public void onSuccess(Location location) {
-          lastLocation[0] = location;
+          for (LocationEngineListener listener : locationListeners) {
+            listener.onLastLocationSuccess(location);
+          }
+
+        }
+      })
+      .addOnFailureListener(new OnFailureListener() {
+        @Override
+        public void onFailure(@NonNull Exception exception) {
+          for (LocationEngineListener listener : locationListeners) {
+            listener.onLastLocationFail(exception);
+          }
         }
       });
-
-      return lastLocation[0];
-    }
-
-    //noinspection MissingPermission
-    return null;
   }
 
-  @SuppressLint("MissingPermission")
   @Override
   public void requestLocationUpdates() {
     LocationRequest request = LocationRequest.create();
@@ -147,17 +124,13 @@ class GoogleLocationEngine extends LocationEngine implements
 
     updateRequestPriority(request);
 
-    if (googleApiClient.isConnected()) {
-      //noinspection MissingPermission
-      fusedLocationProviderClient.requestLocationUpdates(request, locationCallback,null);
-    }
+    //noinspection MissingPermission
+    fusedLocationProviderClient.requestLocationUpdates(request, locationCallback,null);
   }
 
   @Override
   public void removeLocationUpdates() {
-    if (googleApiClient.isConnected()) {
-      fusedLocationProviderClient.removeLocationUpdates(locationCallback);
-    }
+    fusedLocationProviderClient.removeLocationUpdates(locationCallback);
   }
 
   @Override
@@ -169,7 +142,7 @@ class GoogleLocationEngine extends LocationEngine implements
     @Override
     public void onLocationResult(LocationResult locationResult) {
       List<Location> locationList = locationResult.getLocations();
-      if (locationList.size() > 0) {
+      if (!locationList.isEmpty()) {
         Location location = locationList.get(locationList.size() - 1);
 
         for (LocationEngineListener listener : locationListeners) {
@@ -178,16 +151,6 @@ class GoogleLocationEngine extends LocationEngine implements
       }
     }
   };
-
-  private void connect() {
-    if (googleApiClient != null) {
-      if (googleApiClient.isConnected()) {
-        onConnected(null);
-      } else {
-        googleApiClient.connect();
-      }
-    }
-  }
 
   private void updateRequestPriority(LocationRequest request) {
     REQUEST_PRIORITY.get(priority).update(request);
