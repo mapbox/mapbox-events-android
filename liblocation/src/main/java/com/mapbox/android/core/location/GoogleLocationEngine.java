@@ -2,7 +2,6 @@ package com.mapbox.android.core.location;
 
 import android.content.Context;
 import android.location.Location;
-import android.location.LocationManager;
 import android.support.annotation.NonNull;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -13,7 +12,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,9 +21,6 @@ import java.util.Map;
  */
 class GoogleLocationEngine extends LocationEngine {
 
-  private static final String DEFAULT_PRIORITY = LocationManager.PASSIVE_PROVIDER;
-
-  private WeakReference<Context> context;
   private FusedLocationProviderClient fusedLocationProviderClient;
   private final Map<LocationEnginePriority, UpdateGoogleRequestPriority> REQUEST_PRIORITY = new
     HashMap<LocationEnginePriority, UpdateGoogleRequestPriority>() {
@@ -59,7 +54,6 @@ class GoogleLocationEngine extends LocationEngine {
 
   private GoogleLocationEngine(Context context) {
     super();
-    this.context = new WeakReference<>(context);
     fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
   }
 
@@ -88,14 +82,14 @@ class GoogleLocationEngine extends LocationEngine {
 
   @Override
   public void getLastLocation() {
-      //noinspection MissingPermission
-      fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+    //noinspection MissingPermission
+    fusedLocationProviderClient.getLastLocation()
+      .addOnSuccessListener(new OnSuccessListener<Location>() {
         @Override
         public void onSuccess(Location location) {
           for (LocationEngineListener listener : locationListeners) {
             listener.onLastLocationSuccess(location);
           }
-
         }
       })
       .addOnFailureListener(new OnFailureListener() {
