@@ -2,6 +2,7 @@ package com.mapbox.android.core.location;
 
 import android.content.Context;
 import android.location.Location;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -119,7 +120,7 @@ class GoogleLocationEngine extends LocationEngine {
     updateRequestPriority(request);
 
     //noinspection MissingPermission
-    fusedLocationProviderClient.requestLocationUpdates(request, locationCallback,null);
+    fusedLocationProviderClient.requestLocationUpdates(request, locationCallback, Looper.getMainLooper());
   }
 
   @Override
