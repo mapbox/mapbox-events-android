@@ -87,14 +87,13 @@ class AndroidLocationEngine extends LocationEngine implements LocationListener {
   }
 
   @Override
-  public Location getLastLocation() {
+  public void getLastLocation() {
     if (!TextUtils.isEmpty(currentProvider)) {
       //noinspection MissingPermission
-      return locationManager.getLastKnownLocation(currentProvider);
+      for (LocationEngineListener listener : locationListeners) {
+        listener.onLastLocationSuccess(locationManager.getLastKnownLocation(currentProvider));
+      }
     }
-
-    //noinspection MissingPermission
-    return null;
   }
 
   @Override

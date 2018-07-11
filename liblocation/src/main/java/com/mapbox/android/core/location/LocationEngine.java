@@ -72,7 +72,7 @@ public abstract class LocationEngine {
    * @since 2.0.0
    */
   @RequiresPermission(anyOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
-  public abstract Location getLastLocation();
+  public abstract void getLastLocation();
 
   /**
    * if a {@link LocationEngineListener} is setup, registering for location updates will tell the provider to begin

@@ -8,7 +8,7 @@ ext {
     ]
 
     version = [
-            gmsLocation         : '11.0.4',
+            gmsLocation         : '15.0.1',
             junit               : '4.12',
             supportLibVersion   : '26.1.0',
             constraintLayout    : '1.0.2',
