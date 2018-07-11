@@ -34,6 +34,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private static final String UNITY_USER_AGENT = "MapboxEventsUnityAndroid/";
   private static final String NAVIGATION_USER_AGENT = "mapbox-navigation-android/";
   private static final String NAVIGATION_UI_USER_AGENT = "mapbox-navigation-ui-android/";
+  private static final String MAPS_USER_AGENT = "mapbox-maps-android";
   private static final List<String> VALID_USER_AGENTS = new ArrayList<String>() {
     {
       add(EVENTS_USER_AGENT);
@@ -41,6 +42,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
       add(UNITY_USER_AGENT);
       add(NAVIGATION_USER_AGENT);
       add(NAVIGATION_UI_USER_AGENT);
+      add(MAPS_USER_AGENT);
     }
   };
   private static final String NON_NULL_APPLICATION_CONTEXT_REQUIRED = "Non-null application context required.";
