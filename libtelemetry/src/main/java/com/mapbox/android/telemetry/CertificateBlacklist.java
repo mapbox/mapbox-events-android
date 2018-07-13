@@ -37,11 +37,17 @@ class CertificateBlacklist implements Callback {
   private static final String BLACKLIST_FILE = "MapboxBlacklist";
   private static final String SHA256 = "sha256/";
   private static final String NEW_LINE = "\n/";
-  private static final int REMOVE_HEAD = 0;
+  private static final int BLACKLIST_HEAD = 0;
   private static final String REVOKED_CERT_KEYS = "RevokedCertKeys";
   private static final String COM_CONFIG_ENDPOINT = "https://api.mapbox.com/events-config";
   private static final String CHINA_CONFIG_ENDPOINT = "https://api.mapbox.cn/events-config";
   private static final String ACCESS_TOKEN_QUERY_PARAMETER = "access_token";
+  private static final String EXTRACTION_EXEMPTION = "Blacklist Response Extraction Failed";
+  private static final String ENDPOINT_DETERMINATION_FAIL = "Endpoint Determination Failed";
+  private static final String SAVE_BLACKLIST_FAIL = "Unable to save blacklist to file";
+  private static final String RETRIEVE_TIME_FAIL = "Unable to retrieve last update time from blacklist";
+  private static final String RETRIEVE_BLACKLIST_FAIL = "Unable to retrieve blacklist contents from file";
+  private static final String REQUEST_FAIL = "Request failed to download blacklist";
   private static final Map<Environment, String> ENDPOINTS = new HashMap<Environment, String>() {
     {
       put(Environment.COM, COM_CONFIG_ENDPOINT);
@@ -66,9 +72,9 @@ class CertificateBlacklist implements Callback {
       if (file.exists()) {
         try {
           blacklist = obtainBlacklistContents(file);
-          blacklist.remove(REMOVE_HEAD);
+          blacklist.remove(BLACKLIST_HEAD);
         } catch (IOException exception) {
-          Log.e(LOG_TAG, String.valueOf(exception));
+          Log.e(LOG_TAG, RETRIEVE_BLACKLIST_FAIL, exception);
         }
       }
     }
@@ -91,9 +97,9 @@ class CertificateBlacklist implements Callback {
     if (file.exists()) {
       try {
         List<String> blacklist = obtainBlacklistContents(file);
-        lastUpdateTime = Long.valueOf(blacklist.get(0));
+        lastUpdateTime = Long.valueOf(blacklist.get(BLACKLIST_HEAD));
       } catch (IOException exception) {
-        Log.e(LOG_TAG, String.valueOf(exception));
+        Log.e(LOG_TAG, RETRIEVE_TIME_FAIL, exception);
       }
     }
 
@@ -118,12 +124,13 @@ class CertificateBlacklist implements Callback {
       outputStream.write(fileContents.getBytes());
       outputStream.close();
     } catch (Exception exception) {
-      Log.e(LOG_TAG, String.valueOf(exception));
+      Log.e(LOG_TAG, SAVE_BLACKLIST_FAIL, exception);
     }
   }
 
   @Override
   public void onFailure(Call call, IOException exception) {
+    Log.e(LOG_TAG, REQUEST_FAIL, exception);
   }
 
   @Override
@@ -181,7 +188,7 @@ class CertificateBlacklist implements Callback {
         return ENDPOINTS.get(serverInformation.getEnvironment());
       }
     } catch (Exception exception) {
-      Log.e(LOG_TAG, String.valueOf(exception));
+      Log.e(LOG_TAG, ENDPOINT_DETERMINATION_FAIL, exception);
     }
 
     return null;
@@ -201,7 +208,7 @@ class CertificateBlacklist implements Callback {
       revokedKeys = gson.fromJson(String.valueOf(jsonArray), token.getType());
 
     } catch (JSONException exception) {
-      Log.e(LOG_TAG, String.valueOf(exception));
+      Log.e(LOG_TAG, EXTRACTION_EXEMPTION, exception);
     }
 
     return revokedKeys;
