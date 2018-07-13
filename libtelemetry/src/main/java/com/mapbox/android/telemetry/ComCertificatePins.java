@@ -21,7 +21,6 @@ class ComCertificatePins {
           add("sha256/WoiWRyIOVNa9ihaBciRSC7XHjliYS9VwUGOIud4PB18=");
           add("sha256/yGp2XoimPmIK24X3bNV1IaK+HqvbGEgqar5nauDdC5E=");
 
-          //new 50 hashes
           add("sha256/6+ErFga5JfYfvwx2JbEJJNmUXJFnXIKllrbPKmvWqNc=");
           add("sha256/vLkrnr8JTAVaYPwY/jBkKCe+YQWleaHPU3Tlqom+gCg=");
           add("sha256/UofZo86l1bDjTiHyKXurqgfkYaYjtjyTrOYYR68XLG8=");

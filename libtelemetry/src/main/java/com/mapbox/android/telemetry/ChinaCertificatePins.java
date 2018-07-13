@@ -27,7 +27,6 @@ class ChinaCertificatePins {
           add("sha256/zUIraRNo+4JoAYA7ROeWjARtIoN4rIEbCpfCRQT6N6A=");
           add("sha256/r/mIkG3eEpVdm+u/ko/cwxzOMo1bk4TyHIlByibiA5E=");
 
-          //new 50 hashes
           add("sha256/T4XyKSRwZ5icOqGmJUXiDYGa+SaXKTGQXZwhqpwNTEo=");
           add("sha256/KlV7emqpeM6V2MtDEzSDzcIob6VwkdWHiVsNQQzTIeo=");
           add("sha256/16TK3iq9ZB4AukmDemjUyhcPTUnsSuqd5OB5zOrheZY=");

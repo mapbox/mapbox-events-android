@@ -14,7 +14,6 @@ import com.mapbox.android.core.location.LocationEnginePriority;
 import com.mapbox.android.core.permissions.PermissionsManager;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -535,11 +534,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     CertificateBlacklist certificateBlacklist = new CertificateBlacklist(applicationContext, accessToken);
 
     if (certificateBlacklist.daySinceLastUpdate()) {
-      try {
-        certificateBlacklist.updateBlacklist();
-      } catch (MalformedURLException exception) {
-        exception.printStackTrace();
-      }
+      certificateBlacklist.updateBlacklist();
     }
   }
 }

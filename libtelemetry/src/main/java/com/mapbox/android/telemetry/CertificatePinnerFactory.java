@@ -61,13 +61,11 @@ class CertificatePinnerFactory {
     CertificateBlacklist certificateBlacklist = new CertificateBlacklist(MapboxTelemetry.applicationContext,
       MapboxTelemetry.accessToken);
 
-    ArrayList blackList = certificateBlacklist.retrieveBlackList();
+    List blackList = certificateBlacklist.retrieveBlackList();
 
-    if (blackList != null) {
-      for (String hash: new ArrayList<>(hashList)) {
-        if (blackList.contains(hash)) {
-          hashList.remove(hash);
-        }
+    for (String hash: new ArrayList<>(hashList)) {
+      if (blackList.contains(hash)) {
+        hashList.remove(hash);
       }
     }
 
