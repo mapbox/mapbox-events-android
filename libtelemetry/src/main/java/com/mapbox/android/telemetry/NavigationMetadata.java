@@ -35,7 +35,7 @@ public class NavigationMetadata implements Parcelable {
   private Integer originalEstimatedDistance = null;
   private Integer originalEstimatedDuration = null;
   private String audioType;
-  private Integer stepCount = null;
+  private Integer stepCount;
   private Integer originalStepCount = null;
   private String device;
   private String locationEngine;
@@ -49,12 +49,12 @@ public class NavigationMetadata implements Parcelable {
   private Integer legIndex;
   private Integer legCount;
   private Integer stepIndex;
-  private Integer voiceIndex;
-  private Integer bannerIndex;
+  private Integer voiceIndex = null;
+  private Integer bannerIndex = null;
   private Integer totalStepCount;
 
   public NavigationMetadata(Date startTimestamp, int distanceCompleted, int distanceRemaining, int durationRemaining,
-                            String sdKIdentifier, String sdkVersion, int eventVersion, String sessionIdentifier,
+                            String sdkIdentifier, String sdkVersion, int eventVersion, String sessionIdentifier,
                             double lat, double lng, String geometry, String profile, boolean isSimulation,
                             String locationEngine, int absoluteDistanceToDestination, String tripIdentifier,
                             int legIndex, int legCount, int stepIndex, int stepCount, int totalStepCount) {
@@ -63,7 +63,7 @@ public class NavigationMetadata implements Parcelable {
     this.distanceRemaining = distanceRemaining;
     this.durationRemaining = durationRemaining;
     this.operatingSystem = OPERATING_SYSTEM;
-    this.sdkIdentifier = sdKIdentifier;
+    this.sdkIdentifier = sdkIdentifier;
     this.sdkVersion = sdkVersion;
     this.eventVersion = eventVersion;
     this.sessionIdentifier = sessionIdentifier;
