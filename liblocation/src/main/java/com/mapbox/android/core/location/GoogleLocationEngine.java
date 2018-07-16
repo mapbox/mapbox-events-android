@@ -22,6 +22,8 @@ import java.util.Map;
 class GoogleLocationEngine extends LocationEngine implements
   GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
+  private static final LocationEnginePriority DEFAULT_PRIORITY = LocationEnginePriority.NO_POWER;
+
   private WeakReference<Context> context;
   private GoogleApiClient googleApiClient;
   private final Map<LocationEnginePriority, UpdateGoogleRequestPriority> REQUEST_PRIORITY = new
@@ -62,6 +64,7 @@ class GoogleLocationEngine extends LocationEngine implements
       .addOnConnectionFailedListener(this)
       .addApi(LocationServices.API)
       .build();
+    this.priority = DEFAULT_PRIORITY;
   }
 
   static synchronized LocationEngine getLocationEngine(Context context) {
