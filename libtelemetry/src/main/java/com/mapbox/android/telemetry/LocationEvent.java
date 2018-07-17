@@ -30,6 +30,8 @@ class LocationEvent extends Event implements Parcelable {
   private String operatingSystem;
   @SerializedName("applicationState")
   private String applicationState;
+  @SerializedName("horizontalAccuracy")
+  private Float accuracy = null;
 
   LocationEvent(String sessionId, double latitude, double longitude) {
     this.event = LOCATION;
@@ -75,6 +77,14 @@ class LocationEvent extends Event implements Parcelable {
     return operatingSystem;
   }
 
+  Float getAccuracy() {
+    return accuracy;
+  }
+
+  public void setAccuracy(Float accuracy) {
+    this.accuracy = accuracy;
+  }
+
   private LocationEvent(Parcel in) {
     event = in.readString();
     created = in.readString();
@@ -85,6 +95,7 @@ class LocationEvent extends Event implements Parcelable {
     altitude = in.readByte() == 0x00 ? null : in.readDouble();
     operatingSystem = in.readString();
     applicationState = in.readString();
+    accuracy = in.readByte() == 0x00 ? null : in.readFloat();
   }
 
   @Override
@@ -108,6 +119,12 @@ class LocationEvent extends Event implements Parcelable {
     }
     dest.writeString(operatingSystem);
     dest.writeString(applicationState);
+    if (accuracy == null) {
+      dest.writeByte((byte) (0x00));
+    } else {
+      dest.writeByte((byte) (0x01));
+      dest.writeFloat(accuracy);
+    }
   }
 
   @SuppressWarnings("unused")
