@@ -28,12 +28,15 @@ class TelemetryClient {
   private String userAgent = null;
   private TelemetryClientSettings setting;
   private final Logger logger;
+  private CertificateBlacklist certificateBlacklist;
 
-  TelemetryClient(String accessToken, String userAgent, TelemetryClientSettings setting, Logger logger) {
+  TelemetryClient(String accessToken, String userAgent, TelemetryClientSettings setting, Logger logger,
+                  CertificateBlacklist certificateBlacklist) {
     this.accessToken = accessToken;
     this.userAgent = userAgent;
     this.setting = setting;
     this.logger = logger;
+    this.certificateBlacklist = certificateBlacklist;
   }
 
   void updateAccessToken(String accessToken) {
@@ -84,7 +87,7 @@ class TelemetryClient {
       .post(body)
       .build();
 
-    OkHttpClient client = setting.getClient();
+    OkHttpClient client = setting.getClient(certificateBlacklist);
     client.newCall(request).enqueue(callback);
   }
 

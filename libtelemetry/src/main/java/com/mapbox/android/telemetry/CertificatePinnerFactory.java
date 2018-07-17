@@ -1,7 +1,6 @@
 package com.mapbox.android.telemetry;
 
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,13 +19,15 @@ class CertificatePinnerFactory {
   };
   private static final String COM_EVENTS = "events.mapbox.com";
   private static final String CHINA_EVENTS = "events.mapbox.cn";
+  private CertificateBlacklist certificateBlacklist;
 
   /**
    * Based on http://square.github.io/okhttp/3.x/okhttp/okhttp3/CertificatePinner.html
    *
    * @return The CertificatePinner instance
    */
-  CertificatePinner provideCertificatePinnerFor(Environment environment) {
+  CertificatePinner provideCertificatePinnerFor(Environment environment, CertificateBlacklist certificateBlacklist) {
+    this.certificateBlacklist = certificateBlacklist;
     CertificatePinner.Builder certificatePinnerBuilder = new CertificatePinner.Builder();
 
     Map<String, List<String>> certificatesPins = provideCertificatesPinsFor(environment);
@@ -58,14 +59,14 @@ class CertificatePinnerFactory {
     }
 
     List<String> hashList = pins.get(key);
-    CertificateBlacklist certificateBlacklist = new CertificateBlacklist(MapboxTelemetry.applicationContext,
-      MapboxTelemetry.accessToken);
 
     List blackList = certificateBlacklist.retrieveBlackList();
 
-    for (String hash: new ArrayList<>(hashList)) {
-      if (blackList.contains(hash)) {
-        hashList.remove(hash);
+    if (!blackList.isEmpty()) {
+      for (String hash : hashList) {
+        if (blackList.contains(hash)) {
+          hashList.remove(hash);
+        }
       }
     }
 

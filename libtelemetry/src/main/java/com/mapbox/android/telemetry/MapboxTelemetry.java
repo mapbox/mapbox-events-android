@@ -39,7 +39,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   };
   private static final String NON_NULL_APPLICATION_CONTEXT_REQUIRED = "Non-null application context required.";
   private static final int NO_FLAGS = 0;
-  static String accessToken;
+  private String accessToken;
   private String userAgent;
   private EventsQueue queue;
   private TelemetryClient telemetryClient;
@@ -55,11 +55,13 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private boolean isServiceBound = false;
   private PermissionCheckRunnable permissionCheckRunnable = null;
   private CopyOnWriteArraySet<TelemetryListener> telemetryListeners = null;
+  private CertificateBlacklist certificateBlacklist;
   static Context applicationContext = null;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
     initializeQueue();
+    checkBlacklist();
     checkRequiredParameters(accessToken, userAgent);
     this.httpCallback = this;
     AlarmReceiver alarmReceiver = obtainAlarmReceiver();
@@ -69,7 +71,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     this.telemetryLocationEnabler = new TelemetryLocationEnabler(true);
     initializeTelemetryListeners();
     initializeTelemetryLocationState();
-    checkBlacklist();
   }
 
   // For testing only
@@ -306,7 +307,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private TelemetryClient createTelemetryClient(String accessToken, String userAgent) {
     String fullUserAgent = TelemetryUtils.createFullUserAgent(userAgent, applicationContext);
     TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(accessToken, fullUserAgent,
-      new Logger());
+      new Logger(), certificateBlacklist);
     telemetryClient = telemetryClientFactory.obtainTelemetryClient(applicationContext);
 
     return telemetryClient;
@@ -531,7 +532,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   private void checkBlacklist() {
-    CertificateBlacklist certificateBlacklist = new CertificateBlacklist(applicationContext, accessToken);
+    certificateBlacklist = new CertificateBlacklist(applicationContext, accessToken);
 
     if (certificateBlacklist.daySinceLastUpdate()) {
       certificateBlacklist.updateBlacklist();

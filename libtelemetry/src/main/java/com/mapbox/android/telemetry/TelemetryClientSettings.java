@@ -47,8 +47,8 @@ class TelemetryClientSettings {
     return environment;
   }
 
-  OkHttpClient getClient() {
-    return configureHttpClient();
+  OkHttpClient getClient(CertificateBlacklist certificateBlacklist) {
+    return configureHttpClient(certificateBlacklist);
   }
 
   HttpUrl getBaseUrl() {
@@ -136,12 +136,12 @@ class TelemetryClientSettings {
     }
   }
 
-  private OkHttpClient configureHttpClient() {
+  private OkHttpClient configureHttpClient(CertificateBlacklist certificateBlacklist) {
     CertificatePinnerFactory factory = new CertificatePinnerFactory();
     OkHttpClient.Builder builder = client.newBuilder()
       .addInterceptor(new GzipRequestInterceptor())
       .retryOnConnectionFailure(true)
-      .certificatePinner(factory.provideCertificatePinnerFor(environment))
+      .certificatePinner(factory.provideCertificatePinnerFor(environment, certificateBlacklist))
       .connectionSpecs(Arrays.asList(ConnectionSpec.MODERN_TLS, ConnectionSpec.COMPATIBLE_TLS));
     if (isSocketFactoryUnset(sslSocketFactory, x509TrustManager)) {
       builder.sslSocketFactory(sslSocketFactory, x509TrustManager);

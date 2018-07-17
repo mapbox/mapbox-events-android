@@ -36,7 +36,7 @@ class CertificateBlacklist implements Callback {
   private final long DAY_IN_MILLISECONDS = 86400000;
   private static final String BLACKLIST_FILE = "MapboxBlacklist";
   private static final String SHA256 = "sha256/";
-  private static final String NEW_LINE = "\n/";
+  private static final String NEW_LINE = "\n";
   private static final int BLACKLIST_HEAD = 0;
   private static final String REVOKED_CERT_KEYS = "RevokedCertKeys";
   private static final String COM_CONFIG_ENDPOINT = "https://api.mapbox.com/events-config";
