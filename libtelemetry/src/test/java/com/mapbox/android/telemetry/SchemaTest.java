@@ -7,12 +7,14 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.annotations.SerializedName;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -20,22 +22,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.GZIPInputStream;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class SchemaTest {
-  private static final String SCHEMA_URL = "https://mapbox.s3.amazonaws.com/mapbox-gl-native/event-schema/mobile-event-schemas.jsonl.gz";
   private static final String APP_USER_TURNSTILE = "appUserTurnstile";
   private static final String LOCATION = "location";
   private static final String MAP_CLICK = "map.click";
@@ -51,18 +44,7 @@ public class SchemaTest {
 
   @Before
   public void downloadSchema() throws Exception {
-    final CountDownLatch latch = new CountDownLatch(1);
-    final AtomicBoolean failureRef = new AtomicBoolean();
-    Callback callback = provideACallback(latch, failureRef);
-
-    Request request = new Request.Builder()
-      .url(SCHEMA_URL)
-      .build();
-
-    OkHttpClient client = new OkHttpClient();
-    client.newCall(request).enqueue(callback);
-
-    latch.await();
+    unpackSchemas();
   }
 
   @Test
@@ -349,8 +331,15 @@ public class SchemaTest {
     }
   }
 
-  private void unpackSchemas(Response responseData) throws IOException {
-    ByteArrayInputStream bais = new ByteArrayInputStream(responseData.body().bytes());
+  private ByteArrayInputStream getFileBytes() throws IOException {
+    InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("mobile-event-schemas.jsonl.gz");
+    byte[] byteOut = IOUtils.toByteArray(inputStream);
+
+    return new ByteArrayInputStream(byteOut);
+  }
+
+  private void unpackSchemas() throws IOException {
+    ByteArrayInputStream bais = getFileBytes();
     GZIPInputStream gzis = new GZIPInputStream(bais);
     InputStreamReader reader = new InputStreamReader(gzis);
     BufferedReader in = new BufferedReader(reader);
@@ -535,28 +524,5 @@ public class SchemaTest {
     }
 
     return fields;
-  }
-
-  private Callback provideACallback(final CountDownLatch latch, final AtomicBoolean failureRef) {
-    Callback callback = new Callback() {
-      @Override
-      public void onFailure(Call call, IOException exception) {
-        System.out.println("fail: " + exception.getMessage());
-        failureRef.set(true);
-        latch.countDown();
-      }
-
-      @Override
-      public void onResponse(Call call, Response response) throws IOException {
-        try {
-          unpackSchemas(response);
-        } catch (IOException exception) {
-          throw exception;
-        } finally {
-          latch.countDown();
-        }
-      }
-    };
-    return callback;
   }
 }

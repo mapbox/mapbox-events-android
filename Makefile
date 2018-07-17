@@ -3,6 +3,7 @@ checkstyle:
 
 test:
 	./gradlew :libcore:test
+	/gradlew  :libtelemetry:downloadSchema
 	./gradlew :libtelemetry:test
 
 release:
