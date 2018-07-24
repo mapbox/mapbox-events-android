@@ -19,7 +19,6 @@ class CertificatePinnerFactory {
   };
   private static final String COM_EVENTS = "events.mapbox.com";
   private static final String CHINA_EVENTS = "events.mapbox.cn";
-  private CertificateBlacklist certificateBlacklist;
 
   /**
    * Based on http://square.github.io/okhttp/3.x/okhttp/okhttp3/CertificatePinner.html
@@ -27,11 +26,10 @@ class CertificatePinnerFactory {
    * @return The CertificatePinner instance
    */
   CertificatePinner provideCertificatePinnerFor(Environment environment, CertificateBlacklist certificateBlacklist) {
-    this.certificateBlacklist = certificateBlacklist;
     CertificatePinner.Builder certificatePinnerBuilder = new CertificatePinner.Builder();
 
     Map<String, List<String>> certificatesPins = provideCertificatesPinsFor(environment);
-    addCertificatesPins(certificatesPins, certificatePinnerBuilder, environment);
+    addCertificatesPins(certificatesPins, certificatePinnerBuilder, environment, certificateBlacklist);
 
     return certificatePinnerBuilder.build();
   }
@@ -41,8 +39,8 @@ class CertificatePinnerFactory {
   }
 
   private void addCertificatesPins(Map<String, List<String>> pins, CertificatePinner.Builder builder,
-                                   Environment environment) {
-    pins = removeBlacklistedPins(pins, environment);
+                                   Environment environment, CertificateBlacklist certificateBlacklist) {
+    pins = removeBlacklistedPins(pins, environment, certificateBlacklist);
 
     for (Map.Entry<String, List<String>> entry : pins.entrySet()) {
       for (String pin : entry.getValue()) {
@@ -51,7 +49,8 @@ class CertificatePinnerFactory {
     }
   }
 
-  private Map<String, List<String>> removeBlacklistedPins(Map<String, List<String>> pins, Environment environment) {
+  private Map<String, List<String>> removeBlacklistedPins(Map<String, List<String>> pins, Environment environment,
+                                                          CertificateBlacklist certificateBlacklist) {
     String key = COM_EVENTS;
 
     if (environment == Environment.CHINA) {

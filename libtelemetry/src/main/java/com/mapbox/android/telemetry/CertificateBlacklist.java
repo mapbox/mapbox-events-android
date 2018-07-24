@@ -6,11 +6,6 @@ import android.content.pm.PackageManager;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -33,10 +28,11 @@ import okhttp3.Response;
 
 class CertificateBlacklist implements Callback {
   private static final String LOG_TAG = "MapboxBlacklist";
-  private final long DAY_IN_MILLISECONDS = 86400000;
   private static final String BLACKLIST_FILE = "MapboxBlacklist";
   private static final String SHA256 = "sha256/";
   private static final String NEW_LINE = "\n";
+  private static final String QUESTION_MARK = "?";
+  private static final String EQAL_SIGN = "=";
   private static final int BLACKLIST_HEAD = 0;
   private static final String REVOKED_CERT_KEYS = "RevokedCertKeys";
   private static final String COM_CONFIG_ENDPOINT = "https://api.mapbox.com/events-config";
@@ -84,8 +80,9 @@ class CertificateBlacklist implements Callback {
 
   boolean daySinceLastUpdate() {
     long millisecondDiff = System.currentTimeMillis() - retrieveLastUpdateTime();
+    long dayInMilliseconds = 86400000;
 
-    return millisecondDiff >= DAY_IN_MILLISECONDS;
+    return millisecondDiff >= dayInMilliseconds;
   }
 
   private long retrieveLastUpdateTime() {
@@ -108,7 +105,7 @@ class CertificateBlacklist implements Callback {
 
   void updateBlacklist() {
     Request request = new Request.Builder()
-      .url(determineConfigEndpoint() + "?" + ACCESS_TOKEN_QUERY_PARAMETER + "=" + accessToken)
+      .url(determineConfigEndpoint() + QUESTION_MARK + ACCESS_TOKEN_QUERY_PARAMETER + EQAL_SIGN + accessToken)
       .build();
 
     OkHttpClient client = new OkHttpClient();
@@ -197,20 +194,9 @@ class CertificateBlacklist implements Callback {
   private List<String> extractResponse(Response response) throws IOException {
     String responseData = response.body().string();
 
-    List<String> revokedKeys = new ArrayList<>();
+    Gson gson = new Gson();
+    RevokedKeys revokedKeys = gson.fromJson(responseData, RevokedKeys.class);
 
-    try {
-      JSONObject jsonObject = new JSONObject(responseData);
-      JSONArray jsonArray = jsonObject.getJSONArray(REVOKED_CERT_KEYS);
-
-      Gson gson = new Gson();
-      TypeToken<List<String>> token = new TypeToken<List<String>>() {};
-      revokedKeys = gson.fromJson(String.valueOf(jsonArray), token.getType());
-
-    } catch (JSONException exception) {
-      Log.e(LOG_TAG, EXTRACTION_EXEMPTION, exception);
-    }
-
-    return revokedKeys;
+    return revokedKeys.getList();
   }
 }
