@@ -180,9 +180,10 @@ class GoogleLocationEngine extends LocationEngine implements
   }
 
   private void createIntent(Context context) {
-    Intent intent = new Intent(context, FusedLocationIntentService.class);
-    Log.e("test", "intent: " + intent);
-    pendingIntent = PendingIntent.getService(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+//    Intent intent = new Intent(context, FusedLocationIntentService.class);
+//    Log.e("test", "intent: " + intent);
+//    pendingIntent = PendingIntent.getService(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    pendingIntent = FusedLocationIntentService.getPendingIntent(context);
     Log.e("test", "pendingIntent: " + pendingIntent);
   }
 }
