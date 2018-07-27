@@ -24,6 +24,8 @@ dependencies {
     compile dependenciesList.supportAppcompatV7
     compile dependenciesList.supportConstraintLayout
 
+    implementation 'com.google.android.gms:play-services-location:11.8.0'
+
     testCompile dependenciesList.junit
     testCompile dependenciesList.mockito
     androidTestCompile(dependenciesList.testEspressoCore, {

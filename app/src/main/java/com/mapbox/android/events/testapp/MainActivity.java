@@ -1,18 +1,26 @@
 package com.mapbox.android.events.testapp;
 
+import android.annotation.SuppressLint;
+import android.location.Location;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 
+import com.mapbox.android.core.location.LocationEngine;
+import com.mapbox.android.core.location.LocationEngineListener;
+import com.mapbox.android.core.location.LocationEnginePriority;
+import com.mapbox.android.core.location.LocationEngineProvider;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.android.telemetry.MapboxTelemetry;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements PermissionsListener {
+public class MainActivity extends AppCompatActivity implements PermissionsListener, LocationEngineListener {
   private final String LOG_TAG = "MainActivity";
   private MapboxTelemetry mapboxTelemetry;
   private PermissionsManager permissionsManager;
+  private LocationEngine locationEngine;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -29,12 +37,13 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
   @Override
   protected void onStart() {
     super.onStart();
+    startLocation();
   }
 
   @Override
   protected void onDestroy() {
     super.onDestroy();
-    mapboxTelemetry.disable();
+//    mapboxTelemetry.disable();
   }
 
   private String obtainAccessToken() {
@@ -46,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
     boolean permissionsGranted = PermissionsManager.areLocationPermissionsGranted(this);
 
     if (permissionsGranted) {
-      mapboxTelemetry.enable();
+//      mapboxTelemetry.enable();
     } else {
       permissionsManager = new PermissionsManager(this);
       permissionsManager.requestLocationPermissions(this);
@@ -61,7 +70,27 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
   @Override
   public void onPermissionResult(boolean granted) {
     if (granted) {
-      mapboxTelemetry.enable();
+//      mapboxTelemetry.enable();
     }
+  }
+
+  public void startLocation() {
+    LocationEngineProvider locationEngineProvider = new LocationEngineProvider(getApplicationContext());
+
+    locationEngine = locationEngineProvider.obtainBestLocationEngineAvailable();
+    locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
+    locationEngine.addLocationEngineListener(this);
+
+    locationEngine.activate();
+  }
+
+  @Override
+  public void onConnected() {
+    locationEngine.requestLocationUpdates();
+  }
+
+  @Override
+  public void onLocationChanged(Location location) {
+    Log.e("test", "location: " + location);
   }
 }
