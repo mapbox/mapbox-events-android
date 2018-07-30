@@ -2,7 +2,6 @@ package com.mapbox.android.core.location;
 
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;

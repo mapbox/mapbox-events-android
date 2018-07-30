@@ -16,13 +16,14 @@ public class LocationBroadcastReceiver extends BroadcastReceiver {
 
   @Override
   public void onReceive(Context context, Intent intent) {
+    Log.e("test", "On receive");
     if (intent != null) {
       final String action = intent.getAction();
       if (ACTION_PROCESS_UPDATES.equals(action)) {
         LocationResult result = LocationResult.extractResult(intent);
         if (result != null) {
           List<Location> locations = result.getLocations();
-          if(!locations.isEmpty()) {
+          if (!locations.isEmpty()) {
             for (Location location : locations) {
               Log.e("test", "Location update: " + location.toString());
             }

@@ -1,6 +1,5 @@
 package com.mapbox.android.events.testapp;
 
-import android.annotation.SuppressLint;
 import android.location.Location;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -43,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
   @Override
   protected void onDestroy() {
     super.onDestroy();
-//    mapboxTelemetry.disable();
+    //mapboxTelemetry.disable();
   }
 
   private String obtainAccessToken() {
@@ -55,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
     boolean permissionsGranted = PermissionsManager.areLocationPermissionsGranted(this);
 
     if (permissionsGranted) {
-//      mapboxTelemetry.enable();
+      //mapboxTelemetry.enable();
     } else {
       permissionsManager = new PermissionsManager(this);
       permissionsManager.requestLocationPermissions(this);
@@ -70,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
   @Override
   public void onPermissionResult(boolean granted) {
     if (granted) {
-//      mapboxTelemetry.enable();
+      //mapboxTelemetry.enable();
     }
   }
 

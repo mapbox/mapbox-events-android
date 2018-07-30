@@ -28,11 +28,6 @@ public class FusedLocationIntentService extends IntentService {
   }
 
   public static PendingIntent getPendingIntent(Context context) {
-    // Note: for apps targeting API level 25 ("Nougat") or lower, either
-    // PendingIntent.getService() or PendingIntent.getBroadcast() may be used when requesting
-    // location updates. For apps targeting API level O, only
-    // PendingIntent.getBroadcast() should be used. This is due to the limits placed on services
-    // started in the background in "O".
     Intent intent = new Intent(context, LocationBroadcastReceiver.class);
     intent.setAction(LocationBroadcastReceiver.ACTION_PROCESS_UPDATES);
     return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
