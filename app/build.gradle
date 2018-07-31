@@ -18,6 +18,10 @@ android {
             minifyEnabled true
         }
     }
+
+    lintOptions {
+        disable 'GoogleAppIndexingWarning'
+    }
 }
 
 dependencies {
