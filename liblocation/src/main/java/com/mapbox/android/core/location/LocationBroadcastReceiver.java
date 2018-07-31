@@ -12,7 +12,8 @@ import java.util.List;
 
 public class LocationBroadcastReceiver extends BroadcastReceiver {
 
-  static final String ACTION_PROCESS_UPDATES = "com.mapbox.mapboxsdk.context.ACTION_PROCESS_UPDATES";
+  static final String ACTION_PROCESS_UPDATES =
+    "com.mapbox.android.core.location.LocationBroadcastReceiver.ACTION_PROCESS_UPDATES";
 
   @Override
   public void onReceive(Context context, Intent intent) {
@@ -27,7 +28,6 @@ public class LocationBroadcastReceiver extends BroadcastReceiver {
             for (Location location : locations) {
               Log.e("test", "Location update: " + location.toString());
             }
-
           }
         }
       }

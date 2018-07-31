@@ -3,12 +3,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application>
-        <service android:name="com.mapbox.android.core.location.FusedLocationIntentService"/>
 
         <receiver android:name="com.mapbox.android.core.location.LocationBroadcastReceiver"
                   android:exported="true">
             <intent-filter>
-                <action android:name="com.mapbox.mapboxsdk.context.ACTION_PROCESS_UPDATES"/>
+                <action android:name="com.mapbox.android.core.location.LocationBroadcastReceiver.ACTION_PROCESS_UPDATES"/>
             </intent-filter>
         </receiver>
     </application>

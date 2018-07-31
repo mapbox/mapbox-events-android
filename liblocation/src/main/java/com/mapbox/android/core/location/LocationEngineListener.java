@@ -7,7 +7,6 @@ import android.location.Location;
  */
 
 public interface LocationEngineListener {
-
   void onConnected();
 
   void onLocationChanged(Location location);

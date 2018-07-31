@@ -21,6 +21,9 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <service android:name="com.mapbox.android.core.location.FusedLocationIntentService"
+                 android:exported="false"/>
     </application>
 
 </manifest>

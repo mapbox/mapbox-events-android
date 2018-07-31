@@ -2,6 +2,7 @@ package com.mapbox.android.core.location;
 
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,18 +15,22 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import java.io.NotSerializableException;
+import java.io.Serializable;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Sample LocationEngine using Google Play Services
  */
 class GoogleLocationEngine extends LocationEngine implements
-  GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+  GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, Serializable {
 
   private static final LocationEnginePriority DEFAULT_PRIORITY = LocationEnginePriority.NO_POWER;
-  private PendingIntent pendingIntent;
 
   private WeakReference<Context> context;
   private GoogleApiClient googleApiClient;
@@ -62,7 +67,6 @@ class GoogleLocationEngine extends LocationEngine implements
   private GoogleLocationEngine(Context context) {
     super();
     this.context = new WeakReference<>(context);
-    createIntent(context);
     googleApiClient = new GoogleApiClient.Builder(this.context.get())
       .addConnectionCallbacks(this)
       .addOnConnectionFailedListener(this)
@@ -137,18 +141,17 @@ class GoogleLocationEngine extends LocationEngine implements
     updateRequestPriority(request);
 
     if (googleApiClient.isConnected()) {
-      Log.e("test", "apiClient Connected");
       Log.e("test", "request: " + request);
-      Log.e("test", "pendingIntent: " + pendingIntent);
       //noinspection MissingPermission
-      LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, request, pendingIntent);
+      Log.e("test", "Starting location updates");
+      LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, request, getPendingIntent());
     }
   }
 
   @Override
   public void removeLocationUpdates() {
     if (googleApiClient.isConnected()) {
-      LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, pendingIntent);
+      LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, getPendingIntent());
     }
   }
 
@@ -178,11 +181,15 @@ class GoogleLocationEngine extends LocationEngine implements
     REQUEST_PRIORITY.get(priority).update(request);
   }
 
-  private void createIntent(Context context) {
-//    Intent intent = new Intent(context, FusedLocationIntentService.class);
-//    Log.e("test", "intent: " + intent);
-//    pendingIntent = PendingIntent.getService(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-    pendingIntent = FusedLocationIntentService.getPendingIntent(context);
-    Log.e("test", "pendingIntent: " + pendingIntent);
+  private PendingIntent getPendingIntent() {
+    if (context.get() != null) {
+      Intent intent = new Intent(context.get(), FusedLocationIntentService.class);
+      intent.setAction(FusedLocationIntentService.ACTION_PROCESS_UPDATES);
+
+      FusedLocationIntentService.addListeners(locationListeners);
+
+      return PendingIntent.getService(context.get(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+    return null;
   }
 }
