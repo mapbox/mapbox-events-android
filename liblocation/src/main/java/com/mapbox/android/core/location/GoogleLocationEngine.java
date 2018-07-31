@@ -4,6 +4,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,7 +16,6 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +24,7 @@ import java.util.Map;
  * Sample LocationEngine using Google Play Services
  */
 class GoogleLocationEngine extends LocationEngine implements
-  GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, Serializable {
+  GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
   private static final LocationEnginePriority DEFAULT_PRIORITY = LocationEnginePriority.NO_POWER;
 
@@ -179,21 +179,22 @@ class GoogleLocationEngine extends LocationEngine implements
 
   private PendingIntent getPendingIntent() {
     if (context.get() != null) {
-      //service
-      // Intent intent = new Intent(context.get(), FusedLocationIntentService.class);
-      // intent.setAction(FusedLocationIntentService.ACTION_PROCESS_UPDATES);
-      //
-      // FusedLocationIntentService.addListeners(locationListeners);
-      //
-      // return PendingIntent.getService(context.get(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-      //broadcast
-      Intent intent = new Intent(context.get(), LocationBroadcastReceiver.class);
-      intent.setAction(LocationBroadcastReceiver.ACTION_PROCESS_UPDATES);
+      if (Build.VERSION.SDK_INT >= 26) {
+        Intent intent = new Intent(context.get(), LocationBroadcastReceiver.class);
+        intent.setAction(LocationBroadcastReceiver.ACTION_PROCESS_UPDATES);
 
-      LocationBroadcastReceiver.addListeners(locationListeners);
+        LocationBroadcastReceiver.addListeners(locationListeners);
 
-      return PendingIntent.getBroadcast(context.get(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        return PendingIntent.getBroadcast(context.get(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+      } else {
+        Intent intent = new Intent(context.get(), FusedLocationIntentService.class);
+        intent.setAction(FusedLocationIntentService.ACTION_PROCESS_UPDATES);
+
+        FusedLocationIntentService.addListeners(locationListeners);
+
+        return PendingIntent.getService(context.get(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+      }
     }
     return null;
   }
