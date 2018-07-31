@@ -15,14 +15,10 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-import java.io.NotSerializableException;
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Sample LocationEngine using Google Play Services
@@ -183,12 +179,21 @@ class GoogleLocationEngine extends LocationEngine implements
 
   private PendingIntent getPendingIntent() {
     if (context.get() != null) {
-      Intent intent = new Intent(context.get(), FusedLocationIntentService.class);
-      intent.setAction(FusedLocationIntentService.ACTION_PROCESS_UPDATES);
+      //service
+      // Intent intent = new Intent(context.get(), FusedLocationIntentService.class);
+      // intent.setAction(FusedLocationIntentService.ACTION_PROCESS_UPDATES);
+      //
+      // FusedLocationIntentService.addListeners(locationListeners);
+      //
+      // return PendingIntent.getService(context.get(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-      FusedLocationIntentService.addListeners(locationListeners);
+      //broadcast
+      Intent intent = new Intent(context.get(), LocationBroadcastReceiver.class);
+      intent.setAction(LocationBroadcastReceiver.ACTION_PROCESS_UPDATES);
 
-      return PendingIntent.getService(context.get(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+      LocationBroadcastReceiver.addListeners(locationListeners);
+
+      return PendingIntent.getBroadcast(context.get(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
     return null;
   }

@@ -1,4 +1,16 @@
 <manifest package="com.mapbox.android.core"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
+    <application>
+        <service android:name="com.mapbox.android.core.location.FusedLocationIntentService"
+                 android:exported="false"/>
+
+        <receiver android:name="com.mapbox.android.core.location.LocationBroadcastReceiver"
+                  android:exported="true">
+            <intent-filter>
+                <action android:name="com.mapbox.android.core.location.LocationBroadcastReceiver.ACTION_PROCESS_UPDATES"/>
+            </intent-filter>
+        </receiver>
+    </application>
 </manifest>
