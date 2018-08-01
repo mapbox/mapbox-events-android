@@ -7,11 +7,11 @@ import android.support.annotation.Nullable;
 public class LocationUpdateIntentService extends IntentService {
 
   static final String ACTION_PROCESS_UPDATES =
-    "com.mapbox.android.core.location.FusedLocationIntentService.ACTION_PROCESS_UPDATES";
+    "com.mapbox.android.core.location.LocationUpdateIntentService.ACTION_PROCESS_UPDATES";
   private static LocationIntentHandler locationIntentHandler;
 
   public LocationUpdateIntentService() {
-    super("FusedLocationIntentService");
+    super(LocationUpdateIntentService.class.getSimpleName());
   }
 
   @Override

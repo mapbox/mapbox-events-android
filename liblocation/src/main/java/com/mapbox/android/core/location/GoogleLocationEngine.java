@@ -21,7 +21,7 @@ import java.util.Map;
  * Sample LocationEngine using Google Play Services
  */
 class GoogleLocationEngine extends LocationEngine implements
-  GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+  GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
   private static final String CONTEXT_NULL = "Context is Null. Please provide a valid Context";
   private static final LocationEnginePriority DEFAULT_PRIORITY = LocationEnginePriority.NO_POWER;
@@ -152,13 +152,6 @@ class GoogleLocationEngine extends LocationEngine implements
     return Type.GOOGLE_PLAY_SERVICES;
   }
 
-  @Override
-  public void onLocationChanged(Location location) {
-    for (LocationEngineListener listener : locationListeners) {
-      listener.onLocationChanged(location);
-    }
-  }
-
   private void connect() {
     if (googleApiClient != null) {
       if (googleApiClient.isConnected()) {
@@ -179,7 +172,7 @@ class GoogleLocationEngine extends LocationEngine implements
       SdkChecker sdkChecker = new SdkChecker();
       LocationPendingIntentProvider provider =
         new LocationPendingIntentProvider(context, sdkChecker, locationListeners);
-      return provider.buildPendingIntent();
+      return provider.buildLocationPendingIntent().retrievePendingIntent();
     } else {
       throw new IllegalStateException(CONTEXT_NULL);
     }

@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-class LocationUpdateBroadcastReceiver extends BroadcastReceiver {
+public class LocationUpdateBroadcastReceiver extends BroadcastReceiver {
 
   static final String ACTION_PROCESS_UPDATES =
     "com.mapbox.android.core.location.LocationBroadcastReceiver.ACTION_PROCESS_UPDATES";
