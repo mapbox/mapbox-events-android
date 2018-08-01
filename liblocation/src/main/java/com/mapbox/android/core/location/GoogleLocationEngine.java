@@ -2,9 +2,7 @@ package com.mapbox.android.core.location;
 
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.location.Location;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -25,6 +23,7 @@ import java.util.Map;
 class GoogleLocationEngine extends LocationEngine implements
   GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
+  private static final String CONTEXT_NULL = "Context is Null. Please provide a valid Context";
   private static final LocationEnginePriority DEFAULT_PRIORITY = LocationEnginePriority.NO_POWER;
 
   private WeakReference<Context> context;
@@ -175,24 +174,14 @@ class GoogleLocationEngine extends LocationEngine implements
   }
 
   private PendingIntent getPendingIntent() {
-    if (context.get() != null) {
-
-      if (Build.VERSION.SDK_INT >= 26) {
-        Intent intent = new Intent(context.get(), LocationBroadcastReceiver.class);
-        intent.setAction(LocationBroadcastReceiver.ACTION_PROCESS_UPDATES);
-
-        LocationBroadcastReceiver.addListeners(locationListeners);
-
-        return PendingIntent.getBroadcast(context.get(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-      } else {
-        Intent intent = new Intent(context.get(), FusedLocationIntentService.class);
-        intent.setAction(FusedLocationIntentService.ACTION_PROCESS_UPDATES);
-
-        FusedLocationIntentService.addListeners(locationListeners);
-
-        return PendingIntent.getService(context.get(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-      }
+    Context context = this.context.get();
+    if (context != null) {
+      SdkChecker sdkChecker = new SdkChecker();
+      LocationPendingIntentProvider provider =
+        new LocationPendingIntentProvider(context, sdkChecker, locationListeners);
+      return provider.buildPendingIntent();
+    } else {
+      throw new IllegalStateException(CONTEXT_NULL);
     }
-    return null;
   }
 }

@@ -3,10 +3,10 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <application>
-        <service android:name="com.mapbox.android.core.location.FusedLocationIntentService"
+        <service android:name="com.mapbox.android.core.location.LocationUpdateIntentService"
                  android:exported="false"/>
 
-        <receiver android:name="com.mapbox.android.core.location.LocationBroadcastReceiver"
+        <receiver android:name="com.mapbox.android.core.location.LocationUpdateBroadcastReceiver"
                   android:exported="false">
             <intent-filter>
                 <action android:name="com.mapbox.android.core.location.LocationBroadcastReceiver.ACTION_PROCESS_UPDATES"/>
