@@ -9,11 +9,9 @@ import android.support.annotation.Nullable;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,11 +21,10 @@ import java.util.Map;
 class GoogleLocationEngine extends LocationEngine implements
   GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-  private static final String CONTEXT_NULL = "Context is Null. Please provide a valid Context";
   private static final LocationEnginePriority DEFAULT_PRIORITY = LocationEnginePriority.NO_POWER;
 
-  private WeakReference<Context> context;
   private GoogleApiClient googleApiClient;
+  private PendingIntent pendingIntent;
   private final Map<LocationEnginePriority, UpdateGoogleRequestPriority> REQUEST_PRIORITY = new
     HashMap<LocationEnginePriority, UpdateGoogleRequestPriority>() {
       {
@@ -60,12 +57,12 @@ class GoogleLocationEngine extends LocationEngine implements
 
   private GoogleLocationEngine(Context context) {
     super();
-    this.context = new WeakReference<>(context);
-    googleApiClient = new GoogleApiClient.Builder(this.context.get())
+    googleApiClient = new GoogleApiClient.Builder(context)
       .addConnectionCallbacks(this)
       .addOnConnectionFailedListener(this)
       .addApi(LocationServices.API)
       .build();
+    generatePendingIntent(context);
     this.priority = DEFAULT_PRIORITY;
   }
 
@@ -136,14 +133,14 @@ class GoogleLocationEngine extends LocationEngine implements
 
     if (googleApiClient.isConnected()) {
       //noinspection MissingPermission
-      LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, request, getPendingIntent());
+      LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, request, pendingIntent);
     }
   }
 
   @Override
   public void removeLocationUpdates() {
     if (googleApiClient.isConnected()) {
-      LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, getPendingIntent());
+      LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, pendingIntent);
     }
   }
 
@@ -166,15 +163,9 @@ class GoogleLocationEngine extends LocationEngine implements
     REQUEST_PRIORITY.get(priority).update(request);
   }
 
-  private PendingIntent getPendingIntent() {
-    Context context = this.context.get();
-    if (context != null) {
-      SdkChecker sdkChecker = new SdkChecker();
-      LocationPendingIntentProvider provider =
-        new LocationPendingIntentProvider(context, sdkChecker, locationListeners);
-      return provider.buildLocationPendingIntent().retrievePendingIntent();
-    } else {
-      throw new IllegalStateException(CONTEXT_NULL);
-    }
+  private void generatePendingIntent(Context context) {
+    SdkChecker sdkChecker = new SdkChecker();
+    LocationPendingIntentProvider provider = new LocationPendingIntentProvider(context, sdkChecker, locationListeners);
+    pendingIntent = provider.intent().retrievePendingIntent();
   }
 }

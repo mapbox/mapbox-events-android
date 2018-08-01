@@ -7,24 +7,26 @@ import android.content.Intent;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 class LocationPendingIntentProvider {
+
   private static final int REQUEST_CODE = 0;
-  private Context context;
-  private SdkChecker sdkChecker;
-  private CopyOnWriteArrayList<LocationEngineListener> locationEngineListeners;
+  private final LocationPendingIntent locationPendingIntent;
 
   LocationPendingIntentProvider(Context context, SdkChecker sdkChecker,
                                 CopyOnWriteArrayList<LocationEngineListener> locationEngineListeners) {
-    this.context = context;
-    this.sdkChecker = sdkChecker;
-    this.locationEngineListeners = locationEngineListeners;
+    locationPendingIntent = buildIntent(context, sdkChecker, locationEngineListeners);
   }
 
-  LocationPendingIntent buildLocationPendingIntent() {
+  LocationPendingIntent intent() {
+    return locationPendingIntent;
+  }
+
+  private LocationPendingIntent buildIntent(Context context, SdkChecker sdkChecker,
+                                            CopyOnWriteArrayList<LocationEngineListener> locationListeners) {
     if (sdkChecker.isOreoOrAbove()) {
       Intent intent = new Intent(context, LocationUpdateBroadcastReceiver.class);
       intent.setAction(LocationUpdateBroadcastReceiver.ACTION_PROCESS_UPDATES);
 
-      LocationIntentHandler intentHandler = new LocationIntentHandler(locationEngineListeners);
+      LocationIntentHandler intentHandler = new LocationIntentHandler(locationListeners);
       LocationUpdateBroadcastReceiver.addIntentHandler(intentHandler);
 
       PendingIntent broadcastPendingIntent = PendingIntent.getBroadcast(
@@ -35,7 +37,7 @@ class LocationPendingIntentProvider {
       Intent intent = new Intent(context, LocationUpdateIntentService.class);
       intent.setAction(LocationUpdateIntentService.ACTION_PROCESS_UPDATES);
 
-      LocationIntentHandler intentHandler = new LocationIntentHandler(locationEngineListeners);
+      LocationIntentHandler intentHandler = new LocationIntentHandler(locationListeners);
       LocationUpdateIntentService.addIntentHandler(intentHandler);
 
       PendingIntent servicePendingIntent = PendingIntent.getService(

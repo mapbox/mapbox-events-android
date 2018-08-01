@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 class LocationIntentHandler {
-  private CopyOnWriteArrayList<LocationEngineListener> locationEngineListeners;
+  private CopyOnWriteArrayList<LocationEngineListener> locationListeners;
 
-  LocationIntentHandler(CopyOnWriteArrayList<LocationEngineListener> locationEngineListeners) {
-    this.locationEngineListeners = locationEngineListeners;
+  LocationIntentHandler(CopyOnWriteArrayList<LocationEngineListener> locationListeners) {
+    this.locationListeners = locationListeners;
   }
 
   void handle(Intent intent, String actionTag) {
@@ -23,7 +23,7 @@ class LocationIntentHandler {
         if (result != null) {
           List<Location> locations = result.getLocations();
           if (!locations.isEmpty()) {
-            for (LocationEngineListener listener : locationEngineListeners) {
+            for (LocationEngineListener listener : locationListeners) {
               listener.onLocationChanged(locations.get(0));
             }
           }

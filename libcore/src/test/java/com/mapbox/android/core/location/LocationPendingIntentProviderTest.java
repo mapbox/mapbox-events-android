@@ -17,7 +17,7 @@ public class LocationPendingIntentProviderTest {
   public void whenApiVersionIsOreoOrAbove_providerReturnsBroadcastPendingIntent() {
     LocationPendingIntentProvider provider = buildIntentProvider(true);
 
-    LocationPendingIntent pendingIntent = provider.buildLocationPendingIntent();
+    LocationPendingIntent pendingIntent = provider.intent();
 
     assertTrue(pendingIntent instanceof LocationBroadcastPendingIntent);
   }
@@ -26,7 +26,7 @@ public class LocationPendingIntentProviderTest {
   public void whenApiVersionIsBelowOreo_providerReturnsServicePendingIntent() {
     LocationPendingIntentProvider provider = buildIntentProvider(false);
 
-    LocationPendingIntent pendingIntent = provider.buildLocationPendingIntent();
+    LocationPendingIntent pendingIntent = provider.intent();
 
     assertTrue(pendingIntent instanceof LocationServicePendingIntent);
   }
