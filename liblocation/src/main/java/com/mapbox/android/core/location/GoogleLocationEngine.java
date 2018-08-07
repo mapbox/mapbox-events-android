@@ -164,8 +164,7 @@ class GoogleLocationEngine extends LocationEngine implements
   }
 
   private void generatePendingIntent(Context context) {
-    SdkChecker sdkChecker = new SdkChecker();
-    LocationPendingIntentProvider provider = new LocationPendingIntentProvider(context, sdkChecker, locationListeners);
+    LocationPendingIntentProvider provider = new LocationPendingIntentProvider(context, locationListeners);
     pendingIntent = provider.intent().retrievePendingIntent();
   }
 }

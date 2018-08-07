@@ -11,18 +11,17 @@ class LocationPendingIntentProvider {
   private static final int REQUEST_CODE = 0;
   private final LocationPendingIntent locationPendingIntent;
 
-  LocationPendingIntentProvider(Context context, SdkChecker sdkChecker,
-                                CopyOnWriteArrayList<LocationEngineListener> locationEngineListeners) {
-    locationPendingIntent = buildIntent(context, sdkChecker, locationEngineListeners);
+  LocationPendingIntentProvider(Context context, CopyOnWriteArrayList<LocationEngineListener> locationEngineListeners) {
+    locationPendingIntent = buildIntent(context, locationEngineListeners);
   }
 
   LocationPendingIntent intent() {
     return locationPendingIntent;
   }
 
-  private static LocationPendingIntent buildIntent(Context context, SdkChecker sdkChecker,
+  private static LocationPendingIntent buildIntent(Context context,
                                             CopyOnWriteArrayList<LocationEngineListener> locationListeners) {
-    if (sdkChecker.isOreoOrAbove()) {
+    if (SdkChecker.isOreoOrAbove()) {
       Intent intent = new Intent(context, LocationUpdateBroadcastReceiver.class);
       intent.setAction(LocationUpdateBroadcastReceiver.ACTION_PROCESS_UPDATES);
 
