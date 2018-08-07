@@ -20,7 +20,7 @@ class LocationPendingIntentProvider {
     return locationPendingIntent;
   }
 
-  private LocationPendingIntent buildIntent(Context context, SdkChecker sdkChecker,
+  private static LocationPendingIntent buildIntent(Context context, SdkChecker sdkChecker,
                                             CopyOnWriteArrayList<LocationEngineListener> locationListeners) {
     if (sdkChecker.isOreoOrAbove()) {
       Intent intent = new Intent(context, LocationUpdateBroadcastReceiver.class);
