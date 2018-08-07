@@ -51,8 +51,8 @@ public class LocationPendingIntentProviderTest {
 
     try {
       setFinalStatic(Build.VERSION.class.getField("SDK_INT"), sdkInt);
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch (Exception exception) {
+      exception.printStackTrace();
     }
   }
 
