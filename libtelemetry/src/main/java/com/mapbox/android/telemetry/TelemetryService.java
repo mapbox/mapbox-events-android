@@ -66,6 +66,7 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
 
   @Override
   public void onDestroy() {
+    checkApplicationContext();
     unregisterLocationReceiver();
     unregisterTelemetryReceiver();
     disableTelemetryLocationState();
