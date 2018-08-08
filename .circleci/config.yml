@@ -96,7 +96,7 @@ jobs:
       - deploy:
           name: Publish to Maven Central
           command: |
-            if [ "${CIRCLE_BRANCH}" == "3.1.5-telem-0.2.1-core-releases" ]; then
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
               if [ "$OK_TO_RELEASE_CORE" == true ]; then
                 make publish-core ;
               fi
