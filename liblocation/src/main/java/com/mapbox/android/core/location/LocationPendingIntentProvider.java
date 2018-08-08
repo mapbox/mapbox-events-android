@@ -4,45 +4,29 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Random;
 
 class LocationPendingIntentProvider {
 
-  private static final int REQUEST_CODE = 0;
   private final LocationPendingIntent locationPendingIntent;
 
-  LocationPendingIntentProvider(Context context, CopyOnWriteArrayList<LocationEngineListener> locationEngineListeners) {
-    locationPendingIntent = buildIntent(context, locationEngineListeners);
+  LocationPendingIntentProvider(Context context, GoogleLocationEngine googleLocationEngine) {
+    locationPendingIntent = buildIntent(context, googleLocationEngine);
   }
 
   LocationPendingIntent intent() {
     return locationPendingIntent;
   }
 
-  private static LocationPendingIntent buildIntent(Context context,
-                                            CopyOnWriteArrayList<LocationEngineListener> locationListeners) {
-    if (SdkChecker.isOreoOrAbove()) {
-      Intent intent = new Intent(context, LocationUpdateBroadcastReceiver.class);
-      intent.setAction(LocationUpdateBroadcastReceiver.ACTION_PROCESS_UPDATES);
+  static LocationPendingIntent buildIntent(Context context, GoogleLocationEngine googleLocationEngine) {
+    Intent intent = new Intent("GoogleLocationEngineBroadcast-" + googleLocationEngine.toString());
 
-      LocationIntentHandler intentHandler = new LocationIntentHandler(locationListeners);
-      LocationUpdateBroadcastReceiver.addIntentHandler(intentHandler);
+    PendingIntent broadcastPendingIntent = PendingIntent.getBroadcast(context, generateRequestCode(), intent, 0);
+    return new LocationBroadcastPendingIntent(broadcastPendingIntent);
+  }
 
-      PendingIntent broadcastPendingIntent = PendingIntent.getBroadcast(
-        context, REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT
-      );
-      return new LocationBroadcastPendingIntent(broadcastPendingIntent);
-    } else {
-      Intent intent = new Intent(context, LocationUpdateIntentService.class);
-      intent.setAction(LocationUpdateIntentService.ACTION_PROCESS_UPDATES);
-
-      LocationIntentHandler intentHandler = new LocationIntentHandler(locationListeners);
-      LocationUpdateIntentService.addIntentHandler(intentHandler);
-
-      PendingIntent servicePendingIntent = PendingIntent.getService(
-        context, REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT
-      );
-      return new LocationServicePendingIntent(servicePendingIntent);
-    }
+  private static int generateRequestCode() {
+    Random random = new Random();
+    return random.nextInt();
   }
 }

@@ -1,7 +1,10 @@
 package com.mapbox.android.core.location;
 
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -16,13 +19,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Sample LocationEngine using Google Play Services
+ * Sample LocationEngine using Google Play Servicesre
  */
 class GoogleLocationEngine extends LocationEngine implements
   GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
   private static final LocationEnginePriority DEFAULT_PRIORITY = LocationEnginePriority.NO_POWER;
 
+  private BroadcastReceiver broadcastReceiver;
+  private LocationIntentHandler locationIntentHandler;
   private GoogleApiClient googleApiClient;
   private PendingIntent pendingIntent;
   private final Map<LocationEnginePriority, UpdateGoogleRequestPriority> REQUEST_PRIORITY = new
@@ -63,6 +68,7 @@ class GoogleLocationEngine extends LocationEngine implements
       .addApi(LocationServices.API)
       .build();
     generatePendingIntent(context);
+    setupBroadcastReceiver(context);
     this.priority = DEFAULT_PRIORITY;
   }
 
@@ -132,6 +138,7 @@ class GoogleLocationEngine extends LocationEngine implements
     updateRequestPriority(request);
 
     if (googleApiClient.isConnected()) {
+      locationIntentHandler = new LocationIntentHandler(locationListeners);
       //noinspection MissingPermission
       LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, request, pendingIntent);
     }
@@ -164,7 +171,20 @@ class GoogleLocationEngine extends LocationEngine implements
   }
 
   private void generatePendingIntent(Context context) {
-    LocationPendingIntentProvider provider = new LocationPendingIntentProvider(context, locationListeners);
-    pendingIntent = provider.intent().retrievePendingIntent();
+    pendingIntent = LocationPendingIntentProvider.buildIntent(context, this).retrievePendingIntent();
+  }
+
+  private void setupBroadcastReceiver(Context context) {
+    final String action = "GoogleLocationEngineBroadcast-" + this.toString();
+    IntentFilter filter = new IntentFilter();
+    filter.addAction(action);
+    this.broadcastReceiver = new BroadcastReceiver() {
+      @Override
+      public void onReceive(Context context, Intent intent) {
+        locationIntentHandler.handle(intent, action);
+      }
+    };
+
+    context.registerReceiver(broadcastReceiver, filter);
   }
 }
