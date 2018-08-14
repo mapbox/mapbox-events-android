@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 public class VisionEventFactoryTest {
 
   @Test(expected = IllegalStateException.class)
-  public void checksMapboxTelemetryNotInitialized() throws Exception {
+  public void checksMapboxTelemetryNotInitialized() {
     MapboxTelemetry.applicationContext = null;
 
     new VisionEventFactory();
