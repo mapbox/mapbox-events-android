@@ -13,19 +13,29 @@ public class VisionEvent  extends Event implements Parcelable {
   @SerializedName("event")
   private final String event;
   @SerializedName("name")
-  private String name;
+  private String name = "";
   @SerializedName("contents")
-  private HashMap<String, Object> contents;
+  private HashMap<String, Object> contents = new HashMap<>();
 
-  VisionEvent(String name, HashMap<String, Object> contents) {
+  VisionEvent() {
     this.event = VIS_GENERAL;
-    this.name = name;
-    this.contents = contents;
   }
 
   @Override
   Type obtainType() {
     return Type.VIS_GENERAL;
+  }
+
+  public void setContents(HashMap<String, Object> contents) {
+    this.contents = contents;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public HashMap<String, Object> getContents() {
+    return contents;
   }
 
   private VisionEvent(Parcel in) {

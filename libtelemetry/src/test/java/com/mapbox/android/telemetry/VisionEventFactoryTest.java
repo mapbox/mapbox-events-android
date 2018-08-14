@@ -7,8 +7,6 @@ import android.view.WindowManager;
 
 import org.junit.Test;
 
-import java.util.HashMap;
-
 import okhttp3.Callback;
 
 import static org.junit.Assert.assertEquals;
@@ -30,10 +28,8 @@ public class VisionEventFactoryTest {
   public void checksVisionEvent() {
     initializeMapboxTelemetry();
     VisionEventFactory aVisionEventFactory = new VisionEventFactory();
-    String anyName = "anyName";
-    HashMap mockedContents = mock(HashMap.class);
 
-    Event visonEvent = aVisionEventFactory.createVisionEvent(Event.Type.VIS_GENERAL, anyName, mockedContents);
+    Event visonEvent = aVisionEventFactory.createVisionEvent(Event.Type.VIS_GENERAL);
 
     assertTrue(visonEvent instanceof VisionEvent);
   }
@@ -42,10 +38,8 @@ public class VisionEventFactoryTest {
   public void checksVisionType() {
     initializeMapboxTelemetry();
     VisionEventFactory aVisionEventFactory = new VisionEventFactory();
-    String anyName = "anyName";
-    HashMap mockedContents = mock(HashMap.class);
 
-    Event visonEvent = aVisionEventFactory.createVisionEvent(Event.Type.VIS_GENERAL, anyName, mockedContents);
+    Event visonEvent = aVisionEventFactory.createVisionEvent(Event.Type.VIS_GENERAL);
 
     assertEquals(Event.Type.VIS_GENERAL, visonEvent.obtainType());
   }
@@ -54,55 +48,9 @@ public class VisionEventFactoryTest {
   public void checksVisionInvalidType() {
     initializeMapboxTelemetry();
     VisionEventFactory aVisionEventFactory = new VisionEventFactory();
-    String anyName = "anyName";
-    HashMap mockedContents = mock(HashMap.class);
     Event.Type notAVisionType = Event.Type.MAP_CLICK;
 
-    aVisionEventFactory.createVisionEvent(notAVisionType, anyName, mockedContents);
-  }
-
-  @Test
-  public void checksValidName() {
-    initializeMapboxTelemetry();
-    VisionEventFactory aVisionEventFactory = new VisionEventFactory();
-    String validName = "validName";
-    HashMap mockedContents = mock(HashMap.class);
-
-    Event visonEvent = aVisionEventFactory.createVisionEvent(Event.Type.VIS_GENERAL, validName, mockedContents);
-
-    assertTrue(visonEvent instanceof VisionEvent);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void checksInvalidName() {
-    initializeMapboxTelemetry();
-    VisionEventFactory aVisionEventFactory = new VisionEventFactory();
-    String nullName = null;
-    HashMap mockedContents = mock(HashMap.class);
-
-    aVisionEventFactory.createVisionEvent(Event.Type.VIS_GENERAL, nullName, mockedContents);
-  }
-
-  @Test
-  public void checksValidContents() {
-    initializeMapboxTelemetry();
-    VisionEventFactory aVisionEventFactory = new VisionEventFactory();
-    String anyName = "anyName";
-    HashMap validContents = mock(HashMap.class);
-
-    Event visonEvent = aVisionEventFactory.createVisionEvent(Event.Type.VIS_GENERAL, anyName, validContents);
-
-    assertTrue(visonEvent instanceof VisionEvent);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void checksInvalidContents() {
-    initializeMapboxTelemetry();
-    VisionEventFactory aVisionEventFactory = new VisionEventFactory();
-    String anyName = "anyName";
-    HashMap nullContents = null;
-
-    aVisionEventFactory.createVisionEvent(Event.Type.VIS_GENERAL, anyName, nullContents);
+    aVisionEventFactory.createVisionEvent(notAVisionType);
   }
 
   private void initializeMapboxTelemetry() {
