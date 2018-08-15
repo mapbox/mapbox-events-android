@@ -30,6 +30,8 @@ class GoogleLocationEngine extends LocationEngine implements
   private LocationIntentHandler locationIntentHandler;
   private GoogleApiClient googleApiClient;
   private PendingIntent pendingIntent;
+  private String action;
+  private Context context;
   private final Map<LocationEnginePriority, UpdateGoogleRequestPriority> REQUEST_PRIORITY = new
     HashMap<LocationEnginePriority, UpdateGoogleRequestPriority>() {
       {
@@ -67,9 +69,12 @@ class GoogleLocationEngine extends LocationEngine implements
       .addOnConnectionFailedListener(this)
       .addApi(LocationServices.API)
       .build();
+    generateAction();
     generatePendingIntent(context);
-    setupBroadcastReceiver(context);
+    setupBroadcastReceiver();
     this.priority = DEFAULT_PRIORITY;
+    this.locationIntentHandler = new LocationIntentHandler();
+    this.context = context;
   }
 
   static synchronized LocationEngine getLocationEngine(Context context) {
@@ -138,7 +143,8 @@ class GoogleLocationEngine extends LocationEngine implements
     updateRequestPriority(request);
 
     if (googleApiClient.isConnected()) {
-      locationIntentHandler = new LocationIntentHandler(locationListeners);
+      registerReceiver();
+      locationIntentHandler.setLocationListeners(locationListeners);
       //noinspection MissingPermission
       LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, request, pendingIntent);
     }
@@ -148,6 +154,7 @@ class GoogleLocationEngine extends LocationEngine implements
   public void removeLocationUpdates() {
     if (googleApiClient.isConnected()) {
       LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, pendingIntent);
+      unregisterReceiver();
     }
   }
 
@@ -171,20 +178,30 @@ class GoogleLocationEngine extends LocationEngine implements
   }
 
   private void generatePendingIntent(Context context) {
-    pendingIntent = LocationPendingIntentProvider.buildIntent(context, this).retrievePendingIntent();
+    pendingIntent = LocationPendingIntentProvider.buildIntent(context, action)
+      .retrievePendingIntent();
   }
 
-  private void setupBroadcastReceiver(Context context) {
-    final String action = "GoogleLocationEngineBroadcast-" + this.toString();
-    IntentFilter filter = new IntentFilter();
-    filter.addAction(action);
+  private void setupBroadcastReceiver() {
     this.broadcastReceiver = new BroadcastReceiver() {
       @Override
       public void onReceive(Context context, Intent intent) {
-        locationIntentHandler.handle(intent, action);
+        locationIntentHandler.handle(intent);
       }
     };
+  }
 
+  private void registerReceiver() {
+    IntentFilter filter = new IntentFilter();
+    filter.addAction(action);
     context.registerReceiver(broadcastReceiver, filter);
+  }
+
+  private void unregisterReceiver() {
+    context.unregisterReceiver(broadcastReceiver);
+  }
+
+  private void generateAction() {
+    action = "GoogleLocationEngineBroadcast-" + this.hashCode();
   }
 }

@@ -11,21 +11,22 @@ import java.util.concurrent.CopyOnWriteArrayList;
 class LocationIntentHandler {
   private CopyOnWriteArrayList<LocationEngineListener> locationListeners;
 
-  LocationIntentHandler(CopyOnWriteArrayList<LocationEngineListener> locationListeners) {
+  LocationIntentHandler() {
+    locationListeners = new CopyOnWriteArrayList<>();
+  }
+
+  public void setLocationListeners(CopyOnWriteArrayList<LocationEngineListener> locationListeners) {
     this.locationListeners = locationListeners;
   }
 
-  void handle(Intent intent, String actionTag) {
+  void handle(Intent intent) {
     if (intent != null) {
-      final String action = intent.getAction();
-      if (actionTag.equals(action)) {
-        LocationResult result = LocationResult.extractResult(intent);
-        if (result != null) {
-          List<Location> locations = result.getLocations();
-          if (!locations.isEmpty()) {
-            for (LocationEngineListener listener : locationListeners) {
-              listener.onLocationChanged(locations.get(0));
-            }
+      LocationResult result = LocationResult.extractResult(intent);
+      if (result != null) {
+        List<Location> locations = result.getLocations();
+        if (!locations.isEmpty()) {
+          for (LocationEngineListener listener : locationListeners) {
+            listener.onLocationChanged(locations.get(0));
           }
         }
       }
