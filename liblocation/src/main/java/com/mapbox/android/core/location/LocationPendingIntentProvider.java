@@ -8,16 +8,6 @@ import java.util.Random;
 
 class LocationPendingIntentProvider {
 
-  private final LocationPendingIntent locationPendingIntent;
-
-  LocationPendingIntentProvider(Context context, GoogleLocationEngine googleLocationEngine) {
-    locationPendingIntent = buildIntent(context, googleLocationEngine);
-  }
-
-  LocationPendingIntent intent() {
-    return locationPendingIntent;
-  }
-
   static LocationPendingIntent buildIntent(Context context, GoogleLocationEngine googleLocationEngine) {
     Intent intent = new Intent("GoogleLocationEngineBroadcast-" + googleLocationEngine.toString());
 
