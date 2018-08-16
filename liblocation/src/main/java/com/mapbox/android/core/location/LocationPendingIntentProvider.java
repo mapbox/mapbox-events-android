@@ -10,14 +10,15 @@ import java.util.Random;
 class LocationPendingIntentProvider {
   private static ArrayList<Integer> requestCodes = new ArrayList<>();
 
-  static LocationPendingIntent buildIntent(Context context, String action) {
+  static PendingIntent buildIntent(Context context, String action, int requestCode) {
     Intent intent = new Intent(action);
+    requestCodes.add(requestCode);
 
-    PendingIntent broadcastPendingIntent = PendingIntent.getBroadcast(context, generateRequestCode(), intent, 0);
-    return new LocationBroadcastPendingIntent(broadcastPendingIntent);
+    PendingIntent broadcastPendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, 0);
+    return broadcastPendingIntent;
   }
 
-  private static int generateRequestCode() {
+  static int generateRequestCode() {
     Random random = new Random();
     int requestCode = random.nextInt();
 
@@ -26,6 +27,10 @@ class LocationPendingIntentProvider {
     }
 
     return requestCode;
+  }
+
+  static void removeRequestCode(int requestCode) {
+    requestCodes.remove(requestCode);
   }
 
   private static boolean duplicateCode(int code) {

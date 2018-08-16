@@ -32,6 +32,7 @@ class GoogleLocationEngine extends LocationEngine implements
   private PendingIntent pendingIntent;
   private String action;
   private Context context;
+  private int requestCode;
   private final Map<LocationEnginePriority, UpdateGoogleRequestPriority> REQUEST_PRIORITY = new
     HashMap<LocationEnginePriority, UpdateGoogleRequestPriority>() {
       {
@@ -128,6 +129,7 @@ class GoogleLocationEngine extends LocationEngine implements
 
   @Override
   public void requestLocationUpdates() {
+    registerReceiver();
     LocationRequest request = LocationRequest.create();
 
     if (interval != null) {
@@ -143,7 +145,6 @@ class GoogleLocationEngine extends LocationEngine implements
     updateRequestPriority(request);
 
     if (googleApiClient.isConnected()) {
-      registerReceiver();
       locationIntentHandler.setLocationListeners(locationListeners);
       //noinspection MissingPermission
       LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, request, pendingIntent);
@@ -178,8 +179,8 @@ class GoogleLocationEngine extends LocationEngine implements
   }
 
   private void generatePendingIntent(Context context) {
-    pendingIntent = LocationPendingIntentProvider.buildIntent(context, action)
-      .retrievePendingIntent();
+    requestCode = LocationPendingIntentProvider.generateRequestCode();
+    pendingIntent = LocationPendingIntentProvider.buildIntent(context, action, requestCode);
   }
 
   private void setupBroadcastReceiver() {
@@ -199,6 +200,7 @@ class GoogleLocationEngine extends LocationEngine implements
 
   private void unregisterReceiver() {
     context.unregisterReceiver(broadcastReceiver);
+    LocationPendingIntentProvider.removeRequestCode(requestCode);
   }
 
   private void generateAction() {
