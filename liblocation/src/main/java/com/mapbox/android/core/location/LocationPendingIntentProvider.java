@@ -30,7 +30,7 @@ class LocationPendingIntentProvider {
   }
 
   static void removeRequestCode(int requestCode) {
-    requestCodes.remove(requestCode);
+    requestCodes.remove(Integer.valueOf(requestCode));
   }
 
   private static boolean duplicateCode(int code) {
