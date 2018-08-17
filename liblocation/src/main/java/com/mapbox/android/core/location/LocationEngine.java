@@ -72,7 +72,30 @@ public abstract class LocationEngine {
    * @since 2.0.0
    */
   @RequiresPermission(anyOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
-  public abstract void getLastLocation();
+  public abstract void requestLastLocation();
+
+  /**
+   * When first initializing the location engine the location updates oftentimes aren't immediate and your user
+   * experience might diminish since they are forced to wait till a more accurate update arrives. A solution to this is
+   * to request the last known user location. There are no guarantees this won't return null since the {@link Location}
+   * object is simply stored in cache.
+   *
+   * @return The last known user location as a {@link Location} object.
+   * @since 3.2.0
+   */
+  @Deprecated
+  @RequiresPermission(anyOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
+  public abstract Location getLastLocation();
+
+  /**
+   * if a {@link LocationEngineListener} is setup, registering for location updates will tell the provider to begin
+   * sending updates.
+   *
+   * @since 2.0.0
+   */
+  @Deprecated
+  @RequiresPermission(anyOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
+  public abstract void requestLocationUpdates();
 
   /**
    * if a {@link LocationEngineListener} is setup, registering for location updates will tell the provider to begin
@@ -81,14 +104,14 @@ public abstract class LocationEngine {
    * @since 2.0.0
    */
   @RequiresPermission(anyOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
-  public abstract void requestLocationUpdates();
+  public abstract void initiateLocationUpdates();
 
   /**
    * When you no longer wish to receive location updates, you should call this method to prevent the devices battery
    * from draining. It's important to note that your location listeners will remain intake until you call
    * {@link LocationEngine#removeLocationEngineListener(LocationEngineListener)}.
    *
-   * @since 2.0.0
+   * @since 3.2.0
    */
   public abstract void removeLocationUpdates();
 

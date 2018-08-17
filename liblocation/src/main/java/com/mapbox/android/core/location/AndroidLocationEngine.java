@@ -87,7 +87,7 @@ class AndroidLocationEngine extends LocationEngine implements LocationListener {
   }
 
   @Override
-  public void getLastLocation() {
+  public void requestLastLocation() {
     if (!TextUtils.isEmpty(currentProvider)) {
       //noinspection MissingPermission
       for (LocationEngineListener listener : locationListeners) {
@@ -96,8 +96,28 @@ class AndroidLocationEngine extends LocationEngine implements LocationListener {
     }
   }
 
+  @Deprecated
+  @Override
+  public Location getLastLocation() {
+    if (!TextUtils.isEmpty(currentProvider)) {
+      //noinspection MissingPermission
+      return locationManager.getLastKnownLocation(currentProvider);
+    }
+
+    return null;
+  }
+
+  @Deprecated
   @Override
   public void requestLocationUpdates() {
+    if (!TextUtils.isEmpty(currentProvider)) {
+      //noinspection MissingPermission
+      locationManager.requestLocationUpdates(currentProvider, fastestInterval, smallestDisplacement, this);
+    }
+  }
+
+  @Override
+  public void initiateLocationUpdates() {
     if (!TextUtils.isEmpty(currentProvider)) {
       //noinspection MissingPermission
       locationManager.requestLocationUpdates(currentProvider, fastestInterval, smallestDisplacement, this);
