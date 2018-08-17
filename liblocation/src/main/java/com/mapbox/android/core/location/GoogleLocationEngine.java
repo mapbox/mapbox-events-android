@@ -125,6 +125,7 @@ class GoogleLocationEngine extends LocationEngine implements GoogleApiClient.Con
       //noinspection MissingPermission
       return LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
     }
+    //noinspection MissingPermission
     return null;
   }
 

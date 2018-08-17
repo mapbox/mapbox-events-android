@@ -1,5 +1,6 @@
 package com.mapbox.android.core.location;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
@@ -103,7 +104,7 @@ class AndroidLocationEngine extends LocationEngine implements LocationListener {
       //noinspection MissingPermission
       return locationManager.getLastKnownLocation(currentProvider);
     }
-
+    //noinspection MissingPermission
     return null;
   }
 
