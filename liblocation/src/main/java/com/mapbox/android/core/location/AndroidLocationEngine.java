@@ -1,6 +1,5 @@
 package com.mapbox.android.core.location;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
