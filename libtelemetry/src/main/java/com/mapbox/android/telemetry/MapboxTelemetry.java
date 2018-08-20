@@ -61,8 +61,8 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
     initializeQueue();
-    checkBlacklist();
     checkRequiredParameters(accessToken, userAgent);
+    checkBlacklist();
     this.httpCallback = this;
     AlarmReceiver alarmReceiver = obtainAlarmReceiver();
     this.schedulerFlusher = new SchedulerFlusherFactory(applicationContext, alarmReceiver).supply();

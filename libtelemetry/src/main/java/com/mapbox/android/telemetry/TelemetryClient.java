@@ -24,8 +24,8 @@ class TelemetryClient {
   private static final String EXTRA_DEBUGGING_LOG = "Sending POST to %s with %d event(s) (user agent: %s) "
     + "with payload: %s";
 
-  private String accessToken = null;
-  private String userAgent = null;
+  private String accessToken;
+  private String userAgent;
   private TelemetryClientSettings setting;
   private final Logger logger;
   private CertificateBlacklist certificateBlacklist;

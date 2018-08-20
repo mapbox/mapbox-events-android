@@ -22,6 +22,7 @@ import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -31,19 +32,19 @@ class CertificateBlacklist implements Callback {
   private static final String BLACKLIST_FILE = "MapboxBlacklist";
   private static final String SHA256 = "sha256/";
   private static final String NEW_LINE = "\n";
-  private static final String QUESTION_MARK = "?";
-  private static final String EQAL_SIGN = "=";
+  private static final String HTTPS = "https://";
+  private static final String BACKSLASH = "/";
+  private static final String EMPTY_STRING = "";
   private static final int BLACKLIST_HEAD = 0;
-  private static final String REVOKED_CERT_KEYS = "RevokedCertKeys";
   private static final String COM_CONFIG_ENDPOINT = "https://api.mapbox.com/events-config";
   private static final String CHINA_CONFIG_ENDPOINT = "https://api.mapbox.cn/events-config";
   private static final String ACCESS_TOKEN_QUERY_PARAMETER = "access_token";
-  private static final String EXTRACTION_EXEMPTION = "Blacklist Response Extraction Failed";
   private static final String ENDPOINT_DETERMINATION_FAIL = "Endpoint Determination Failed";
   private static final String SAVE_BLACKLIST_FAIL = "Unable to save blacklist to file";
   private static final String RETRIEVE_TIME_FAIL = "Unable to retrieve last update time from blacklist";
   private static final String RETRIEVE_BLACKLIST_FAIL = "Unable to retrieve blacklist contents from file";
   private static final String REQUEST_FAIL = "Request failed to download blacklist";
+  private static final String HTTPS_SCHEME = "https";
   private static final Map<Environment, String> ENDPOINTS = new HashMap<Environment, String>() {
     {
       put(Environment.COM, COM_CONFIG_ENDPOINT);
@@ -104,8 +105,12 @@ class CertificateBlacklist implements Callback {
   }
 
   void updateBlacklist() {
+    HttpUrl baseUrl = configUrl(determineConfigEndpoint());
+    HttpUrl requestUrl = baseUrl.newBuilder()
+      .addQueryParameter(ACCESS_TOKEN_QUERY_PARAMETER, accessToken).build();
+
     Request request = new Request.Builder()
-      .url(determineConfigEndpoint() + QUESTION_MARK + ACCESS_TOKEN_QUERY_PARAMETER + EQAL_SIGN + accessToken)
+      .url(requestUrl)
       .build();
 
     OkHttpClient client = new OkHttpClient();
@@ -142,7 +147,7 @@ class CertificateBlacklist implements Callback {
 
     StringBuilder content = new StringBuilder(date.getTime() + NEW_LINE);
 
-    for (String key: revokedKeys) {
+    for (String key : revokedKeys) {
       content.append(SHA256).append(key).append(NEW_LINE);
     }
 
@@ -188,7 +193,7 @@ class CertificateBlacklist implements Callback {
       Log.e(LOG_TAG, ENDPOINT_DETERMINATION_FAIL, exception);
     }
 
-    return null;
+    return COM_CONFIG_ENDPOINT;
   }
 
   private List<String> extractResponse(Response response) throws IOException {
@@ -198,5 +203,18 @@ class CertificateBlacklist implements Callback {
     RevokedKeys revokedKeys = gson.fromJson(responseData, RevokedKeys.class);
 
     return revokedKeys.getList();
+  }
+
+  private HttpUrl configUrl(String eventsHost) {
+    String[] urlSegments = separateUrlSegments(eventsHost);
+    HttpUrl.Builder builder = new HttpUrl.Builder().scheme(HTTPS_SCHEME);
+    builder.host(urlSegments[0]);
+    builder.addPathSegment(urlSegments[1]);
+    return builder.build();
+  }
+
+  private String[] separateUrlSegments(String url) {
+    url = url.replace(HTTPS, EMPTY_STRING);
+    return url.split(BACKSLASH);
   }
 }

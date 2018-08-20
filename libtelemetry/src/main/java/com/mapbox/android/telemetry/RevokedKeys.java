@@ -4,9 +4,9 @@ import java.util.List;
 
 class RevokedKeys {
 
-  private List<String> RevokedCertKeys;
+  private List<String> revokedCertKeys;
 
   public List<String> getList() {
-    return RevokedCertKeys;
+    return revokedCertKeys;
   }
 }

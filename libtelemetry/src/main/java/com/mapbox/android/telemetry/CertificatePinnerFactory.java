@@ -4,6 +4,7 @@ package com.mapbox.android.telemetry;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import okhttp3.CertificatePinner;
 
@@ -17,8 +18,6 @@ class CertificatePinnerFactory {
       put(Environment.CHINA, ChinaCertificatePins.CERTIFICATE_PINS);
     }
   };
-  private static final String COM_EVENTS = "events.mapbox.com";
-  private static final String CHINA_EVENTS = "events.mapbox.cn";
 
   /**
    * Based on http://square.github.io/okhttp/3.x/okhttp/okhttp3/CertificatePinner.html
@@ -29,7 +28,7 @@ class CertificatePinnerFactory {
     CertificatePinner.Builder certificatePinnerBuilder = new CertificatePinner.Builder();
 
     Map<String, List<String>> certificatesPins = provideCertificatesPinsFor(environment);
-    addCertificatesPins(certificatesPins, certificatePinnerBuilder, environment, certificateBlacklist);
+    addCertificatesPins(certificatesPins, certificatePinnerBuilder, certificateBlacklist);
 
     return certificatePinnerBuilder.build();
   }
@@ -39,8 +38,8 @@ class CertificatePinnerFactory {
   }
 
   private void addCertificatesPins(Map<String, List<String>> pins, CertificatePinner.Builder builder,
-                                   Environment environment, CertificateBlacklist certificateBlacklist) {
-    pins = removeBlacklistedPins(pins, environment, certificateBlacklist);
+                                   CertificateBlacklist certificateBlacklist) {
+    pins = removeBlacklistedPins(pins, certificateBlacklist);
 
     for (Map.Entry<String, List<String>> entry : pins.entrySet()) {
       for (String pin : entry.getValue()) {
@@ -49,28 +48,25 @@ class CertificatePinnerFactory {
     }
   }
 
-  private Map<String, List<String>> removeBlacklistedPins(Map<String, List<String>> pins, Environment environment,
+  private Map<String, List<String>> removeBlacklistedPins(Map<String, List<String>> pins,
                                                           CertificateBlacklist certificateBlacklist) {
-    String key = COM_EVENTS;
-
-    if (environment == Environment.CHINA) {
-      key = CHINA_EVENTS;
-    }
+    Set<String> pinsKey = pins.keySet();
+    String key = pinsKey.iterator().next();
 
     List<String> hashList = pins.get(key);
 
-    List blackList = certificateBlacklist.retrieveBlackList();
-
-    if (!blackList.isEmpty()) {
-      for (String hash : hashList) {
-        if (blackList.contains(hash)) {
-          hashList.remove(hash);
+    if (certificateBlacklist != null) {
+      List blackList = certificateBlacklist.retrieveBlackList();
+      if (!blackList.isEmpty()) {
+        for (String hash : hashList) {
+          if (blackList.contains(hash)) {
+            hashList.remove(hash);
+          }
         }
       }
     }
 
     pins.put(key, hashList);
-
     return pins;
   }
 }
