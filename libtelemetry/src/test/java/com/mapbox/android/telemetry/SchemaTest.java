@@ -1,5 +1,6 @@
 package com.mapbox.android.telemetry;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -20,8 +21,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
 import static org.junit.Assert.assertEquals;
@@ -346,11 +345,10 @@ public class SchemaTest {
 
     schemaArray = new ArrayList<>();
 
+    Gson gson = new Gson();
     String readed;
     while ((readed = in.readLine()) != null) {
-      JsonParser jsonParser = new JsonParser();
-      JsonObject schema = (JsonObject)jsonParser.parse(readed);
-
+      JsonObject schema = gson.fromJson(readed, JsonObject.class);
       schemaArray.add(schema);
     }
   }
@@ -360,7 +358,21 @@ public class SchemaTest {
       String name = thisSchema.get("name").getAsString();
 
       if (name.equalsIgnoreCase(eventName)) {
-        JsonObject schema = thisSchema.get("properties").getAsJsonObject();
+        Gson gson = new Gson();
+        String schemaString = gson.toJson(thisSchema.get("properties"));
+        JsonObject schema = gson.fromJson(thisSchema.get("properties"), JsonObject.class);
+
+        if (schema.has("step")) {
+          JsonObject stepJson = schema.get("step").getAsJsonObject();
+          JsonObject stepProperties = stepJson.get("properties").getAsJsonObject();
+
+          String stepPropertiesJson = gson.toJson(stepProperties);
+          schemaString = generateStepSchemaString(stepPropertiesJson, schemaString);
+
+          schema = gson.fromJson(schemaString, JsonObject.class);
+          schema.remove("step");
+        }
+
         schema.remove("userAgent");
         schema.remove("received");
         schema.remove("token");
@@ -368,25 +380,6 @@ public class SchemaTest {
         schema.remove("owner");
         //temporary need to work out a solution to include this data
         schema.remove("platform");
-
-        if (schema.has("step")) {
-          JsonObject stepJson = schema.get("step").getAsJsonObject();
-          JsonObject stepProperties = stepJson.get("properties").getAsJsonObject();
-
-          Set<Map.Entry<String, JsonElement>> entries = stepProperties.entrySet();
-          for (Map.Entry<String, JsonElement> entry: entries) {
-            String key = entry.getKey();
-
-            if (key.equalsIgnoreCase("distanceRemaining") || key.equalsIgnoreCase("durationRemaining")) {
-              StringBuilder stringBuilder = new StringBuilder(key);
-              stringBuilder.insert(0, "step");
-
-              key = stringBuilder.toString();
-            }
-            schema.add(key, entry.getValue());
-          }
-          schema.remove("step");
-        }
 
         return schema;
       }
@@ -524,5 +517,15 @@ public class SchemaTest {
     }
 
     return fields;
+  }
+
+  private String generateStepSchemaString(String stepJson, String schemaString) {
+    stepJson = stepJson.replace("\"distanceRemaining\"", "\"stepdistanceRemaining\"");
+    stepJson = stepJson.replace("durationRemaining", "stepdurationRemaining");
+    stepJson = stepJson.replaceFirst("\\{", ",");
+    schemaString = schemaString.replaceAll("}$", "");
+    schemaString = schemaString + stepJson;
+
+    return schemaString;
   }
 }
