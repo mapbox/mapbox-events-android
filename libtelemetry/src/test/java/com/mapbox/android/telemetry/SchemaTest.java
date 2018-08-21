@@ -8,7 +8,7 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.annotations.SerializedName;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -40,10 +40,10 @@ public class SchemaTest {
   private static final String NAVIGATION_FASTER_ROUTE = "navigation.fasterRoute";
   private static final String NAVIGATION_FEEDBACK = "navigation.feedback";
   private static final String NAVIGATION_REROUTE = "navigation.reroute";
-  private ArrayList<JsonObject> schemaArray;
+  private static ArrayList<JsonObject> schemaArray;
 
-  @Before
-  public void downloadSchema() throws Exception {
+  @BeforeClass
+  public static void downloadSchema() throws Exception {
     unpackSchemas();
   }
 
@@ -331,14 +331,14 @@ public class SchemaTest {
     }
   }
 
-  private ByteArrayInputStream getFileBytes() throws IOException {
-    InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("mobile-event-schemas.jsonl.gz");
+  private static ByteArrayInputStream getFileBytes() throws IOException {
+    InputStream inputStream = SchemaTest.class.getClassLoader().getResourceAsStream("mobile-event-schemas.jsonl.gz");
     byte[] byteOut = IOUtils.toByteArray(inputStream);
 
     return new ByteArrayInputStream(byteOut);
   }
 
-  private void unpackSchemas() throws IOException {
+  private static void unpackSchemas() throws IOException {
     ByteArrayInputStream bais = getFileBytes();
     GZIPInputStream gzis = new GZIPInputStream(bais);
     InputStreamReader reader = new InputStreamReader(gzis);
