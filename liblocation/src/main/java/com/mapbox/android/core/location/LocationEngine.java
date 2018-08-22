@@ -81,7 +81,7 @@ public abstract class LocationEngine {
    * object is simply stored in cache.
    *
    * @return The last known user location as a {@link Location} object.
-   * @since 3.2.0
+   * @since 0.3.0
    */
   @Deprecated
   @RequiresPermission(anyOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
@@ -91,7 +91,7 @@ public abstract class LocationEngine {
    * if a {@link LocationEngineListener} is setup, registering for location updates will tell the provider to begin
    * sending updates.
    *
-   * @since 2.0.0
+   * @since 0.2.0
    */
   @Deprecated
   @RequiresPermission(anyOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
@@ -101,7 +101,7 @@ public abstract class LocationEngine {
    * if a {@link LocationEngineListener} is setup, registering for location updates will tell the provider to begin
    * sending updates.
    *
-   * @since 2.0.0
+   * @since 0.2.0
    */
   @RequiresPermission(anyOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
   public abstract void initiateLocationUpdates();
@@ -111,7 +111,7 @@ public abstract class LocationEngine {
    * from draining. It's important to note that your location listeners will remain intake until you call
    * {@link LocationEngine#removeLocationEngineListener(LocationEngineListener)}.
    *
-   * @since 3.2.0
+   * @since 0.3.0
    */
   public abstract void removeLocationUpdates();
 

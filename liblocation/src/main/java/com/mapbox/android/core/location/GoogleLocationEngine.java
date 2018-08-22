@@ -18,6 +18,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ class GoogleLocationEngine extends LocationEngine implements GoogleApiClient.Con
   GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
   private FusedLocationProviderClient fusedLocationProviderClient;
+  private WeakReference<Context> context;
   private GoogleApiClient googleApiClient;
   private final Map<LocationEnginePriority, UpdateGoogleRequestPriority> REQUEST_PRIORITY = new
     HashMap<LocationEnginePriority, UpdateGoogleRequestPriority>() {
@@ -62,8 +64,9 @@ class GoogleLocationEngine extends LocationEngine implements GoogleApiClient.Con
 
   private GoogleLocationEngine(Context context) {
     super();
-    fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
-    googleApiClient = new GoogleApiClient.Builder(context)
+    this.context = new WeakReference<>(context);
+    fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this.context.get());
+    googleApiClient = new GoogleApiClient.Builder(this.context.get())
       .addConnectionCallbacks(this)
       .addOnConnectionFailedListener(this)
       .addApi(LocationServices.API)
@@ -79,9 +82,6 @@ class GoogleLocationEngine extends LocationEngine implements GoogleApiClient.Con
   @Override
   public void activate() {
     connect();
-    for (LocationEngineListener listener : locationListeners) {
-      listener.onConnected();
-    }
   }
 
   @Override
@@ -93,7 +93,7 @@ class GoogleLocationEngine extends LocationEngine implements GoogleApiClient.Con
 
   @Override
   public boolean isConnected() {
-    return true;
+    return googleApiClient.isConnected();
   }
 
   @Override
@@ -174,6 +174,9 @@ class GoogleLocationEngine extends LocationEngine implements GoogleApiClient.Con
 
   @Override
   public void removeLocationUpdates() {
+    if (googleApiClient.isConnected()) {
+      LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+    }
     fusedLocationProviderClient.removeLocationUpdates(locationCallback);
   }
 
@@ -182,12 +185,37 @@ class GoogleLocationEngine extends LocationEngine implements GoogleApiClient.Con
     return Type.GOOGLE_PLAY_SERVICES;
   }
 
+  @Override
+  public void onLocationChanged(Location location) {
+    for (LocationEngineListener listener : locationListeners) {
+      listener.onLocationChanged(location);
+    }
+  }
+
+  @Override
+  public void onConnected(@Nullable Bundle bundle) {
+    for (LocationEngineListener listener : locationListeners) {
+      listener.onConnected();
+    }
+  }
+
+  @Override
+  public void onConnectionSuspended(int cause) {
+
+  }
+
+  @Override
+  public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+  }
+
   private LocationCallback locationCallback = new LocationCallback() {
     @Override
     public void onLocationResult(LocationResult locationResult) {
       List<Location> locationList = locationResult.getLocations();
       if (!locationList.isEmpty()) {
-        Location location = locationList.get(locationList.size() - 1);
+        int lastLocation = locationList.size() - 1;
+        Location location = locationList.get(lastLocation);
         for (LocationEngineListener listener : locationListeners) {
           listener.onLocationChanged(location);
         }
@@ -207,29 +235,5 @@ class GoogleLocationEngine extends LocationEngine implements GoogleApiClient.Con
         googleApiClient.connect();
       }
     }
-  }
-
-  @Override
-  public void onLocationChanged(Location location) {
-    for (LocationEngineListener listener : locationListeners) {
-      listener.onLocationChanged(location);
-    }
-  }
-
-  @Override
-  public void onConnected(@Nullable Bundle bundle) {
-    for (LocationEngineListener listener : locationListeners) {
-      listener.onConnected();
-    }
-  }
-
-  @Override
-  public void onConnectionSuspended(int i) {
-
-  }
-
-  @Override
-  public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
   }
 }
