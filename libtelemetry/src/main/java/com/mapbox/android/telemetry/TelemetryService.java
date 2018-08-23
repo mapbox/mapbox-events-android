@@ -1,19 +1,24 @@
 package com.mapbox.android.telemetry;
 
 
+import android.Manifest;
 import android.app.Service;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.content.PermissionChecker;
 
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineListener;
 import com.mapbox.android.core.location.LocationEnginePriority;
 import com.mapbox.android.core.location.LocationEngineProvider;
+import com.mapbox.android.core.permissions.PermissionsManager;
 
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -22,6 +27,7 @@ import static com.mapbox.android.telemetry.TelemetryReceiver.TELEMETRY_RECEIVER_
 
 public class TelemetryService extends Service implements TelemetryCallback, LocationEngineListener, EventCallback {
   public static final String IS_LOCATION_ENABLER_FROM_PREFERENCES = "isLocationEnablerFromPreferences";
+  public static final int API_LEVEL_23 = 23;
   private LocationReceiver locationReceiver = null;
   private TelemetryReceiver telemetryReceiver = null;
   private EventsQueue queue = null;
@@ -60,6 +66,7 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
 
   @Override
   public void onDestroy() {
+    checkApplicationContext();
     unregisterLocationReceiver();
     unregisterTelemetryReceiver();
     disableTelemetryLocationState();
@@ -170,7 +177,10 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   private void connectLocationEngine() {
     obtainLocationEngine();
     setupLocationEngine();
-    activateLocationEngine();
+
+    if (locationPermissionCheck()) {
+      activateLocationEngine();
+    }
   }
 
   private void obtainLocationEngine() {
@@ -259,6 +269,20 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   class TelemetryBinder extends Binder {
     TelemetryService obtainService() {
       return TelemetryService.this;
+    }
+  }
+
+  private boolean locationPermissionCheck() {
+    if (Build.VERSION.SDK_INT >= API_LEVEL_23) {
+      return PermissionsManager.areLocationPermissionsGranted(this);
+    } else {
+      int coarsePermission = PermissionChecker.checkSelfPermission(MapboxTelemetry.applicationContext,
+        Manifest.permission.ACCESS_COARSE_LOCATION);
+      int finePermission = PermissionChecker.checkSelfPermission(MapboxTelemetry.applicationContext,
+        Manifest.permission.ACCESS_FINE_LOCATION);
+
+      return coarsePermission == PackageManager.PERMISSION_GRANTED
+        || finePermission == PackageManager.PERMISSION_GRANTED;
     }
   }
 }

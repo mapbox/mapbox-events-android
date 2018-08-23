@@ -17,7 +17,7 @@ ext {
             okhttp3             : '3.10.0',
             gson                : '2.8.2',
             espressoVersion     : '3.0.1',
-            archLifecycleVersion: "1.1.1"
+            archLifecycleVersion: "1.1.0"
     ]
 
     pluginVersion = [
