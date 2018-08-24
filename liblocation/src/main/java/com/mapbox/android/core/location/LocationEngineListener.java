@@ -11,8 +11,4 @@ public interface LocationEngineListener {
   void onConnected();
 
   void onLocationChanged(Location location);
-
-  void onLastLocationSuccess(Location location);
-
-  void onLastLocationFail(Exception exception);
 }

@@ -72,7 +72,7 @@ public abstract class LocationEngine {
    * @since 2.0.0
    */
   @RequiresPermission(anyOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
-  public abstract void requestLastLocation();
+  public abstract void requestLastLocation(LastLocationListener lastLocationListener);
 
   /**
    * When first initializing the location engine the location updates oftentimes aren't immediate and your user
@@ -96,15 +96,6 @@ public abstract class LocationEngine {
   @Deprecated
   @RequiresPermission(anyOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
   public abstract void requestLocationUpdates();
-
-  /**
-   * if a {@link LocationEngineListener} is setup, registering for location updates will tell the provider to begin
-   * sending updates.
-   *
-   * @since 0.2.0
-   */
-  @RequiresPermission(anyOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
-  public abstract void initiateLocationUpdates();
 
   /**
    * When you no longer wish to receive location updates, you should call this method to prevent the devices battery

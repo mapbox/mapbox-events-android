@@ -101,16 +101,6 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   }
 
   @Override
-  public void onLastLocationSuccess(Location location) {
-
-  }
-
-  @Override
-  public void onLastLocationFail(Exception exception) {
-
-  }
-
-  @Override
   public void onEventReceived(Event event) {
     if (queue != null) {
       queue.push(event);
