@@ -82,7 +82,8 @@ public class LocationEngineProvider {
     backgroundLocationEngineDictionary = new HashMap<>();
     Map<LocationEngine.Type, LocationEngineSupplier> backgroundLocationEnginesDictionary =
       obtainDefaultBackgroundLocationEnginesDictionary();
-    for (Map.Entry<LocationEngine.Type, LocationEngineSupplier> entry : backgroundLocationEnginesDictionary.entrySet()) {
+    for (Map.Entry<LocationEngine.Type,
+      LocationEngineSupplier> entry : backgroundLocationEnginesDictionary.entrySet()) {
       LocationEngineSupplier locationEngineSupplier = entry.getValue();
       if (locationEngineSupplier.hasDependencyOnClasspath()) {
         LocationEngine available = locationEngineSupplier.supply(context);
