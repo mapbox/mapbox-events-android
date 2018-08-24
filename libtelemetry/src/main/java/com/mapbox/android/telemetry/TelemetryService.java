@@ -183,7 +183,7 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   }
 
   private void obtainLocationEngine() {
-    locationEngine = new LocationEngineProvider(this).obtainBestLocationEngineAvailable();
+    locationEngine = new LocationEngineProvider(this).obtainBestBackgroundLocationEngineAvailable();
   }
 
   private void setupLocationEngine() {

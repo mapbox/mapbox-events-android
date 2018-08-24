@@ -1,0 +1,23 @@
+package com.mapbox.android.core.location;
+
+import android.content.Context;
+
+public class GoogleBackgroundLocationEngineFactory implements LocationEngineSupplier {
+
+  private static final String GOOGLE_LOCATION_SERVICES = "com.google.android.gms.location.LocationServices";
+  private final ClasspathChecker classpathChecker;
+
+  GoogleBackgroundLocationEngineFactory(ClasspathChecker classpathChecker) {
+    this.classpathChecker = classpathChecker;
+  }
+
+  @Override
+  public LocationEngine supply(Context context) {
+    return GoogleBackgroundLocationEngine.getLocationEngine(context);
+  }
+
+  @Override
+  public boolean hasDependencyOnClasspath() {
+    return classpathChecker.hasDependencyOnClasspath(GOOGLE_LOCATION_SERVICES);
+  }
+}

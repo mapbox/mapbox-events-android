@@ -12,6 +12,7 @@ import java.util.Map;
 
 public class LocationEngineProvider {
   private Map<LocationEngine.Type, LocationEngine> locationEngineDictionary;
+  private Map<LocationEngine.Type, LocationEngine> backgroundLocationEngineDictionary;
   private static final List<LocationEngine.Type> OPTIONAL_LOCATION_ENGINES = new ArrayList<LocationEngine.Type>() {
     {
       add(LocationEngine.Type.GOOGLE_PLAY_SERVICES);
@@ -33,6 +34,16 @@ public class LocationEngineProvider {
   }
 
   /**
+   * Get the best location engine for background, given the included libraries
+   *
+   * @return a unique instance of {@link LocationEngine} every time method is called.
+   */
+  @NonNull
+  public LocationEngine obtainBestBackgroundLocationEngineAvailable() {
+    return obtainBestBackgroundLocationEngine();
+  }
+
+  /**
    * Get a location engine of desired type
    *
    * @param type {@link LocationEngine.Type}
@@ -41,6 +52,18 @@ public class LocationEngineProvider {
   @Nullable
   public LocationEngine obtainLocationEngineBy(LocationEngine.Type type) {
     LocationEngine locationEngine = locationEngineDictionary.get(type);
+    return locationEngine;
+  }
+
+  /**
+   * Get a background location engine of desired type
+   *
+   * @param type {@link LocationEngine.Type}
+   * @return a unique instance of {@link LocationEngine} every time method is called.
+   */
+  @Nullable
+  public LocationEngine obtainBackgroundLocationEngineBy(LocationEngine.Type type) {
+    LocationEngine locationEngine = backgroundLocationEngineDictionary.get(type);
     return locationEngine;
   }
 
@@ -55,6 +78,17 @@ public class LocationEngineProvider {
         locationEngineDictionary.put(entry.getKey(), available);
       }
     }
+
+    backgroundLocationEngineDictionary = new HashMap<>();
+    Map<LocationEngine.Type, LocationEngineSupplier> backgroundLocationEnginesDictionary =
+      obtainDefaultBackgroundLocationEnginesDictionary();
+    for (Map.Entry<LocationEngine.Type, LocationEngineSupplier> entry : backgroundLocationEnginesDictionary.entrySet()) {
+      LocationEngineSupplier locationEngineSupplier = entry.getValue();
+      if (locationEngineSupplier.hasDependencyOnClasspath()) {
+        LocationEngine available = locationEngineSupplier.supply(context);
+        backgroundLocationEngineDictionary.put(entry.getKey(), available);
+      }
+    }
   }
 
   private Map<LocationEngine.Type, LocationEngineSupplier> obtainDefaultLocationEnginesDictionary() {
@@ -66,10 +100,31 @@ public class LocationEngineProvider {
     return locationSources;
   }
 
+  private Map<LocationEngine.Type, LocationEngineSupplier> obtainDefaultBackgroundLocationEnginesDictionary() {
+    ClasspathChecker classpathChecker = new ClasspathChecker();
+    Map<LocationEngine.Type, LocationEngineSupplier> locationSources = new HashMap<>();
+    locationSources.put(LocationEngine.Type.GOOGLE_PLAY_SERVICES,
+      new GoogleBackgroundLocationEngineFactory(classpathChecker));
+    locationSources.put(LocationEngine.Type.ANDROID, new AndroidLocationEngineFactory());
+
+    return locationSources;
+  }
+
   private LocationEngine obtainBestLocationEngine() {
     LocationEngine androidLocationEngine = locationEngineDictionary.get(LocationEngine.Type.ANDROID);
     for (LocationEngine.Type type : OPTIONAL_LOCATION_ENGINES) {
       LocationEngine bestLocationEngine = locationEngineDictionary.get(type);
+      if (bestLocationEngine != null) {
+        return bestLocationEngine;
+      }
+    }
+    return androidLocationEngine;
+  }
+
+  private LocationEngine obtainBestBackgroundLocationEngine() {
+    LocationEngine androidLocationEngine = backgroundLocationEngineDictionary.get(LocationEngine.Type.ANDROID);
+    for (LocationEngine.Type type : OPTIONAL_LOCATION_ENGINES) {
+      LocationEngine bestLocationEngine = backgroundLocationEngineDictionary.get(type);
       if (bestLocationEngine != null) {
         return bestLocationEngine;
       }
