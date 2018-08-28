@@ -39,19 +39,25 @@ public class TelemetryEnabler {
   }
 
   public static State retrieveTelemetryStateFromPreferences() {
-    SharedPreferences sharedPreferences = obtainSharedPreferences();
-    String telemetryStateName = sharedPreferences.getString(MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE,
-      State.ENABLED.name());
+    if (MapboxTelemetry.applicationContext != null) {
+      SharedPreferences sharedPreferences = obtainSharedPreferences();
+      String telemetryStateName = sharedPreferences.getString(MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE,
+        State.ENABLED.name());
 
-    return STATES.get(telemetryStateName);
+      return STATES.get(telemetryStateName);
+    }
+
+    return STATES.get(State.ENABLED.name());
   }
 
   public static State updateTelemetryState(State telemetryState) {
-    SharedPreferences sharedPreferences = obtainSharedPreferences();
-    SharedPreferences.Editor editor = sharedPreferences.edit();
+    if (MapboxTelemetry.applicationContext != null) {
+      SharedPreferences sharedPreferences = obtainSharedPreferences();
+      SharedPreferences.Editor editor = sharedPreferences.edit();
 
-    editor.putString(MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE, telemetryState.name());
-    editor.apply();
+      editor.putString(MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE, telemetryState.name());
+      editor.apply();
+    }
 
     return telemetryState;
   }
