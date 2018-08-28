@@ -177,18 +177,18 @@ public class TelemetryUtils {
   }
 
   static String retrieveVendorId() {
-    if (MapboxTelemetry.applicationContext != null) {
-      SharedPreferences sharedPreferences = obtainSharedPreferences();
-      String mapboxVendorId = sharedPreferences.getString(MAPBOX_SHARED_PREFERENCE_KEY_VENDOR_ID, "");
-
-      if (TelemetryUtils.isEmpty(mapboxVendorId)) {
-        mapboxVendorId = TelemetryUtils.updateVendorId();
-      }
-
-      return mapboxVendorId;
+    if (MapboxTelemetry.applicationContext == null) {
+      return updateVendorId();
     }
 
-    return updateVendorId();
+    SharedPreferences sharedPreferences = obtainSharedPreferences();
+    String mapboxVendorId = sharedPreferences.getString(MAPBOX_SHARED_PREFERENCE_KEY_VENDOR_ID, "");
+
+    if (TelemetryUtils.isEmpty(mapboxVendorId)) {
+      mapboxVendorId = TelemetryUtils.updateVendorId();
+    }
+
+    return mapboxVendorId;
   }
 
   static SharedPreferences obtainSharedPreferences() {
@@ -198,14 +198,15 @@ public class TelemetryUtils {
   private static String updateVendorId() {
     String uniqueId = obtainUniversalUniqueIdentifier();
 
-    if (MapboxTelemetry.applicationContext != null) {
-      SharedPreferences sharedPreferences = obtainSharedPreferences();
-      SharedPreferences.Editor editor = sharedPreferences.edit();
-
-
-      editor.putString(MAPBOX_SHARED_PREFERENCE_KEY_VENDOR_ID, uniqueId);
-      editor.apply();
+    if (MapboxTelemetry.applicationContext == null) {
+      return uniqueId;
     }
+
+    SharedPreferences sharedPreferences = obtainSharedPreferences();
+    SharedPreferences.Editor editor = sharedPreferences.edit();
+
+    editor.putString(MAPBOX_SHARED_PREFERENCE_KEY_VENDOR_ID, uniqueId);
+    editor.apply();
 
     return uniqueId;
   }
