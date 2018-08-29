@@ -55,13 +55,11 @@ class CertificatePinnerFactory {
 
     List<String> hashList = pins.get(key);
 
-    if (certificateBlacklist != null) {
-      List blackList = certificateBlacklist.retrieveBlackList();
-      if (!blackList.isEmpty()) {
-        for (String hash : hashList) {
-          if (blackList.contains(hash)) {
-            hashList.remove(hash);
-          }
+    List blackList = certificateBlacklist.retrieveBlackList();
+    if (!blackList.isEmpty()) {
+      for (String hash : hashList) {
+        if (blackList.contains(hash)) {
+          hashList.remove(hash);
         }
       }
     }
