@@ -105,9 +105,10 @@ class CertificateBlacklist implements Callback {
   }
 
   void updateBlacklist() {
-    HttpUrl baseUrl = configUrl(determineConfigEndpoint());
-    HttpUrl requestUrl = baseUrl.newBuilder()
-      .addQueryParameter(ACCESS_TOKEN_QUERY_PARAMETER, accessToken).build();
+    HttpUrl requestUrl = new HttpUrl.Builder().scheme(HTTPS_SCHEME)
+      .host(determineConfigEndpoint())
+      .addQueryParameter(ACCESS_TOKEN_QUERY_PARAMETER, accessToken)
+      .build();
 
     Request request = new Request.Builder()
       .url(requestUrl)
@@ -203,14 +204,6 @@ class CertificateBlacklist implements Callback {
     RevokedKeys revokedKeys = gson.fromJson(responseData, RevokedKeys.class);
 
     return revokedKeys.getList();
-  }
-
-  private HttpUrl configUrl(String eventsHost) {
-    String[] urlSegments = separateUrlSegments(eventsHost);
-    HttpUrl.Builder builder = new HttpUrl.Builder().scheme(HTTPS_SCHEME);
-    builder.host(urlSegments[0]);
-    builder.addPathSegment(urlSegments[1]);
-    return builder.build();
   }
 
   private String[] separateUrlSegments(String url) {
