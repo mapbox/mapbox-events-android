@@ -16,9 +16,9 @@ public class AttachmentMetadata extends Event implements Parcelable {
 
   AttachmentMetadata(String name, String eventId, String format, String type) {
     this.name = name;
+    this.created = TelemetryUtils.obtainCurrentDate();
     this.eventId = eventId;
     this.format = format;
-    this.created = TelemetryUtils.obtainCurrentDate();
     this.type = type;
   }
 
@@ -55,6 +55,38 @@ public class AttachmentMetadata extends Event implements Parcelable {
 
   public void setSize(int size) {
     this.size = size;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getCreated() {
+    return created;
+  }
+
+  public String getEventId() {
+    return eventId;
+  }
+
+  public String getFormat() {
+    return format;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public Integer getSize() {
+    return size;
+  }
+
+  public String getStartTime() {
+    return startTime;
+  }
+
+  public String getEndTime() {
+    return endTime;
   }
 
   @Override
