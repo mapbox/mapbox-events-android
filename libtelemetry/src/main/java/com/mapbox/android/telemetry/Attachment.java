@@ -13,15 +13,12 @@ public class Attachment extends Event implements Parcelable {
 
   @SerializedName("event")
   private final String event;
-  @SerializedName("attachmentMetadata")
-  private List<AttachmentMetadata> attachmentMetadata;
   @SerializedName("files")
-  private List<AttachmentFile> files;
+  private List<VisionsAttachment> attachments;
 
   Attachment() {
     this.event = VIS_ATTACHMENT;
-    this.attachmentMetadata = new ArrayList<>();
-    this.files = new ArrayList<>();
+    this.attachments = new ArrayList<>();
   }
 
   protected Attachment(Parcel in) {
@@ -40,20 +37,12 @@ public class Attachment extends Event implements Parcelable {
     }
   };
 
-  public void addMetadata(AttachmentMetadata metadata) {
-    attachmentMetadata.add(metadata);
+  public List<VisionsAttachment> getAttachments() {
+    return attachments;
   }
 
-  public void addFile(AttachmentFile file) {
-    files.add(file);
-  }
-
-  public List<AttachmentMetadata> getAttachmentMetadata() {
-    return attachmentMetadata;
-  }
-
-  public List<AttachmentFile> getFiles() {
-    return files;
+  public void addAttachment(VisionsAttachment attachment) {
+    attachments.add(attachment);
   }
 
   @Override
