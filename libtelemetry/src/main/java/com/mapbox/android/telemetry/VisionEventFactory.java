@@ -30,9 +30,19 @@ public class VisionEventFactory {
     return BUILD_EVENT_VISION.get(type).build();
   }
 
+  public Attachment createVisionAttachment(Event.Type type) {
+    checkVisionEvent(type);
+    return buildVisionAttachment();
+  }
+
   private VisionEvent buildVisionEvent() {
     VisionEvent visionEvent = new VisionEvent();
     return visionEvent;
+  }
+
+  private Attachment buildVisionAttachment() {
+    Attachment attachment = new Attachment();
+    return attachment;
   }
 
   private void checkVisionEvent(Event.Type type) {

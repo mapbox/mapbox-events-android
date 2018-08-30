@@ -16,17 +16,16 @@ public class Attachment extends Event implements Parcelable {
   @SerializedName("attachmentMetadata")
   private List<AttachmentMetadata> attachmentMetadata;
   @SerializedName("files")
-  private List<byte[]> files;
+  private List<AttachmentFile> files;
 
   Attachment() {
     this.event = VIS_ATTACHMENT;
-    attachmentMetadata = new ArrayList<>();
-    files = new ArrayList<>();
+    this.attachmentMetadata = new ArrayList<>();
+    this.files = new ArrayList<>();
   }
 
   protected Attachment(Parcel in) {
     event = in.readString();
-    attachmentMetadata = in.createTypedArrayList(AttachmentMetadata.CREATOR);
   }
 
   public static final Creator<Attachment> CREATOR = new Creator<Attachment>() {
@@ -45,15 +44,15 @@ public class Attachment extends Event implements Parcelable {
     attachmentMetadata.add(metadata);
   }
 
-  public void addFile(byte[] fileBytes) {
-    files.add(fileBytes);
+  public void addFile(AttachmentFile file) {
+    files.add(file);
   }
 
   public List<AttachmentMetadata> getAttachmentMetadata() {
     return attachmentMetadata;
   }
 
-  public List<byte[]> getFiles() {
+  public List<AttachmentFile> getFiles() {
     return files;
   }
 
@@ -70,6 +69,5 @@ public class Attachment extends Event implements Parcelable {
   @Override
   public void writeToParcel(Parcel dest, int flags) {
     dest.writeString(event);
-    dest.writeTypedList(attachmentMetadata);
   }
 }

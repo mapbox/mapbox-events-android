@@ -1,9 +1,6 @@
 package com.mapbox.android.telemetry;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
-public class AttachmentMetadata extends Event implements Parcelable {
+public class AttachmentMetadata {
 
   private String name;
   private String created;
@@ -21,29 +18,6 @@ public class AttachmentMetadata extends Event implements Parcelable {
     this.format = format;
     this.type = type;
   }
-
-  protected AttachmentMetadata(Parcel in) {
-    name = in.readString();
-    created = in.readString();
-    eventId = in.readString();
-    format = in.readString();
-    type = in.readString();
-    size = in.readByte() == 0x00 ? null : in.readInt();
-    startTime = in.readString();
-    endTime = in.readString();
-  }
-
-  public static final Creator<AttachmentMetadata> CREATOR = new Creator<AttachmentMetadata>() {
-    @Override
-    public AttachmentMetadata createFromParcel(Parcel in) {
-      return new AttachmentMetadata(in);
-    }
-
-    @Override
-    public AttachmentMetadata[] newArray(int size) {
-      return new AttachmentMetadata[size];
-    }
-  };
 
   public void setStartTime(String startTime) {
     this.startTime = startTime;
@@ -87,32 +61,5 @@ public class AttachmentMetadata extends Event implements Parcelable {
 
   public String getEndTime() {
     return endTime;
-  }
-
-  @Override
-  Type obtainType() {
-    return null;
-  }
-
-  @Override
-  public int describeContents() {
-    return 0;
-  }
-
-  @Override
-  public void writeToParcel(Parcel dest, int flags) {
-    dest.writeString(name);
-    dest.writeString(created);
-    dest.writeString(eventId);
-    dest.writeString(format);
-    dest.writeString(type);
-    if (size == null) {
-      dest.writeByte((byte) 0);
-    } else {
-      dest.writeByte((byte) 1);
-      dest.writeInt(size);
-    }
-    dest.writeString(startTime);
-    dest.writeString(endTime);
   }
 }
