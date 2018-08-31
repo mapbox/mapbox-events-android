@@ -11,7 +11,7 @@ public class AttachmentMetadata {
   private String startTime;
   private String endTime;
 
-  AttachmentMetadata(String name, String eventId, String format, String type) {
+  public AttachmentMetadata(String name, String eventId, String format, String type) {
     this.name = name;
     this.created = TelemetryUtils.obtainCurrentDate();
     this.eventId = eventId;

@@ -14,6 +14,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.mapbox.android.core.location.LocationEnginePriority;
 import com.mapbox.android.core.permissions.PermissionsManager;
@@ -460,6 +461,12 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
       sendEventsIfPossible(appUserTurnstile);
       return true;
     }
+
+    if (Event.Type.VIS_ATTACHMENT.equals((event.obtainType()))) {
+      Log.e("test", "Whitelisted");
+      sendAttachment(event);
+    }
+
     return false;
   }
 
@@ -543,6 +550,13 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     }
 
     return false;
+  }
+
+  private void sendAttachment(Event event) {
+    if (isNetworkConnected() && checkRequiredParameters(accessToken, userAgent)) {
+      Attachment attachment = (Attachment) event;
+      telemetryClient.sendAttachment(attachment, httpCallback);
+    }
   }
 
   @OnLifecycleEvent(Lifecycle.Event.ON_START)

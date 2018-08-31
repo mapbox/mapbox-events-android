@@ -48,7 +48,11 @@ class TelemetryClientSettings {
   }
 
   OkHttpClient getClient() {
-    return configureHttpClient();
+    return configureHttpClient(false);
+  }
+
+  OkHttpClient getAttachmentClient() {
+    return configureHttpClient(true);
   }
 
   HttpUrl getBaseUrl() {
@@ -136,13 +140,17 @@ class TelemetryClientSettings {
     }
   }
 
-  private OkHttpClient configureHttpClient() {
+  private OkHttpClient configureHttpClient(boolean attachment) {
     CertificatePinnerFactory factory = new CertificatePinnerFactory();
     OkHttpClient.Builder builder = client.newBuilder()
-      .addInterceptor(new GzipRequestInterceptor())
       .retryOnConnectionFailure(true)
       .certificatePinner(factory.provideCertificatePinnerFor(environment))
       .connectionSpecs(Arrays.asList(ConnectionSpec.MODERN_TLS, ConnectionSpec.COMPATIBLE_TLS));
+
+    if (!attachment) {
+      builder.addInterceptor(new GzipRequestInterceptor());
+    }
+
     if (isSocketFactoryUnset(sslSocketFactory, x509TrustManager)) {
       builder.sslSocketFactory(sslSocketFactory, x509TrustManager);
       builder.hostnameVerifier(hostnameVerifier);
