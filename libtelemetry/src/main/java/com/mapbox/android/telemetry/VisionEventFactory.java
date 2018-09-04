@@ -32,10 +32,14 @@ public class VisionEventFactory {
     return BUILD_EVENT_VISION.get(type).build();
   }
 
-  public VisionAttachment createVisionAttachment(Event.Type type, String filePath, MediaType mediaType,
+  public VisionAttachment createVisionAttachment(String filePath, MediaType mediaType,
                                                   AttachmentMetadata attachmentMetadata) {
-    checkVisionEvent(type);
     return buildVisionAttachment(filePath, mediaType, attachmentMetadata);
+  }
+
+  public Attachment createAttachment(Event.Type type) {
+    checkVisionEvent(type);
+    return buildAttachment();
   }
 
   private VisionEvent buildVisionEvent() {
@@ -47,6 +51,11 @@ public class VisionEventFactory {
                                                  AttachmentMetadata attachmentMetadata) {
     VisionAttachment visionsAttachment = new VisionAttachment(attachmentMetadata, filepath, mediaType);
     return visionsAttachment;
+  }
+
+  private Attachment buildAttachment() {
+    Attachment attachment = new Attachment();
+    return attachment;
   }
 
   private void checkVisionEvent(Event.Type type) {

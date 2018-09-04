@@ -16,7 +16,7 @@ public class Attachment extends Event implements Parcelable {
   @SerializedName("files")
   private List<VisionAttachment> attachments;
 
-  public Attachment() {
+  Attachment() {
     this.event = VIS_ATTACHMENT;
     this.attachments = new ArrayList<>();
   }

@@ -8,6 +8,7 @@ import android.view.WindowManager;
 import org.junit.Test;
 
 import okhttp3.Callback;
+import okhttp3.MediaType;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -35,6 +36,30 @@ public class VisionEventFactoryTest {
   }
 
   @Test
+  public void checksVisionsAttachmentEvent() {
+    initializeMapboxTelemetry();
+    VisionEventFactory aVisionEventFactory = new VisionEventFactory();
+    String filepath = "aFilepath";
+    MediaType mediaType = mock(MediaType.class);
+    AttachmentMetadata attachmentMetadata = mock(AttachmentMetadata.class);
+
+    VisionAttachment visionAttachment = aVisionEventFactory.createVisionAttachment(filepath, mediaType,
+      attachmentMetadata);
+
+    assertTrue(visionAttachment instanceof VisionAttachment);
+  }
+
+  @Test
+  public void checksAttachmentEvent() {
+    initializeMapboxTelemetry();
+    VisionEventFactory aVisionEventFactory = new VisionEventFactory();
+
+    Event visonEvent = aVisionEventFactory.createAttachment(Event.Type.VIS_ATTACHMENT);
+
+    assertTrue(visonEvent instanceof Attachment);
+  }
+
+  @Test
   public void checksVisionType() {
     initializeMapboxTelemetry();
     VisionEventFactory aVisionEventFactory = new VisionEventFactory();
@@ -42,6 +67,16 @@ public class VisionEventFactoryTest {
     Event visonEvent = aVisionEventFactory.createVisionEvent(Event.Type.VIS_GENERAL);
 
     assertEquals(Event.Type.VIS_GENERAL, visonEvent.obtainType());
+  }
+
+  @Test
+  public void checksAttachmentType() {
+    initializeMapboxTelemetry();
+    VisionEventFactory aVisionEventFactory = new VisionEventFactory();
+
+    Attachment visionAttachment = aVisionEventFactory.createAttachment(Event.Type.VIS_ATTACHMENT);
+
+    assertEquals(Event.Type.VIS_ATTACHMENT, visionAttachment.obtainType());
   }
 
   @Test(expected = IllegalArgumentException.class)
