@@ -177,6 +177,10 @@ public class TelemetryUtils {
   }
 
   static String retrieveVendorId() {
+    if (MapboxTelemetry.applicationContext == null) {
+      return updateVendorId();
+    }
+
     SharedPreferences sharedPreferences = obtainSharedPreferences();
     String mapboxVendorId = sharedPreferences.getString(MAPBOX_SHARED_PREFERENCE_KEY_VENDOR_ID, "");
 
@@ -192,10 +196,15 @@ public class TelemetryUtils {
   }
 
   private static String updateVendorId() {
+    String uniqueId = obtainUniversalUniqueIdentifier();
+
+    if (MapboxTelemetry.applicationContext == null) {
+      return uniqueId;
+    }
+
     SharedPreferences sharedPreferences = obtainSharedPreferences();
     SharedPreferences.Editor editor = sharedPreferences.edit();
 
-    String uniqueId = obtainUniversalUniqueIdentifier();
     editor.putString(MAPBOX_SHARED_PREFERENCE_KEY_VENDOR_ID, uniqueId);
     editor.apply();
 

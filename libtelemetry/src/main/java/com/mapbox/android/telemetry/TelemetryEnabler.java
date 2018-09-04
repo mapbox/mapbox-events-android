@@ -39,6 +39,10 @@ public class TelemetryEnabler {
   }
 
   public static State retrieveTelemetryStateFromPreferences() {
+    if (MapboxTelemetry.applicationContext == null) {
+      return STATES.get(State.ENABLED.name());
+    }
+
     SharedPreferences sharedPreferences = obtainSharedPreferences();
     String telemetryStateName = sharedPreferences.getString(MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE,
       State.ENABLED.name());
@@ -47,6 +51,10 @@ public class TelemetryEnabler {
   }
 
   public static State updateTelemetryState(State telemetryState) {
+    if (MapboxTelemetry.applicationContext == null) {
+      return telemetryState;
+    }
+
     SharedPreferences sharedPreferences = obtainSharedPreferences();
     SharedPreferences.Editor editor = sharedPreferences.edit();
 
