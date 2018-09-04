@@ -36,6 +36,7 @@ class CertificateBlacklist implements Callback {
   private static final String BACKSLASH = "/";
   private static final String EMPTY_STRING = "";
   private static final int BLACKLIST_HEAD = 0;
+  private static final long DAY_IN_MILLIS = 86400000;
   private static final String COM_CONFIG_ENDPOINT = "https://api.mapbox.com/events-config";
   private static final String CHINA_CONFIG_ENDPOINT = "https://api.mapbox.cn/events-config";
   private static final String ACCESS_TOKEN_QUERY_PARAMETER = "access_token";
@@ -44,6 +45,7 @@ class CertificateBlacklist implements Callback {
   private static final String RETRIEVE_TIME_FAIL = "Unable to retrieve last update time from blacklist";
   private static final String RETRIEVE_BLACKLIST_FAIL = "Unable to retrieve blacklist contents from file";
   private static final String REQUEST_FAIL = "Request failed to download blacklist";
+  private static final String READLINE_FAIL = "Unable to read line of Blacklist file";
   private static final String HTTPS_SCHEME = "https";
   private static final Map<Environment, String> ENDPOINTS = new HashMap<Environment, String>() {
     {
@@ -51,12 +53,14 @@ class CertificateBlacklist implements Callback {
       put(Environment.CHINA, CHINA_CONFIG_ENDPOINT);
     }
   };
-  private Context context;
-  private String accessToken;
+  private final Context context;
+  private final String accessToken;
+  private Logger logger;
 
   CertificateBlacklist(Context context, String accessToken) {
     this.context = context;
     this.accessToken = accessToken;
+    this.logger = new Logger();
   }
 
   List<String> retrieveBlackList() {
@@ -71,7 +75,7 @@ class CertificateBlacklist implements Callback {
           blacklist = obtainBlacklistContents(file);
           blacklist.remove(BLACKLIST_HEAD);
         } catch (IOException exception) {
-          Log.e(LOG_TAG, RETRIEVE_BLACKLIST_FAIL, exception);
+          logger.error(RETRIEVE_BLACKLIST_FAIL, exception.getMessage());
         }
       }
     }
@@ -81,9 +85,7 @@ class CertificateBlacklist implements Callback {
 
   boolean daySinceLastUpdate() {
     long millisecondDiff = System.currentTimeMillis() - retrieveLastUpdateTime();
-    long dayInMilliseconds = 86400000;
-
-    return millisecondDiff >= dayInMilliseconds;
+    return millisecondDiff >= DAY_IN_MILLIS;
   }
 
   private long retrieveLastUpdateTime() {
@@ -97,7 +99,7 @@ class CertificateBlacklist implements Callback {
         List<String> blacklist = obtainBlacklistContents(file);
         lastUpdateTime = Long.valueOf(blacklist.get(BLACKLIST_HEAD));
       } catch (IOException exception) {
-        Log.e(LOG_TAG, RETRIEVE_TIME_FAIL, exception);
+        logger.error(RETRIEVE_TIME_FAIL, exception.getMessage());
       }
     }
 
@@ -127,7 +129,7 @@ class CertificateBlacklist implements Callback {
       outputStream.write(fileContents.getBytes());
       outputStream.close();
     } catch (Exception exception) {
-      Log.e(LOG_TAG, SAVE_BLACKLIST_FAIL, exception);
+      logger.error(SAVE_BLACKLIST_FAIL, exception.getMessage());
     }
   }
 
@@ -161,20 +163,22 @@ class CertificateBlacklist implements Callback {
 
     List<String> blacklist = new ArrayList<>();
 
-    boolean done = false;
+    try {
+      boolean done = false;
+      while (!done) {
+        String line = reader.readLine();
+        done = (line == null);
 
-    while (!done) {
-      String line = reader.readLine();
-      done = (line == null);
-
-      if (line != null && !line.isEmpty()) {
-        blacklist.add(line);
+        if (line != null && !line.isEmpty()) {
+          blacklist.add(line);
+        }
       }
+    } catch (Exception exception) {
+      logger.error(READLINE_FAIL, exception.getMessage());
+    } finally {
+      reader.close();
+      inputStream.close();
     }
-
-    reader.close();
-    inputStream.close();
-
     return blacklist;
   }
 
@@ -191,7 +195,7 @@ class CertificateBlacklist implements Callback {
         return ENDPOINTS.get(serverInformation.getEnvironment());
       }
     } catch (Exception exception) {
-      Log.e(LOG_TAG, ENDPOINT_DETERMINATION_FAIL, exception);
+      logger.error(ENDPOINT_DETERMINATION_FAIL, exception.getMessage());
     }
 
     return COM_CONFIG_ENDPOINT;
@@ -201,9 +205,9 @@ class CertificateBlacklist implements Callback {
     String responseData = response.body().string();
 
     Gson gson = new Gson();
-    RevokedKeys revokedKeys = gson.fromJson(responseData, RevokedKeys.class);
+    List revokedKeys = gson.fromJson(responseData, List.class);
 
-    return revokedKeys.getList();
+    return revokedKeys;
   }
 
   private String[] separateUrlSegments(String url) {

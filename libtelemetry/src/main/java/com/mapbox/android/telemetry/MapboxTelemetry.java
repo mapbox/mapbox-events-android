@@ -62,7 +62,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     initializeContext(context);
     initializeQueue();
     checkRequiredParameters(accessToken, userAgent);
-    checkBlacklist();
+    checkBlacklist(context, accessToken);
     this.httpCallback = this;
     AlarmReceiver alarmReceiver = obtainAlarmReceiver();
     this.schedulerFlusher = new SchedulerFlusherFactory(applicationContext, alarmReceiver).supply();
@@ -531,8 +531,8 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     return false;
   }
 
-  private void checkBlacklist() {
-    certificateBlacklist = new CertificateBlacklist(applicationContext, accessToken);
+  private void checkBlacklist(Context context, String accessToken) {
+    certificateBlacklist = new CertificateBlacklist(context, accessToken);
 
     if (certificateBlacklist.daySinceLastUpdate()) {
       certificateBlacklist.updateBlacklist();
