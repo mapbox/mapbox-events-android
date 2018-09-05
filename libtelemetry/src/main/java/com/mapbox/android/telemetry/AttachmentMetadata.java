@@ -4,7 +4,7 @@ public class AttachmentMetadata {
 
   private String name;
   private String created;
-  private String eventId;
+  private String fileId;
   private String format;
   private String type;
   private String sessionId;
@@ -12,10 +12,10 @@ public class AttachmentMetadata {
   private String startTime;
   private String endTime;
 
-  public AttachmentMetadata(String name, String eventId, String format, String type, String sessionId) {
+  public AttachmentMetadata(String name, String fileId, String format, String type, String sessionId) {
     this.name = name;
     this.created = TelemetryUtils.obtainCurrentDate();
-    this.eventId = eventId;
+    this.fileId = fileId;
     this.format = format;
     this.type = type;
     this.sessionId = sessionId;
@@ -41,8 +41,8 @@ public class AttachmentMetadata {
     return created;
   }
 
-  public String getEventId() {
-    return eventId;
+  public String getFileId() {
+    return fileId;
   }
 
   public String getFormat() {

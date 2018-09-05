@@ -61,7 +61,7 @@ class TelemetryClient {
   void sendAttachment(Attachment attachment, final CopyOnWriteArraySet<AttachmentListener> attachmentListeners) {
     List<FileAttachment> visionAttachments = attachment.getAttachments();
     List<AttachmentMetadata> metadataList = new ArrayList<>();
-    final List<String> eventIds = new ArrayList<>();
+    final List<String> fieldIds = new ArrayList<>();
 
     MultipartBody.Builder requestBodyBuilder = new MultipartBody.Builder(BOUNDARY)
       .setType(MultipartBody.FORM);
@@ -74,7 +74,7 @@ class TelemetryClient {
       requestBodyBuilder.addFormDataPart("file", attachmentMetadata.getName(),
         RequestBody.create(filepath.getType(), new File(filepath.getFilePath())));
 
-      eventIds.add(attachmentMetadata.getEventId());
+      fieldIds.add(attachmentMetadata.getFileId());
     }
 
     Gson gson = new Gson();
@@ -96,14 +96,14 @@ class TelemetryClient {
       @Override
       public void onFailure(Call call, IOException exception) {
         for (AttachmentListener attachmentListener : attachmentListeners) {
-          attachmentListener.onAttachmentFailure(exception.getMessage(), eventIds);
+          attachmentListener.onAttachmentFailure(exception.getMessage(), fieldIds);
         }
       }
 
       @Override
       public void onResponse(Call call, Response response) {
         for (AttachmentListener attachmentListener : attachmentListeners) {
-          attachmentListener.onAttachmentResponse(response.message(), response.code(), eventIds);
+          attachmentListener.onAttachmentResponse(response.message(), response.code(), fieldIds);
         }
       }
     });
