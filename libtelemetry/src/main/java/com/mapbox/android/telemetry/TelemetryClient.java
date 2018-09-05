@@ -66,20 +66,21 @@ class TelemetryClient {
     MultipartBody.Builder requestBodyBuilder = new MultipartBody.Builder(BOUNDARY)
       .setType(MultipartBody.FORM);
 
-    for (FileAttachment visionAttachment: visionAttachments) {
-      FileData filepath = visionAttachment.getFileData();
-      AttachmentMetadata attachmentMetadata = visionAttachment.getAttachmentMetadata();
+    for (FileAttachment fileAttachment: visionAttachments) {
+      FileData fileData = fileAttachment.getFileData();
+      AttachmentMetadata attachmentMetadata = fileAttachment.getAttachmentMetadata();
       metadataList.add(attachmentMetadata);
 
       requestBodyBuilder.addFormDataPart("file", attachmentMetadata.getName(),
-        RequestBody.create(filepath.getType(), new File(filepath.getFilePath())));
+        RequestBody.create(fileData.getType(), new File(fileData.getFilePath())));
 
       fieldIds.add(attachmentMetadata.getFileId());
     }
 
     Gson gson = new Gson();
     requestBodyBuilder.addFormDataPart("attachments", gson.toJson(metadataList));
-    RequestBody requestBody = requestBodyBuilder.build();
+
+    RequestBody requestBody = reverseMultiForm(requestBodyBuilder);
 
     HttpUrl baseUrl = setting.getBaseUrl();
     HttpUrl requestUrl = baseUrl.newBuilder(ATTACHMENTS_ENDPOINT)
@@ -166,5 +167,18 @@ class TelemetryClient {
     JsonSerializer<NavigationFasterRouteEvent> fasterRouteSerializer = new FasterRouteEventSerializer();
     gsonBuilder.registerTypeAdapter(NavigationFasterRouteEvent.class, fasterRouteSerializer);
     return gsonBuilder;
+  }
+
+  private RequestBody reverseMultiForm(MultipartBody.Builder builder) {
+    MultipartBody multipartBody = builder.build();
+
+    builder = new MultipartBody.Builder(BOUNDARY)
+      .setType(MultipartBody.FORM);
+
+    for (int i = multipartBody.size() - 1; i > -1 ; i--) {
+      builder.addPart(multipartBody.part(i));
+    }
+
+    return builder.build();
   }
 }
