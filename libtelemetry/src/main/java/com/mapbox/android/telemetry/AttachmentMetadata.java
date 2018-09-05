@@ -7,16 +7,18 @@ public class AttachmentMetadata {
   private String eventId;
   private String format;
   private String type;
+  private String sessionId;
   private Integer size;
   private String startTime;
   private String endTime;
 
-  public AttachmentMetadata(String name, String eventId, String format, String type) {
+  public AttachmentMetadata(String name, String eventId, String format, String type, String sessionId) {
     this.name = name;
     this.created = TelemetryUtils.obtainCurrentDate();
     this.eventId = eventId;
     this.format = format;
     this.type = type;
+    this.sessionId = sessionId;
   }
 
   public void setStartTime(String startTime) {
@@ -49,6 +51,10 @@ public class AttachmentMetadata {
 
   public String getType() {
     return type;
+  }
+
+  public String getSessionId() {
+    return sessionId;
   }
 
   public Integer getSize() {
