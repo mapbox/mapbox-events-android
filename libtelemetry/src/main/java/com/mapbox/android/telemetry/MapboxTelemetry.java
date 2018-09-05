@@ -566,10 +566,17 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   private void sendAttachment(Event event) {
-    if (isNetworkConnected() && checkRequiredParameters(accessToken, userAgent)) {
-      Attachment attachment = (Attachment) event;
-      telemetryClient.sendAttachment(attachment, attachmentListeners);
+    if (checkNetworkAndParameters()) {
+      telemetryClient.sendAttachment(convertEventToAttachment(event), attachmentListeners);
     }
+  }
+
+  private Attachment convertEventToAttachment(Event event) {
+    return (Attachment) event;
+  }
+
+  private Boolean checkNetworkAndParameters() {
+    return isNetworkConnected() && checkRequiredParameters(accessToken, userAgent);
   }
 
   @OnLifecycleEvent(Lifecycle.Event.ON_START)

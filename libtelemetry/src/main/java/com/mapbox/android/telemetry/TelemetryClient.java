@@ -30,6 +30,7 @@ class TelemetryClient {
   private static final String ACCESS_TOKEN_QUERY_PARAMETER = "access_token";
   private static final String EXTRA_DEBUGGING_LOG = "Sending POST to %s with %d event(s) (user agent: %s) "
     + "with payload: %s";
+  private static final String BOUNDARY = "--01ead4a5-7a67-4703-ad02-589886e00923";
 
   private String accessToken = null;
   private String userAgent = null;
@@ -58,20 +59,20 @@ class TelemetryClient {
   }
 
   void sendAttachment(Attachment attachment, final CopyOnWriteArraySet<AttachmentListener> attachmentListeners) {
-    List<VisionAttachment> visionAttachments = attachment.getAttachments();
+    List<FileAttachment> visionAttachments = attachment.getAttachments();
     List<AttachmentMetadata> metadataList = new ArrayList<>();
     final List<String> eventIds = new ArrayList<>();
 
-    MultipartBody.Builder requestBodyBuilder = new MultipartBody.Builder("--01ead4a5-7a67-4703-ad02-589886e00923")
+    MultipartBody.Builder requestBodyBuilder = new MultipartBody.Builder(BOUNDARY)
       .setType(MultipartBody.FORM);
 
-    for (VisionAttachment visionAttachment: visionAttachments) {
-      AttachmentFilePath filepath = visionAttachment.getFilePath();
+    for (FileAttachment visionAttachment: visionAttachments) {
+      FileData filepath = visionAttachment.getFileData();
       AttachmentMetadata attachmentMetadata = visionAttachment.getAttachmentMetadata();
       metadataList.add(attachmentMetadata);
 
-      requestBodyBuilder.addFormDataPart("file", attachmentMetadata.getName(), RequestBody.create(filepath.type,
-        new File(filepath.filePath)));
+      requestBodyBuilder.addFormDataPart("file", attachmentMetadata.getName(),
+        RequestBody.create(filepath.getType(), new File(filepath.getFilePath())));
 
       eventIds.add(attachmentMetadata.getEventId());
     }

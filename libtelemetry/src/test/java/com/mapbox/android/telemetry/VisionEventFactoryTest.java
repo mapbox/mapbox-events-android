@@ -43,10 +43,9 @@ public class VisionEventFactoryTest {
     MediaType mediaType = mock(MediaType.class);
     AttachmentMetadata attachmentMetadata = mock(AttachmentMetadata.class);
 
-    VisionAttachment visionAttachment = aVisionEventFactory.createVisionAttachment(filepath, mediaType,
-      attachmentMetadata);
+    FileAttachment visionAttachment = aVisionEventFactory.createFileAttachment(filepath, mediaType, attachmentMetadata);
 
-    assertTrue(visionAttachment instanceof VisionAttachment);
+    assertTrue(visionAttachment instanceof FileAttachment);
   }
 
   @Test

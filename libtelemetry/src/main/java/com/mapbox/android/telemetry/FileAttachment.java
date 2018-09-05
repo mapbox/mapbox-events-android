@@ -2,12 +2,12 @@ package com.mapbox.android.telemetry;
 
 import okhttp3.MediaType;
 
-public class VisionAttachment {
+public class FileAttachment {
   private AttachmentMetadata attachmentMetadata;
   private String filePath;
   private MediaType mediaType;
 
-  VisionAttachment(AttachmentMetadata attachmentMetadata, String filePath, MediaType mediaType) {
+  FileAttachment(AttachmentMetadata attachmentMetadata, String filePath, MediaType mediaType) {
     this.attachmentMetadata = attachmentMetadata;
     this.filePath = filePath;
     this.mediaType = mediaType;
@@ -17,7 +17,7 @@ public class VisionAttachment {
     return attachmentMetadata;
   }
 
-  public AttachmentFilePath getFilePath() {
-    return new AttachmentFilePath(filePath, mediaType);
+  public FileData getFileData() {
+    return new FileData(filePath, mediaType);
   }
 }

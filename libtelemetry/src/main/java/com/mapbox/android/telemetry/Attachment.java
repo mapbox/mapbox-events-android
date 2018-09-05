@@ -14,7 +14,7 @@ public class Attachment extends Event implements Parcelable {
   @SerializedName("event")
   private final String event;
   @SerializedName("files")
-  private List<VisionAttachment> attachments;
+  private List<FileAttachment> attachments;
 
   Attachment() {
     this.event = VIS_ATTACHMENT;
@@ -37,11 +37,11 @@ public class Attachment extends Event implements Parcelable {
     }
   };
 
-  public List<VisionAttachment> getAttachments() {
+  public List<FileAttachment> getAttachments() {
     return attachments;
   }
 
-  public void addAttachment(VisionAttachment attachment) {
+  public void addAttachment(FileAttachment attachment) {
     attachments.add(attachment);
   }
 
