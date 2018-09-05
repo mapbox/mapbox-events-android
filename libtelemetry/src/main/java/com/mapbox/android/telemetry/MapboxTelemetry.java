@@ -14,7 +14,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.IBinder;
-import android.util.Log;
 
 import com.mapbox.android.core.location.LocationEnginePriority;
 import com.mapbox.android.core.permissions.PermissionsManager;
@@ -64,6 +63,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private boolean isServiceBound = false;
   private PermissionCheckRunnable permissionCheckRunnable = null;
   private CopyOnWriteArraySet<TelemetryListener> telemetryListeners = null;
+  private CopyOnWriteArraySet<AttachmentListener> attachmentListeners = null;
   static Context applicationContext = null;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
@@ -77,6 +77,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     this.telemetryEnabler = new TelemetryEnabler(true);
     this.telemetryLocationEnabler = new TelemetryLocationEnabler(true);
     initializeTelemetryListeners();
+    initializeAttachmentListeners();
     initializeTelemetryLocationState();
   }
 
@@ -96,6 +97,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     this.telemetryLocationEnabler = telemetryLocationEnabler;
     this.isServiceBound = isServiceBound;
     initializeTelemetryListeners();
+    initializeAttachmentListeners();
   }
 
   @Override
@@ -201,6 +203,14 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   public boolean removeTelemetryListener(TelemetryListener listener) {
     return telemetryListeners.remove(listener);
+  }
+
+  public boolean addAttachmentListener(AttachmentListener listener) {
+    return attachmentListeners.add(listener);
+  }
+
+  public boolean removeAttachmentListener(AttachmentListener listener) {
+    return attachmentListeners.remove(listener);
   }
 
   boolean optLocationIn() {
@@ -402,6 +412,10 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     telemetryListeners = new CopyOnWriteArraySet<>();
   }
 
+  private void initializeAttachmentListeners() {
+    attachmentListeners = new CopyOnWriteArraySet<>();
+  }
+
   private void initializeTelemetryLocationState() {
     if (!isMyServiceRunning(TelemetryService.class)) {
       telemetryLocationEnabler.updateTelemetryLocationState(TelemetryLocationEnabler.LocationState.DISABLED);
@@ -463,7 +477,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     }
 
     if (Event.Type.VIS_ATTACHMENT.equals((event.obtainType()))) {
-      Log.e("test", "Whitelisted");
       sendAttachment(event);
     }
 
@@ -555,7 +568,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private void sendAttachment(Event event) {
     if (isNetworkConnected() && checkRequiredParameters(accessToken, userAgent)) {
       Attachment attachment = (Attachment) event;
-      telemetryClient.sendAttachment(attachment, httpCallback);
+      telemetryClient.sendAttachment(attachment, attachmentListeners);
     }
   }
 

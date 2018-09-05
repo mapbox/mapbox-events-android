@@ -5,10 +5,13 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSerializer;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CopyOnWriteArraySet;
 
+import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
@@ -16,6 +19,7 @@ import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.Response;
 
 class TelemetryClient {
   private static final String LOG_TAG = "TelemetryClient";
@@ -53,9 +57,10 @@ class TelemetryClient {
     sendBatch(batch, callback);
   }
 
-  void sendAttachment(Attachment attachment, Callback callback) {
+  void sendAttachment(Attachment attachment, final CopyOnWriteArraySet<AttachmentListener> attachmentListeners) {
     List<VisionAttachment> visionAttachments = attachment.getAttachments();
     List<AttachmentMetadata> metadataList = new ArrayList<>();
+    final List<String> eventIds = new ArrayList<>();
 
     MultipartBody.Builder requestBodyBuilder = new MultipartBody.Builder("--01ead4a5-7a67-4703-ad02-589886e00923")
       .setType(MultipartBody.FORM);
@@ -67,6 +72,8 @@ class TelemetryClient {
 
       requestBodyBuilder.addFormDataPart("file", attachmentMetadata.getName(), RequestBody.create(filepath.type,
         new File(filepath.filePath)));
+
+      eventIds.add(attachmentMetadata.getEventId());
     }
 
     Gson gson = new Gson();
@@ -84,7 +91,21 @@ class TelemetryClient {
       .build();
 
     OkHttpClient client = setting.getAttachmentClient();
-    client.newCall(request).enqueue(callback);
+    client.newCall(request).enqueue(new Callback() {
+      @Override
+      public void onFailure(Call call, IOException exception) {
+        for (AttachmentListener attachmentListener : attachmentListeners) {
+          attachmentListener.onAttachmentFailure(exception.getMessage(), eventIds);
+        }
+      }
+
+      @Override
+      public void onResponse(Call call, Response response) {
+        for (AttachmentListener attachmentListener : attachmentListeners) {
+          attachmentListener.onAttachmentResponse(response.message(), response.code(), eventIds);
+        }
+      }
+    });
   }
 
   void updateDebugLoggingEnabled(boolean debugLoggingEnabled) {
