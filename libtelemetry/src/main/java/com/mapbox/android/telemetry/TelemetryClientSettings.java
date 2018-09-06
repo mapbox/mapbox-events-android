@@ -1,6 +1,8 @@
 package com.mapbox.android.telemetry;
 
 
+import android.support.annotation.Nullable;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,6 +13,7 @@ import javax.net.ssl.X509TrustManager;
 
 import okhttp3.ConnectionSpec;
 import okhttp3.HttpUrl;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 
 class TelemetryClientSettings {
@@ -47,8 +50,11 @@ class TelemetryClientSettings {
     return environment;
   }
 
-  OkHttpClient getClient(CertificateBlacklist certificateBlacklist) {
+  OkHttpClient getClient(CertificateBlacklist certificateBlacklist, new GzipRequestInterceptor()) {
     return configureHttpClient(certificateBlacklist);
+
+  OkHttpClient getAttachmentClient() {
+    return configureHttpClient(CertificateBlacklist certificateBlacklist, null);
   }
 
   HttpUrl getBaseUrl() {
@@ -136,13 +142,17 @@ class TelemetryClientSettings {
     }
   }
 
-  private OkHttpClient configureHttpClient(CertificateBlacklist certificateBlacklist) {
+  private OkHttpClient configureHttpClient(CertificateBlacklist certificateBlacklist, @Nullable Interceptor interceptor) {
     CertificatePinnerFactory factory = new CertificatePinnerFactory();
     OkHttpClient.Builder builder = client.newBuilder()
-      .addInterceptor(new GzipRequestInterceptor())
       .retryOnConnectionFailure(true)
       .certificatePinner(factory.provideCertificatePinnerFor(environment, certificateBlacklist))
       .connectionSpecs(Arrays.asList(ConnectionSpec.MODERN_TLS, ConnectionSpec.COMPATIBLE_TLS));
+
+    if (interceptor != null) {
+      builder.addInterceptor(interceptor);
+    }
+
     if (isSocketFactoryUnset(sslSocketFactory, x509TrustManager)) {
       builder.sslSocketFactory(sslSocketFactory, x509TrustManager);
       builder.hostnameVerifier(hostnameVerifier);

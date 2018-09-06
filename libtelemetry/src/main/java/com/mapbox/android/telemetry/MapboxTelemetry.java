@@ -2,12 +2,17 @@ package com.mapbox.android.telemetry;
 
 
 import android.app.ActivityManager;
+import android.arch.lifecycle.Lifecycle;
+import android.arch.lifecycle.LifecycleObserver;
+import android.arch.lifecycle.OnLifecycleEvent;
+import android.arch.lifecycle.ProcessLifecycleOwner;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.IBinder;
 
 import com.mapbox.android.core.location.LocationEnginePriority;
@@ -22,12 +27,14 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-public class MapboxTelemetry implements FullQueueCallback, EventCallback, ServiceTaskCallback, Callback {
+public class MapboxTelemetry implements FullQueueCallback, EventCallback, ServiceTaskCallback, Callback,
+  LifecycleObserver {
   private static final String EVENTS_USER_AGENT = "MapboxEventsAndroid/";
   private static final String TELEMETRY_USER_AGENT = "MapboxTelemetryAndroid/";
   private static final String UNITY_USER_AGENT = "MapboxEventsUnityAndroid/";
   private static final String NAVIGATION_USER_AGENT = "mapbox-navigation-android/";
   private static final String NAVIGATION_UI_USER_AGENT = "mapbox-navigation-ui-android/";
+  private static final String MAPS_USER_AGENT = "mapbox-maps-android/";
   private static final List<String> VALID_USER_AGENTS = new ArrayList<String>() {
     {
       add(EVENTS_USER_AGENT);
@@ -35,6 +42,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
       add(UNITY_USER_AGENT);
       add(NAVIGATION_USER_AGENT);
       add(NAVIGATION_UI_USER_AGENT);
+      add(MAPS_USER_AGENT);
     }
   };
   private static final String NON_NULL_APPLICATION_CONTEXT_REQUIRED = "Non-null application context required.";
@@ -56,6 +64,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private PermissionCheckRunnable permissionCheckRunnable = null;
   private CopyOnWriteArraySet<TelemetryListener> telemetryListeners = null;
   private CertificateBlacklist certificateBlacklist;
+  private CopyOnWriteArraySet<AttachmentListener> attachmentListeners = null;
   static Context applicationContext = null;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
@@ -70,6 +79,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     this.telemetryEnabler = new TelemetryEnabler(true);
     this.telemetryLocationEnabler = new TelemetryLocationEnabler(true);
     initializeTelemetryListeners();
+    initializeAttachmentListeners();
     initializeTelemetryLocationState();
   }
 
@@ -89,12 +99,13 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     this.telemetryLocationEnabler = telemetryLocationEnabler;
     this.isServiceBound = isServiceBound;
     initializeTelemetryListeners();
+    initializeAttachmentListeners();
   }
 
   @Override
   public void onFullQueue(List<Event> fullQueue) {
     TelemetryEnabler.State telemetryState = telemetryEnabler.obtainTelemetryState();
-    if (TelemetryEnabler.State.ENABLED.equals(telemetryState)) {
+    if (TelemetryEnabler.State.ENABLED.equals(telemetryState) && !TelemetryUtils.adjustWakeUpMode()) {
       sendEventsIfPossible(fullQueue);
     }
   }
@@ -194,6 +205,14 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   public boolean removeTelemetryListener(TelemetryListener listener) {
     return telemetryListeners.remove(listener);
+  }
+
+  public boolean addAttachmentListener(AttachmentListener listener) {
+    return attachmentListeners.add(listener);
+  }
+
+  public boolean removeAttachmentListener(AttachmentListener listener) {
+    return attachmentListeners.remove(listener);
   }
 
   boolean optLocationIn() {
@@ -395,6 +414,10 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     telemetryListeners = new CopyOnWriteArraySet<>();
   }
 
+  private void initializeAttachmentListeners() {
+    attachmentListeners = new CopyOnWriteArraySet<>();
+  }
+
   private void initializeTelemetryLocationState() {
     if (!isMyServiceRunning(TelemetryService.class)) {
       telemetryLocationEnabler.updateTelemetryLocationState(TelemetryLocationEnabler.LocationState.DISABLED);
@@ -454,6 +477,11 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
       sendEventsIfPossible(appUserTurnstile);
       return true;
     }
+
+    if (Event.Type.VIS_ATTACHMENT.equals((event.obtainType()))) {
+      sendAttachment(event);
+    }
+
     return false;
   }
 
@@ -490,7 +518,15 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   private void startLocation() {
-    applicationContext.startService(obtainLocationServiceIntent());
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      if (ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+        applicationContext.startService(obtainLocationServiceIntent());
+      } else {
+        ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
+      }
+    } else {
+      applicationContext.startService(obtainLocationServiceIntent());
+    }
   }
 
   private void startAlarm() {
@@ -537,5 +573,25 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     if (certificateBlacklist.daySinceLastUpdate()) {
       certificateBlacklist.updateBlacklist();
     }
+  }
+
+  private void sendAttachment(Event event) {
+    if (checkNetworkAndParameters()) {
+      telemetryClient.sendAttachment(convertEventToAttachment(event), attachmentListeners);
+    }
+  }
+
+  private Attachment convertEventToAttachment(Event event) {
+    return (Attachment) event;
+  }
+
+  private Boolean checkNetworkAndParameters() {
+    return isNetworkConnected() && checkRequiredParameters(accessToken, userAgent);
+  }
+
+  @OnLifecycleEvent(Lifecycle.Event.ON_START)
+  void onEnterForeground() {
+    startLocation();
+    ProcessLifecycleOwner.get().getLifecycle().removeObserver(this);
   }
 }
