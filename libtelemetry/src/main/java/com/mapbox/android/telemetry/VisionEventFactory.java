@@ -3,6 +3,8 @@ package com.mapbox.android.telemetry;
 import java.util.HashMap;
 import java.util.Map;
 
+import okhttp3.MediaType;
+
 public class VisionEventFactory {
   private static final String APPLICATION_CONTEXT_CANT_BE_NULL = "Create a MapboxTelemetry instance before calling "
     + "this method.";
@@ -30,9 +32,24 @@ public class VisionEventFactory {
     return BUILD_EVENT_VISION.get(type).build();
   }
 
+  public FileAttachment createFileAttachment(String filePath, MediaType mediaType,
+                                               AttachmentMetadata attachmentMetadata) {
+    return new FileAttachment(attachmentMetadata, filePath, mediaType);
+  }
+
+  public Attachment createAttachment(Event.Type type) {
+    checkVisionEvent(type);
+    return buildAttachment();
+  }
+
   private VisionEvent buildVisionEvent() {
     VisionEvent visionEvent = new VisionEvent();
     return visionEvent;
+  }
+
+  private Attachment buildAttachment() {
+    Attachment attachment = new Attachment();
+    return attachment;
   }
 
   private void checkVisionEvent(Event.Type type) {
