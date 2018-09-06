@@ -50,11 +50,12 @@ class TelemetryClientSettings {
     return environment;
   }
 
-  OkHttpClient getClient(CertificateBlacklist certificateBlacklist, new GzipRequestInterceptor()) {
-    return configureHttpClient(certificateBlacklist);
+  OkHttpClient getClient(CertificateBlacklist certificateBlacklist) {
+    return configureHttpClient(certificateBlacklist, new GzipRequestInterceptor());
+  }
 
-  OkHttpClient getAttachmentClient() {
-    return configureHttpClient(CertificateBlacklist certificateBlacklist, null);
+  OkHttpClient getAttachmentClient(CertificateBlacklist certificateBlacklist) {
+    return configureHttpClient(certificateBlacklist, null);
   }
 
   HttpUrl getBaseUrl() {
@@ -142,7 +143,8 @@ class TelemetryClientSettings {
     }
   }
 
-  private OkHttpClient configureHttpClient(CertificateBlacklist certificateBlacklist, @Nullable Interceptor interceptor) {
+  private OkHttpClient configureHttpClient(CertificateBlacklist certificateBlacklist,
+                                           @Nullable Interceptor interceptor) {
     CertificatePinnerFactory factory = new CertificatePinnerFactory();
     OkHttpClient.Builder builder = client.newBuilder()
       .retryOnConnectionFailure(true)

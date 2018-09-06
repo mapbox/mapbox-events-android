@@ -174,8 +174,8 @@ public class TelemetryServiceTest {
 
   private void waitUntilServiceIsDestroyed() throws InterruptedException {
     // Have to wait a bit until the system calls Service#onDestroy()
-    // Note that it only needs 10 milliseconds to clean the resources up
-    Thread.sleep(10);
+    // Note that it only needs 15 milliseconds to clean the resources up
+    Thread.sleep(15);
   }
 
   private void assertLocationReceiverNotRegistered(TelemetryService[] telemetryService) {

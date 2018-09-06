@@ -95,7 +95,7 @@ class TelemetryClient {
       .post(requestBody)
       .build();
 
-    OkHttpClient client = setting.getAttachmentClient();
+    OkHttpClient client = setting.getAttachmentClient(certificateBlacklist);
     client.newCall(request).enqueue(new Callback() {
       @Override
       public void onFailure(Call call, IOException exception) {

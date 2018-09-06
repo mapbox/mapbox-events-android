@@ -6,6 +6,8 @@ import android.content.pm.PackageManager;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,6 +16,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -37,8 +40,8 @@ class CertificateBlacklist implements Callback {
   private static final String EMPTY_STRING = "";
   private static final int BLACKLIST_HEAD = 0;
   private static final long DAY_IN_MILLIS = 86400000;
-  private static final String COM_CONFIG_ENDPOINT = "https://api.mapbox.com/events-config";
-  private static final String CHINA_CONFIG_ENDPOINT = "https://api.mapbox.cn/events-config";
+  private static final String COM_CONFIG_ENDPOINT = "api.mapbox.com";
+  private static final String CHINA_CONFIG_ENDPOINT = "api.mapbox.cn";
   private static final String ACCESS_TOKEN_QUERY_PARAMETER = "access_token";
   private static final String ENDPOINT_DETERMINATION_FAIL = "Endpoint Determination Failed";
   private static final String SAVE_BLACKLIST_FAIL = "Unable to save blacklist to file";
@@ -50,6 +53,7 @@ class CertificateBlacklist implements Callback {
   private static final Map<Environment, String> ENDPOINTS = new HashMap<Environment, String>() {
     {
       put(Environment.COM, COM_CONFIG_ENDPOINT);
+      put(Environment.STAGING, COM_CONFIG_ENDPOINT);
       put(Environment.CHINA, CHINA_CONFIG_ENDPOINT);
     }
   };
@@ -109,6 +113,7 @@ class CertificateBlacklist implements Callback {
   void updateBlacklist() {
     HttpUrl requestUrl = new HttpUrl.Builder().scheme(HTTPS_SCHEME)
       .host(determineConfigEndpoint())
+      .addPathSegment("events-config")
       .addQueryParameter(ACCESS_TOKEN_QUERY_PARAMETER, accessToken)
       .build();
 
@@ -205,7 +210,10 @@ class CertificateBlacklist implements Callback {
     String responseData = response.body().string();
 
     Gson gson = new Gson();
-    List revokedKeys = gson.fromJson(responseData, List.class);
+    JsonObject jsonObject = gson.fromJson(responseData, JsonObject.class);
+
+    Type listType = new TypeToken<List<String>>() {}.getType();
+    List revokedKeys = gson.fromJson(jsonObject.get("RevokedCertKeys"), listType);
 
     return revokedKeys;
   }
