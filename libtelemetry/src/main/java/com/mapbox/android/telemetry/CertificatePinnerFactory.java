@@ -28,7 +28,8 @@ class CertificatePinnerFactory {
     CertificatePinner.Builder certificatePinnerBuilder = new CertificatePinner.Builder();
 
     Map<String, List<String>> certificatesPins = provideCertificatesPinsFor(environment);
-    addCertificatesPins(certificatesPins, certificatePinnerBuilder, certificateBlacklist);
+    certificatesPins = removeBlacklistedPins(certificatesPins, certificateBlacklist);
+    addCertificatesPins(certificatesPins, certificatePinnerBuilder);
 
     return certificatePinnerBuilder.build();
   }
@@ -37,10 +38,7 @@ class CertificatePinnerFactory {
     return CERTIFICATES_PINS.get(environment);
   }
 
-  private void addCertificatesPins(Map<String, List<String>> pins, CertificatePinner.Builder builder,
-                                   CertificateBlacklist certificateBlacklist) {
-    pins = removeBlacklistedPins(pins, certificateBlacklist);
-
+  private void addCertificatesPins(Map<String, List<String>> pins, CertificatePinner.Builder builder) {
     for (Map.Entry<String, List<String>> entry : pins.entrySet()) {
       for (String pin : entry.getValue()) {
         builder.add(entry.getKey(), pin);
@@ -50,24 +48,33 @@ class CertificatePinnerFactory {
 
   private Map<String, List<String>> removeBlacklistedPins(Map<String, List<String>> pins,
                                                           CertificateBlacklist certificateBlacklist) {
-    Set<String> pinsKey = pins.keySet();
-    String key = pinsKey.iterator().next();
-
-    List<String> hashList = pins.get(key);
-
     List blackList = certificateBlacklist.retrieveBlackList();
 
     if (blackList.isEmpty()) {
       return pins;
     }
 
+    String key = retrievePinKey(pins);
+    List<String> hashList = pins.get(key);
+    hashList = removeBlaklistedHashes(blackList, hashList);
+
+    pins.put(key, hashList);
+    return pins;
+  }
+
+  private String retrievePinKey(Map<String, List<String>> pins) {
+    Set<String> pinsKey = pins.keySet();
+
+    return pinsKey.iterator().next();
+  }
+
+  private List<String> removeBlaklistedHashes(List blackList, List<String> hashList) {
     for (String hash : hashList) {
       if (blackList.contains(hash)) {
         hashList.remove(hash);
       }
     }
 
-    pins.put(key, hashList);
-    return pins;
+    return hashList;
   }
 }

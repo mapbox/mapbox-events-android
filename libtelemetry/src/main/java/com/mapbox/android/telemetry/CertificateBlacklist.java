@@ -178,12 +178,13 @@ class CertificateBlacklist implements Callback {
           blacklist.add(line);
         }
       }
-    } catch (Exception exception) {
-      logger.error(READLINE_FAIL, exception.getMessage());
-    } finally {
+
       reader.close();
       inputStream.close();
+    } catch (Exception exception) {
+      logger.error(READLINE_FAIL, exception.getMessage());
     }
+
     return blacklist;
   }
 
