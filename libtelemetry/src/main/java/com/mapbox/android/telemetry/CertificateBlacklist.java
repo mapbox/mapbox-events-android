@@ -47,6 +47,8 @@ class CertificateBlacklist implements Callback {
   private static final String SAVE_BLACKLIST_FAIL = "Unable to save blacklist to file";
   private static final String RETRIEVE_TIME_FAIL = "Unable to retrieve last update time from blacklist";
   private static final String RETRIEVE_BLACKLIST_FAIL = "Unable to retrieve blacklist contents from file";
+  private static final String CLOSE_STREAM_FAIL = "Unable to close stream";
+  private static final String CLOSE_BUFFER_READER_FAIL = "Unable to close BufferedReader";
   private static final String REQUEST_FAIL = "Request failed to download blacklist";
   private static final String READLINE_FAIL = "Unable to read line of Blacklist file";
   private static final String HTTPS_SCHEME = "https";
@@ -127,14 +129,19 @@ class CertificateBlacklist implements Callback {
 
   private void saveBlackList(List<String> revokedKeys) {
     String fileContents = createListContent(revokedKeys);
-    FileOutputStream outputStream;
+    FileOutputStream outputStream = null;
 
     try {
       outputStream = context.openFileOutput(BLACKLIST_FILE, Context.MODE_PRIVATE);
       outputStream.write(fileContents.getBytes());
-      outputStream.close();
     } catch (Exception exception) {
       logger.error(SAVE_BLACKLIST_FAIL, exception.getMessage());
+    } finally {
+      try {
+        outputStream.close();
+      } catch (Exception exception) {
+        logger.error(CLOSE_STREAM_FAIL, exception.getMessage());
+      }
     }
   }
 
@@ -179,10 +186,20 @@ class CertificateBlacklist implements Callback {
         }
       }
 
-      reader.close();
-      inputStream.close();
     } catch (Exception exception) {
       logger.error(READLINE_FAIL, exception.getMessage());
+    } finally {
+      try {
+        inputStream.close();
+      } catch (Exception exception) {
+        logger.error(CLOSE_STREAM_FAIL, exception.getMessage());
+      }
+
+      try {
+        reader.close();
+      } catch (Exception exception) {
+        logger.error(CLOSE_BUFFER_READER_FAIL, exception.getMessage());
+      }
     }
 
     return blacklist;
