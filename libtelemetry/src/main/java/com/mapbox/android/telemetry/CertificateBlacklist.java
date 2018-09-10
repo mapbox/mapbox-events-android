@@ -43,7 +43,7 @@ class CertificateBlacklist implements Callback {
   private static final String COM_CONFIG_ENDPOINT = "api.mapbox.com";
   private static final String CHINA_CONFIG_ENDPOINT = "api.mapbox.cn";
   private static final String ACCESS_TOKEN_QUERY_PARAMETER = "access_token";
-  private static final String ENDPOINT_DETERMINATION_FAIL = "Endpoint Determination Failed";
+  private static final String NAME_NOT_FOUND_EXCEPTION = "Name Not Found";
   private static final String SAVE_BLACKLIST_FAIL = "Unable to save blacklist to file";
   private static final String RETRIEVE_TIME_FAIL = "Unable to retrieve last update time from blacklist";
   private static final String RETRIEVE_BLACKLIST_FAIL = "Unable to retrieve blacklist contents from file";
@@ -200,8 +200,8 @@ class CertificateBlacklist implements Callback {
         serverInformation = setupChain.obtainServerInformation(appInformation.metaData);
         return ENDPOINTS.get(serverInformation.getEnvironment());
       }
-    } catch (Exception exception) {
-      logger.error(ENDPOINT_DETERMINATION_FAIL, exception.getMessage());
+    } catch (PackageManager.NameNotFoundException exception) {
+      logger.error(NAME_NOT_FOUND_EXCEPTION, exception.getMessage());
     }
 
     return COM_CONFIG_ENDPOINT;
