@@ -4,6 +4,7 @@ package com.mapbox.android.telemetry;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import okhttp3.CertificatePinner;
 
@@ -23,10 +24,11 @@ class CertificatePinnerFactory {
    *
    * @return The CertificatePinner instance
    */
-  CertificatePinner provideCertificatePinnerFor(Environment environment) {
+  CertificatePinner provideCertificatePinnerFor(Environment environment, CertificateBlacklist certificateBlacklist) {
     CertificatePinner.Builder certificatePinnerBuilder = new CertificatePinner.Builder();
 
     Map<String, List<String>> certificatesPins = provideCertificatesPinsFor(environment);
+    certificatesPins = removeBlacklistedPins(certificatesPins, certificateBlacklist);
     addCertificatesPins(certificatesPins, certificatePinnerBuilder);
 
     return certificatePinnerBuilder.build();
@@ -42,5 +44,37 @@ class CertificatePinnerFactory {
         builder.add(entry.getKey(), pin);
       }
     }
+  }
+
+  private Map<String, List<String>> removeBlacklistedPins(Map<String, List<String>> pins,
+                                                          CertificateBlacklist certificateBlacklist) {
+    List<String> blackList = certificateBlacklist.retrieveBlackList();
+
+    if (blackList.isEmpty()) {
+      return pins;
+    }
+
+    String key = retrievePinKey(pins);
+    List<String> hashList = pins.get(key);
+    hashList = removeBlaklistedHashes(blackList, hashList);
+
+    pins.put(key, hashList);
+    return pins;
+  }
+
+  private String retrievePinKey(Map<String, List<String>> pins) {
+    Set<String> pinsKey = pins.keySet();
+
+    return pinsKey.iterator().next();
+  }
+
+  private List<String> removeBlaklistedHashes(List blackList, List<String> hashList) {
+    for (String hash : hashList) {
+      if (blackList.contains(hash)) {
+        hashList.remove(hash);
+      }
+    }
+
+    return hashList;
   }
 }

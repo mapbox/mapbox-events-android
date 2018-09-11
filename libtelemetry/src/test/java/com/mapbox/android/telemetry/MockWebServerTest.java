@@ -130,7 +130,8 @@ class MockWebServerTest {
   TelemetryClient obtainATelemetryClient(String accessToken, String userAgent) {
     TelemetryClientSettings telemetryClientSettings = provideDefaultTelemetryClientSettings();
     Logger mockedLogger = mock(Logger.class);
-    return new TelemetryClient(accessToken, userAgent, telemetryClientSettings, mockedLogger);
+    CertificateBlacklist mockedBlacklist = mock(CertificateBlacklist.class);
+    return new TelemetryClient(accessToken, userAgent, telemetryClientSettings, mockedLogger, mockedBlacklist);
   }
 
   List<Event> obtainAnEvent() {

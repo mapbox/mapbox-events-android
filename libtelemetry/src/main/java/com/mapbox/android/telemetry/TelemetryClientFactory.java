@@ -14,34 +14,37 @@ class TelemetryClientFactory {
   private final String accessToken;
   private final String userAgent;
   private final Logger logger;
+  private final CertificateBlacklist certificateBlacklist;
   private final Map<Environment, TelemetryClientBuild> BUILD_TELEMETRY_CLIENT = new HashMap<Environment,
     TelemetryClientBuild>() {
     {
       put(Environment.CHINA, new TelemetryClientBuild() {
         @Override
         public TelemetryClient build(ServerInformation serverInformation) {
-          return buildTelemetryClient(Environment.CHINA);
+          return buildTelemetryClient(Environment.CHINA, certificateBlacklist);
         }
       });
       put(Environment.STAGING, new TelemetryClientBuild() {
         @Override
         public TelemetryClient build(ServerInformation serverInformation) {
-          return buildTelemetryClientCustom(serverInformation);
+          return buildTelemetryClientCustom(serverInformation, certificateBlacklist);
         }
       });
       put(Environment.COM, new TelemetryClientBuild() {
         @Override
         public TelemetryClient build(ServerInformation serverInformation) {
-          return buildTelemetryClient(Environment.COM);
+          return buildTelemetryClient(Environment.COM, certificateBlacklist);
         }
       });
     }
   };
 
-  TelemetryClientFactory(String accessToken, String userAgent, Logger logger) {
+  TelemetryClientFactory(String accessToken, String userAgent, Logger logger,
+                         CertificateBlacklist certificateBlacklist) {
     this.accessToken = accessToken;
     this.userAgent = userAgent;
     this.logger = logger;
+    this.certificateBlacklist = certificateBlacklist;
   }
 
   TelemetryClient obtainTelemetryClient(Context context) {
@@ -58,19 +61,21 @@ class TelemetryClientFactory {
     } catch (Exception exception) {
       logger.error(LOG_TAG, String.format(RETRIEVING_APP_META_DATA_ERROR_MESSAGE, exception.getMessage()));
     }
-    return buildTelemetryClient(Environment.COM);
+    return buildTelemetryClient(Environment.COM, certificateBlacklist);
   }
 
-  private TelemetryClient buildTelemetryClient(Environment environment) {
+  private TelemetryClient buildTelemetryClient(Environment environment, CertificateBlacklist certificateBlacklist) {
     TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder()
       .environment(environment)
       .build();
-    TelemetryClient telemetryClient = new TelemetryClient(accessToken, userAgent, telemetryClientSettings, logger);
+    TelemetryClient telemetryClient = new TelemetryClient(accessToken, userAgent, telemetryClientSettings, logger,
+      certificateBlacklist);
 
     return telemetryClient;
   }
 
-  private TelemetryClient buildTelemetryClientCustom(ServerInformation serverInformation) {
+  private TelemetryClient buildTelemetryClientCustom(ServerInformation serverInformation,
+                                                     CertificateBlacklist certificateBlacklist) {
     Environment environment = serverInformation.getEnvironment();
     String hostname = serverInformation.getHostname();
     String accessToken = serverInformation.getAccessToken();
@@ -78,7 +83,8 @@ class TelemetryClientFactory {
       .environment(environment)
       .baseUrl(TelemetryClientSettings.configureUrlHostname(hostname))
       .build();
-    TelemetryClient telemetryClient = new TelemetryClient(accessToken, userAgent, telemetryClientSettings, logger);
+    TelemetryClient telemetryClient = new TelemetryClient(accessToken, userAgent, telemetryClientSettings, logger,
+      certificateBlacklist);
 
     return telemetryClient;
   }
