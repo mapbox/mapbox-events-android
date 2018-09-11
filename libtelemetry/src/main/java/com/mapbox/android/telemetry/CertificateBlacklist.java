@@ -134,12 +134,12 @@ class CertificateBlacklist implements Callback {
     try {
       outputStream = context.openFileOutput(BLACKLIST_FILE, Context.MODE_PRIVATE);
       outputStream.write(fileContents.getBytes());
-    } catch (Exception exception) {
+    } catch (IOException exception) {
       logger.error(SAVE_BLACKLIST_FAIL, exception.getMessage());
     } finally {
       try {
         outputStream.close();
-      } catch (Exception exception) {
+      } catch (IOException exception) {
         logger.error(CLOSE_STREAM_FAIL, exception.getMessage());
       }
     }
