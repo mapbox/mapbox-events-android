@@ -48,7 +48,7 @@ class CertificatePinnerFactory {
 
   private Map<String, List<String>> removeBlacklistedPins(Map<String, List<String>> pins,
                                                           CertificateBlacklist certificateBlacklist) {
-    List blackList = certificateBlacklist.retrieveBlackList();
+    List<String> blackList = certificateBlacklist.retrieveBlackList();
 
     if (blackList.isEmpty()) {
       return pins;

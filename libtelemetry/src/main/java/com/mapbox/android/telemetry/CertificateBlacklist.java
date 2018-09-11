@@ -186,18 +186,18 @@ class CertificateBlacklist implements Callback {
         }
       }
 
-    } catch (Exception exception) {
+    } catch (IOException exception) {
       logger.error(READLINE_FAIL, exception.getMessage());
     } finally {
       try {
         inputStream.close();
-      } catch (Exception exception) {
+      } catch (IOException exception) {
         logger.error(CLOSE_STREAM_FAIL, exception.getMessage());
       }
 
       try {
         reader.close();
-      } catch (Exception exception) {
+      } catch (IOException exception) {
         logger.error(CLOSE_BUFFER_READER_FAIL, exception.getMessage());
       }
     }
