@@ -86,7 +86,6 @@ public class LocationEngineProvider {
     return bestLocationEngine;
   }
 
-  @Nullable
   private LocationEngine getAndroidLocationEngine() {
     LocationEngine androidLocationEngine;
     androidLocationEngine = obtainLocationEngineBy(LocationEngine.Type.ANDROID);
