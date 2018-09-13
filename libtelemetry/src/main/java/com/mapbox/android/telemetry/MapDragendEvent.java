@@ -21,7 +21,7 @@ class MapDragendEvent extends Event implements Parcelable {
   @SerializedName("orientation")
   private String orientation = null;
   @SerializedName("batteryLevel")
-  private Integer batteryLevel;
+  private int batteryLevel;
   @SerializedName("pluggedIn")
   private Boolean pluggedIn;
   @SerializedName("carrier")

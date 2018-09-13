@@ -35,23 +35,23 @@ public class NavigationMetadata implements Parcelable {
   private Integer originalEstimatedDistance = null;
   private Integer originalEstimatedDuration = null;
   private String audioType;
-  private Integer stepCount;
+  private int stepCount;
   private Integer originalStepCount = null;
   private String device;
   private String locationEngine;
-  private Integer volumeLevel;
-  private Integer screenBrightness;
+  private int volumeLevel;
+  private int screenBrightness;
   private String applicationState;
   private Boolean batteryPluggedIn;
-  private Integer batteryLevel;
+  private int batteryLevel;
   private String connectivity;
   private String tripIdentifier;
-  private Integer legIndex;
-  private Integer legCount;
-  private Integer stepIndex;
+  private int legIndex;
+  private int legCount;
+  private int stepIndex;
   private Integer voiceIndex = null;
   private Integer bannerIndex = null;
-  private Integer totalStepCount;
+  private int totalStepCount;
 
   public NavigationMetadata(Date startTimestamp, int distanceCompleted, int distanceRemaining, int durationRemaining,
                             String sdkIdentifier, String sdkVersion, int eventVersion, String sessionIdentifier,
