@@ -63,12 +63,14 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private boolean isServiceBound = false;
   private PermissionCheckRunnable permissionCheckRunnable = null;
   private CopyOnWriteArraySet<TelemetryListener> telemetryListeners = null;
+  private CertificateBlacklist certificateBlacklist;
   private CopyOnWriteArraySet<AttachmentListener> attachmentListeners = null;
   static Context applicationContext = null;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
     initializeQueue();
+    checkBlacklist(context, accessToken);
     checkRequiredParameters(accessToken, userAgent);
     this.httpCallback = this;
     AlarmReceiver alarmReceiver = obtainAlarmReceiver();
@@ -324,7 +326,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private TelemetryClient createTelemetryClient(String accessToken, String userAgent) {
     String fullUserAgent = TelemetryUtils.createFullUserAgent(userAgent, applicationContext);
     TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(accessToken, fullUserAgent,
-      new Logger());
+      new Logger(), certificateBlacklist);
     telemetryClient = telemetryClientFactory.obtainTelemetryClient(applicationContext);
 
     return telemetryClient;
@@ -563,6 +565,14 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     }
 
     return false;
+  }
+
+  private void checkBlacklist(Context context, String accessToken) {
+    certificateBlacklist = new CertificateBlacklist(context, accessToken);
+
+    if (certificateBlacklist.daySinceLastUpdate()) {
+      certificateBlacklist.updateBlacklist();
+    }
   }
 
   private void sendAttachment(Event event) {
