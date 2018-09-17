@@ -392,14 +392,18 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     return new ServiceConnection() {
       @Override
       public void onServiceConnected(ComponentName className, IBinder service) {
-        TelemetryService.TelemetryBinder binder = (TelemetryService.TelemetryBinder) service;
-        telemetryService = binder.obtainService();
-        telemetryService.addServiceTask(MapboxTelemetry.this);
-        if (telemetryService.obtainBoundInstances() == 0) {
-          telemetryService.injectEventsQueue(queue);
+        if (service instanceof TelemetryService.TelemetryBinder) {
+          TelemetryService.TelemetryBinder binder = (TelemetryService.TelemetryBinder) service;
+          telemetryService = binder.obtainService();
+          telemetryService.addServiceTask(MapboxTelemetry.this);
+          if (telemetryService.obtainBoundInstances() == 0) {
+            telemetryService.injectEventsQueue(queue);
+          }
+          telemetryService.bindInstance();
+          isServiceBound = true;
+        } else {
+          applicationContext.stopService(obtainLocationServiceIntent());
         }
-        telemetryService.bindInstance();
-        isServiceBound = true;
       }
 
       @Override
