@@ -194,7 +194,7 @@ public class TelemetryClientTest extends MockWebServerTest {
       })
       .build();
     TelemetryClient telemetryClient = new TelemetryClient("anyAccessToken", "anyUserAgent", telemetryClientSettings,
-      mock(Logger.class));
+      mock(Logger.class), mock(CertificateBlacklist.class));
     List<Event> theEvent = obtainAnEvent();
     final CountDownLatch latch = new CountDownLatch(1);
     final AtomicReference<String> bodyRef = new AtomicReference<>();

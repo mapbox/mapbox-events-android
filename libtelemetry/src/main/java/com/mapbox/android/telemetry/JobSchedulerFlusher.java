@@ -12,7 +12,7 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v4.content.LocalBroadcastManager;
 
-import static com.mapbox.android.telemetry.SchedulerFlusherFactory.FLUSHING_PERIOD_IN_MILLIS;
+import static com.mapbox.android.telemetry.SchedulerFlusherFactory.flushingPeriod;
 
 class JobSchedulerFlusher implements SchedulerFlusher {
   private static final int SCHEDULER_FLUSHER_JOB_ID = 0;
@@ -52,7 +52,7 @@ class JobSchedulerFlusher implements SchedulerFlusher {
     JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
     jobScheduler.schedule(new JobInfo.Builder(SCHEDULER_FLUSHER_JOB_ID,
       new ComponentName(context, SchedulerFlusherJobService.class))
-      .setPeriodic(FLUSHING_PERIOD_IN_MILLIS)
+      .setPeriodic(flushingPeriod)
       .build());
   }
 

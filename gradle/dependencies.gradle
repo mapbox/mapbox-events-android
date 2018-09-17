@@ -2,22 +2,22 @@ ext {
 
     androidVersions = [
             minSdkVersion    : 14,
-            targetSdkVersion : 25,
-            compileSdkVersion: 25,
+            targetSdkVersion : 26,
+            compileSdkVersion: 26,
             buildToolsVersion: '27.0.2'
     ]
 
     version = [
-            mapboxServices   : '2.2.6',
-            gmsLocation      : '11.0.4',
-            junit            : '4.12',
-            supportLibVersion: '25.4.0',
-            constraintLayout : '1.0.2',
-            mockito          : '2.11.0',
-            testRunnerVersion: '1.0.1',
-            okhttp3          : '3.10.0',
-            gson             : '2.8.2',
-            espressoVersion  : '3.0.1'
+            gmsLocation         : '11.0.4',
+            junit               : '4.12',
+            supportLibVersion   : '26.1.0',
+            constraintLayout    : '1.0.2',
+            mockito             : '2.11.0',
+            testRunnerVersion   : '1.0.1',
+            okhttp3             : '3.10.0',
+            gson                : '2.8.2',
+            espressoVersion     : '3.0.1',
+            archLifecycleVersion: "1.1.0"
     ]
 
     pluginVersion = [
@@ -27,11 +27,12 @@ ext {
     ]
 
     dependenciesList = [
-            // mapbox
-            mapboxServices         : "com.mapbox.mapboxsdk:mapbox-java-services:${version.mapboxServices}",
-
             // play services
             gmsLocation            : "com.google.android.gms:play-services-location:${version.gmsLocation}",
+
+            //architecture components
+            archLifecycleExtensions: "android.arch.lifecycle:extensions:${version.archLifecycleVersion}",
+            archLifecycleCompiler  : "android.arch.lifecycle:compiler:${version.archLifecycleVersion}",
 
             // okhttp
             okhttp3                : "com.squareup.okhttp3:okhttp:${version.okhttp3}",
