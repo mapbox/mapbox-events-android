@@ -32,16 +32,19 @@ class TelemetryClient {
     + "with payload: %s";
   private static final String BOUNDARY = "--01ead4a5-7a67-4703-ad02-589886e00923";
 
-  private String accessToken = null;
-  private String userAgent = null;
+  private String accessToken;
+  private String userAgent;
   private TelemetryClientSettings setting;
   private final Logger logger;
+  private CertificateBlacklist certificateBlacklist;
 
-  TelemetryClient(String accessToken, String userAgent, TelemetryClientSettings setting, Logger logger) {
+  TelemetryClient(String accessToken, String userAgent, TelemetryClientSettings setting, Logger logger,
+                  CertificateBlacklist certificateBlacklist) {
     this.accessToken = accessToken;
     this.userAgent = userAgent;
     this.setting = setting;
     this.logger = logger;
+    this.certificateBlacklist = certificateBlacklist;
   }
 
   void updateAccessToken(String accessToken) {
@@ -61,7 +64,7 @@ class TelemetryClient {
   void sendAttachment(Attachment attachment, final CopyOnWriteArraySet<AttachmentListener> attachmentListeners) {
     List<FileAttachment> visionAttachments = attachment.getAttachments();
     List<AttachmentMetadata> metadataList = new ArrayList<>();
-    final List<String> fieldIds = new ArrayList<>();
+    final List<String> fileIds = new ArrayList<>();
 
     MultipartBody.Builder requestBodyBuilder = new MultipartBody.Builder(BOUNDARY)
       .setType(MultipartBody.FORM);
@@ -74,7 +77,7 @@ class TelemetryClient {
       requestBodyBuilder.addFormDataPart("file", attachmentMetadata.getName(),
         RequestBody.create(fileData.getType(), new File(fileData.getFilePath())));
 
-      fieldIds.add(attachmentMetadata.getFileId());
+      fileIds.add(attachmentMetadata.getFileId());
     }
 
     Gson gson = new Gson();
@@ -92,19 +95,19 @@ class TelemetryClient {
       .post(requestBody)
       .build();
 
-    OkHttpClient client = setting.getAttachmentClient();
+    OkHttpClient client = setting.getAttachmentClient(certificateBlacklist);
     client.newCall(request).enqueue(new Callback() {
       @Override
       public void onFailure(Call call, IOException exception) {
         for (AttachmentListener attachmentListener : attachmentListeners) {
-          attachmentListener.onAttachmentFailure(exception.getMessage(), fieldIds);
+          attachmentListener.onAttachmentFailure(exception.getMessage(), fileIds);
         }
       }
 
       @Override
       public void onResponse(Call call, Response response) {
         for (AttachmentListener attachmentListener : attachmentListeners) {
-          attachmentListener.onAttachmentResponse(response.message(), response.code(), fieldIds);
+          attachmentListener.onAttachmentResponse(response.message(), response.code(), fileIds);
         }
       }
     });
@@ -144,7 +147,7 @@ class TelemetryClient {
       .post(body)
       .build();
 
-    OkHttpClient client = setting.getClient();
+    OkHttpClient client = setting.getClient(certificateBlacklist);
     client.newCall(request).enqueue(callback);
   }
 

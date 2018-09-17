@@ -4,6 +4,14 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v3.2.0
+- Change fieldIds to fileIds - [#212](https://github.com/mapbox/mapbox-events-android/pull/212)
+- Attachment Event - [#205](https://github.com/mapbox/mapbox-events-android/pull/205)
+- Null Checks for obtainSharedPreferences - [#202](https://github.com/mapbox/mapbox-events-android/pull/202)
+- Create General VisionEvent - [#197](https://github.com/mapbox/mapbox-events-android/pull/197)
+- Add Maps UserAgent - [#179](https://github.com/mapbox/mapbox-events-android/pull/179)
+- New Hashes and Blacklist - [#151](https://github.com/mapbox/mapbox-events-android/pull/151)
+
 ### v3.1.5
 - Check Application Context when stopping service - [#190](https://github.com/mapbox/mapbox-events-android/pull/190)
 - Crash Fix When Disabling Location Permissions Manually - [#184](https://github.com/mapbox/mapbox-events-android/pull/184)
