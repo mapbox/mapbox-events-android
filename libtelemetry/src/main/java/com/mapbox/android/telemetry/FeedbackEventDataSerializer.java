@@ -22,7 +22,6 @@ class FeedbackEventDataSerializer implements JsonSerializer<FeedbackEventData> {
     feedbackEventData.addProperty(DESCRIPTION, src.getDescription());
     feedbackEventData.addProperty(SOURCE, src.getSource());
     feedbackEventData.addProperty(USER_ID, src.getUserId());
-    feedbackEventData.addProperty(AUDIO, src.getAudio());
     return feedbackEventData;
   }
 }
