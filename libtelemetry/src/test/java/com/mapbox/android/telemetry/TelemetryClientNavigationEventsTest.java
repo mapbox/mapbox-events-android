@@ -246,7 +246,8 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
   private NavigationState obtainDefaultNavigationState(Date date) {
     NavigationMetadata metadata = new NavigationMetadata(date, 13, 22, 180, "sdkIdentifier", "sdkVersion",
-      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "AndroidLocationEngine", 50);
+      3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "AndroidLocationEngine", 50,
+      "tripIdentifier", 3, 5, 2, 3, 10);
     return new NavigationState(metadata);
   }
 

@@ -17,7 +17,7 @@ public class NavigationMetadata implements Parcelable {
   private int durationRemaining;
   private String operatingSystem;
   private int eventVersion;
-  private String sdKIdentifier;
+  private String sdkIdentifier;
   private String sdkVersion;
   private String sessionIdentifier;
   private double lat;
@@ -35,27 +35,35 @@ public class NavigationMetadata implements Parcelable {
   private Integer originalEstimatedDistance = null;
   private Integer originalEstimatedDuration = null;
   private String audioType;
-  private Integer stepCount = null;
+  private int stepCount;
   private Integer originalStepCount = null;
   private String device;
   private String locationEngine;
-  private Integer volumeLevel;
-  private Integer screenBrightness;
+  private int volumeLevel;
+  private int screenBrightness;
   private String applicationState;
   private Boolean batteryPluggedIn;
-  private Integer batteryLevel;
+  private int batteryLevel;
   private String connectivity;
+  private String tripIdentifier;
+  private int legIndex;
+  private int legCount;
+  private int stepIndex;
+  private Integer voiceIndex = null;
+  private Integer bannerIndex = null;
+  private int totalStepCount;
 
   public NavigationMetadata(Date startTimestamp, int distanceCompleted, int distanceRemaining, int durationRemaining,
-                            String sdKIdentifier, String sdkVersion, int eventVersion, String sessionIdentifier,
+                            String sdkIdentifier, String sdkVersion, int eventVersion, String sessionIdentifier,
                             double lat, double lng, String geometry, String profile, boolean isSimulation,
-                            String locationEngine, int absoluteDistanceToDestination) {
+                            String locationEngine, int absoluteDistanceToDestination, String tripIdentifier,
+                            int legIndex, int legCount, int stepIndex, int stepCount, int totalStepCount) {
     this.startTimestamp = TelemetryUtils.generateCreateDateFormatted(startTimestamp);
     this.distanceCompleted = distanceCompleted;
     this.distanceRemaining = distanceRemaining;
     this.durationRemaining = durationRemaining;
     this.operatingSystem = OPERATING_SYSTEM;
-    this.sdKIdentifier = sdKIdentifier;
+    this.sdkIdentifier = sdkIdentifier;
     this.sdkVersion = sdkVersion;
     this.eventVersion = eventVersion;
     this.sessionIdentifier = sessionIdentifier;
@@ -75,6 +83,12 @@ public class NavigationMetadata implements Parcelable {
     this.connectivity = TelemetryUtils.obtainCellularNetworkType();
     this.audioType = NavigationUtils.obtainAudioType();
     this.applicationState = TelemetryUtils.obtainApplicationState();
+    this.tripIdentifier = tripIdentifier;
+    this.legIndex = legIndex;
+    this.legCount = legCount;
+    this.stepIndex = stepIndex;
+    this.stepCount = stepCount;
+    this.totalStepCount = totalStepCount;
   }
 
   public void setCreated(Date created) {
@@ -110,7 +124,7 @@ public class NavigationMetadata implements Parcelable {
   }
 
   String getSdKIdentifier() {
-    return sdKIdentifier;
+    return sdkIdentifier;
   }
 
   String getSdkVersion() {
@@ -209,14 +223,6 @@ public class NavigationMetadata implements Parcelable {
     return audioType;
   }
 
-  Integer getStepCount() {
-    return stepCount;
-  }
-
-  public void setStepCount(Integer stepCount) {
-    this.stepCount = stepCount;
-  }
-
   Integer getOriginalStepCount() {
     return originalStepCount;
   }
@@ -282,6 +288,46 @@ public class NavigationMetadata implements Parcelable {
     this.percentTimeInForeground = percentTimeInForeground;
   }
 
+  String getTripIdentifier() {
+    return tripIdentifier;
+  }
+
+  Integer getLegIndex() {
+    return legIndex;
+  }
+
+  Integer getLegCount() {
+    return legCount;
+  }
+
+  Integer getStepIndex() {
+    return stepIndex;
+  }
+
+  Integer getStepCount() {
+    return stepCount;
+  }
+
+  Integer getVoiceIndex() {
+    return voiceIndex;
+  }
+
+  void setVoiceIndex(int voiceIndex) {
+    this.voiceIndex = voiceIndex;
+  }
+
+  Integer getBannerIndex() {
+    return bannerIndex;
+  }
+
+  public void setBannerIndex(int bannerIndex) {
+    this.bannerIndex = bannerIndex;
+  }
+
+  Integer getTotalStepCount() {
+    return totalStepCount;
+  }
+
   private NavigationMetadata(Parcel in) {
     absoluteDistanceToDestination = in.readInt();
     percentTimeInPortrait = in.readByte() == 0x00 ? null : in.readInt();
@@ -292,7 +338,7 @@ public class NavigationMetadata implements Parcelable {
     durationRemaining = in.readInt();
     operatingSystem = in.readString();
     eventVersion = in.readInt();
-    sdKIdentifier = in.readString();
+    sdkIdentifier = in.readString();
     sdkVersion = in.readString();
     sessionIdentifier = in.readString();
     lat = in.readDouble();
@@ -310,7 +356,6 @@ public class NavigationMetadata implements Parcelable {
     originalEstimatedDistance = in.readByte() == 0x00 ? null : in.readInt();
     originalEstimatedDuration = in.readByte() == 0x00 ? null : in.readInt();
     audioType = in.readString();
-    stepCount = in.readByte() == 0x00 ? null : in.readInt();
     originalStepCount = in.readByte() == 0x00 ? null : in.readInt();
     device = in.readString();
     locationEngine = in.readString();
@@ -320,6 +365,14 @@ public class NavigationMetadata implements Parcelable {
     batteryPluggedIn = in.readByte() != 0x00;
     batteryLevel = in.readInt();
     connectivity = in.readString();
+    tripIdentifier = in.readString();
+    legIndex = in.readInt();
+    legCount = in.readInt();
+    stepIndex = in.readInt();
+    stepCount = in.readInt();
+    voiceIndex = in.readByte() == 0x00 ? null : in.readInt();
+    bannerIndex = in.readByte() == 0x00 ? null : in.readInt();
+    totalStepCount = in.readInt();
   }
 
   @Override
@@ -348,7 +401,7 @@ public class NavigationMetadata implements Parcelable {
     dest.writeInt(durationRemaining);
     dest.writeString(operatingSystem);
     dest.writeInt(eventVersion);
-    dest.writeString(sdKIdentifier);
+    dest.writeString(sdkIdentifier);
     dest.writeString(sdkVersion);
     dest.writeString(sessionIdentifier);
     dest.writeDouble(lat);
@@ -391,12 +444,6 @@ public class NavigationMetadata implements Parcelable {
       dest.writeInt(originalEstimatedDuration);
     }
     dest.writeString(audioType);
-    if (stepCount == null) {
-      dest.writeByte((byte) (0x00));
-    } else {
-      dest.writeByte((byte) (0x01));
-      dest.writeInt(stepCount);
-    }
     if (originalStepCount == null) {
       dest.writeByte((byte) (0x00));
     } else {
@@ -411,6 +458,24 @@ public class NavigationMetadata implements Parcelable {
     dest.writeByte((byte) (batteryPluggedIn ? 0x01 : 0x00));
     dest.writeInt(batteryLevel);
     dest.writeString(connectivity);
+    dest.writeString(tripIdentifier);
+    dest.writeInt(legIndex);
+    dest.writeInt(legCount);
+    dest.writeInt(stepIndex);
+    dest.writeInt(stepCount);
+    if (voiceIndex == null) {
+      dest.writeByte((byte) (0x00));
+    } else {
+      dest.writeByte((byte) (0x01));
+      dest.writeInt(voiceIndex);
+    }
+    if (bannerIndex == null) {
+      dest.writeByte((byte) (0x00));
+    } else {
+      dest.writeByte((byte) (0x01));
+      dest.writeInt(bannerIndex);
+    }
+    dest.writeInt(totalStepCount);
   }
 
   @SuppressWarnings("unused")

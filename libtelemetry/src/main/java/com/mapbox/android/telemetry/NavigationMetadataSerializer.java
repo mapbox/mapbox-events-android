@@ -36,7 +36,6 @@ class NavigationMetadataSerializer implements JsonSerializer<NavigationMetadata>
   private static final String ORIGINAL_ESTIMATED_DISTANCE = "originalEstimatedDistance";
   private static final String ORIGINAL_ESTIMATED_DURATION = "originalEstimatedDuration";
   private static final String AUDIO_TYPE = "audioType";
-  private static final String STEP_COUNT = "stepCount";
   private static final String ORIGINAL_STEP_COUNT = "originalStepCount";
   private static final String DEVICE = "device";
   private static final String LOCATION_ENGINE = "locationEngine";
@@ -46,6 +45,14 @@ class NavigationMetadataSerializer implements JsonSerializer<NavigationMetadata>
   private static final String BATTERY_PLUGGED_IN = "batteryPluggedIn";
   private static final String BATTERY_LEVEL = "batteryLevel";
   private static final String CONNECTIVITY = "connectivity";
+  private static final String TRIP_IDENTIFIER = "tripIdentifier";
+  private static final String LEG_INDEX = "legIndex";
+  private static final String LEG_COUNT = "legCount";
+  private static final String STEP_INDEX = "stepIndex";
+  private static final String STEP_COUNT = "stepCount";
+  private static final String VOICE_INDEX = "voiceIndex";
+  private static final String BANNER_INDEX = "bannerIndex";
+  private static final String TOTAL_STEP_COUNT = "totalStepCount";
 
   @Override
   public JsonElement serialize(NavigationMetadata src, Type typeOfSrc, JsonSerializationContext context) {
@@ -74,6 +81,12 @@ class NavigationMetadataSerializer implements JsonSerializer<NavigationMetadata>
     metadata.addProperty(LOCATION_ENGINE, src.getLocationEngine());
     metadata.addProperty(CREATED, src.getCreated());
     metadata.addProperty(ABSOLUTE_DISTANCE_TO_DESTINATION, src.getAbsoluteDistanceToDestination());
+    metadata.addProperty(TRIP_IDENTIFIER, src.getTripIdentifier());
+    metadata.addProperty(LEG_INDEX, src.getLegIndex());
+    metadata.addProperty(LEG_COUNT, src.getLegCount());
+    metadata.addProperty(STEP_INDEX, src.getStepIndex());
+    metadata.addProperty(STEP_COUNT, src.getStepCount());
+    metadata.addProperty(TOTAL_STEP_COUNT, src.getTotalStepCount());
   }
 
   private void serializeOptional(NavigationMetadata src, JsonObject metadata) {
@@ -86,7 +99,6 @@ class NavigationMetadataSerializer implements JsonSerializer<NavigationMetadata>
     metadata.addProperty(ORIGINAL_ESTIMATED_DISTANCE, src.getOriginalEstimatedDistance());
     metadata.addProperty(ORIGINAL_ESTIMATED_DURATION, src.getOriginalEstimatedDuration());
     metadata.addProperty(AUDIO_TYPE, src.getAudioType());
-    metadata.addProperty(STEP_COUNT, src.getStepCount());
     metadata.addProperty(ORIGINAL_STEP_COUNT, src.getOriginalStepCount());
     metadata.addProperty(VOLUME_LEVEL, src.getVolumeLevel());
     metadata.addProperty(SCREEN_BRIGHTNESS, src.getScreenBrightness());
@@ -96,5 +108,7 @@ class NavigationMetadataSerializer implements JsonSerializer<NavigationMetadata>
     metadata.addProperty(CONNECTIVITY, src.getConnectivity());
     metadata.addProperty(PERCENT_TIME_IN_PORTRAIT, src.getPercentTimeInPortrait());
     metadata.addProperty(PERCENT_TIME_IN_FOREGROUND, src.getPercentTimeInForeground());
+    metadata.addProperty(VOICE_INDEX, src.getVoiceIndex());
+    metadata.addProperty(BANNER_INDEX, src.getBannerIndex());
   }
 }
