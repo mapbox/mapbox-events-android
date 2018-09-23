@@ -5,10 +5,16 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.mapbox.android.core.location.LocationEnginePriority.BALANCED_POWER_ACCURACY;
+import static com.mapbox.android.core.location.LocationEnginePriority.HIGH_ACCURACY;
 
 public class LocationEngineProvider {
   private Map<LocationEngine.Type, LocationEngine> locationEngineDictionary;
@@ -17,8 +23,10 @@ public class LocationEngineProvider {
       add(LocationEngine.Type.GOOGLE_PLAY_SERVICES);
     }
   };
+  private int googlePlayAvailabilityResultCode;
 
   public LocationEngineProvider(Context context) {
+    googlePlayAvailabilityResultCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context.getApplicationContext());
     initAvailableLocationEngines(context);
   }
 
@@ -67,13 +75,34 @@ public class LocationEngineProvider {
   }
 
   private LocationEngine obtainBestLocationEngine() {
-    LocationEngine androidLocationEngine = locationEngineDictionary.get(LocationEngine.Type.ANDROID);
-    for (LocationEngine.Type type : OPTIONAL_LOCATION_ENGINES) {
-      LocationEngine bestLocationEngine = locationEngineDictionary.get(type);
-      if (bestLocationEngine != null) {
-        return bestLocationEngine;
-      }
+    LocationEngine bestLocationEngine;
+
+    // Check to see if google play services is installed and updated to required version
+    if (googlePlayAvailabilityResultCode == ConnectionResult.SUCCESS) {
+      bestLocationEngine = getGoogleLocationEngine();
+    } else {
+      bestLocationEngine = getAndroidLocationEngine();
+    }
+    return bestLocationEngine;
+  }
+
+  private LocationEngine getAndroidLocationEngine() {
+    LocationEngine androidLocationEngine;
+    androidLocationEngine = obtainLocationEngineBy(LocationEngine.Type.ANDROID);
+    if (androidLocationEngine != null) {
+      androidLocationEngine.setPriority(BALANCED_POWER_ACCURACY);
+      androidLocationEngine.setFastestInterval(5000);
     }
     return androidLocationEngine;
+  }
+
+  private LocationEngine getGoogleLocationEngine() {
+    LocationEngine googleLocationEngine;
+    googleLocationEngine = obtainLocationEngineBy(LocationEngine.Type.GOOGLE_PLAY_SERVICES);
+    if (googleLocationEngine != null) {
+      googleLocationEngine.setPriority(HIGH_ACCURACY);
+      googleLocationEngine.setFastestInterval(2000);
+    }
+    return googleLocationEngine;
   }
 }
