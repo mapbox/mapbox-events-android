@@ -164,7 +164,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   public boolean updateSessionIdRotationInterval(SessionInterval interval) {
-    if (isServiceBound) {
+    if (isServiceBound && telemetryService != null) {
       int hour = interval.obtainInterval();
       SessionIdentifier sessionIdentifier = new SessionIdentifier(hour);
       telemetryService.updateSessionIdentifier(sessionIdentifier);
@@ -186,7 +186,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   public void updateLocationPriority(LocationEnginePriority locationPriority) {
-    if (isServiceBound) {
+    if (isServiceBound && telemetryService != null) {
       telemetryService.updateLocationPriority(locationPriority);
     }
   }
@@ -224,7 +224,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   boolean optLocationOut() {
     TelemetryLocationEnabler.LocationState telemetryLocationState = telemetryLocationEnabler
       .obtainTelemetryLocationState();
-    if (isServiceBound) {
+    if (isServiceBound && telemetryService != null) {
       telemetryService.unbindInstance();
       telemetryService.removeServiceTask(this);
       if (telemetryService.obtainBoundInstances() == 0
@@ -459,13 +459,17 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   private void unbindTelemetryService() {
-    if (isServiceBound) {
+    if (isServiceBound && telemetryService != null) {
       telemetryService.unbindInstance();
       unbindServiceConnection();
     }
   }
 
   private void stopTelemetryService() {
+    if (telemetryService == null) {
+      return;
+    }
+
     TelemetryLocationEnabler.LocationState telemetryLocationState = telemetryLocationEnabler
       .obtainTelemetryLocationState();
     if (telemetryService.obtainBoundInstances() == 0
