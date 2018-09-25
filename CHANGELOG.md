@@ -4,6 +4,12 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v3.2.1
+- StopTelemetryService obtainBoundInstances bug fix - [#221](https://github.com/mapbox/mapbox-events-android/pull/221)
+- Telemetry proguard configuration - [#218](https://github.com/mapbox/mapbox-events-android/pull/218)
+- More specific Proguard rules - [#217](https://github.com/mapbox/mapbox-events-android/pull/217)
+- Detect BinderProxy - [#209](https://github.com/mapbox/mapbox-events-android/pull/209)
+
 ### v3.2.0
 - Change fieldIds to fileIds - [#212](https://github.com/mapbox/mapbox-events-android/pull/212)
 - Attachment Event - [#205](https://github.com/mapbox/mapbox-events-android/pull/205)
