@@ -468,9 +468,11 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private void stopTelemetryService() {
     TelemetryLocationEnabler.LocationState telemetryLocationState = telemetryLocationEnabler
       .obtainTelemetryLocationState();
-    if (telemetryService.obtainBoundInstances() == 0
-      && TelemetryLocationEnabler.LocationState.ENABLED.equals(telemetryLocationState)) {
-      stopLocation();
+    if (telemetryService != null) {
+      if (telemetryService.obtainBoundInstances() == 0
+        && TelemetryLocationEnabler.LocationState.ENABLED.equals(telemetryLocationState)) {
+        stopLocation();
+      }
     }
   }
 
