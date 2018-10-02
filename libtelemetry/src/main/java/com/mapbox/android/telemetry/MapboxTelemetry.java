@@ -241,6 +241,10 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     return isLocationOpted;
   }
 
+  EventsQueue getQueue() {
+    return queue;
+  }
+
   private void startTelemetryService() {
     TelemetryLocationEnabler.LocationState telemetryLocationState = telemetryLocationEnabler
       .obtainTelemetryLocationState();
