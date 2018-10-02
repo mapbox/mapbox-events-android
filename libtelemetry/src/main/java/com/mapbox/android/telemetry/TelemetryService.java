@@ -13,6 +13,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.content.PermissionChecker;
+import android.util.Log;
 
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineListener;
@@ -27,6 +28,8 @@ import static com.mapbox.android.telemetry.TelemetryReceiver.TELEMETRY_RECEIVER_
 
 public class TelemetryService extends Service implements TelemetryCallback, LocationEngineListener, EventCallback {
   public static final String IS_LOCATION_ENABLER_FROM_PREFERENCES = "isLocationEnablerFromPreferences";
+  private static final String MISSING_FINE_PERMISSION = "Detected that ACCESS_FINE_LOCATION permission is missing. "
+    + "This is a required permission for Mapbox. Please add this permission back into your manifest. Thank you.";
   public static final int API_LEVEL_23 = 23;
   private LocationReceiver locationReceiver = null;
   private TelemetryReceiver telemetryReceiver = null;
@@ -36,6 +39,7 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   private LocationEnginePriority locationPriority = LocationEnginePriority.NO_POWER;
   private CopyOnWriteArraySet<ServiceTaskCallback> serviceTaskCallbacks = null;
   private TelemetryLocationEnabler telemetryLocationEnabler;
+  private Logger logger;
   // For testing only:
   private boolean isLocationEnablerFromPreferences = true;
   private boolean isLocationReceiverRegistered = false;
@@ -44,6 +48,7 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   @Override
   public void onCreate() {
     super.onCreate();
+    this.logger = new Logger();
     createLocationReceiver();
     createTelemetryReceiver();
     createServiceTaskCallbacks();
@@ -287,8 +292,20 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
       int finePermission = PermissionChecker.checkSelfPermission(MapboxTelemetry.applicationContext,
         Manifest.permission.ACCESS_FINE_LOCATION);
 
+      checkFinePermission(finePermission);
+
       return coarsePermission == PackageManager.PERMISSION_GRANTED
         || finePermission == PackageManager.PERMISSION_GRANTED;
+    }
+  }
+
+  private void checkFinePermission(int finePermission) {
+    if (finePermission != PackageManager.PERMISSION_GRANTED) {
+      try {
+        throw new Exception(MISSING_FINE_PERMISSION);
+      } catch (Exception exception) {
+        Log.e("Permission Exception", exception.getMessage());
+      }
     }
   }
 }
