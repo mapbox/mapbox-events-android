@@ -2,172 +2,91 @@ package com.mapbox.android.core.location;
 
 import android.content.Context;
 import android.location.Location;
-import android.os.Bundle;
+import android.os.Looper;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-
-import java.lang.ref.WeakReference;
-import java.util.HashMap;
-import java.util.Map;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 /**
  * Sample LocationEngine using Google Play Services
  */
-class GoogleLocationEngine extends LocationEngine implements
-  GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+class GoogleLocationEngine extends AbstractLocationEngine<LocationCallback> implements LocationEngine {
+  private final FusedLocationProviderClient fusedLocationProviderClient;
 
-  private static final LocationEnginePriority DEFAULT_PRIORITY = LocationEnginePriority.NO_POWER;
+  GoogleLocationEngine(@NonNull Context context) {
+    super();
+    fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
+  }
 
-  private WeakReference<Context> context;
-  private GoogleApiClient googleApiClient;
-  private final Map<LocationEnginePriority, UpdateGoogleRequestPriority> REQUEST_PRIORITY = new
-    HashMap<LocationEnginePriority, UpdateGoogleRequestPriority>() {
-      {
-        put(LocationEnginePriority.NO_POWER, new UpdateGoogleRequestPriority() {
-          @Override
-          public void update(LocationRequest request) {
-            request.setPriority(LocationRequest.PRIORITY_NO_POWER);
-          }
-        });
-        put(LocationEnginePriority.LOW_POWER, new UpdateGoogleRequestPriority() {
-          @Override
-          public void update(LocationRequest request) {
-            request.setPriority(LocationRequest.PRIORITY_LOW_POWER);
-          }
-        });
-        put(LocationEnginePriority.BALANCED_POWER_ACCURACY, new UpdateGoogleRequestPriority() {
-          @Override
-          public void update(LocationRequest request) {
-            request.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-          }
-        });
-        put(LocationEnginePriority.HIGH_ACCURACY, new UpdateGoogleRequestPriority() {
-          @Override
-          public void update(LocationRequest request) {
-            request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-          }
-        });
+  @NonNull
+  @Override
+  protected LocationCallback getListener(final LocationEngineCallback<Location> callback) {
+    return new LocationCallback() {
+      @Override
+      public void onLocationResult(LocationResult locationResult) {
+        super.onLocationResult(locationResult);
+
+        Location location = locationResult.getLastLocation();
+        if (location != null) {
+          callback.onSuccess(locationResult.getLastLocation());
+        } else {
+          callback.onFailure(new Exception("Unavailable location"));
+        }
       }
     };
-
-  private GoogleLocationEngine(Context context) {
-    super();
-    this.context = new WeakReference<>(context);
-    googleApiClient = new GoogleApiClient.Builder(this.context.get())
-      .addConnectionCallbacks(this)
-      .addOnConnectionFailedListener(this)
-      .addApi(LocationServices.API)
-      .build();
-    this.priority = DEFAULT_PRIORITY;
-  }
-
-  static synchronized LocationEngine getLocationEngine(Context context) {
-    LocationEngine googleLocationEngine = new GoogleLocationEngine(context.getApplicationContext());
-
-    return googleLocationEngine;
   }
 
   @Override
-  public void activate() {
-    connect();
-  }
-
-  @Override
-  public void deactivate() {
-    if (googleApiClient != null && googleApiClient.isConnected()) {
-      googleApiClient.disconnect();
-    }
-  }
-
-  @Override
-  public boolean isConnected() {
-    return googleApiClient.isConnected();
-  }
-
-  @Override
-  public void onConnected(@Nullable Bundle bundle) {
-    for (LocationEngineListener listener : locationListeners) {
-      listener.onConnected();
-    }
-  }
-
-  @Override
-  public void onConnectionSuspended(int cause) {
-  }
-
-  @Override
-  public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-  }
-
-  @Override
-  public Location getLastLocation() {
-    if (googleApiClient.isConnected()) {
-      //noinspection MissingPermission
-      return LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-    }
-
-    //noinspection MissingPermission
-    return null;
-  }
-
-  @Override
-  public void requestLocationUpdates() {
-    LocationRequest request = LocationRequest.create();
-
-    if (interval != null) {
-      request.setInterval(interval);
-    }
-    if (fastestInterval != null) {
-      request.setFastestInterval(fastestInterval);
-    }
-    if (smallestDisplacement != null) {
-      request.setSmallestDisplacement(smallestDisplacement);
-    }
-
-    updateRequestPriority(request);
-
-    if (googleApiClient.isConnected()) {
-      //noinspection MissingPermission
-      LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, request, this);
-    }
-  }
-
-  @Override
-  public void removeLocationUpdates() {
-    if (googleApiClient.isConnected()) {
-      LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
-    }
-  }
-
-  @Override
-  public Type obtainType() {
-    return Type.GOOGLE_PLAY_SERVICES;
-  }
-
-  @Override
-  public void onLocationChanged(Location location) {
-    for (LocationEngineListener listener : locationListeners) {
-      listener.onLocationChanged(location);
-    }
-  }
-
-  private void connect() {
-    if (googleApiClient != null) {
-      if (googleApiClient.isConnected()) {
-        onConnected(null);
-      } else {
-        googleApiClient.connect();
+  public void getLastLocation(final LocationEngineCallback<Location> callback) throws SecurityException {
+    fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+      @Override
+      public void onSuccess(Location location) {
+        callback.onSuccess(location);
       }
-    }
+    }).addOnFailureListener(new OnFailureListener() {
+      @Override
+      public void onFailure(@NonNull Exception e) {
+        callback.onFailure(e);
+      }
+    });
   }
 
-  private void updateRequestPriority(LocationRequest request) {
-    REQUEST_PRIORITY.get(priority).update(request);
+  @Override
+  public void requestLocationUpdates(LocationEngineRequest request, LocationEngineCallback<Location> callback,
+                                     Looper looper) throws SecurityException {
+    LocationCallback locationCallback = addLocationListener(callback);
+    fusedLocationProviderClient.requestLocationUpdates(toGMSLocationRequest(request), locationCallback, looper);
+  }
+
+  @Override
+  public void removeLocationUpdates(LocationEngineCallback<Location> callback) {
+    LocationCallback locationCallback = removeLocationListener(callback);
+    fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+  }
+
+  private static LocationRequest toGMSLocationRequest(LocationEngineRequest request) {
+    LocationRequest locationRequest = new LocationRequest();
+    locationRequest.setInterval(request.getInterval());
+    locationRequest.setPriority(toGMSLocationPriority(request.getPriority()));
+    return locationRequest;
+  }
+
+  private static int toGMSLocationPriority(int enginePriority) {
+    switch (enginePriority) {
+      case LocationEngineRequest.PRIORITY_HIGH_ACCURACY:
+        return LocationRequest.PRIORITY_HIGH_ACCURACY;
+      case LocationEngineRequest.PRIORITY_BALANCED_POWER_ACCURACY:
+        return LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY;
+      case LocationEngineRequest.PRIORITY_LOW_POWER:
+        return LocationRequest.PRIORITY_LOW_POWER;
+      case LocationEngineRequest.PRIORITY_NO_POWER:
+      default: return LocationRequest.PRIORITY_NO_POWER;
+    }
   }
 }

@@ -1,162 +1,105 @@
 package com.mapbox.android.core.location;
 
 import android.content.Context;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.text.TextUtils;
-
-import com.mapbox.android.core.permissions.PermissionsManager;
-
-import java.lang.ref.WeakReference;
-import java.util.HashMap;
-import java.util.Map;
+import android.os.Looper;
+import android.support.annotation.NonNull;
+import android.util.Log;
 
 /**
  * A location engine that uses core android.location and has no external dependencies
  * https://developer.android.com/guide/topics/location/strategies.html
  */
-class AndroidLocationEngine extends LocationEngine implements LocationListener {
+class AndroidLocationEngine extends AbstractLocationEngine<LocationListener> implements LocationEngine {
+  private static final String TAG = "AndroidLocationEngine";
+  private final LocationManager locationManager;
 
-  private static final String DEFAULT_PROVIDER = LocationManager.PASSIVE_PROVIDER;
+  private String currentProvider = LocationManager.PASSIVE_PROVIDER;
 
-  private WeakReference<Context> context;
-  private LocationManager locationManager;
-  private String currentProvider = null;
-  private final Map<LocationEnginePriority, UpdateAndroidProvider> CURRENT_PROVIDER = new
-    HashMap<LocationEnginePriority, UpdateAndroidProvider>() {
-      {
-        put(LocationEnginePriority.NO_POWER, new UpdateAndroidProvider() {
-          @Override
-          public void update() {
-            currentProvider = LocationManager.PASSIVE_PROVIDER;
-          }
-        });
-        put(LocationEnginePriority.LOW_POWER, new UpdateAndroidProvider() {
-          @Override
-          public void update() {
-            currentProvider = LocationManager.NETWORK_PROVIDER;
-          }
-        });
-        put(LocationEnginePriority.BALANCED_POWER_ACCURACY, new UpdateAndroidProvider() {
-          @Override
-          public void update() {
-            currentProvider = LocationManager.NETWORK_PROVIDER;
-          }
-        });
-        put(LocationEnginePriority.HIGH_ACCURACY, new UpdateAndroidProvider() {
-          @Override
-          public void update() {
-            currentProvider = LocationManager.GPS_PROVIDER;
-          }
-        });
-      }
-    };
-
-  private AndroidLocationEngine(Context context) {
+  AndroidLocationEngine(@NonNull Context context) {
     super();
-
-    this.context = new WeakReference<>(context);
-    locationManager = (LocationManager) this.context.get().getSystemService(Context.LOCATION_SERVICE);
-    currentProvider = DEFAULT_PROVIDER;
+    locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
   }
 
-  static synchronized LocationEngine getLocationEngine(Context context) {
-    AndroidLocationEngine androidLocationEngine = new AndroidLocationEngine(context.getApplicationContext());
+  @NonNull
+  @Override
+  protected LocationListener getListener(final LocationEngineCallback<Location> callback) {
+     return new LocationListener() {
+          @Override
+          public void onLocationChanged(Location location) {
+              callback.onSuccess(location);
+          }
 
-    return androidLocationEngine;
+          @Override
+          public void onStatusChanged(String s, int i, Bundle bundle) {
+              // noop
+          }
+
+          @Override
+          public void onProviderEnabled(String s) {
+              // noop
+          }
+
+          @Override
+          public void onProviderDisabled(String s) {
+              callback.onFailure(new Exception("Current provider disabled"));
+          }
+     };
   }
 
   @Override
-  public void activate() {
-    // "Connection" is immediate
-    for (LocationEngineListener listener : locationListeners) {
-      listener.onConnected();
+  public void getLastLocation(LocationEngineCallback<Location> callback) throws SecurityException {
+    Location lastLocation = null;
+    try {
+      lastLocation = locationManager.getLastKnownLocation(currentProvider);
+    } catch (IllegalArgumentException iae) {
+      Log.e(TAG, iae.toString());
+    }
+
+    if (lastLocation != null) {
+      callback.onSuccess(lastLocation);
+    } else {
+      callback.onFailure(new Exception("Last location unavailable"));
     }
   }
 
   @Override
-  public void deactivate() {
-    // No op
+  public void requestLocationUpdates(LocationEngineRequest request,
+                                     LocationEngineCallback<Location> callback, Looper looper) throws SecurityException {
+    LocationListener locationListener = addLocationListener(callback);
+    currentProvider = locationManager.getBestProvider(getCriteria(request.getPriority()),true);
+    locationManager.requestLocationUpdates(currentProvider, request.getInterval(), request.getDisplacemnt(),
+            locationListener, looper);
   }
 
   @Override
-  public boolean isConnected() {
-    return true;
+  public void removeLocationUpdates(LocationEngineCallback<Location> callback) {
+    LocationListener listener = removeLocationListener(callback);
+    locationManager.removeUpdates(listener);
   }
 
-  @Override
-  public Location getLastLocation() {
-    if (!TextUtils.isEmpty(currentProvider)) {
-      //noinspection MissingPermission
-      return locationManager.getLastKnownLocation(currentProvider);
+  private static Criteria getCriteria(int priority) {
+    Criteria criteria = new Criteria();
+    criteria.setAccuracy(Criteria.ACCURACY_FINE);
+    criteria.setAltitudeRequired(false);
+    criteria.setCostAllowed(true);
+    criteria.setPowerRequirement(priorityToPowerRequirement(priority));
+    return criteria;
+  }
+
+  private static int priorityToPowerRequirement(int priority) {
+    switch (priority) {
+      case LocationEngineRequest.PRIORITY_HIGH_ACCURACY:
+        return Criteria.POWER_HIGH;
+      case LocationEngineRequest.PRIORITY_BALANCED_POWER_ACCURACY:
+        return Criteria.POWER_MEDIUM;
+      case LocationEngineRequest.PRIORITY_LOW_POWER:
+      case LocationEngineRequest.PRIORITY_NO_POWER:
+      default: return Criteria.POWER_LOW;
     }
-
-    //noinspection MissingPermission
-    return null;
-  }
-
-  @Override
-  public void requestLocationUpdates() {
-    if (!TextUtils.isEmpty(currentProvider)) {
-      //noinspection MissingPermission
-      locationManager.requestLocationUpdates(currentProvider, fastestInterval, smallestDisplacement, this);
-    }
-  }
-
-  @Override
-  public void setPriority(LocationEnginePriority priority) {
-    super.setPriority(priority);
-    updateCurrentProvider();
-  }
-
-  @Override
-  public void removeLocationUpdates() {
-    if (PermissionsManager.areLocationPermissionsGranted(context.get())) {
-      //noinspection MissingPermission
-      locationManager.removeUpdates(this);
-    }
-  }
-
-  @Override
-  public Type obtainType() {
-    return Type.ANDROID;
-  }
-
-  /**
-   * Called when the location has changed.
-   */
-  @Override
-  public void onLocationChanged(Location location) {
-    for (LocationEngineListener listener : locationListeners) {
-      listener.onLocationChanged(location);
-    }
-  }
-
-  /**
-   * Called when the provider status changes.
-   */
-  @Override
-  public void onStatusChanged(String provider, int status, Bundle extras) {
-  }
-
-  /**
-   * Called when the provider is enabled by the user.
-   */
-  @Override
-  public void onProviderEnabled(String provider) {
-  }
-
-  /**
-   * Called when the provider is disabled by the user.
-   */
-  @Override
-  public void onProviderDisabled(String provider) {
-  }
-
-  private void updateCurrentProvider() {
-    // We might want to explore android.location.Criteria here.
-    CURRENT_PROVIDER.get(priority).update();
   }
 }
