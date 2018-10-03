@@ -475,34 +475,24 @@ public class MapboxTelemetryTest {
 
   @Test
   public void checksAppUserTurnstileNotQueued() throws Exception {
-    Context mockedContext = obtainNetworkConnectedMockedContext();
-    TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
-    Callback mockedHttpCallback = mock(Callback.class);
-    EventsQueue eventsQueue = new EventsQueue(mock(FlushQueueCallback.class));
-    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext, mockedTelemetryClient,
-      mockedHttpCallback, eventsQueue);
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetry();
 
     Event whitelistedEvent = new AppUserTurnstile("anySdkIdentifier", "anySdkVersion", false);
     theMapboxTelemetry.enable();
     theMapboxTelemetry.push(whitelistedEvent);
 
-    assertEquals(0, theMapboxTelemetry.getQueue().queue.size());
+    assertTrue(theMapboxTelemetry.isQueueEmpty());
   }
 
   @Test
   public void checksAttachmentEventNotQueued() throws Exception {
-    Context mockedContext = obtainNetworkConnectedMockedContext();
-    TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
-    Callback mockedHttpCallback = mock(Callback.class);
-    EventsQueue eventsQueue = new EventsQueue(mock(FlushQueueCallback.class));
-    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext, mockedTelemetryClient,
-      mockedHttpCallback, eventsQueue);
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetry();
 
     Event whitelistedEvent = new Attachment();
     theMapboxTelemetry.enable();
     theMapboxTelemetry.push(whitelistedEvent);
 
-    assertEquals(0, theMapboxTelemetry.getQueue().queue.size());
+    assertTrue(theMapboxTelemetry.isQueueEmpty());
   }
 
   private MapboxTelemetry obtainMapboxTelemetryWith(Context context) {
@@ -580,19 +570,21 @@ public class MapboxTelemetryTest {
     return mapboxTelemetry;
   }
 
-  private MapboxTelemetry obtainMapboxTelemetryWith(Context context, TelemetryClient telemetryClient,
-                                                    Callback httpCallback, EventsQueue eventsQueue) {
-    MapboxTelemetry.applicationContext = context;
+  private MapboxTelemetry obtainMapboxTelemetry() {
+    MapboxTelemetry.applicationContext = obtainNetworkConnectedMockedContext();
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
+    EventsQueue eventsQueue = new EventsQueue(mock(FlushQueueCallback.class));
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
+    TelemetryClient telemetryClient = mock(TelemetryClient.class);
+    Callback httpCallback = mock(Callback.class);
     Clock mockedClock = mock(Clock.class);
     boolean indifferentServiceBound = true;
     TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false);
     TelemetryLocationEnabler telemetryLocationEnabler = new TelemetryLocationEnabler(false);
-    MapboxTelemetry mapboxTelemetry = new MapboxTelemetry(context, aValidAccessToken, aValidUserAgent,
-      eventsQueue, telemetryClient, httpCallback, mockedSchedulerFlusher, mockedClock,
-      indifferentServiceBound, telemetryEnabler, telemetryLocationEnabler);
+    MapboxTelemetry mapboxTelemetry = new MapboxTelemetry(MapboxTelemetry.applicationContext,
+      aValidAccessToken, aValidUserAgent, eventsQueue, telemetryClient, httpCallback, mockedSchedulerFlusher,
+      mockedClock, indifferentServiceBound, telemetryEnabler, telemetryLocationEnabler);
     return mapboxTelemetry;
   }
 
