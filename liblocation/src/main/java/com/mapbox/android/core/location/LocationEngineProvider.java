@@ -4,6 +4,9 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+/**
+ * The main entry point for location engine integration.
+ */
 public final class LocationEngineProvider {
   private static final String GOOGLE_LOCATION_SERVICES = "com.google.android.gms.location.LocationServices";
 
@@ -12,7 +15,7 @@ public final class LocationEngineProvider {
   }
 
   /**
-   * Returns instance to the best location engine, given the included libraries
+   * Returns instance to the best location engine, given the included libraries.
    * @param context The {@link Context}.
    *
    * @return a unique instance of {@link LocationEngine} every time method is called.

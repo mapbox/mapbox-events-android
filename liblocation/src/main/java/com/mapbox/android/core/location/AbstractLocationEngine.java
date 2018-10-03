@@ -3,6 +3,7 @@ package com.mapbox.android.core.location;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
@@ -37,6 +38,11 @@ abstract class AbstractLocationEngine<T> {
     T locationListener = listeners.get(wListener);
     listeners.remove(locationListener);
     return locationListener;
+  }
+
+  @VisibleForTesting
+  int registeredListeners() {
+    return listeners.size();
   }
 
   @Nullable

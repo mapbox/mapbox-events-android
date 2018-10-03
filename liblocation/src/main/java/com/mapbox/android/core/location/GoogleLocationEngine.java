@@ -5,6 +5,7 @@ import android.location.Location;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 
+import android.support.annotation.Nullable;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -43,7 +44,7 @@ class GoogleLocationEngine extends AbstractLocationEngine<LocationCallback> impl
   }
 
   @Override
-  public void getLastLocation(final LocationEngineCallback<Location> callback) throws SecurityException {
+  public void getLastLocation(@NonNull final LocationEngineCallback<Location> callback) throws SecurityException {
     fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
       @Override
       public void onSuccess(Location location) {
@@ -58,14 +59,15 @@ class GoogleLocationEngine extends AbstractLocationEngine<LocationCallback> impl
   }
 
   @Override
-  public void requestLocationUpdates(LocationEngineRequest request, LocationEngineCallback<Location> callback,
-                                     Looper looper) throws SecurityException {
+  public void requestLocationUpdates(@NonNull LocationEngineRequest request,
+                                     @NonNull LocationEngineCallback<Location> callback,
+                                     @Nullable Looper looper) throws SecurityException {
     LocationCallback locationCallback = addLocationListener(callback);
     fusedLocationProviderClient.requestLocationUpdates(toGMSLocationRequest(request), locationCallback, looper);
   }
 
   @Override
-  public void removeLocationUpdates(LocationEngineCallback<Location> callback) {
+  public void removeLocationUpdates(@NonNull LocationEngineCallback<Location> callback) {
     LocationCallback locationCallback = removeLocationListener(callback);
     fusedLocationProviderClient.removeLocationUpdates(locationCallback);
   }

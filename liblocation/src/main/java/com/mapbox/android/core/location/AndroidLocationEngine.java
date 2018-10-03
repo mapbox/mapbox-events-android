@@ -8,6 +8,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 /**
@@ -52,7 +53,7 @@ class AndroidLocationEngine extends AbstractLocationEngine<LocationListener> imp
   }
 
   @Override
-  public void getLastLocation(LocationEngineCallback<Location> callback) throws SecurityException {
+  public void getLastLocation(@NonNull LocationEngineCallback<Location> callback) throws SecurityException {
     Location lastLocation = null;
     try {
       lastLocation = locationManager.getLastKnownLocation(currentProvider);
@@ -68,8 +69,9 @@ class AndroidLocationEngine extends AbstractLocationEngine<LocationListener> imp
   }
 
   @Override
-  public void requestLocationUpdates(LocationEngineRequest request,
-                                     LocationEngineCallback<Location> callback, Looper looper) throws SecurityException {
+  public void requestLocationUpdates(@NonNull LocationEngineRequest request,
+                                     @NonNull LocationEngineCallback<Location> callback,
+                                     @Nullable Looper looper) throws SecurityException {
     LocationListener locationListener = addLocationListener(callback);
     currentProvider = locationManager.getBestProvider(getCriteria(request.getPriority()),true);
     locationManager.requestLocationUpdates(currentProvider, request.getInterval(), request.getDisplacemnt(),
@@ -77,7 +79,7 @@ class AndroidLocationEngine extends AbstractLocationEngine<LocationListener> imp
   }
 
   @Override
-  public void removeLocationUpdates(LocationEngineCallback<Location> callback) {
+  public void removeLocationUpdates(@NonNull LocationEngineCallback<Location> callback) {
     LocationListener listener = removeLocationListener(callback);
     locationManager.removeUpdates(listener);
   }
