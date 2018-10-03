@@ -21,7 +21,6 @@ public class MapEventFactory {
   private static final int NO_NETWORK = -1;
   private static final String NOT_A_LOAD_MAP_EVENT_TYPE = "Type must be a load map event.";
   private static final String NOT_A_GESTURE_MAP_EVENT_TYPE = "Type must be a gesture map event.";
-  private static final String NOT_AN_OFFLINE_MAP_EVENT_TYPE = "Type must be an offline map event.";
   private static final String MAP_STATE_ILLEGAL_NULL = "MapState cannot be null.";
   private static final Map<Integer, String> ORIENTATIONS = new HashMap<Integer, String>() {
     {
@@ -62,15 +61,14 @@ public class MapEventFactory {
     return BUILD_EVENT_MAP_GESTURE.get(type).build(mapState);
   }
 
-  public Event createMapOfflineEvent(Event.Type type,
-                                     double latitudeNorth, double latitudeSouth,
-                                     double longitudeEast, double longitudeWest) {
-    checkOffline(type);
+  public Event buildMapOfflineEvent(double minZoom, double maxZoom,
+                                    String shapeForOfflineRegion,
+                                    String[] sources) {
     MapOfflineEvent mapOfflineEvent = new MapOfflineEvent();
-    mapOfflineEvent.setLatitudeNorth(latitudeNorth);
-    mapOfflineEvent.setLatitudeSouth(latitudeSouth);
-    mapOfflineEvent.setLongitudeEast(longitudeEast);
-    mapOfflineEvent.setLongitudeWest(longitudeWest);
+    mapOfflineEvent.setMinZoom(minZoom);
+    mapOfflineEvent.setMaxZoom(maxZoom);
+    mapOfflineEvent.setShapeForOfflineRegion(shapeForOfflineRegion);
+    mapOfflineEvent.setSources(sources);
     return mapOfflineEvent;
   }
 
@@ -174,12 +172,6 @@ public class MapEventFactory {
   private void checkGestureMapEvent(Event.Type type) {
     if (!Event.mapGestureEventTypes.contains(type)) {
       throw new IllegalArgumentException(NOT_A_GESTURE_MAP_EVENT_TYPE);
-    }
-  }
-
-  private void checkOffline(Event.Type type) {
-    if (type != Event.Type.MAP_OFFLINE) {
-      throw new IllegalArgumentException(NOT_AN_OFFLINE_MAP_EVENT_TYPE);
     }
   }
 

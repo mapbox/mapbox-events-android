@@ -5,21 +5,44 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
 
+
 public class MapOfflineEvent extends Event implements Parcelable {
-  private static final String MAP_OFFLINE = "map.offline";
+
+  private static final String MAP_OFFLINE = "map.offline.download";
 
   @SerializedName("event")
   private final String event;
+
   @SerializedName("created")
-  private String created;
-  @SerializedName("lat_north")
-  private double latitudeNorth;
-  @SerializedName("lat_south")
-  private double latitudeSouth;
-  @SerializedName("lon_east")
-  private double longitudeEast;
-  @SerializedName("lon_west")
-  private double longitudeWest;
+  private final String created;
+
+  @SerializedName("minZoom")
+  private Double minZoom;
+
+  @SerializedName("maxZoom")
+  private Double maxZoom;
+
+  @SerializedName("shapeForOfflineRegion")
+  private String shapeForOfflineRegion;
+
+  @SerializedName("sources")
+  private String[] sources;
+
+  public void setMinZoom(Double minZoom) {
+    this.minZoom = minZoom;
+  }
+
+  public void setMaxZoom(Double maxZoom) {
+    this.maxZoom = maxZoom;
+  }
+
+  public void setShapeForOfflineRegion(String shapeForOfflineRegion) {
+    this.shapeForOfflineRegion = shapeForOfflineRegion;
+  }
+
+  public void setSources(String[] sources) {
+    this.sources = sources;
+  }
 
   MapOfflineEvent() {
     this.event = MAP_OFFLINE;
@@ -29,42 +52,10 @@ public class MapOfflineEvent extends Event implements Parcelable {
   private MapOfflineEvent(Parcel in) {
     event = in.readString();
     created = in.readString();
-    latitudeNorth = in.readDouble();
-    latitudeSouth = in.readDouble();
-    longitudeEast = in.readDouble();
-    longitudeWest = in.readDouble();
-  }
-
-  public double getLatitudeNorth() {
-    return latitudeNorth;
-  }
-
-  public void setLatitudeNorth(double latitudeNorth) {
-    this.latitudeNorth = latitudeNorth;
-  }
-
-  public double getLatitudeSouth() {
-    return latitudeSouth;
-  }
-
-  public void setLatitudeSouth(double latitudeSouth) {
-    this.latitudeSouth = latitudeSouth;
-  }
-
-  public double getLongitudeEast() {
-    return longitudeEast;
-  }
-
-  public void setLongitudeEast(double longitudeEast) {
-    this.longitudeEast = longitudeEast;
-  }
-
-  public double getLongitudeWest() {
-    return longitudeWest;
-  }
-
-  public void setLongitudeWest(double longitudeWest) {
-    this.longitudeWest = longitudeWest;
+    minZoom = in.readDouble();
+    maxZoom = in.readDouble();
+    shapeForOfflineRegion = in.readString();
+    sources = in.createStringArray();
   }
 
   @Override
@@ -81,10 +72,10 @@ public class MapOfflineEvent extends Event implements Parcelable {
   public void writeToParcel(Parcel dest, int flags) {
     dest.writeString(event);
     dest.writeString(created);
-    dest.writeDouble(latitudeNorth);
-    dest.writeDouble(latitudeSouth);
-    dest.writeDouble(longitudeEast);
-    dest.writeDouble(longitudeWest);
+    dest.writeDouble(minZoom);
+    dest.writeDouble(maxZoom);
+    dest.writeString(shapeForOfflineRegion);
+    dest.writeStringArray(sources);
   }
 
   public static final Creator<MapOfflineEvent> CREATOR = new Creator<MapOfflineEvent>() {
