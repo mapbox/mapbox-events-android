@@ -30,8 +30,8 @@ public class MapOfflineEvent extends Event implements Parcelable {
     event = in.readString();
     created = in.readString();
     latitudeNorth = in.readDouble();
-    latitudeSouth = in.readDouble();
     longitudeEast = in.readDouble();
+    latitudeSouth = in.readDouble();
     longitudeWest = in.readDouble();
   }
 
@@ -82,8 +82,8 @@ public class MapOfflineEvent extends Event implements Parcelable {
     dest.writeString(event);
     dest.writeString(created);
     dest.writeDouble(latitudeNorth);
-    dest.writeDouble(latitudeSouth);
     dest.writeDouble(longitudeEast);
+    dest.writeDouble(latitudeSouth);
     dest.writeDouble(longitudeWest);
   }
 

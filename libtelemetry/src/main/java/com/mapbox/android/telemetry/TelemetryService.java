@@ -66,6 +66,7 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
 
   @Override
   public void onDestroy() {
+    checkApplicationContext();
     unregisterLocationReceiver();
     unregisterTelemetryReceiver();
     disableTelemetryLocationState();
@@ -128,15 +129,21 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   }
 
   void bindInstance() {
-    boundInstances++;
+    synchronized (this) {
+      boundInstances++;
+    }
   }
 
   void unbindInstance() {
-    boundInstances--;
+    synchronized (this) {
+      boundInstances--;
+    }
   }
 
   int obtainBoundInstances() {
-    return boundInstances;
+    synchronized (this) {
+      return boundInstances;
+    }
   }
 
   boolean addServiceTask(ServiceTaskCallback callback) {

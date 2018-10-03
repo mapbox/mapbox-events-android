@@ -63,13 +63,13 @@ public class MapEventFactory {
   }
 
   public Event createMapOfflineEvent(Event.Type type,
-                                     double latitudeNorth, double latitudeSouth,
-                                     double longitudeEast, double longitudeWest) {
+                                     double latitudeNorth, double longitudeEast,
+                                     double latitudeSouth, double longitudeWest) {
     checkOffline(type);
     MapOfflineEvent mapOfflineEvent = new MapOfflineEvent();
     mapOfflineEvent.setLatitudeNorth(latitudeNorth);
-    mapOfflineEvent.setLatitudeSouth(latitudeSouth);
     mapOfflineEvent.setLongitudeEast(longitudeEast);
+    mapOfflineEvent.setLatitudeSouth(latitudeSouth);
     mapOfflineEvent.setLongitudeWest(longitudeWest);
     return mapOfflineEvent;
   }

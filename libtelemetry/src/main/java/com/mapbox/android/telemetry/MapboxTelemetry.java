@@ -34,6 +34,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private static final String UNITY_USER_AGENT = "MapboxEventsUnityAndroid/";
   private static final String NAVIGATION_USER_AGENT = "mapbox-navigation-android/";
   private static final String NAVIGATION_UI_USER_AGENT = "mapbox-navigation-ui-android/";
+  private static final String MAPS_USER_AGENT = "mapbox-maps-android/";
   private static final List<String> VALID_USER_AGENTS = new ArrayList<String>() {
     {
       add(EVENTS_USER_AGENT);
@@ -41,6 +42,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
       add(UNITY_USER_AGENT);
       add(NAVIGATION_USER_AGENT);
       add(NAVIGATION_UI_USER_AGENT);
+      add(MAPS_USER_AGENT);
     }
   };
   private static final String NON_NULL_APPLICATION_CONTEXT_REQUIRED = "Non-null application context required.";
@@ -61,11 +63,14 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private boolean isServiceBound = false;
   private PermissionCheckRunnable permissionCheckRunnable = null;
   private CopyOnWriteArraySet<TelemetryListener> telemetryListeners = null;
+  private CertificateBlacklist certificateBlacklist;
+  private CopyOnWriteArraySet<AttachmentListener> attachmentListeners = null;
   static Context applicationContext = null;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
     initializeQueue();
+    checkBlacklist(context, accessToken);
     checkRequiredParameters(accessToken, userAgent);
     this.httpCallback = this;
     AlarmReceiver alarmReceiver = obtainAlarmReceiver();
@@ -74,6 +79,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     this.telemetryEnabler = new TelemetryEnabler(true);
     this.telemetryLocationEnabler = new TelemetryLocationEnabler(true);
     initializeTelemetryListeners();
+    initializeAttachmentListeners();
     initializeTelemetryLocationState();
   }
 
@@ -93,6 +99,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     this.telemetryLocationEnabler = telemetryLocationEnabler;
     this.isServiceBound = isServiceBound;
     initializeTelemetryListeners();
+    initializeAttachmentListeners();
   }
 
   @Override
@@ -157,7 +164,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   public boolean updateSessionIdRotationInterval(SessionInterval interval) {
-    if (isServiceBound) {
+    if (isServiceBound && telemetryService != null) {
       int hour = interval.obtainInterval();
       SessionIdentifier sessionIdentifier = new SessionIdentifier(hour);
       telemetryService.updateSessionIdentifier(sessionIdentifier);
@@ -179,7 +186,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   public void updateLocationPriority(LocationEnginePriority locationPriority) {
-    if (isServiceBound) {
+    if (isServiceBound && telemetryService != null) {
       telemetryService.updateLocationPriority(locationPriority);
     }
   }
@@ -200,6 +207,14 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     return telemetryListeners.remove(listener);
   }
 
+  public boolean addAttachmentListener(AttachmentListener listener) {
+    return attachmentListeners.add(listener);
+  }
+
+  public boolean removeAttachmentListener(AttachmentListener listener) {
+    return attachmentListeners.remove(listener);
+  }
+
   boolean optLocationIn() {
     startTelemetryService();
     bindTelemetryService();
@@ -209,7 +224,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   boolean optLocationOut() {
     TelemetryLocationEnabler.LocationState telemetryLocationState = telemetryLocationEnabler
       .obtainTelemetryLocationState();
-    if (isServiceBound) {
+    if (isServiceBound && telemetryService != null) {
       telemetryService.unbindInstance();
       telemetryService.removeServiceTask(this);
       if (telemetryService.obtainBoundInstances() == 0
@@ -311,7 +326,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private TelemetryClient createTelemetryClient(String accessToken, String userAgent) {
     String fullUserAgent = TelemetryUtils.createFullUserAgent(userAgent, applicationContext);
     TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(accessToken, fullUserAgent,
-      new Logger());
+      new Logger(), certificateBlacklist);
     telemetryClient = telemetryClientFactory.obtainTelemetryClient(applicationContext);
 
     return telemetryClient;
@@ -377,14 +392,18 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     return new ServiceConnection() {
       @Override
       public void onServiceConnected(ComponentName className, IBinder service) {
-        TelemetryService.TelemetryBinder binder = (TelemetryService.TelemetryBinder) service;
-        telemetryService = binder.obtainService();
-        telemetryService.addServiceTask(MapboxTelemetry.this);
-        if (telemetryService.obtainBoundInstances() == 0) {
-          telemetryService.injectEventsQueue(queue);
+        if (service instanceof TelemetryService.TelemetryBinder) {
+          TelemetryService.TelemetryBinder binder = (TelemetryService.TelemetryBinder) service;
+          telemetryService = binder.obtainService();
+          telemetryService.addServiceTask(MapboxTelemetry.this);
+          if (telemetryService.obtainBoundInstances() == 0) {
+            telemetryService.injectEventsQueue(queue);
+          }
+          telemetryService.bindInstance();
+          isServiceBound = true;
+        } else {
+          applicationContext.stopService(obtainLocationServiceIntent());
         }
-        telemetryService.bindInstance();
-        isServiceBound = true;
       }
 
       @Override
@@ -397,6 +416,10 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   private void initializeTelemetryListeners() {
     telemetryListeners = new CopyOnWriteArraySet<>();
+  }
+
+  private void initializeAttachmentListeners() {
+    attachmentListeners = new CopyOnWriteArraySet<>();
   }
 
   private void initializeTelemetryLocationState() {
@@ -436,13 +459,17 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   private void unbindTelemetryService() {
-    if (isServiceBound) {
+    if (isServiceBound && telemetryService != null) {
       telemetryService.unbindInstance();
       unbindServiceConnection();
     }
   }
 
   private void stopTelemetryService() {
+    if (telemetryService == null) {
+      return;
+    }
+
     TelemetryLocationEnabler.LocationState telemetryLocationState = telemetryLocationEnabler
       .obtainTelemetryLocationState();
     if (telemetryService.obtainBoundInstances() == 0
@@ -458,6 +485,11 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
       sendEventsIfPossible(appUserTurnstile);
       return true;
     }
+
+    if (Event.Type.VIS_ATTACHMENT.equals((event.obtainType()))) {
+      sendAttachment(event);
+    }
+
     return false;
   }
 
@@ -541,6 +573,28 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     }
 
     return false;
+  }
+
+  private void checkBlacklist(Context context, String accessToken) {
+    certificateBlacklist = new CertificateBlacklist(context, accessToken);
+
+    if (certificateBlacklist.daySinceLastUpdate()) {
+      certificateBlacklist.updateBlacklist();
+    }
+  }
+
+  private void sendAttachment(Event event) {
+    if (checkNetworkAndParameters()) {
+      telemetryClient.sendAttachment(convertEventToAttachment(event), attachmentListeners);
+    }
+  }
+
+  private Attachment convertEventToAttachment(Event event) {
+    return (Attachment) event;
+  }
+
+  private Boolean checkNetworkAndParameters() {
+    return isNetworkConnected() && checkRequiredParameters(accessToken, userAgent);
   }
 
   @OnLifecycleEvent(Lifecycle.Event.ON_START)

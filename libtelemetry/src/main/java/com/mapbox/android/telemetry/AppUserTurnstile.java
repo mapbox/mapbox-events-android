@@ -23,6 +23,8 @@ public class AppUserTurnstile extends Event implements Parcelable {
   private final String userId;
   @SerializedName("enabled.telemetry")
   private final boolean enabledTelemetry;
+  @SerializedName("device")
+  private final String device;
   @SerializedName("sdkIdentifier")
   private final String sdkIdentifier;
   @SerializedName("sdkVersion")
@@ -39,6 +41,7 @@ public class AppUserTurnstile extends Event implements Parcelable {
     this.userId = TelemetryUtils.retrieveVendorId();
     TelemetryEnabler telemetryEnabler = new TelemetryEnabler(true);
     this.enabledTelemetry = TELEMETRY_STATES.get(telemetryEnabler.obtainTelemetryState());
+    this.device = Build.DEVICE;
     this.sdkIdentifier = sdkIdentifier;
     this.sdkVersion = sdkVersion;
     this.model = Build.MODEL;
@@ -52,6 +55,7 @@ public class AppUserTurnstile extends Event implements Parcelable {
     this.userId = TelemetryUtils.retrieveVendorId();
     TelemetryEnabler telemetryEnabler = new TelemetryEnabler(isFromPreferences);
     this.enabledTelemetry = TELEMETRY_STATES.get(telemetryEnabler.obtainTelemetryState());
+    this.device = Build.DEVICE;
     this.sdkIdentifier = sdkIdentifier;
     this.sdkVersion = sdkVersion;
     this.model = Build.MODEL;
@@ -68,6 +72,7 @@ public class AppUserTurnstile extends Event implements Parcelable {
     created = in.readString();
     userId = in.readString();
     enabledTelemetry = in.readByte() != 0x00;
+    device = in.readString();
     sdkIdentifier = in.readString();
     sdkVersion = in.readString();
     model = in.readString();
@@ -85,6 +90,7 @@ public class AppUserTurnstile extends Event implements Parcelable {
     dest.writeString(created);
     dest.writeString(userId);
     dest.writeByte((byte) (enabledTelemetry ? 0x01 : 0x00));
+    dest.writeString(device);
     dest.writeString(sdkIdentifier);
     dest.writeString(sdkVersion);
     dest.writeString(model);

@@ -23,8 +23,9 @@ public class TelemetryClientFactoryTest {
     String anyAccessToken = "anyAccessToken";
     String anyUserAgent = "anyUserAgent";
     Logger mockedLogger = mock(Logger.class);
+    CertificateBlacklist mockedBlacklist = mock(CertificateBlacklist.class);
     TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(anyAccessToken, anyUserAgent,
-      mockedLogger);
+      mockedLogger, mockedBlacklist);
     Bundle mockedBundle = mock(Bundle.class);
     when(mockedBundle
       .getBoolean(eq("com.mapbox.CnEventsServer")))
@@ -41,8 +42,9 @@ public class TelemetryClientFactoryTest {
     String anyAccessToken = "anyAccessToken";
     String anyUserAgent = "anyUserAgent";
     Logger mockedLogger = mock(Logger.class);
+    CertificateBlacklist mockedBlacklist = mock(CertificateBlacklist.class);
     TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(anyAccessToken, anyUserAgent,
-      mockedLogger);
+      mockedLogger, mockedBlacklist);
     String anyAppInfoHostname = "any.app.info.hostname";
     String anyAppInfoAccessToken = "anyAppInfoAccessToken";
     Bundle mockedBundle = obtainStagingBundle(anyAppInfoHostname, anyAppInfoAccessToken);
@@ -58,8 +60,9 @@ public class TelemetryClientFactoryTest {
     String anyAccessToken = "anyAccessToken";
     String anyUserAgent = "anyUserAgent";
     Logger mockedLogger = mock(Logger.class);
+    CertificateBlacklist mockedBlacklist = mock(CertificateBlacklist.class);
     TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(anyAccessToken, anyUserAgent,
-      mockedLogger);
+      mockedLogger, mockedBlacklist);
     String theAppInfoHostname = "the.app.info.hostname";
     String anyAppInfoAccessToken = "anyAppInfoAccessToken";
     Bundle mockedBundle = obtainStagingBundle(theAppInfoHostname, anyAppInfoAccessToken);
@@ -75,8 +78,9 @@ public class TelemetryClientFactoryTest {
     String anyAccessToken = "anyAccessToken";
     String anyUserAgent = "anyUserAgent";
     Logger mockedLogger = mock(Logger.class);
+    CertificateBlacklist mockedBlacklist = mock(CertificateBlacklist.class);
     TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(anyAccessToken, anyUserAgent,
-      mockedLogger);
+      mockedLogger, mockedBlacklist);
     String anyAppInfoHostname = "any.app.info.hostname";
     String theAppInfoAccessToken = "theAppInfoAccessToken";
     Bundle mockedBundle = obtainStagingBundle(anyAppInfoHostname, theAppInfoAccessToken);
@@ -92,8 +96,9 @@ public class TelemetryClientFactoryTest {
     String anyAccessToken = "anyAccessToken";
     String anyUserAgent = "anyUserAgent";
     Logger mockedLogger = mock(Logger.class);
+    CertificateBlacklist mockedBlacklist = mock(CertificateBlacklist.class);
     TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(anyAccessToken, anyUserAgent,
-      mockedLogger);
+      mockedLogger, mockedBlacklist);
     Bundle mockedBundle = mock(Bundle.class);
     Context mockedContext = obtainMockedContext(mockedBundle);
 
@@ -107,8 +112,9 @@ public class TelemetryClientFactoryTest {
     String anyAccessToken = "anyAccessToken";
     String anyUserAgent = "anyUserAgent";
     Logger mockedLogger = mock(Logger.class);
+    CertificateBlacklist mockedBlacklist = mock(CertificateBlacklist.class);
     TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(anyAccessToken, anyUserAgent,
-      mockedLogger);
+      mockedLogger, mockedBlacklist);
     Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     setup(mockedContext, null);
 
@@ -122,8 +128,9 @@ public class TelemetryClientFactoryTest {
     String anyAccessToken = "anyAccessToken";
     String anyUserAgent = "anyUserAgent";
     Logger mockedLogger = mock(Logger.class);
+    CertificateBlacklist mockedBlacklist = mock(CertificateBlacklist.class);
     TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(anyAccessToken, anyUserAgent,
-      mockedLogger);
+      mockedLogger, mockedBlacklist);
     Context mockedContext = obtainMockedContext(null);
 
     TelemetryClient actual = telemetryClientFactory.obtainTelemetryClient(mockedContext);
@@ -136,8 +143,9 @@ public class TelemetryClientFactoryTest {
     String anyAccessToken = "anyAccessToken";
     String anyUserAgent = "anyUserAgent";
     Logger mockedLogger = mock(Logger.class);
+    CertificateBlacklist mockedBlacklist = mock(CertificateBlacklist.class);
     TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(anyAccessToken, anyUserAgent,
-      mockedLogger);
+      mockedLogger, mockedBlacklist);
     Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     setupThrowExceptionRetrievingAppInfo(mockedContext, mockedLogger);
 
