@@ -129,6 +129,18 @@ public class MapEventFactoryTest {
     aMapEventFactory.createMapGestureEvent(aDragendMapEventType, nullMapState);
   }
 
+  @Test
+  public void checksMapOfflineEvent() throws Exception {
+    initializeMapboxTelemetry();
+    MapEventFactory aMapEventFactory = new MapEventFactory();
+
+    Event mapOfflineEvent = aMapEventFactory.buildMapOfflineEvent(
+      3, 7, "bounds",
+      new String[]{"mapbox.mapbox-streets-v7", "mapbox.mapbox-terrain-v2"});
+
+    assertTrue(mapOfflineEvent instanceof MapOfflineEvent);
+  }
+
   private void initializeMapboxTelemetry() {
     Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     TelephonyManager mockedTelephonyManager = mock(TelephonyManager.class, RETURNS_DEEP_STUBS);
