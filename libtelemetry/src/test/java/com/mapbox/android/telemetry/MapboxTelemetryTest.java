@@ -588,8 +588,8 @@ public class MapboxTelemetryTest {
     return mapboxTelemetry;
   }
 
-  private MapboxTelemetry obtainMapboxTelemetryWith(Context context, EventsQueue eventsQueue, TelemetryEnabler.State
-    state) {
+  private MapboxTelemetry obtainMapboxTelemetryWith(Context context, EventsQueue eventsQueue,
+                                                    TelemetryEnabler.State state) {
     MapboxTelemetry.applicationContext = context;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
