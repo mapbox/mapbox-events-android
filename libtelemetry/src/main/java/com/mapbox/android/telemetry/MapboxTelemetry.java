@@ -241,7 +241,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     return isLocationOpted;
   }
 
-  Boolean isQueueEmpty() {
+  boolean isQueueEmpty() {
     return queue.queue.size() == 0;
   }
 
