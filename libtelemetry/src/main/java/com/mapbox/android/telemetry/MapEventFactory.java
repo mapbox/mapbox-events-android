@@ -61,6 +61,17 @@ public class MapEventFactory {
     return BUILD_EVENT_MAP_GESTURE.get(type).build(mapState);
   }
 
+  public Event buildMapOfflineEvent(double minZoom, double maxZoom,
+                                    String shapeForOfflineRegion,
+                                    String[] sources) {
+    MapOfflineEvent mapOfflineEvent = new MapOfflineEvent();
+    mapOfflineEvent.setMinZoom(minZoom);
+    mapOfflineEvent.setMaxZoom(maxZoom);
+    mapOfflineEvent.setShapeForOfflineRegion(shapeForOfflineRegion);
+    mapOfflineEvent.setSources(sources);
+    return mapOfflineEvent;
+  }
+
   private MapClickEvent buildMapClickEvent(MapState mapState) {
     MapClickEvent mapClickEvent = new MapClickEvent(mapState);
 
