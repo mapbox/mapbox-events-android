@@ -39,7 +39,6 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   private LocationEnginePriority locationPriority = LocationEnginePriority.NO_POWER;
   private CopyOnWriteArraySet<ServiceTaskCallback> serviceTaskCallbacks = null;
   private TelemetryLocationEnabler telemetryLocationEnabler;
-  private Logger logger;
   // For testing only:
   private boolean isLocationEnablerFromPreferences = true;
   private boolean isLocationReceiverRegistered = false;
@@ -48,7 +47,6 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   @Override
   public void onCreate() {
     super.onCreate();
-    this.logger = new Logger();
     createLocationReceiver();
     createTelemetryReceiver();
     createServiceTaskCallbacks();
@@ -292,20 +290,26 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
       int finePermission = PermissionChecker.checkSelfPermission(MapboxTelemetry.applicationContext,
         Manifest.permission.ACCESS_FINE_LOCATION);
 
-      checkFinePermission(finePermission);
+      if (checkFinePermission(finePermission)) {
+        return false;
+      }
 
       return coarsePermission == PackageManager.PERMISSION_GRANTED
         || finePermission == PackageManager.PERMISSION_GRANTED;
     }
   }
 
-  private void checkFinePermission(int finePermission) {
+  private boolean checkFinePermission(int finePermission) {
     if (finePermission != PackageManager.PERMISSION_GRANTED) {
       try {
         throw new Exception(MISSING_FINE_PERMISSION);
       } catch (Exception exception) {
         Log.e("Permission Exception", exception.getMessage());
       }
+
+      return true;
     }
+
+    return false;
   }
 }
