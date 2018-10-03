@@ -8,7 +8,6 @@ import java.util.EnumSet;
 public abstract class Event implements Parcelable {
 
   public enum Type {
-
     TURNSTILE, MAP_LOAD, MAP_CLICK, MAP_DRAGEND, MAP_OFFLINE, LOCATION,
     NAV_DEPART, NAV_ARRIVE, NAV_CANCEL, NAV_REROUTE,
     NAV_FEEDBACK, NAV_FASTER_ROUTE, VIS_GENERAL, VIS_ATTACHMENT
