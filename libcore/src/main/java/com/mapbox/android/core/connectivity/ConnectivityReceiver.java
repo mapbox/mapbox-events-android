@@ -51,9 +51,11 @@ public class ConnectivityReceiver extends BroadcastReceiver {
   private static boolean getSystemConnectivity(Context context) {
     try {
       ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-      //noinspection MissingPermission
-      NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+      if (cm == null) {
+        return false;
+      }
 
+      NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
       return activeNetwork.isConnectedOrConnecting();
     } catch (Exception exception) {
       return false;
