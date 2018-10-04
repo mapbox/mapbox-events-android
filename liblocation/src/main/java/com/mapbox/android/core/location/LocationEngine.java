@@ -20,10 +20,10 @@ public interface LocationEngine {
 
   /**
    * Returns the most recent location currently available.
-   *
+   * <p>
    * If a location is not available, which should happen very rarely, null will be returned.
    *
-   * @param callback {@link LocationEngineCallback<Location>} for the location updates.
+   * @param callback {@link LocationEngineCallback} for the location updates.
    * @throws SecurityException if permission is not granted to access location services.
    * @since 3.0.0
    */
@@ -33,10 +33,10 @@ public interface LocationEngine {
   /**
    * Requests location updates with a callback on the specified Looper thread.
    *
-   * @param request {@link LocationEngineRequest} for the updates.
-   * @param callback {@link LocationEngineCallback<Location>} for the location updates.
-   * @param looper The Looper object whose message queue will be used to implement the callback mechanism,
-   *               or null to invoke callbacks on the main thread.
+   * @param request  {@link LocationEngineRequest} for the updates.
+   * @param callback {@link LocationEngineCallback} for the location updates.
+   * @param looper   The Looper object whose message queue will be used to implement the callback mechanism,
+   *                 or null to invoke callbacks on the main thread.
    * @throws SecurityException if permission is not granted to access location services.
    * @since 3.0.0
    */
@@ -47,8 +47,11 @@ public interface LocationEngine {
 
   /**
    * Removes location updates for the given location engine callback.
+   * <p>
+   * It is recommended to remove location requests when the activity is in a paused or
+   * stopped state, doing so helps battery performance.
    *
-   * @param callback {@link LocationEngineCallback<Location>} to remove.
+   * @param callback {@link LocationEngineCallback} to remove.
    * @since 3.0.0
    */
   void removeLocationUpdates(@NonNull LocationEngineCallback<Location> callback);

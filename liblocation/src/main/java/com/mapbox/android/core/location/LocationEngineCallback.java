@@ -9,15 +9,17 @@ import android.support.annotation.NonNull;
  * @param <T> Successful updated data type
  */
 public interface LocationEngineCallback<T> {
-    /**
-     * Invoked when new data available.
-     * @param result updated data.
-     */
-    void onSuccess(T result);
+  /**
+   * Invoked when new data available.
+   *
+   * @param result updated data.
+   */
+  void onSuccess(T result);
 
-    /**
-     * Invoked when engine exception occurs.
-     * @param exception {@link Exception}
-     */
-    void onFailure(@NonNull Exception exception);
+  /**
+   * Invoked when engine exception occurs.
+   *
+   * @param exception {@link Exception}
+   */
+  void onFailure(@NonNull Exception exception);
 }

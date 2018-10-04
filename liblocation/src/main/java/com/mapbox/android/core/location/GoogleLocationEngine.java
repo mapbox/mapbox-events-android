@@ -88,7 +88,8 @@ class GoogleLocationEngine extends AbstractLocationEngine<LocationCallback> impl
       case LocationEngineRequest.PRIORITY_LOW_POWER:
         return LocationRequest.PRIORITY_LOW_POWER;
       case LocationEngineRequest.PRIORITY_NO_POWER:
-      default: return LocationRequest.PRIORITY_NO_POWER;
+      default:
+        return LocationRequest.PRIORITY_NO_POWER;
     }
   }
 }

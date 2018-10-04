@@ -11,13 +11,13 @@ public final class LocationEngineProvider {
   private static final String GOOGLE_LOCATION_SERVICES = "com.google.android.gms.location.LocationServices";
 
   private LocationEngineProvider() {
-      // prevent instantiation
+    // prevent instantiation
   }
 
   /**
    * Returns instance to the best location engine, given the included libraries.
-   * @param context The {@link Context}.
    *
+   * @param context The {@link Context}.
    * @return a unique instance of {@link LocationEngine} every time method is called.
    */
   @NonNull

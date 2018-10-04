@@ -29,27 +29,27 @@ class AndroidLocationEngine extends AbstractLocationEngine<LocationListener> imp
   @NonNull
   @Override
   protected LocationListener getListener(final LocationEngineCallback<Location> callback) {
-     return new LocationListener() {
-          @Override
-          public void onLocationChanged(Location location) {
-              callback.onSuccess(location);
-          }
+    return new LocationListener() {
+      @Override
+      public void onLocationChanged(Location location) {
+        callback.onSuccess(location);
+      }
 
-          @Override
-          public void onStatusChanged(String s, int i, Bundle bundle) {
-              // noop
-          }
+      @Override
+      public void onStatusChanged(String s, int i, Bundle bundle) {
+        // noop
+      }
 
-          @Override
-          public void onProviderEnabled(String s) {
-              // noop
-          }
+      @Override
+      public void onProviderEnabled(String s) {
+        // noop
+      }
 
-          @Override
-          public void onProviderDisabled(String s) {
-              callback.onFailure(new Exception("Current provider disabled"));
-          }
-     };
+      @Override
+      public void onProviderDisabled(String s) {
+        callback.onFailure(new Exception("Current provider disabled"));
+      }
+    };
   }
 
   @Override
@@ -73,7 +73,7 @@ class AndroidLocationEngine extends AbstractLocationEngine<LocationListener> imp
                                      @NonNull LocationEngineCallback<Location> callback,
                                      @Nullable Looper looper) throws SecurityException {
     LocationListener locationListener = addLocationListener(callback);
-    currentProvider = locationManager.getBestProvider(getCriteria(request.getPriority()),true);
+    currentProvider = locationManager.getBestProvider(getCriteria(request.getPriority()), true);
     locationManager.requestLocationUpdates(currentProvider, request.getInterval(), request.getDisplacemnt(),
             locationListener, looper);
   }
@@ -101,7 +101,8 @@ class AndroidLocationEngine extends AbstractLocationEngine<LocationListener> imp
         return Criteria.POWER_MEDIUM;
       case LocationEngineRequest.PRIORITY_LOW_POWER:
       case LocationEngineRequest.PRIORITY_NO_POWER:
-      default: return Criteria.POWER_LOW;
+      default:
+        return Criteria.POWER_LOW;
     }
   }
 }
