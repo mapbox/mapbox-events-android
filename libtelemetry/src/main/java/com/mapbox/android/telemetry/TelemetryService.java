@@ -28,8 +28,9 @@ import static com.mapbox.android.telemetry.TelemetryReceiver.TELEMETRY_RECEIVER_
 
 public class TelemetryService extends Service implements TelemetryCallback, LocationEngineListener, EventCallback {
   public static final String IS_LOCATION_ENABLER_FROM_PREFERENCES = "isLocationEnablerFromPreferences";
-  private static final String MISSING_FINE_PERMISSION = "Detected that ACCESS_FINE_LOCATION permission is missing. "
-    + "This is a required permission for Mapbox. Please add this permission back into your manifest. Thank you.";
+  private static final String MISSING_FINE_PERMISSION = "Detected that ACCESS_FINE_LOCATION permission is missing from"
+    + " the manifest. This is a required permission for Mapbox. Please add this permission back into your manifest, "
+    + "so our system can work properly";
   public static final int API_LEVEL_23 = 23;
   private LocationReceiver locationReceiver = null;
   private TelemetryReceiver telemetryReceiver = null;
@@ -301,12 +302,7 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
 
   private boolean checkFinePermission(int finePermission) {
     if (finePermission != PackageManager.PERMISSION_GRANTED) {
-      try {
-        throw new Exception(MISSING_FINE_PERMISSION);
-      } catch (Exception exception) {
-        Log.e("Permission Exception", exception.getMessage());
-      }
-
+      Log.d("Missing Permission", MISSING_FINE_PERMISSION);
       return true;
     }
 
