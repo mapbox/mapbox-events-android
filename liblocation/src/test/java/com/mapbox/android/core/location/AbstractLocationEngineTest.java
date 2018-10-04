@@ -15,33 +15,33 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AbstractLocationEngineTest {
-    @Mock
-    private LocationEngineCallback<Location> callback;
+  @Mock
+  private LocationEngineCallback<Location> callback;
 
-    @Mock
-    private LocationListener locationListener;
+  @Mock
+  private LocationListener locationListener;
 
-    @Spy
-    private AbstractLocationEngine spyEngine;
+  @Spy
+  private AbstractLocationEngine spyEngine;
 
-    @Test
-    public void testAddRemoveListener() {
-        when(spyEngine.getListener(callback)).thenReturn(locationListener);
-        spyEngine.addLocationListener(callback);
+  @Test
+  public void testAddRemoveListener() {
+    when(spyEngine.getListener(callback)).thenReturn(locationListener);
+    spyEngine.addLocationListener(callback);
 
-        LocationListener removedLocationListener = (LocationListener)spyEngine.removeLocationListener(callback);
-        assertEquals(locationListener, removedLocationListener);
-    }
+    LocationListener removedLocationListener = (LocationListener) spyEngine.removeLocationListener(callback);
+    assertEquals(locationListener, removedLocationListener);
+  }
 
-    @Test
-    public void testAddNullListener() {
-        when(spyEngine.getListener(null)).thenReturn(locationListener);
-        assertNotNull(spyEngine.addLocationListener(null));
-    }
+  @Test
+  public void testAddNullListener() {
+    when(spyEngine.getListener(null)).thenReturn(locationListener);
+    assertNotNull(spyEngine.addLocationListener(null));
+  }
 
-    @Test
-    public void testRemoveNullListener() {
-        when(spyEngine.getListener(null)).thenReturn(locationListener);
-        assertNull(spyEngine.removeLocationListener(null));
-    }
+  @Test
+  public void testRemoveNullListener() {
+    when(spyEngine.getListener(null)).thenReturn(locationListener);
+    assertNull(spyEngine.removeLocationListener(null));
+  }
 }
