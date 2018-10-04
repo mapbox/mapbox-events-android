@@ -100,14 +100,12 @@ class AndroidLocationEngine extends AbstractLocationEngine<LocationListener> imp
   private static int priorityToAccuracy(int priority) {
     switch (priority) {
       case LocationEngineRequest.PRIORITY_HIGH_ACCURACY:
-        return Criteria.ACCURACY_HIGH;
       case LocationEngineRequest.PRIORITY_BALANCED_POWER_ACCURACY:
         return Criteria.ACCURACY_FINE;
       case LocationEngineRequest.PRIORITY_LOW_POWER:
-        return Criteria.ACCURACY_MEDIUM;
       case LocationEngineRequest.PRIORITY_NO_POWER:
       default:
-        return Criteria.ACCURACY_LOW;
+        return Criteria.ACCURACY_COARSE;
     }
   }
 
@@ -118,9 +116,10 @@ class AndroidLocationEngine extends AbstractLocationEngine<LocationListener> imp
       case LocationEngineRequest.PRIORITY_BALANCED_POWER_ACCURACY:
         return Criteria.POWER_MEDIUM;
       case LocationEngineRequest.PRIORITY_LOW_POWER:
+        return Criteria.POWER_LOW;
       case LocationEngineRequest.PRIORITY_NO_POWER:
       default:
-        return Criteria.POWER_LOW;
+        return Criteria.NO_REQUIREMENT;
     }
   }
 }
