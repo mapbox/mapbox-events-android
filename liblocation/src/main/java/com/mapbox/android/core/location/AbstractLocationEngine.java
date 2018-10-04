@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 
 import java.lang.ref.WeakReference;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -20,24 +19,31 @@ abstract class AbstractLocationEngine<T> {
   @NonNull
   protected abstract T getListener(LocationEngineCallback<Location> callback);
 
+  protected abstract void removeListener(@NonNull T listener);
+
   @NonNull
-  T addLocationListener(LocationEngineCallback<Location> callback) {
-    WeakReference<LocationEngineCallback<Location>> wListener = new WeakReference<>(callback);
+  T mapLocationListener(@NonNull LocationEngineCallback<Location> callback) {
+    if (callback == null) {
+      throw new IllegalArgumentException("Callback can't be null");
+    }
+
+    WeakReference<LocationEngineCallback<Location>> weakReference = findWeakReference(callback);
+    if (weakReference == null) {
+      weakReference = new WeakReference<>(callback);
+    } else {
+      // Remove listener for existing callback
+      removeListener(listeners.get(weakReference));
+    }
+
     T listener = getListener(callback);
-    listeners.put(wListener, listener);
+    listeners.put(weakReference, listener);
     return listener;
   }
 
   @Nullable
-  T removeLocationListener(LocationEngineCallback<Location> callback) {
-    WeakReference<LocationEngineCallback<Location>> wListener = findListener(callback);
-    if (wListener == null) {
-      return null;
-    }
-
-    T locationListener = listeners.get(wListener);
-    listeners.remove(locationListener);
-    return locationListener;
+  T unmapLocationListener(@NonNull LocationEngineCallback<Location> callback) {
+    WeakReference<LocationEngineCallback<Location>> weakReference = findWeakReference(callback);
+    return weakReference != null ? listeners.remove(weakReference) : null;
   }
 
   @VisibleForTesting
@@ -46,17 +52,15 @@ abstract class AbstractLocationEngine<T> {
   }
 
   @Nullable
-  private WeakReference<LocationEngineCallback<Location>> findListener(LocationEngineCallback<Location> callback) {
-    Iterator<WeakReference<LocationEngineCallback<Location>>> iterator = listeners.keySet().iterator();
-    while (iterator.hasNext()) {
-      final WeakReference<LocationEngineCallback<Location>> wListener = iterator.next();
-      if (wListener == null) {
+  private WeakReference<LocationEngineCallback<Location>> findWeakReference(LocationEngineCallback<Location> callback) {
+    for (final WeakReference<LocationEngineCallback<Location>> weakReference : listeners.keySet()) {
+      if (weakReference == null) {
         continue;
       }
 
-      final LocationEngineCallback<Location> curCallback = wListener.get();
+      final LocationEngineCallback<Location> curCallback = weakReference.get();
       if (curCallback != null && curCallback == callback) {
-        return wListener;
+        return weakReference;
       }
     }
     return null;

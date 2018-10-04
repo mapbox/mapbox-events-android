@@ -53,6 +53,11 @@ class AndroidLocationEngine extends AbstractLocationEngine<LocationListener> imp
   }
 
   @Override
+  protected void removeListener(@NonNull LocationListener listener) {
+    locationManager.removeUpdates(listener);
+  }
+
+  @Override
   public void getLastLocation(@NonNull LocationEngineCallback<Location> callback) throws SecurityException {
     Location lastLocation = null;
     try {
@@ -72,7 +77,7 @@ class AndroidLocationEngine extends AbstractLocationEngine<LocationListener> imp
   public void requestLocationUpdates(@NonNull LocationEngineRequest request,
                                      @NonNull LocationEngineCallback<Location> callback,
                                      @Nullable Looper looper) throws SecurityException {
-    LocationListener locationListener = addLocationListener(callback);
+    LocationListener locationListener = mapLocationListener(callback);
 
     // Pick best provider only if user has not explicitly chosen passive mode
     if (request.getPriority() != LocationEngineRequest.PRIORITY_NO_POWER) {
@@ -85,8 +90,10 @@ class AndroidLocationEngine extends AbstractLocationEngine<LocationListener> imp
 
   @Override
   public void removeLocationUpdates(@NonNull LocationEngineCallback<Location> callback) {
-    LocationListener listener = removeLocationListener(callback);
-    locationManager.removeUpdates(listener);
+    LocationListener listener = unmapLocationListener(callback);
+    if (listener != null) {
+      locationManager.removeUpdates(listener);
+    }
   }
 
   private static Criteria getCriteria(int priority) {

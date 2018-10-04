@@ -8,9 +8,10 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -25,23 +26,38 @@ public class AbstractLocationEngineTest {
   private AbstractLocationEngine spyEngine;
 
   @Test
+  public void testListenerForNull() {
+    when(spyEngine.getListener(callback)).thenReturn(locationListener);
+    assertNotNull(spyEngine.mapLocationListener(callback));
+  }
+
+  @Test
   public void testAddRemoveListener() {
     when(spyEngine.getListener(callback)).thenReturn(locationListener);
-    spyEngine.addLocationListener(callback);
+    LocationListener addedlocationListener = (LocationListener)spyEngine.mapLocationListener(callback);
+    assertEquals(locationListener, addedlocationListener);
 
-    LocationListener removedLocationListener = (LocationListener) spyEngine.removeLocationListener(callback);
+    LocationListener removedLocationListener = (LocationListener) spyEngine.unmapLocationListener(callback);
     assertEquals(locationListener, removedLocationListener);
   }
 
   @Test
-  public void testAddNullListener() {
-    when(spyEngine.getListener(null)).thenReturn(locationListener);
-    assertNotNull(spyEngine.addLocationListener(null));
+  public void testAddListenerTwice() {
+    spyEngine.mapLocationListener(callback);
+    spyEngine.mapLocationListener(callback);
+    assertEquals(spyEngine.registeredListeners(), 1);
   }
 
   @Test
-  public void testRemoveNullListener() {
-    when(spyEngine.getListener(null)).thenReturn(locationListener);
-    assertNull(spyEngine.removeLocationListener(null));
+  public void testAddTwoListeners() {
+    spyEngine.mapLocationListener(callback);
+    LocationEngineCallback<Location> anotherCallback = mock(LocationEngineCallback.class);
+    spyEngine.mapLocationListener(anotherCallback);
+    assertEquals(spyEngine.registeredListeners(), 2);
+  }
+
+  @Test
+  public void testRemoveUnaddedListener() {
+    assertNull(spyEngine.unmapLocationListener(callback));
   }
 }

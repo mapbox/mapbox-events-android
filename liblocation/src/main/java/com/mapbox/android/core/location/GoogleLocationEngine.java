@@ -44,6 +44,11 @@ class GoogleLocationEngine extends AbstractLocationEngine<LocationCallback> impl
   }
 
   @Override
+  protected void removeListener(@NonNull LocationCallback callback) {
+    fusedLocationProviderClient.removeLocationUpdates(callback);
+  }
+
+  @Override
   public void getLastLocation(@NonNull final LocationEngineCallback<Location> callback) throws SecurityException {
     fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
       @Override
@@ -62,14 +67,16 @@ class GoogleLocationEngine extends AbstractLocationEngine<LocationCallback> impl
   public void requestLocationUpdates(@NonNull LocationEngineRequest request,
                                      @NonNull LocationEngineCallback<Location> callback,
                                      @Nullable Looper looper) throws SecurityException {
-    LocationCallback locationCallback = addLocationListener(callback);
+    LocationCallback locationCallback = mapLocationListener(callback);
     fusedLocationProviderClient.requestLocationUpdates(toGMSLocationRequest(request), locationCallback, looper);
   }
 
   @Override
   public void removeLocationUpdates(@NonNull LocationEngineCallback<Location> callback) {
-    LocationCallback locationCallback = removeLocationListener(callback);
-    fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+    LocationCallback locationCallback = unmapLocationListener(callback);
+    if (locationCallback != null) {
+      fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+    }
   }
 
   private static LocationRequest toGMSLocationRequest(LocationEngineRequest request) {
