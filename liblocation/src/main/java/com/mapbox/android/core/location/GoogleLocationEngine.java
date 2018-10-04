@@ -74,7 +74,8 @@ class GoogleLocationEngine extends AbstractLocationEngine<LocationCallback> impl
 
   private static LocationRequest toGMSLocationRequest(LocationEngineRequest request) {
     LocationRequest locationRequest = new LocationRequest();
-    locationRequest.setInterval(request.getInterval());
+    locationRequest.setFastestInterval(request.getInterval());
+    locationRequest.setSmallestDisplacement(request.getDisplacemnt());
     locationRequest.setPriority(toGMSLocationPriority(request.getPriority()));
     return locationRequest;
   }

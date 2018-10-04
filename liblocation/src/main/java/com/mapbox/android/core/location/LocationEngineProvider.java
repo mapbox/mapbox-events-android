@@ -11,6 +11,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
  */
 public final class LocationEngineProvider {
   private static final String GOOGLE_LOCATION_SERVICES = "com.google.android.gms.location.LocationServices";
+  private static final String GOOGLE_API_AVAILABILITY = "com.google.android.gms.common.GoogleApiAvailability";
 
   private LocationEngineProvider() {
     // prevent instantiation
@@ -24,19 +25,25 @@ public final class LocationEngineProvider {
    */
   @NonNull
   public static LocationEngine getBestLocationEngine(@NonNull Context context) {
-    boolean hasGoogleLocationServices = true;
-    try {
-      Class.forName(GOOGLE_LOCATION_SERVICES);
-    } catch (ClassNotFoundException exception) {
-      Log.w("LocationEngineProvider", "Missing " + GOOGLE_LOCATION_SERVICES);
-      hasGoogleLocationServices = false;
+    boolean hasGoogleLocationServices = isOnClassPath(GOOGLE_LOCATION_SERVICES);
+    if (isOnClassPath(GOOGLE_API_AVAILABILITY)) {
+      // Check Google Play services APK is available and up-to-date on this device
+      hasGoogleLocationServices &= GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context)
+              == ConnectionResult.SUCCESS;
     }
-
-    // Check Google Play services APK is available and up-to-date on this device
-    hasGoogleLocationServices &= GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context)
-            == ConnectionResult.SUCCESS;
 
     return hasGoogleLocationServices ? new GoogleLocationEngine(context.getApplicationContext()) :
             new AndroidLocationEngine(context.getApplicationContext());
+  }
+
+  private static boolean isOnClassPath(String className) {
+    boolean isOnClassPath = true;
+    try {
+      Class.forName(className);
+    } catch (ClassNotFoundException exception) {
+      Log.w("LocationEngineProvider", "Missing " + className);
+      isOnClassPath = false;
+    }
+    return isOnClassPath;
   }
 }

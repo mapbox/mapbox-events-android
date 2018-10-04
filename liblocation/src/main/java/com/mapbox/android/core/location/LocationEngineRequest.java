@@ -110,7 +110,7 @@ public class LocationEngineRequest {
     public Builder(long interval) {
       this.interval = interval;
       this.priority = PRIORITY_HIGH_ACCURACY;
-      this.displacement = 0f;
+      this.displacement = 3.0f;
       this.isBackground = false;
     }
 

@@ -73,7 +73,12 @@ class AndroidLocationEngine extends AbstractLocationEngine<LocationListener> imp
                                      @NonNull LocationEngineCallback<Location> callback,
                                      @Nullable Looper looper) throws SecurityException {
     LocationListener locationListener = addLocationListener(callback);
-    currentProvider = locationManager.getBestProvider(getCriteria(request.getPriority()), true);
+
+    // Pick best provider only if user has not explicitly chosen passive mode
+    if (request.getPriority() != LocationEngineRequest.PRIORITY_NO_POWER) {
+      currentProvider = locationManager.getBestProvider(getCriteria(request.getPriority()), true);
+    }
+
     locationManager.requestLocationUpdates(currentProvider, request.getInterval(), request.getDisplacemnt(),
             locationListener, looper);
   }
@@ -86,11 +91,24 @@ class AndroidLocationEngine extends AbstractLocationEngine<LocationListener> imp
 
   private static Criteria getCriteria(int priority) {
     Criteria criteria = new Criteria();
-    criteria.setAccuracy(Criteria.ACCURACY_FINE);
-    criteria.setAltitudeRequired(false);
+    criteria.setAccuracy(priorityToAccuracy(priority));
     criteria.setCostAllowed(true);
     criteria.setPowerRequirement(priorityToPowerRequirement(priority));
     return criteria;
+  }
+
+  private static int priorityToAccuracy(int priority) {
+    switch (priority) {
+      case LocationEngineRequest.PRIORITY_HIGH_ACCURACY:
+        return Criteria.ACCURACY_HIGH;
+      case LocationEngineRequest.PRIORITY_BALANCED_POWER_ACCURACY:
+        return Criteria.ACCURACY_FINE;
+      case LocationEngineRequest.PRIORITY_LOW_POWER:
+        return Criteria.ACCURACY_MEDIUM;
+      case LocationEngineRequest.PRIORITY_NO_POWER:
+      default:
+        return Criteria.ACCURACY_LOW;
+    }
   }
 
   private static int priorityToPowerRequirement(int priority) {
