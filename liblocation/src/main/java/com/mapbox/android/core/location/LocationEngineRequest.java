@@ -40,7 +40,7 @@ public class LocationEngineRequest {
    */
   public static final int PRIORITY_NO_POWER = 3;
 
-  private final int interval;
+  private final long interval;
   private final int priority;
   private final float displacement;
   private final boolean isBackground;
@@ -95,7 +95,7 @@ public class LocationEngineRequest {
   }
 
   public static final class Builder {
-    private final int interval;
+    private final long interval;
 
     private int priority;
     private float displacement;
@@ -107,7 +107,7 @@ public class LocationEngineRequest {
      * @param interval default interval between location updates
      * @since 3.0.0
      */
-    public Builder(int interval) {
+    public Builder(long interval) {
       this.interval = interval;
       this.priority = PRIORITY_HIGH_ACCURACY;
       this.displacement = 0f;
