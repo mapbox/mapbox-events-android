@@ -172,7 +172,7 @@ public class TelemetryService extends Service implements TelemetryCallback, Even
     locationEngine = LocationEngineProvider.getBestLocationEngine(getApplicationContext());
     if (locationPermissionCheck()) {
       try {
-        locationEngine.requestLocationUpdates(getRequest(), callback, null);
+        locationEngine.requestLocationUpdates(getRequest(), callback, getMainLooper());
       } catch (SecurityException se) {
         Log.e(TAG, se.toString());
       }
