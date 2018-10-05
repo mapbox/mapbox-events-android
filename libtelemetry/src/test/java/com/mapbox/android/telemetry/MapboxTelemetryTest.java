@@ -473,6 +473,46 @@ public class MapboxTelemetryTest {
     assertFalse(notUpdatedSessionInterval);
   }
 
+  @Test
+  public void checksAppUserTurnstileNotQueued() throws Exception {
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetry();
+
+    Event whitelistedEvent = new AppUserTurnstile("anySdkIdentifier", "anySdkVersion", false);
+    theMapboxTelemetry.enable();
+    theMapboxTelemetry.push(whitelistedEvent);
+
+    assertTrue(theMapboxTelemetry.isQueueEmpty());
+  }
+
+  @Test
+  public void checksAttachmentEventNotQueued() throws Exception {
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetry();
+
+    Event whitelistedEvent = new Attachment();
+    theMapboxTelemetry.enable();
+    theMapboxTelemetry.push(whitelistedEvent);
+
+    assertTrue(theMapboxTelemetry.isQueueEmpty());
+  }
+
+  private MapboxTelemetry obtainMapboxTelemetry() {
+    MapboxTelemetry.applicationContext = obtainNetworkConnectedMockedContext();
+    String aValidAccessToken = "validAccessToken";
+    String aValidUserAgent = "MapboxTelemetryAndroid/";
+    EventsQueue eventsQueue = new EventsQueue(mock(FlushQueueCallback.class));
+    SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
+    TelemetryClient telemetryClient = mock(TelemetryClient.class);
+    Callback httpCallback = mock(Callback.class);
+    Clock mockedClock = mock(Clock.class);
+    boolean indifferentServiceBound = true;
+    TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false);
+    TelemetryLocationEnabler telemetryLocationEnabler = new TelemetryLocationEnabler(false);
+    MapboxTelemetry mapboxTelemetry = new MapboxTelemetry(MapboxTelemetry.applicationContext,
+      aValidAccessToken, aValidUserAgent, eventsQueue, telemetryClient, httpCallback, mockedSchedulerFlusher,
+      mockedClock, indifferentServiceBound, telemetryEnabler, telemetryLocationEnabler);
+    return mapboxTelemetry;
+  }
+
   private MapboxTelemetry obtainMapboxTelemetryWith(Context context) {
     MapboxTelemetry.applicationContext = context;
     String aValidAccessToken = "validAccessToken";
@@ -548,8 +588,8 @@ public class MapboxTelemetryTest {
     return mapboxTelemetry;
   }
 
-  private MapboxTelemetry obtainMapboxTelemetryWith(Context context, EventsQueue eventsQueue, TelemetryEnabler.State
-    state) {
+  private MapboxTelemetry obtainMapboxTelemetryWith(Context context, EventsQueue eventsQueue,
+                                                    TelemetryEnabler.State state) {
     MapboxTelemetry.applicationContext = context;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";

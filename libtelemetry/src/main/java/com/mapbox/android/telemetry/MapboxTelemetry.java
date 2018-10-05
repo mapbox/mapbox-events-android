@@ -241,6 +241,10 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     return isLocationOpted;
   }
 
+  boolean isQueueEmpty() {
+    return queue.queue.size() == 0;
+  }
+
   private void startTelemetryService() {
     TelemetryLocationEnabler.LocationState telemetryLocationState = telemetryLocationEnabler
       .obtainTelemetryLocationState();
@@ -488,6 +492,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
     if (Event.Type.VIS_ATTACHMENT.equals((event.obtainType()))) {
       sendAttachment(event);
+      return true;
     }
 
     return false;
