@@ -43,12 +43,14 @@ public class LocationEngineRequest {
   private final long interval;
   private final int priority;
   private final float displacement;
+  private final long maxWaitTime;
   private final boolean isBackground;
 
   private LocationEngineRequest(Builder builder) {
     this.interval = builder.interval;
     this.priority = builder.priority;
     this.displacement = builder.displacement;
+    this.maxWaitTime = builder.maxWaitTime;
     this.isBackground = builder.isBackground;
   }
 
@@ -94,11 +96,22 @@ public class LocationEngineRequest {
     return displacement;
   }
 
+  /**
+   * Returns maximum wait time in milliseconds for location updates.
+   *
+   * @return maximum wait time in milliseconds.
+   * @since 3.0.0
+   */
+  public long getMaxWaitTime() {
+    return maxWaitTime;
+  }
+
   public static final class Builder {
     private final long interval;
 
     private int priority;
     private float displacement;
+    private long maxWaitTime;
     private boolean isBackground;
 
     /**
@@ -111,6 +124,7 @@ public class LocationEngineRequest {
       this.interval = interval;
       this.priority = PRIORITY_HIGH_ACCURACY;
       this.displacement = 3.0f;
+      this.maxWaitTime = 0L;
       this.isBackground = false;
     }
 
@@ -136,6 +150,21 @@ public class LocationEngineRequest {
      */
     public Builder setDisplacement(float displacement) {
       this.displacement = displacement;
+      return this;
+    }
+
+    /**
+     * Sets the maximum wait time in milliseconds for location updates.
+     * <p>
+     * Locations determined at intervals but delivered in batch based on
+     * wait time. Batching is not supported by all engines.
+     *
+     * @param maxWaitTime wait time in milliseconds.
+     * @return reference to builder
+     * @since 3.0.0
+     */
+    public Builder setMaxWaitTime(long maxWaitTime) {
+      this.maxWaitTime = maxWaitTime;
       return this;
     }
 
