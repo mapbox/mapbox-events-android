@@ -286,26 +286,19 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
     if (Build.VERSION.SDK_INT >= API_LEVEL_23) {
       return PermissionsManager.areLocationPermissionsGranted(this);
     } else {
-      int coarsePermission = PermissionChecker.checkSelfPermission(MapboxTelemetry.applicationContext,
-        Manifest.permission.ACCESS_COARSE_LOCATION);
       int finePermission = PermissionChecker.checkSelfPermission(MapboxTelemetry.applicationContext,
         Manifest.permission.ACCESS_FINE_LOCATION);
 
-      if (checkFinePermission(finePermission)) {
-        return false;
-      }
-
-      return coarsePermission == PackageManager.PERMISSION_GRANTED
-        || finePermission == PackageManager.PERMISSION_GRANTED;
+      return checkFinePermission(finePermission);
     }
   }
 
   private boolean checkFinePermission(int finePermission) {
     if (finePermission != PackageManager.PERMISSION_GRANTED) {
       Log.d("Missing Permission", MISSING_FINE_PERMISSION);
-      return true;
+      return false;
     }
 
-    return false;
+    return true;
   }
 }
