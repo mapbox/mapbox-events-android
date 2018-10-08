@@ -28,7 +28,7 @@ interface LocationEngineImpl<T> {
                               @NonNull T listener, @Nullable Looper looper) throws SecurityException;
 
   void requestLocationUpdates(@NonNull LocationEngineRequest request,
-                              @NonNull PendingIntent pendingIntent, @Nullable Looper looper) throws SecurityException;
+                              @NonNull PendingIntent pendingIntent) throws SecurityException;
 
   void removeLocationUpdates(T listener);
 

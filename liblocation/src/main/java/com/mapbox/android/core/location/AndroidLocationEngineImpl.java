@@ -109,14 +109,14 @@ class AndroidLocationEngineImpl extends AbstractLocationEngineImpl<LocationListe
 
   @Override
   public void requestLocationUpdates(@NonNull LocationEngineRequest request,
-                                     @NonNull PendingIntent pendingIntent,
-                                     @Nullable Looper looper) throws SecurityException {
+                                     @NonNull PendingIntent pendingIntent) throws SecurityException {
     // Pick best provider only if user has not explicitly chosen passive mode
     if (request.getPriority() != LocationEngineRequest.PRIORITY_NO_POWER) {
       currentProvider = locationManager.getBestProvider(getCriteria(request.getPriority()), true);
     }
 
-    // TODO: implement request
+    locationManager.requestLocationUpdates(currentProvider, request.getInterval(),
+            request.getDisplacemnt(), pendingIntent);
   }
 
   @Override

@@ -95,9 +95,8 @@ class GoogleLocationEngineImpl extends AbstractLocationEngineImpl<LocationCallba
 
   @Override
   public void requestLocationUpdates(@NonNull LocationEngineRequest request,
-                                     @NonNull PendingIntent pendingIntent,
-                                     @Nullable Looper looper) throws SecurityException {
-    // TODO: implement background request
+                                     @NonNull PendingIntent pendingIntent) throws SecurityException {
+    fusedLocationProviderClient.requestLocationUpdates(toGMSLocationRequest(request), pendingIntent);
   }
 
   @Override
