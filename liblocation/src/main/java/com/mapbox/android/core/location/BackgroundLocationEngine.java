@@ -35,7 +35,7 @@ class BackgroundLocationEngine extends ForegroundLocationEngine implements Inten
     callbacks.add(callback);
     locationEngineImpl.requestLocationUpdates(request,
             broadcastReceiverProxy.getPendingIntent(LocationUpdatesBroadcastReceiver.class,
-                    LocationUpdatesBroadcastReceiver.ACTION_PROCESS_UPDATES), looper);
+                    LocationUpdatesBroadcastReceiver.ACTION_PROCESS_UPDATES));
   }
 
   @Override
