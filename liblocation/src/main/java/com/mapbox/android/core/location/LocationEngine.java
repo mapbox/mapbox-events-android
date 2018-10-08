@@ -1,6 +1,5 @@
 package com.mapbox.android.core.location;
 
-import android.location.Location;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -23,18 +22,18 @@ public interface LocationEngine {
    * <p>
    * If a location is not available, which should happen very rarely, null will be returned.
    *
-   * @param callback {@link LocationEngineCallback} for the location updates.
+   * @param callback {@link LocationEngineCallback} for the location result {@link LocationEngineResult}.
    * @throws SecurityException if permission is not granted to access location services.
    * @since 3.0.0
    */
   @RequiresPermission(anyOf = {ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION})
-  void getLastLocation(@NonNull LocationEngineCallback<Location> callback) throws SecurityException;
+  void getLastLocation(@NonNull LocationEngineCallback<LocationEngineResult> callback) throws SecurityException;
 
   /**
    * Requests location updates with a callback on the specified Looper thread.
    *
    * @param request  {@link LocationEngineRequest} for the updates.
-   * @param callback {@link LocationEngineCallback} for the location updates.
+   * @param callback {@link LocationEngineCallback} for the location result {@link LocationEngineResult}.
    * @param looper   The Looper object whose message queue will be used to implement the callback mechanism,
    *                 or null to invoke callbacks on the main thread.
    * @throws SecurityException if permission is not granted to access location services.
@@ -42,7 +41,7 @@ public interface LocationEngine {
    */
   @RequiresPermission(anyOf = {ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION})
   void requestLocationUpdates(@NonNull LocationEngineRequest request,
-                              @NonNull LocationEngineCallback<Location> callback,
+                              @NonNull LocationEngineCallback<LocationEngineResult> callback,
                               @Nullable Looper looper) throws SecurityException;
 
   /**
@@ -54,5 +53,5 @@ public interface LocationEngine {
    * @param callback {@link LocationEngineCallback} to remove.
    * @since 3.0.0
    */
-  void removeLocationUpdates(@NonNull LocationEngineCallback<Location> callback);
+  void removeLocationUpdates(@NonNull LocationEngineCallback<LocationEngineResult> callback);
 }

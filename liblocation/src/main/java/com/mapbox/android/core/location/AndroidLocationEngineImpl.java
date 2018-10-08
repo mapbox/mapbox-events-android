@@ -30,11 +30,11 @@ class AndroidLocationEngineImpl extends AbstractLocationEngineImpl<LocationListe
 
   @NonNull
   @Override
-  LocationListener createListener(final LocationEngineCallback<Location> callback) {
+  LocationListener createListener(final LocationEngineCallback<LocationEngineResult> callback) {
     return new LocationListener() {
       @Override
       public void onLocationChanged(Location location) {
-        callback.onSuccess(location);
+        callback.onSuccess(LocationEngineResult.create(location));
       }
 
       @Override
@@ -61,25 +61,25 @@ class AndroidLocationEngineImpl extends AbstractLocationEngineImpl<LocationListe
 
   @NonNull
   @Override
-  public LocationListener getLocationListener(@NonNull LocationEngineCallback<Location> callback) {
+  public LocationListener getLocationListener(@NonNull LocationEngineCallback<LocationEngineResult> callback) {
     return mapLocationListener(callback);
   }
 
   @Nullable
   @Override
-  public LocationListener removeLocationListener(@NonNull LocationEngineCallback<Location> callback) {
+  public LocationListener removeLocationListener(@NonNull LocationEngineCallback<LocationEngineResult> callback) {
     return unmapLocationListener(callback);
   }
 
   @Nullable
   @Override
-  public Location extractResult(Intent intent) {
+  public LocationEngineResult extractResult(Intent intent) {
     // TODO: implement parsing logic
     return null;
   }
 
   @Override
-  public void getLastLocation(@NonNull LocationEngineCallback<Location> callback) throws SecurityException {
+  public void getLastLocation(@NonNull LocationEngineCallback<LocationEngineResult> callback) throws SecurityException {
     Location lastLocation = null;
     try {
       lastLocation = locationManager.getLastKnownLocation(currentProvider);
@@ -88,7 +88,7 @@ class AndroidLocationEngineImpl extends AbstractLocationEngineImpl<LocationListe
     }
 
     if (lastLocation != null) {
-      callback.onSuccess(lastLocation);
+      callback.onSuccess(LocationEngineResult.create(lastLocation));
     } else {
       callback.onFailure(new Exception("Last location unavailable"));
     }

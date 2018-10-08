@@ -16,10 +16,11 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.content.PermissionChecker;
 import android.util.Log;
 
+import com.mapbox.android.core.location.LocationEngineProvider;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineCallback;
-import com.mapbox.android.core.location.LocationEngineProvider;
 import com.mapbox.android.core.location.LocationEngineRequest;
+import com.mapbox.android.core.location.LocationEngineResult;
 import com.mapbox.android.core.permissions.PermissionsManager;
 
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -48,11 +49,17 @@ public class TelemetryService extends Service implements TelemetryCallback, Even
   private boolean isLocationReceiverRegistered = false;
   private boolean isTelemetryReceiverRegistered = false;
 
-  private final LocationEngineCallback<Location> callback = new LocationEngineCallback<Location>() {
+  private final LocationEngineCallback<LocationEngineResult> callback =
+          new LocationEngineCallback<LocationEngineResult>() {
     @Override
-    public void onSuccess(Location result) {
+    public void onSuccess(LocationEngineResult result) {
       checkApplicationContext();
-      LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(LocationReceiver.supplyIntent(result));
+      Location location = result.getLastLocation();
+      if (location == null) {
+        Log.e(TAG, "Location is unavailable");
+        return;
+      }
+      LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(LocationReceiver.supplyIntent(location));
     }
 
     @Override

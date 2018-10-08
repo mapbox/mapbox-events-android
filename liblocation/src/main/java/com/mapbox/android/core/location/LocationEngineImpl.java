@@ -2,7 +2,6 @@ package com.mapbox.android.core.location;
 
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.location.Location;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,15 +13,15 @@ import android.support.annotation.Nullable;
  */
 interface LocationEngineImpl<T> {
   @NonNull
-  T getLocationListener(@NonNull LocationEngineCallback<Location> callback);
+  T getLocationListener(@NonNull LocationEngineCallback<LocationEngineResult> callback);
 
   @Nullable
-  T removeLocationListener(@NonNull LocationEngineCallback<Location> callback);
+  T removeLocationListener(@NonNull LocationEngineCallback<LocationEngineResult> callback);
 
   @Nullable
-  Location extractResult(Intent intent);
+  LocationEngineResult extractResult(Intent intent);
 
-  void getLastLocation(@NonNull LocationEngineCallback<Location> callback) throws SecurityException;
+  void getLastLocation(@NonNull LocationEngineCallback<LocationEngineResult> callback) throws SecurityException;
 
   void requestLocationUpdates(@NonNull LocationEngineRequest request,
                               @NonNull T listener, @Nullable Looper looper) throws SecurityException;

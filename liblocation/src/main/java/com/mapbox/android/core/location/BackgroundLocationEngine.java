@@ -1,7 +1,6 @@
 package com.mapbox.android.core.location;
 
 import android.content.Intent;
-import android.location.Location;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,7 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 class BackgroundLocationEngine extends ForegroundLocationEngine implements IntentHandler {
   private final BroadcastReceiverProxy broadcastReceiverProxy;
-  private final List<LocationEngineCallback<Location>> callbacks;
+  private final List<LocationEngineCallback<LocationEngineResult>> callbacks;
 
   private LocationUpdatesBroadcastReceiver broadcastReceiver;
 
@@ -24,7 +23,7 @@ class BackgroundLocationEngine extends ForegroundLocationEngine implements Inten
 
   @Override
   public void requestLocationUpdates(@NonNull LocationEngineRequest request,
-                                     @NonNull LocationEngineCallback<Location> callback,
+                                     @NonNull LocationEngineCallback<LocationEngineResult> callback,
                                      @Nullable Looper looper) throws SecurityException {
     if (broadcastReceiver == null) {
       broadcastReceiver = (LocationUpdatesBroadcastReceiver) broadcastReceiverProxy.createReceiver(this);
@@ -39,7 +38,7 @@ class BackgroundLocationEngine extends ForegroundLocationEngine implements Inten
   }
 
   @Override
-  public void removeLocationUpdates(@NonNull LocationEngineCallback<Location> callback) {
+  public void removeLocationUpdates(@NonNull LocationEngineCallback<LocationEngineResult> callback) {
     callbacks.remove(callback);
     locationEngineImpl.removeLocationUpdates(
             broadcastReceiverProxy.getPendingIntent(LocationUpdatesBroadcastReceiver.class,
@@ -57,8 +56,8 @@ class BackgroundLocationEngine extends ForegroundLocationEngine implements Inten
       return;
     }
 
-    Location location = locationEngineImpl.extractResult(intent);
-    for (LocationEngineCallback<Location> callback : callbacks) {
+    LocationEngineResult location = locationEngineImpl.extractResult(intent);
+    for (LocationEngineCallback<LocationEngineResult> callback : callbacks) {
       callback.onSuccess(location);
     }
   }

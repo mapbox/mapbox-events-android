@@ -1,6 +1,5 @@
 package com.mapbox.android.core.location;
 
-import android.location.Location;
 import android.location.LocationListener;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,7 +16,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class AbstractLocationEngineImplTest {
   @Mock
-  private LocationEngineCallback<Location> callback;
+  private LocationEngineCallback<LocationEngineResult> callback;
 
   @Mock
   private LocationListener locationListener;
@@ -51,7 +50,7 @@ public class AbstractLocationEngineImplTest {
   @Test
   public void testAddTwoListeners() {
     spyEngine.mapLocationListener(callback);
-    LocationEngineCallback<Location> anotherCallback = mock(LocationEngineCallback.class);
+    LocationEngineCallback<LocationEngineResult> anotherCallback = mock(LocationEngineCallback.class);
     spyEngine.mapLocationListener(anotherCallback);
     assertEquals(spyEngine.registeredListeners(), 2);
   }

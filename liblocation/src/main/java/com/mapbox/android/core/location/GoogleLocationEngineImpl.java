@@ -16,6 +16,8 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.util.List;
+
 /**
  * Wraps implementation of Fused Location Provider
  */
@@ -29,15 +31,15 @@ class GoogleLocationEngineImpl extends AbstractLocationEngineImpl<LocationCallba
 
   @NonNull
   @Override
-  LocationCallback createListener(final LocationEngineCallback<Location> callback) {
+  LocationCallback createListener(final LocationEngineCallback<LocationEngineResult> callback) {
     return new LocationCallback() {
       @Override
       public void onLocationResult(LocationResult locationResult) {
         super.onLocationResult(locationResult);
 
-        Location location = locationResult.getLastLocation();
-        if (location != null) {
-          callback.onSuccess(locationResult.getLastLocation());
+        List<Location> locations = locationResult.getLocations();
+        if (!locations.isEmpty()) {
+          callback.onSuccess(LocationEngineResult.create(locations));
         } else {
           callback.onFailure(new Exception("Unavailable location"));
         }
@@ -54,29 +56,30 @@ class GoogleLocationEngineImpl extends AbstractLocationEngineImpl<LocationCallba
 
   @NonNull
   @Override
-  public LocationCallback getLocationListener(@NonNull LocationEngineCallback<Location> callback) {
+  public LocationCallback getLocationListener(@NonNull LocationEngineCallback<LocationEngineResult> callback) {
     return mapLocationListener(callback);
   }
 
   @Nullable
   @Override
-  public LocationCallback removeLocationListener(@NonNull LocationEngineCallback<Location> callback) {
+  public LocationCallback removeLocationListener(@NonNull LocationEngineCallback<LocationEngineResult> callback) {
     return unmapLocationListener(callback);
   }
 
   @Nullable
   @Override
-  public Location extractResult(Intent intent) {
+  public LocationEngineResult extractResult(Intent intent) {
     LocationResult result = LocationResult.extractResult(intent);
-    return result != null ? result.getLocations().get(0) : null;
+    return result != null ? LocationEngineResult.create(result.getLocations()) : null;
   }
 
   @Override
-  public void getLastLocation(@NonNull final LocationEngineCallback<Location> callback) throws SecurityException {
+  public void getLastLocation(@NonNull final LocationEngineCallback<LocationEngineResult> callback)
+          throws SecurityException {
     fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
       @Override
       public void onSuccess(Location location) {
-        callback.onSuccess(location);
+        callback.onSuccess(LocationEngineResult.create(location));
       }
     }).addOnFailureListener(new OnFailureListener() {
       @Override
