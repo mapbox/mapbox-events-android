@@ -1,6 +1,8 @@
 package com.mapbox.android.core.location;
 
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -15,20 +17,20 @@ import android.util.Log;
  * A location engine that uses core android.location and has no external dependencies
  * https://developer.android.com/guide/topics/location/strategies.html
  */
-class AndroidLocationEngine extends AbstractLocationEngine<LocationListener> implements LocationEngine {
+class AndroidLocationEngineImpl extends AbstractLocationEngineImpl<LocationListener>
+        implements LocationEngineImpl<LocationListener> {
   private static final String TAG = "AndroidLocationEngine";
   private final LocationManager locationManager;
 
   private String currentProvider = LocationManager.PASSIVE_PROVIDER;
 
-  AndroidLocationEngine(@NonNull Context context) {
-    super();
+  AndroidLocationEngineImpl(@NonNull Context context) {
     locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
   }
 
   @NonNull
   @Override
-  protected LocationListener getListener(final LocationEngineCallback<Location> callback) {
+  LocationListener createListener(final LocationEngineCallback<Location> callback) {
     return new LocationListener() {
       @Override
       public void onLocationChanged(Location location) {
@@ -53,8 +55,27 @@ class AndroidLocationEngine extends AbstractLocationEngine<LocationListener> imp
   }
 
   @Override
-  protected void removeListener(@NonNull LocationListener listener) {
+  void destroyListener(@NonNull LocationListener listener) {
     locationManager.removeUpdates(listener);
+  }
+
+  @NonNull
+  @Override
+  public LocationListener getLocationListener(@NonNull LocationEngineCallback<Location> callback) {
+    return mapLocationListener(callback);
+  }
+
+  @Nullable
+  @Override
+  public LocationListener removeLocationListener(@NonNull LocationEngineCallback<Location> callback) {
+    return unmapLocationListener(callback);
+  }
+
+  @Nullable
+  @Override
+  public Location extractResult(Intent intent) {
+    // TODO: implement parsing logic
+    return null;
   }
 
   @Override
@@ -75,24 +96,40 @@ class AndroidLocationEngine extends AbstractLocationEngine<LocationListener> imp
 
   @Override
   public void requestLocationUpdates(@NonNull LocationEngineRequest request,
-                                     @NonNull LocationEngineCallback<Location> callback,
+                                     @NonNull LocationListener listener,
                                      @Nullable Looper looper) throws SecurityException {
-    LocationListener locationListener = mapLocationListener(callback);
-
     // Pick best provider only if user has not explicitly chosen passive mode
     if (request.getPriority() != LocationEngineRequest.PRIORITY_NO_POWER) {
       currentProvider = locationManager.getBestProvider(getCriteria(request.getPriority()), true);
     }
 
     locationManager.requestLocationUpdates(currentProvider, request.getInterval(), request.getDisplacemnt(),
-            locationListener, looper);
+            listener, looper);
   }
 
   @Override
-  public void removeLocationUpdates(@NonNull LocationEngineCallback<Location> callback) {
-    LocationListener listener = unmapLocationListener(callback);
+  public void requestLocationUpdates(@NonNull LocationEngineRequest request,
+                                     @NonNull PendingIntent pendingIntent,
+                                     @Nullable Looper looper) throws SecurityException {
+    // Pick best provider only if user has not explicitly chosen passive mode
+    if (request.getPriority() != LocationEngineRequest.PRIORITY_NO_POWER) {
+      currentProvider = locationManager.getBestProvider(getCriteria(request.getPriority()), true);
+    }
+
+    // TODO: implement request
+  }
+
+  @Override
+  public void removeLocationUpdates(@NonNull LocationListener listener) {
     if (listener != null) {
       locationManager.removeUpdates(listener);
+    }
+  }
+
+  @Override
+  public void removeLocationUpdates(@NonNull PendingIntent pendingIntent) {
+    if (pendingIntent != null) {
+      locationManager.removeUpdates(pendingIntent);
     }
   }
 

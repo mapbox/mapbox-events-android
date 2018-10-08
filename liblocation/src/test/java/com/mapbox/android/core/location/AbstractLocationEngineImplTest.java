@@ -15,7 +15,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AbstractLocationEngineTest {
+public class AbstractLocationEngineImplTest {
   @Mock
   private LocationEngineCallback<Location> callback;
 
@@ -23,17 +23,17 @@ public class AbstractLocationEngineTest {
   private LocationListener locationListener;
 
   @Spy
-  private AbstractLocationEngine spyEngine;
+  private AbstractLocationEngineImpl spyEngine;
 
   @Test
   public void testListenerForNull() {
-    when(spyEngine.getListener(callback)).thenReturn(locationListener);
+    when(spyEngine.createListener(callback)).thenReturn(locationListener);
     assertNotNull(spyEngine.mapLocationListener(callback));
   }
 
   @Test
   public void testAddRemoveListener() {
-    when(spyEngine.getListener(callback)).thenReturn(locationListener);
+    when(spyEngine.createListener(callback)).thenReturn(locationListener);
     LocationListener addedlocationListener = (LocationListener)spyEngine.mapLocationListener(callback);
     assertEquals(locationListener, addedlocationListener);
 

@@ -9,19 +9,23 @@ import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-abstract class AbstractLocationEngine<T> {
+/**
+ * Maintains callbacks mappings location engine callback to implementation specific callbacks.
+ *
+ * @param <T> listener object type
+ */
+abstract class AbstractLocationEngineImpl<T> {
   private final Map<WeakReference<LocationEngineCallback<Location>>, T> listeners;
 
-  AbstractLocationEngine() {
+  AbstractLocationEngineImpl() {
     listeners = new WeakHashMap<>();
   }
 
   @NonNull
-  protected abstract T getListener(LocationEngineCallback<Location> callback);
+  abstract T createListener(LocationEngineCallback<Location> callback);
 
-  protected abstract void removeListener(@NonNull T listener);
+  abstract void destroyListener(@NonNull T listener);
 
-  @NonNull
   T mapLocationListener(@NonNull LocationEngineCallback<Location> callback) {
     if (callback == null) {
       throw new IllegalArgumentException("Callback can't be null");
@@ -32,15 +36,14 @@ abstract class AbstractLocationEngine<T> {
       weakReference = new WeakReference<>(callback);
     } else {
       // Remove listener for existing callback
-      removeListener(listeners.get(weakReference));
+      destroyListener(listeners.get(weakReference));
     }
 
-    T listener = getListener(callback);
+    T listener = createListener(callback);
     listeners.put(weakReference, listener);
     return listener;
   }
 
-  @Nullable
   T unmapLocationListener(@NonNull LocationEngineCallback<Location> callback) {
     WeakReference<LocationEngineCallback<Location>> weakReference = findWeakReference(callback);
     return weakReference != null ? listeners.remove(weakReference) : null;

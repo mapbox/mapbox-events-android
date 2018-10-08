@@ -44,14 +44,12 @@ public class LocationEngineRequest {
   private final int priority;
   private final float displacement;
   private final long maxWaitTime;
-  private final boolean isBackground;
 
   private LocationEngineRequest(Builder builder) {
     this.interval = builder.interval;
     this.priority = builder.priority;
     this.displacement = builder.displacement;
     this.maxWaitTime = builder.maxWaitTime;
-    this.isBackground = builder.isBackground;
   }
 
   /**
@@ -73,17 +71,6 @@ public class LocationEngineRequest {
    */
   public int getPriority() {
     return priority;
-  }
-
-  /**
-   * Returns true if location updates
-   * should be provided in background.
-   *
-   * @return true if background mode is supported.
-   * @since 3.0.0
-   */
-  public boolean isBackground() {
-    return isBackground;
   }
 
   /**
@@ -165,18 +152,6 @@ public class LocationEngineRequest {
      */
     public Builder setMaxWaitTime(long maxWaitTime) {
       this.maxWaitTime = maxWaitTime;
-      return this;
-    }
-
-    /**
-     * Enable background mode for location updates.
-     *
-     * @param isBackground enable background location.
-     * @return reference to builder
-     * @since 3.0.0
-     */
-    public Builder background(boolean isBackground) {
-      this.isBackground = isBackground;
       return this;
     }
 

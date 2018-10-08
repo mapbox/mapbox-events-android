@@ -1,6 +1,8 @@
 package com.mapbox.android.core.location;
 
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -15,19 +17,19 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 /**
- * Sample LocationEngine using Google Play Services
+ * Wraps implementation of Fused Location Provider
  */
-class GoogleLocationEngine extends AbstractLocationEngine<LocationCallback> implements LocationEngine {
+class GoogleLocationEngineImpl extends AbstractLocationEngineImpl<LocationCallback>
+        implements LocationEngineImpl<LocationCallback> {
   private final FusedLocationProviderClient fusedLocationProviderClient;
 
-  GoogleLocationEngine(@NonNull Context context) {
-    super();
+  GoogleLocationEngineImpl(@NonNull Context context) {
     fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
   }
 
   @NonNull
   @Override
-  protected LocationCallback getListener(final LocationEngineCallback<Location> callback) {
+  LocationCallback createListener(final LocationEngineCallback<Location> callback) {
     return new LocationCallback() {
       @Override
       public void onLocationResult(LocationResult locationResult) {
@@ -44,8 +46,29 @@ class GoogleLocationEngine extends AbstractLocationEngine<LocationCallback> impl
   }
 
   @Override
-  protected void removeListener(@NonNull LocationCallback callback) {
-    fusedLocationProviderClient.removeLocationUpdates(callback);
+  void destroyListener(@NonNull LocationCallback listener) {
+    if (listener != null) {
+      fusedLocationProviderClient.removeLocationUpdates(listener);
+    }
+  }
+
+  @NonNull
+  @Override
+  public LocationCallback getLocationListener(@NonNull LocationEngineCallback<Location> callback) {
+    return mapLocationListener(callback);
+  }
+
+  @Nullable
+  @Override
+  public LocationCallback removeLocationListener(@NonNull LocationEngineCallback<Location> callback) {
+    return unmapLocationListener(callback);
+  }
+
+  @Nullable
+  @Override
+  public Location extractResult(Intent intent) {
+    LocationResult result = LocationResult.extractResult(intent);
+    return result != null ? result.getLocations().get(0) : null;
   }
 
   @Override
@@ -65,17 +88,29 @@ class GoogleLocationEngine extends AbstractLocationEngine<LocationCallback> impl
 
   @Override
   public void requestLocationUpdates(@NonNull LocationEngineRequest request,
-                                     @NonNull LocationEngineCallback<Location> callback,
+                                     @NonNull LocationCallback listener,
                                      @Nullable Looper looper) throws SecurityException {
-    LocationCallback locationCallback = mapLocationListener(callback);
-    fusedLocationProviderClient.requestLocationUpdates(toGMSLocationRequest(request), locationCallback, looper);
+    fusedLocationProviderClient.requestLocationUpdates(toGMSLocationRequest(request), listener, looper);
   }
 
   @Override
-  public void removeLocationUpdates(@NonNull LocationEngineCallback<Location> callback) {
-    LocationCallback locationCallback = unmapLocationListener(callback);
-    if (locationCallback != null) {
-      fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+  public void requestLocationUpdates(@NonNull LocationEngineRequest request,
+                                     @NonNull PendingIntent pendingIntent,
+                                     @Nullable Looper looper) throws SecurityException {
+    // TODO: implement background request
+  }
+
+  @Override
+  public void removeLocationUpdates(@NonNull LocationCallback listener) {
+    if (listener != null) {
+      fusedLocationProviderClient.removeLocationUpdates(listener);
+    }
+  }
+
+  @Override
+  public void removeLocationUpdates(@NonNull PendingIntent pendingIntent) {
+    if (pendingIntent != null) {
+      fusedLocationProviderClient.removeLocationUpdates(pendingIntent);
     }
   }
 

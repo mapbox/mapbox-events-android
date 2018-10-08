@@ -169,7 +169,7 @@ public class TelemetryService extends Service implements TelemetryCallback, Even
 
   private void registerLocationReceiver() {
     // Instantiate location engine and request updates
-    locationEngine = LocationEngineProvider.getBestLocationEngine(getApplicationContext());
+    locationEngine = LocationEngineProvider.getBestLocationEngine(getApplicationContext(), false);
     if (locationPermissionCheck()) {
       try {
         locationEngine.requestLocationUpdates(getRequest(), callback, getMainLooper());
