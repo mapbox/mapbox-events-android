@@ -14,8 +14,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.content.PermissionChecker;
-
 import android.util.Log;
+
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineCallback;
 import com.mapbox.android.core.location.LocationEngineProvider;
@@ -29,6 +29,10 @@ import static com.mapbox.android.telemetry.TelemetryReceiver.TELEMETRY_RECEIVER_
 
 public class TelemetryService extends Service implements TelemetryCallback, EventCallback {
   public static final String IS_LOCATION_ENABLER_FROM_PREFERENCES = "isLocationEnablerFromPreferences";
+  private static final String MISSING_FINE_PERMISSION = "Detected that ACCESS_FINE_LOCATION permission is missing from"
+          + " the manifest. This is a required permission for Mapbox."
+          + "Please add this permission back into your manifest, "
+          + "so our system can work properly";
   public static final int API_LEVEL_23 = 23;
   private static final int DEFAULT_INTERVAL_IN_MILLISECONDS = 1000;
   private static final String TAG = "TelemetryService";
@@ -255,13 +259,18 @@ public class TelemetryService extends Service implements TelemetryCallback, Even
     if (Build.VERSION.SDK_INT >= API_LEVEL_23) {
       return PermissionsManager.areLocationPermissionsGranted(this);
     } else {
-      int coarsePermission = PermissionChecker.checkSelfPermission(MapboxTelemetry.applicationContext,
-              Manifest.permission.ACCESS_COARSE_LOCATION);
       int finePermission = PermissionChecker.checkSelfPermission(MapboxTelemetry.applicationContext,
               Manifest.permission.ACCESS_FINE_LOCATION);
-
-      return coarsePermission == PackageManager.PERMISSION_GRANTED
-              || finePermission == PackageManager.PERMISSION_GRANTED;
+      return checkFinePermission(finePermission);
     }
+  }
+
+  private boolean checkFinePermission(int finePermission) {
+    if (finePermission != PackageManager.PERMISSION_GRANTED) {
+      Log.d("Missing Permission", MISSING_FINE_PERMISSION);
+      return false;
+    }
+
+    return true;
   }
 }
