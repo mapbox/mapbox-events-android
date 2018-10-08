@@ -4,6 +4,11 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v3.3.0
+- ACCESS_FINE_LOCATION Permission Bug fix - [#227](https://github.com/mapbox/mapbox-events-android/pull/227)
+- Fix FileAttachment Queue Bug - [#226](https://github.com/mapbox/mapbox-events-android/pull/226)
+- Offline Maps Event - [#193](https://github.com/mapbox/mapbox-events-android/pull/193)
+
 ### v3.2.1
 - StopTelemetryService obtainBoundInstances bug fix - [#221](https://github.com/mapbox/mapbox-events-android/pull/221)
 - Telemetry proguard configuration - [#218](https://github.com/mapbox/mapbox-events-android/pull/218)
