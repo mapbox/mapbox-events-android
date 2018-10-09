@@ -17,6 +17,7 @@ dependencies {
     provided dependenciesList.gmsLocation
     testCompile dependenciesList.junit
     testCompile dependenciesList.mockito
+    testCompile dependenciesList.assertJ
 }
 
 apply from: "${rootDir}/gradle/checkstyle.gradle"

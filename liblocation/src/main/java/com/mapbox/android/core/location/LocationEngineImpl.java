@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
 /**
  * Internal location engine implementation interface.
@@ -32,4 +33,7 @@ interface LocationEngineImpl<T> {
   void removeLocationUpdates(T listener);
 
   void removeLocationUpdates(PendingIntent pendingIntent);
+
+  @VisibleForTesting
+  int getListenersCount();
 }

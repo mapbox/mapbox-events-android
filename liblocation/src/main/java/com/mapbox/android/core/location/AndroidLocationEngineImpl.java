@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 
 /**
@@ -131,6 +132,12 @@ class AndroidLocationEngineImpl extends AbstractLocationEngineImpl<LocationListe
     if (pendingIntent != null) {
       locationManager.removeUpdates(pendingIntent);
     }
+  }
+
+  @VisibleForTesting
+  @Override
+  public int getListenersCount() {
+    return registeredListeners();
   }
 
   private static Criteria getCriteria(int priority) {
