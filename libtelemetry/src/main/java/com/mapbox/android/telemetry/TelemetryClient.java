@@ -37,6 +37,19 @@ class TelemetryClient {
   private TelemetryClientSettings setting;
   private final Logger logger;
   private CertificateBlacklist certificateBlacklist;
+  private int requests;
+  private String failedRequests;
+  private int totalDataTransfer;
+  private int cellDataTransfer;
+  private int wifiDataTransfer;
+  private int appWakeups;
+  private String eventCountPerType;
+  private int eventCountFailed;
+  private int eventCountTotal;
+  private int eventCountMax;
+  private double deviceLat;
+  private double deviceLon;
+  private int deviceTimeDrift;
 
   TelemetryClient(String accessToken, String userAgent, TelemetryClientSettings setting, Logger logger,
                   CertificateBlacklist certificateBlacklist) {
@@ -45,6 +58,7 @@ class TelemetryClient {
     this.setting = setting;
     this.logger = logger;
     this.certificateBlacklist = certificateBlacklist;
+    resetCounters();
   }
 
   void updateAccessToken(String accessToken) {
@@ -59,6 +73,7 @@ class TelemetryClient {
     ArrayList<Event> batch = new ArrayList<>();
     batch.addAll(events);
     sendBatch(batch, callback);
+    requests++;
   }
 
   void sendAttachment(Attachment attachment, final CopyOnWriteArraySet<AttachmentListener> attachmentListeners) {
@@ -183,5 +198,16 @@ class TelemetryClient {
     }
 
     return builder.build();
+  }
+
+  private void resetCounters() {
+    requests = 0;
+    failedRequests = "";
+    totalDataTransfer = 0;
+    cellDataTransfer = 0;
+    wifiDataTransfer = 0;
+    eventCountFailed = 0;
+    eventCountTotal = 0;
+    eventCountMax = 0;
   }
 }

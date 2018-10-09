@@ -109,7 +109,7 @@ class MetricEvent extends Event implements Parcelable {
     return Type.TELEMETRY_METRIC;
   }
 
-  protected MetricEvent(Parcel in) {
+  MetricEvent(Parcel in) {
     event = in.readString();
     created = in.readString();
     dateUTC = in.readString();
