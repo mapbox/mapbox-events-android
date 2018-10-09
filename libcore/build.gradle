@@ -15,6 +15,10 @@ android {
         consumerProguardFiles 'proguard-consumer.pro'
     }
 
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
     sourceSets {
         main {
             java.srcDirs = ['src/main/java', '../liblocation/src/main/java']

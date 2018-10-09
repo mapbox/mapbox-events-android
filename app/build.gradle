@@ -26,6 +26,7 @@ android {
 dependencies {
     compile dependenciesList.supportAppcompatV7
     compile dependenciesList.supportConstraintLayout
+    compile dependenciesList.gmsLocation
 
     testCompile dependenciesList.junit
     testCompile dependenciesList.mockito
