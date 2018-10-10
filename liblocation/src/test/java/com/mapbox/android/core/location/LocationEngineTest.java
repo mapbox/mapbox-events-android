@@ -54,6 +54,11 @@ public class LocationEngineTest {
     assertThat(result.getLastLocation()).isEqualTo(expectedResult.getLastLocation());
   }
 
+  @Test(expected = NullPointerException.class)
+  public void getLastLocationNullCallback() {
+    engine.getLastLocation(null);
+  }
+
   @Test
   public void requestLocationUpdates() throws InterruptedException {
     final CountDownLatch latch = new CountDownLatch(1);
@@ -73,6 +78,16 @@ public class LocationEngineTest {
     LocationEngineResult result = resultRef.get();
     assertThat(result).isSameAs(expectedResult);
     assertThat(result.getLastLocation()).isEqualTo(expectedResult.getLastLocation());
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void requestLocationUpdatesNullCallback() {
+    engine.requestLocationUpdates(null, null, null);
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void removeLocationUpdatesNullCallback() {
+    engine.removeLocationUpdates(null);
   }
 
   @After

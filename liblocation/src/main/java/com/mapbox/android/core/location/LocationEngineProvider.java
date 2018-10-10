@@ -6,6 +6,8 @@ import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
+import static com.mapbox.android.core.location.Utils.checkNotNull;
+
 /**
  * The main entry point for location engine integration.
  */
@@ -27,6 +29,8 @@ public final class LocationEngineProvider {
    */
   @NonNull
   public static LocationEngine getBestLocationEngine(@NonNull Context context, boolean background) {
+    checkNotNull(context, "context == null");
+
     boolean hasGoogleLocationServices = isOnClasspath(GOOGLE_LOCATION_SERVICES);
     if (isOnClasspath(GOOGLE_API_AVAILABILITY)) {
       // Check Google Play services APK is available and up-to-date on this device

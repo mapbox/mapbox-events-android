@@ -9,6 +9,8 @@ import android.support.annotation.Nullable;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static com.mapbox.android.core.location.Utils.checkNotNull;
+
 class BackgroundLocationEngine extends ForegroundLocationEngine implements IntentHandler {
   private final BroadcastReceiverProxy broadcastReceiverProxy;
   private final List<LocationEngineCallback<LocationEngineResult>> callbacks;
@@ -30,6 +32,10 @@ class BackgroundLocationEngine extends ForegroundLocationEngine implements Inten
   public void requestLocationUpdates(@NonNull LocationEngineRequest request,
                                      @NonNull LocationEngineCallback<LocationEngineResult> callback,
                                      @Nullable Looper looper) throws SecurityException {
+
+    checkNotNull(request, "request == null");
+    checkNotNull(callback, "callback == null");
+
     if (broadcastReceiver == null) {
       broadcastReceiver = broadcastReceiverProxy.createReceiver(this);
       broadcastReceiverProxy.registerReceiver(broadcastReceiver);
@@ -41,6 +47,8 @@ class BackgroundLocationEngine extends ForegroundLocationEngine implements Inten
 
   @Override
   public void removeLocationUpdates(@NonNull LocationEngineCallback<LocationEngineResult> callback) {
+    checkNotNull(callback, "callback == null");
+
     callbacks.remove(callback);
     locationEngineImpl.removeLocationUpdates(broadcastReceiverProxy.getPendingIntent());
 

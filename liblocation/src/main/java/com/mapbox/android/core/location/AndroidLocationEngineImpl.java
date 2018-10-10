@@ -102,7 +102,11 @@ class AndroidLocationEngineImpl extends AbstractLocationEngineImpl<LocationListe
                                      @Nullable Looper looper) throws SecurityException {
     // Pick best provider only if user has not explicitly chosen passive mode
     if (request.getPriority() != LocationEngineRequest.PRIORITY_NO_POWER) {
-      currentProvider = locationManager.getBestProvider(getCriteria(request.getPriority()), true);
+      String provider = locationManager.getBestProvider(getCriteria(request.getPriority()), true);
+
+      if (provider != null) {
+        currentProvider = provider;
+      }
     }
 
     locationManager.requestLocationUpdates(currentProvider, request.getInterval(), request.getDisplacemnt(),
