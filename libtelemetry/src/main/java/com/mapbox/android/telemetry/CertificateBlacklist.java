@@ -240,4 +240,9 @@ class CertificateBlacklist implements Callback {
     url = url.replace(HTTPS, EMPTY_STRING);
     return url.split(BACKSLASH);
   }
+
+  private void setupMetrics(long serverTime, String responseString) {
+    MetricUtils.setConfigResponse(responseString);
+    MetricUtils.calculateTimeDiff(serverTime);
+  }
 }

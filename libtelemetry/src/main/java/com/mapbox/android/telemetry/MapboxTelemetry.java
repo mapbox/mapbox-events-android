@@ -130,6 +130,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   @Override
   public void onResponse(Call call, Response response) {
+    telemetryClient.updateFailedRequests(response.code());
     response.body().close();
     for (TelemetryListener telemetryListener : telemetryListeners) {
       telemetryListener.onHttpResponse(response.isSuccessful(), response.code());

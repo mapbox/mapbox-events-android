@@ -1,5 +1,7 @@
 package com.mapbox.android.telemetry;
 
+import android.location.Location;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSerializer;
@@ -9,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import okhttp3.Call;
@@ -37,19 +40,19 @@ class TelemetryClient {
   private TelemetryClientSettings setting;
   private final Logger logger;
   private CertificateBlacklist certificateBlacklist;
+  private MetricUtils metricUtils;
   private int requests;
-  private String failedRequests;
   private int totalDataTransfer;
   private int cellDataTransfer;
   private int wifiDataTransfer;
   private int appWakeups;
-  private String eventCountPerType;
   private int eventCountFailed;
   private int eventCountTotal;
   private int eventCountMax;
-  private double deviceLat;
-  private double deviceLon;
+  private Location deviceLocation;
   private int deviceTimeDrift;
+  private Map<String, Integer> eventCountPerType;
+  private Map<String, Integer> failedRequests;
 
   TelemetryClient(String accessToken, String userAgent, TelemetryClientSettings setting, Logger logger,
                   CertificateBlacklist certificateBlacklist) {
@@ -70,10 +73,15 @@ class TelemetryClient {
   }
 
   void sendEvents(List<Event> events, Callback callback) {
+    if (metricUtils.isNewDate()) {
+      buildMetricEvent();
+    }
+
     ArrayList<Event> batch = new ArrayList<>();
     batch.addAll(events);
     sendBatch(batch, callback);
     requests++;
+    eventCountPerType = metricUtils.calculateEventCountByType(events, eventCountPerType);
   }
 
   void sendAttachment(Attachment attachment, final CopyOnWriteArraySet<AttachmentListener> attachmentListeners) {
@@ -142,6 +150,12 @@ class TelemetryClient {
     return setting;
   }
 
+  void updateFailedRequests(int code) {
+    if (code >= 400) {
+      failedRequests = metricUtils.calculateFailedRequests(code, failedRequests);
+    }
+  }
+
   private void sendBatch(List<Event> batch, Callback callback) {
     GsonBuilder gsonBuilder = configureGsonBuilder();
     Gson gson = gsonBuilder.create();
@@ -200,12 +214,32 @@ class TelemetryClient {
     return builder.build();
   }
 
+  private void buildMetricEvent() {
+    MetricEvent metricEvent = new MetricEvent();
+    metricEvent.setDateUTC(metricUtils.getDateString());
+    metricEvent.setRequests(requests);
+    metricEvent.setFailedRequests(metricUtils.convertMapToJson(failedRequests));
+    metricEvent.setTotalDataTransfer(totalDataTransfer);
+    metricEvent.setCellDataTransfer(cellDataTransfer);
+    metricEvent.setWifiDataTransfer(wifiDataTransfer);
+    metricEvent.setAppWakeups(appWakeups);
+    metricEvent.setEventCountPerType(metricUtils.convertMapToJson(eventCountPerType));
+    metricEvent.setEventCountFailed(eventCountFailed);
+    metricEvent.setEventCountTotal(eventCountTotal);
+    metricEvent.setEventCountMax(eventCountMax);
+    //    metricEvent.setDeviceLat();
+    //    metricEvent.setDeviceLon();
+    //    metricEvent.setDeviceTimeDrift();
+    //    metricEvent.setConfigResponse();
+  }
+
   private void resetCounters() {
+    metricUtils = new MetricUtils();
     requests = 0;
-    failedRequests = "";
     totalDataTransfer = 0;
     cellDataTransfer = 0;
     wifiDataTransfer = 0;
+    appWakeups = 0;
     eventCountFailed = 0;
     eventCountTotal = 0;
     eventCountMax = 0;

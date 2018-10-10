@@ -43,7 +43,7 @@ class MetricEvent extends Event implements Parcelable {
   @SerializedName("configResponse")
   private String configResponse;
 
-  public MetricEvent() {
+  MetricEvent() {
     this.event = TELEMETRY_METRIC;
     this.created = TelemetryUtils.obtainCurrentDate();
   }
@@ -98,6 +98,10 @@ class MetricEvent extends Event implements Parcelable {
 
   public void setDeviceLon(Double deviceLon) {
     this.deviceLon = deviceLon;
+  }
+
+  public void setDeviceTimeDrift(Integer deviceTimeDrift) {
+    this.deviceTimeDrift = deviceTimeDrift;
   }
 
   public void setConfigResponse(String configResponse) {
