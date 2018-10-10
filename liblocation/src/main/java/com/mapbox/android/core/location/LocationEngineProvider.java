@@ -1,79 +1,65 @@
 package com.mapbox.android.core.location;
 
-
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.util.Log;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import static com.mapbox.android.core.location.Utils.checkNotNull;
 
-public class LocationEngineProvider {
-  private Map<LocationEngine.Type, LocationEngine> locationEngineDictionary;
-  private static final List<LocationEngine.Type> OPTIONAL_LOCATION_ENGINES = new ArrayList<LocationEngine.Type>() {
-    {
-      add(LocationEngine.Type.GOOGLE_PLAY_SERVICES);
-    }
-  };
+/**
+ * The main entry point for location engine integration.
+ */
+public final class LocationEngineProvider {
+  private static final String GOOGLE_LOCATION_SERVICES = "com.google.android.gms.location.LocationServices";
+  private static final String GOOGLE_API_AVAILABILITY = "com.google.android.gms.common.GoogleApiAvailability";
 
-  public LocationEngineProvider(Context context) {
-    initAvailableLocationEngines(context);
+  private LocationEngineProvider() {
+    // prevent instantiation
   }
 
   /**
-   * Get the best location engine, given the included libraries
+   * Returns instance to the best location engine, given the included libraries.
    *
+   * @param context    {@link Context}.
+   * @param background true if background optimized engine is desired.
    * @return a unique instance of {@link LocationEngine} every time method is called.
+   * @since 3.0.0
    */
   @NonNull
-  public LocationEngine obtainBestLocationEngineAvailable() {
-    return obtainBestLocationEngine();
-  }
+  public static LocationEngine getBestLocationEngine(@NonNull Context context, boolean background) {
+    checkNotNull(context, "context == null");
 
-  /**
-   * Get a location engine of desired type
-   *
-   * @param type {@link LocationEngine.Type}
-   * @return a unique instance of {@link LocationEngine} every time method is called.
-   */
-  @Nullable
-  public LocationEngine obtainLocationEngineBy(LocationEngine.Type type) {
-    LocationEngine locationEngine = locationEngineDictionary.get(type);
-    return locationEngine;
-  }
-
-  private void initAvailableLocationEngines(Context context) {
-    locationEngineDictionary = new HashMap<>();
-    Map<LocationEngine.Type, LocationEngineSupplier> locationEnginesDictionary =
-      obtainDefaultLocationEnginesDictionary();
-    for (Map.Entry<LocationEngine.Type, LocationEngineSupplier> entry : locationEnginesDictionary.entrySet()) {
-      LocationEngineSupplier locationEngineSupplier = entry.getValue();
-      if (locationEngineSupplier.hasDependencyOnClasspath()) {
-        LocationEngine available = locationEngineSupplier.supply(context);
-        locationEngineDictionary.put(entry.getKey(), available);
-      }
+    boolean hasGoogleLocationServices = isOnClasspath(GOOGLE_LOCATION_SERVICES);
+    if (isOnClasspath(GOOGLE_API_AVAILABILITY)) {
+      // Check Google Play services APK is available and up-to-date on this device
+      hasGoogleLocationServices &= GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context)
+              == ConnectionResult.SUCCESS;
     }
+
+    return getLocationEngine(context, hasGoogleLocationServices, background);
   }
 
-  private Map<LocationEngine.Type, LocationEngineSupplier> obtainDefaultLocationEnginesDictionary() {
-    ClasspathChecker classpathChecker = new ClasspathChecker();
-    Map<LocationEngine.Type, LocationEngineSupplier> locationSources = new HashMap<>();
-    locationSources.put(LocationEngine.Type.GOOGLE_PLAY_SERVICES, new GoogleLocationEngineFactory(classpathChecker));
-    locationSources.put(LocationEngine.Type.ANDROID, new AndroidLocationEngineFactory());
-
-    return locationSources;
+  private static LocationEngine getLocationEngine(Context context, boolean isGoogle, boolean background) {
+    return background ? new BackgroundLocationEngine(getEngineImplementation(context, isGoogle),
+            new LocationUpdatesBroadcastReceiverProxy(context)) :
+            new ForegroundLocationEngine(getEngineImplementation(context, isGoogle));
   }
 
-  private LocationEngine obtainBestLocationEngine() {
-    LocationEngine androidLocationEngine = locationEngineDictionary.get(LocationEngine.Type.ANDROID);
-    for (LocationEngine.Type type : OPTIONAL_LOCATION_ENGINES) {
-      LocationEngine bestLocationEngine = locationEngineDictionary.get(type);
-      if (bestLocationEngine != null) {
-        return bestLocationEngine;
-      }
+  private static LocationEngineImpl getEngineImplementation(Context context, boolean hasGoogleLocationServices) {
+    return hasGoogleLocationServices ? new GoogleLocationEngineImpl(context.getApplicationContext()) :
+            new AndroidLocationEngineImpl(context.getApplicationContext());
+  }
+
+  private static boolean isOnClasspath(String className) {
+    boolean isOnClassPath = true;
+    try {
+      Class.forName(className);
+    } catch (ClassNotFoundException exception) {
+      Log.w("LocationEngineProvider", "Missing " + className);
+      isOnClassPath = false;
     }
-    return androidLocationEngine;
+    return isOnClassPath;
   }
 }

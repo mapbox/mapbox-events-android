@@ -15,14 +15,14 @@ android {
 
 dependencies {
     provided dependenciesList.gmsLocation
-
-    compile dependenciesList.supportAppcompatV7
-
     testCompile dependenciesList.junit
     testCompile dependenciesList.mockito
+    testCompile dependenciesList.assertJ
+
     androidTestCompile(dependenciesList.testEspressoCore, {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+    androidTestCompile dependenciesList.gmsLocation
 }
 
 apply from: "${rootDir}/gradle/checkstyle.gradle"
