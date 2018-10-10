@@ -37,9 +37,9 @@ class MapLoadEvent extends Event implements Parcelable {
   @SerializedName("wifi")
   private Boolean wifi = null;
   @SerializedName("sdkIdentifier")
-  private String sdkIdentifier;
+  private String sdkIdentifier = null;
   @SerializedName("sdkVersion")
-  private String sdkVersion;
+  private String sdkVersion = null;
 
   MapLoadEvent(String userId) {
     this.event = MAP_LOAD;
