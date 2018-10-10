@@ -99,7 +99,6 @@ public class LocationEngineRequest {
     private int priority;
     private float displacement;
     private long maxWaitTime;
-    private boolean isBackground;
 
     /**
      * Default builder constructor.
@@ -112,7 +111,6 @@ public class LocationEngineRequest {
       this.priority = PRIORITY_HIGH_ACCURACY;
       this.displacement = 3.0f;
       this.maxWaitTime = 0L;
-      this.isBackground = false;
     }
 
     /**

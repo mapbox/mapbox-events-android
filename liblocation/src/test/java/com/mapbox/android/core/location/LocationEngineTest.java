@@ -1,6 +1,7 @@
 package com.mapbox.android.core.location;
 
 import android.location.Location;
+import android.os.Looper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,7 +23,7 @@ import static org.mockito.Mockito.doAnswer;
 public class LocationEngineTest {
   private static final double LATITUDE = 37.7749;
   private static final double LONGITUDE = 122.4194;
-  private static final long INTERVAL = 1L;
+  private static final long INTERVAL = 1000L;
 
   @Mock
   private LocationEngineImpl locationEngineImpl;
@@ -32,12 +33,11 @@ public class LocationEngineTest {
   @Before
   public void setUp() {
     locationEngineImpl = mock(LocationEngineImpl.class);
+    engine = new ForegroundLocationEngine(locationEngineImpl);
   }
 
   @Test
   public void getLastLocation() throws InterruptedException {
-    engine = new ForegroundLocationEngine(locationEngineImpl);
-
     final CountDownLatch latch = new CountDownLatch(1);
     final AtomicReference<LocationEngineResult> resultRef = new AtomicReference<>();
 
@@ -56,19 +56,18 @@ public class LocationEngineTest {
 
   @Test
   public void requestLocationUpdates() throws InterruptedException {
-    engine = new ForegroundLocationEngine(locationEngineImpl);
-
     final CountDownLatch latch = new CountDownLatch(1);
     final AtomicReference<LocationEngineResult> resultRef = new AtomicReference<>();
 
     LocationEngineCallback<LocationEngineResult> callback = getCallback(resultRef, latch);
     final LocationEngineResult expectedResult = getResult(LATITUDE, LONGITUDE);
+    Looper looper = mock(Looper.class);
 
     setupDoAnswer(expectedResult).when(locationEngineImpl)
             .requestLocationUpdates(getRequest(INTERVAL),
-                    locationEngineImpl.getLocationListener(callback), null);
+                    locationEngineImpl.getLocationListener(callback), looper);
 
-    engine.requestLocationUpdates(getRequest(INTERVAL), callback, null);
+    engine.requestLocationUpdates(getRequest(INTERVAL), callback, looper);
     assertTrue(latch.await(5, SECONDS));
 
     LocationEngineResult result = resultRef.get();

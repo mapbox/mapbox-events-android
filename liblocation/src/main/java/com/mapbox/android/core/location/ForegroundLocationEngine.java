@@ -21,7 +21,7 @@ class ForegroundLocationEngine implements LocationEngine {
                                      @NonNull LocationEngineCallback<LocationEngineResult> callback,
                                      @Nullable Looper looper) throws SecurityException {
     locationEngineImpl.requestLocationUpdates(request, locationEngineImpl.getLocationListener(callback),
-            looper);
+            looper == null ? Looper.getMainLooper() : looper);
   }
 
   @Override

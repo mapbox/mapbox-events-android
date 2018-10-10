@@ -75,8 +75,9 @@ class AndroidLocationEngineImpl extends AbstractLocationEngineImpl<LocationListe
   @Nullable
   @Override
   public LocationEngineResult extractResult(Intent intent) {
-    // TODO: implement parsing logic
-    return null;
+    return !hasResult(intent) ? null :
+            LocationEngineResult.create((Location)intent.getExtras()
+                    .getParcelable(LocationManager.KEY_LOCATION_CHANGED));
   }
 
   @Override
@@ -172,5 +173,9 @@ class AndroidLocationEngineImpl extends AbstractLocationEngineImpl<LocationListe
       default:
         return Criteria.NO_REQUIREMENT;
     }
+  }
+
+  private static boolean hasResult(Intent intent) {
+    return intent != null && intent.hasExtra(LocationManager.KEY_LOCATION_CHANGED);
   }
 }

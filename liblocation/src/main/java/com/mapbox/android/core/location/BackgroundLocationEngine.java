@@ -1,5 +1,6 @@
 package com.mapbox.android.core.location;
 
+import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -12,7 +13,7 @@ class BackgroundLocationEngine extends ForegroundLocationEngine implements Inten
   private final BroadcastReceiverProxy broadcastReceiverProxy;
   private final List<LocationEngineCallback<LocationEngineResult>> callbacks;
 
-  private LocationUpdatesBroadcastReceiver broadcastReceiver;
+  private BroadcastReceiver broadcastReceiver;
 
   BackgroundLocationEngine(@NonNull LocationEngineImpl locationEngineImpl,
                            @NonNull BroadcastReceiverProxy broadcastReceiverProxy) {
@@ -21,28 +22,27 @@ class BackgroundLocationEngine extends ForegroundLocationEngine implements Inten
     this.callbacks = new CopyOnWriteArrayList<>();
   }
 
+  /**
+   * Note:
+   * @param looper is ignored since the location result events are dispatched on main thread.
+   */
   @Override
   public void requestLocationUpdates(@NonNull LocationEngineRequest request,
                                      @NonNull LocationEngineCallback<LocationEngineResult> callback,
                                      @Nullable Looper looper) throws SecurityException {
     if (broadcastReceiver == null) {
-      broadcastReceiver = (LocationUpdatesBroadcastReceiver) broadcastReceiverProxy.createReceiver(this);
-      broadcastReceiverProxy.registerReceiver(broadcastReceiver,
-              LocationUpdatesBroadcastReceiver.ACTION_PROCESS_UPDATES);
+      broadcastReceiver = broadcastReceiverProxy.createReceiver(this);
+      broadcastReceiverProxy.registerReceiver(broadcastReceiver);
     }
 
     callbacks.add(callback);
-    locationEngineImpl.requestLocationUpdates(request,
-            broadcastReceiverProxy.getPendingIntent(LocationUpdatesBroadcastReceiver.class,
-                    LocationUpdatesBroadcastReceiver.ACTION_PROCESS_UPDATES));
+    locationEngineImpl.requestLocationUpdates(request, broadcastReceiverProxy.getPendingIntent());
   }
 
   @Override
   public void removeLocationUpdates(@NonNull LocationEngineCallback<LocationEngineResult> callback) {
     callbacks.remove(callback);
-    locationEngineImpl.removeLocationUpdates(
-            broadcastReceiverProxy.getPendingIntent(LocationUpdatesBroadcastReceiver.class,
-                    LocationUpdatesBroadcastReceiver.ACTION_PROCESS_UPDATES));
+    locationEngineImpl.removeLocationUpdates(broadcastReceiverProxy.getPendingIntent());
 
     if (callbacks.isEmpty()) {
       broadcastReceiverProxy.unregisterReceiver(broadcastReceiver);
