@@ -1,7 +1,5 @@
 package com.mapbox.android.telemetry;
 
-import android.location.Location;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSerializer;
@@ -49,8 +47,6 @@ class TelemetryClient {
   private int eventCountFailed;
   private int eventCountTotal;
   private int eventCountMax;
-  private Location deviceLocation;
-  private int deviceTimeDrift;
   private Map<String, Integer> eventCountPerType;
   private Map<String, Integer> failedRequests;
 
@@ -227,10 +223,10 @@ class TelemetryClient {
     metricEvent.setEventCountFailed(eventCountFailed);
     metricEvent.setEventCountTotal(eventCountTotal);
     metricEvent.setEventCountMax(eventCountMax);
-    //    metricEvent.setDeviceLat();
-    //    metricEvent.setDeviceLon();
-    //    metricEvent.setDeviceTimeDrift();
-    //    metricEvent.setConfigResponse();
+    metricEvent.setDeviceLat(metricUtils.getLatestLocation().getLatitude());
+    metricEvent.setDeviceLon(metricUtils.getLatestLocation().getLongitude());
+    metricEvent.setDeviceTimeDrift(metricUtils.getTimeDrift());
+    metricEvent.setConfigResponse(metricUtils.getConfigResponse());
   }
 
   private void resetCounters() {

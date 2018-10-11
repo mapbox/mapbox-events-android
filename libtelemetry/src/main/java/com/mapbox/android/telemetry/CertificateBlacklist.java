@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,6 +27,7 @@ import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.Headers;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -52,6 +55,7 @@ class CertificateBlacklist implements Callback {
   private static final String REQUEST_FAIL = "Request failed to download blacklist";
   private static final String READLINE_FAIL = "Unable to read line of Blacklist file";
   private static final String HTTPS_SCHEME = "https";
+  private static final String DATE_FORMAT = "EEE, dd MMM YYYY HH:mm:ss zzz";
   private static final Map<Environment, String> ENDPOINTS = new HashMap<Environment, String>() {
     {
       put(Environment.COM, COM_CONFIG_ENDPOINT);
@@ -226,6 +230,9 @@ class CertificateBlacklist implements Callback {
 
   private List<String> extractResponse(Response response) throws IOException {
     String responseData = response.body().string();
+    long serverTime = obtainServerTime(response);
+
+    setupMetrics(serverTime, responseData);
 
     Gson gson = new Gson();
     JsonObject jsonObject = gson.fromJson(responseData, JsonObject.class);
@@ -244,5 +251,23 @@ class CertificateBlacklist implements Callback {
   private void setupMetrics(long serverTime, String responseString) {
     MetricUtils.setConfigResponse(responseString);
     MetricUtils.calculateTimeDiff(serverTime);
+  }
+
+  private long obtainServerTime(Response response) {
+    Headers headers = response.headers();
+
+    String dateString = headers.get("Date");
+
+    SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+    Date serverDate = new Date();
+
+    try {
+      serverDate = dateFormat.parse(dateString);
+      Log.e("test", "date: " + serverDate);
+    } catch (ParseException exception) {
+      exception.printStackTrace();
+    }
+
+    return serverDate.getTime();
   }
 }

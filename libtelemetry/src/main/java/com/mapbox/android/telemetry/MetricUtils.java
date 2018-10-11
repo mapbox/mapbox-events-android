@@ -1,6 +1,7 @@
 package com.mapbox.android.telemetry;
 
 import android.content.Context;
+import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
@@ -17,9 +18,10 @@ import java.util.TimeZone;
 
 class MetricUtils {
   private Date utcDate;
-  private static long timeDrift;
+  private static int timeDrift;
   private static String configResponse;
   private int appWakeups;
+  private static Location latestLocation;
 
   void setAppWakeups(int appWakeups) {
     this.appWakeups = appWakeups;
@@ -27,6 +29,10 @@ class MetricUtils {
 
   static void setConfigResponse(String response) {
     configResponse = response;
+  }
+
+  static void setLatestLocation(Location location) {
+    latestLocation = location;
   }
 
   Date getUtcDate() {
@@ -37,8 +43,16 @@ class MetricUtils {
     return appWakeups;
   }
 
-  long getTimeDrift() {
+  int getTimeDrift() {
     return timeDrift;
+  }
+
+  String getConfigResponse() {
+    return configResponse;
+  }
+
+  Location getLatestLocation() {
+    return latestLocation;
   }
 
   Map<String, Integer> calculateEventCountByType(List<Event> eventsQueue,
@@ -87,7 +101,7 @@ class MetricUtils {
   }
 
   static void calculateTimeDiff(long serverTime) {
-    timeDrift = serverTime - System.currentTimeMillis();
+    timeDrift = (int) (serverTime - System.currentTimeMillis());
   }
 
   Map<String, Integer> calculateFailedRequests(int code, @Nullable Map<String, Integer> failedRequests) {
