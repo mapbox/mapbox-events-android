@@ -15,7 +15,6 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.IBinder;
 
-import com.mapbox.android.core.location.LocationEnginePriority;
 import com.mapbox.android.core.permissions.PermissionsManager;
 
 import java.io.IOException;
@@ -183,12 +182,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   public void updateUserAgent(String userAgent) {
     if (isUserAgentValid(userAgent)) {
       telemetryClient.updateUserAgent(TelemetryUtils.createFullUserAgent(userAgent, applicationContext));
-    }
-  }
-
-  public void updateLocationPriority(LocationEnginePriority locationPriority) {
-    if (isServiceBound && telemetryService != null) {
-      telemetryService.updateLocationPriority(locationPriority);
     }
   }
 

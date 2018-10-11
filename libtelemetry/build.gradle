@@ -33,7 +33,6 @@ dependencies {
     compile project(':libcore')
     compile dependenciesList.okhttp3
     compile dependenciesList.gson
-    compile dependenciesList.supportAppcompatV7
     compile dependenciesList.archLifecycleExtensions
     annotationProcessor dependenciesList.archLifecycleCompiler
 

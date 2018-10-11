@@ -17,7 +17,8 @@ ext {
             okhttp3             : '3.10.0',
             gson                : '2.8.2',
             espressoVersion     : '3.0.1',
-            archLifecycleVersion: "1.1.0"
+            archLifecycleVersion: "1.1.0",
+            assertJ             : "3.11.1"
     ]
 
     pluginVersion = [
@@ -62,7 +63,8 @@ ext {
             // unit test
             junit                  : "junit:junit:${version.junit}",
             mockito                : "org.mockito:mockito-core:${version.mockito}",
-            mockitoAndroid         : "org.mockito:mockito-android:${version.mockito}"
+            mockitoAndroid         : "org.mockito:mockito-android:${version.mockito}",
+            assertJ                : "org.assertj:assertj-core:${version.assertJ}"
     ]
 
     pluginDependencies = [
