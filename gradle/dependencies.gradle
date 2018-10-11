@@ -2,15 +2,15 @@ ext {
 
     androidVersions = [
             minSdkVersion    : 14,
-            targetSdkVersion : 26,
-            compileSdkVersion: 26,
-            buildToolsVersion: '27.0.2'
+            targetSdkVersion : 28,
+            compileSdkVersion: 28,
+            buildToolsVersion: '28.0.3'
     ]
 
     version = [
-            gmsLocation         : '11.0.4',
+            gmsLocation         : '15.0.1',
             junit               : '4.12',
-            supportLibVersion   : '26.1.0',
+            supportLibVersion   : '28.0.0',
             constraintLayout    : '1.0.2',
             mockito             : '2.11.0',
             testRunnerVersion   : '1.0.1',
