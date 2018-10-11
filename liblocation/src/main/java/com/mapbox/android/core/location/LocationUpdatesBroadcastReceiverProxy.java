@@ -35,12 +35,20 @@ class LocationUpdatesBroadcastReceiverProxy implements BroadcastReceiverProxy {
 
   @Override
   public void registerReceiver(BroadcastReceiver receiver) {
-    context.registerReceiver(receiver, new IntentFilter(ACTION_PROCESS_UPDATES));
+    try {
+      context.registerReceiver(receiver, new IntentFilter(ACTION_PROCESS_UPDATES));
+    } catch (IllegalArgumentException iae) {
+      iae.printStackTrace();
+    }
   }
 
   @Override
   public void unregisterReceiver(BroadcastReceiver receiver) {
-    context.unregisterReceiver(receiver);
+    try {
+      context.unregisterReceiver(receiver);
+    } catch (IllegalArgumentException iae) {
+      iae.printStackTrace();
+    }
   }
 
   @Override
