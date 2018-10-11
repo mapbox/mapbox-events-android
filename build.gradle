@@ -24,6 +24,10 @@ allprojects {
 subprojects {
     apply plugin: 'idea'
     apply from: "${rootDir}/gradle/dependencies.gradle"
+
+    afterEvaluate {
+        tasks.findByName('check').dependsOn('checkstyle')
+    }
 }
 
 task clean(type: Delete) {

@@ -10,15 +10,17 @@ import android.location.Location;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.content.PermissionChecker;
 import android.util.Log;
 
-import com.mapbox.android.core.location.LocationEngine;
-import com.mapbox.android.core.location.LocationEngineListener;
-import com.mapbox.android.core.location.LocationEnginePriority;
 import com.mapbox.android.core.location.LocationEngineProvider;
+import com.mapbox.android.core.location.LocationEngine;
+import com.mapbox.android.core.location.LocationEngineCallback;
+import com.mapbox.android.core.location.LocationEngineRequest;
+import com.mapbox.android.core.location.LocationEngineResult;
 import com.mapbox.android.core.permissions.PermissionsManager;
 
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -26,24 +28,45 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import static com.mapbox.android.telemetry.LocationReceiver.LOCATION_RECEIVER_INTENT;
 import static com.mapbox.android.telemetry.TelemetryReceiver.TELEMETRY_RECEIVER_INTENT;
 
-public class TelemetryService extends Service implements TelemetryCallback, LocationEngineListener, EventCallback {
+public class TelemetryService extends Service implements TelemetryCallback, EventCallback {
   public static final String IS_LOCATION_ENABLER_FROM_PREFERENCES = "isLocationEnablerFromPreferences";
   private static final String MISSING_FINE_PERMISSION = "Detected that ACCESS_FINE_LOCATION permission is missing from"
-    + " the manifest. This is a required permission for Mapbox. Please add this permission back into your manifest, "
-    + "so our system can work properly";
+          + " the manifest. This is a required permission for Mapbox."
+          + "Please add this permission back into your manifest, "
+          + "so our system can work properly";
   public static final int API_LEVEL_23 = 23;
+  private static final int DEFAULT_INTERVAL_IN_MILLISECONDS = 1000;
+  private static final String TAG = "TelemetryService";
   private LocationReceiver locationReceiver = null;
   private TelemetryReceiver telemetryReceiver = null;
   private EventsQueue queue = null;
   private int boundInstances = 0;
   private LocationEngine locationEngine = null;
-  private LocationEnginePriority locationPriority = LocationEnginePriority.NO_POWER;
   private CopyOnWriteArraySet<ServiceTaskCallback> serviceTaskCallbacks = null;
   private TelemetryLocationEnabler telemetryLocationEnabler;
   // For testing only:
   private boolean isLocationEnablerFromPreferences = true;
   private boolean isLocationReceiverRegistered = false;
   private boolean isTelemetryReceiverRegistered = false;
+
+  private final LocationEngineCallback<LocationEngineResult> callback =
+          new LocationEngineCallback<LocationEngineResult>() {
+    @Override
+    public void onSuccess(LocationEngineResult result) {
+      checkApplicationContext();
+      Location location = result.getLastLocation();
+      if (location == null) {
+        Log.e(TAG, "Location is unavailable");
+        return;
+      }
+      LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(LocationReceiver.supplyIntent(location));
+    }
+
+    @Override
+    public void onFailure(@NonNull Exception exception) {
+      Log.e(TAG, exception.toString());
+    }
+  };
 
   @Override
   public void onCreate() {
@@ -100,18 +123,6 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   }
 
   @Override
-  @SuppressWarnings( {"MissingPermission"})
-  public void onConnected() {
-    locationEngine.requestLocationUpdates();
-  }
-
-  @Override
-  public void onLocationChanged(Location location) {
-    checkApplicationContext();
-    LocalBroadcastManager.getInstance(this).sendBroadcast(LocationReceiver.supplyIntent(location));
-  }
-
-  @Override
   public void onEventReceived(Event event) {
     if (queue != null) {
       queue.push(event);
@@ -120,16 +131,6 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
 
   public void updateSessionIdentifier(SessionIdentifier sessionIdentifier) {
     locationReceiver.updateSessionIdentifier(sessionIdentifier);
-  }
-
-  public void updateLocationPriority(LocationEnginePriority priority) {
-    locationPriority = priority;
-
-    if (locationEngine != null) {
-      disconnectLocationEngine();
-      setupLocationEngine();
-      activateLocationEngine();
-    }
   }
 
   void bindInstance() {
@@ -178,32 +179,24 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   }
 
   private void registerLocationReceiver() {
-    connectLocationEngine();
+    // Instantiate location engine and request updates
+    locationEngine = LocationEngineProvider.getBestLocationEngine(getApplicationContext(), false);
+    if (locationPermissionCheck()) {
+      try {
+        locationEngine.requestLocationUpdates(getRequest(), callback, getMainLooper());
+      } catch (SecurityException se) {
+        Log.e(TAG, se.toString());
+      }
+    }
+
     LocalBroadcastManager.getInstance(getApplicationContext())
-      .registerReceiver(locationReceiver, new IntentFilter(LOCATION_RECEIVER_INTENT));
+            .registerReceiver(locationReceiver, new IntentFilter(LOCATION_RECEIVER_INTENT));
     isLocationReceiverRegistered = true;
   }
 
-  private void connectLocationEngine() {
-    obtainLocationEngine();
-    setupLocationEngine();
-
-    if (locationPermissionCheck()) {
-      activateLocationEngine();
-    }
-  }
-
-  private void obtainLocationEngine() {
-    locationEngine = new LocationEngineProvider(this).obtainBestLocationEngineAvailable();
-  }
-
-  private void setupLocationEngine() {
-    locationEngine.setPriority(locationPriority);
-    locationEngine.addLocationEngineListener(this);
-  }
-
-  private void activateLocationEngine() {
-    locationEngine.activate();
+  private static LocationEngineRequest getRequest() {
+    return new LocationEngineRequest.Builder(DEFAULT_INTERVAL_IN_MILLISECONDS)
+            .setPriority(LocationEngineRequest.PRIORITY_NO_POWER).build();
   }
 
   private void createTelemetryReceiver() {
@@ -213,7 +206,7 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
 
   private void registerTelemetryReceiver() {
     LocalBroadcastManager.getInstance(getApplicationContext())
-      .registerReceiver(telemetryReceiver, new IntentFilter(TELEMETRY_RECEIVER_INTENT));
+            .registerReceiver(telemetryReceiver, new IntentFilter(TELEMETRY_RECEIVER_INTENT));
     isTelemetryReceiverRegistered = true;
   }
 
@@ -231,29 +224,16 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
   }
 
   private void unregisterLocationReceiver() {
-    disconnectLocationEngine();
+    locationEngine.removeLocationUpdates(callback);
+
     LocalBroadcastManager.getInstance(getApplicationContext())
-      .unregisterReceiver(locationReceiver);
+            .unregisterReceiver(locationReceiver);
     isLocationReceiverRegistered = false;
-  }
-
-  private void disconnectLocationEngine() {
-    removeLocationUpdates();
-    deactivateLocationEngine();
-  }
-
-  private void removeLocationUpdates() {
-    locationEngine.removeLocationUpdates();
-    locationEngine.removeLocationEngineListener(this);
-  }
-
-  private void deactivateLocationEngine() {
-    locationEngine.deactivate();
   }
 
   private void unregisterTelemetryReceiver() {
     LocalBroadcastManager.getInstance(getApplicationContext())
-      .unregisterReceiver(telemetryReceiver);
+            .unregisterReceiver(telemetryReceiver);
     isTelemetryReceiverRegistered = false;
   }
 
@@ -287,8 +267,7 @@ public class TelemetryService extends Service implements TelemetryCallback, Loca
       return PermissionsManager.areLocationPermissionsGranted(this);
     } else {
       int finePermission = PermissionChecker.checkSelfPermission(MapboxTelemetry.applicationContext,
-        Manifest.permission.ACCESS_FINE_LOCATION);
-
+              Manifest.permission.ACCESS_FINE_LOCATION);
       return checkFinePermission(finePermission);
     }
   }
