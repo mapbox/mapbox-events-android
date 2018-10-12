@@ -23,6 +23,13 @@ android {
     }
 }
 
+configurations.all {
+    resolutionStrategy {
+        // Force our version of support-v4 to silence lint
+        force dependenciesList.supportV4
+    }
+}
+
 dependencies {
     implementation dependenciesList.supportAppcompatV7
     implementation dependenciesList.supportConstraintLayout
