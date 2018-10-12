@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import com.google.gson.Gson;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -20,12 +21,8 @@ class MetricUtils {
   private Date utcDate;
   private static int timeDrift;
   private static String configResponse;
-  private int appWakeups;
+  private static int appWakeups = 0;
   private static Location latestLocation;
-
-  void setAppWakeups(int appWakeups) {
-    this.appWakeups = appWakeups;
-  }
 
   static void setConfigResponse(String response) {
     configResponse = response;
@@ -33,10 +30,6 @@ class MetricUtils {
 
   static void setLatestLocation(Location location) {
     latestLocation = location;
-  }
-
-  Date getUtcDate() {
-    return utcDate;
   }
 
   int getAppWakeups() {
@@ -59,7 +52,7 @@ class MetricUtils {
                                                  @Nullable Map<String, Integer> eventCountByType) {
     if (eventsQueue.size() > 0) {
       if (eventCountByType == null) {
-        eventCountByType = new HashMap<String, Integer>();
+        eventCountByType = new HashMap<>();
       }
 
       for (Event event: eventsQueue) {
@@ -91,13 +84,21 @@ class MetricUtils {
       return false;
     }
 
-    return System.currentTimeMillis() > utcDate.getTime();
+    Calendar calendarPluseOneDay = Calendar.getInstance();
+    calendarPluseOneDay.setTime(utcDate);
+    calendarPluseOneDay.add(Calendar.DAY_OF_MONTH, 1);
+
+    return System.currentTimeMillis() > calendarPluseOneDay.getTimeInMillis();
   }
 
   String getDateString() {
     SimpleDateFormat format = new SimpleDateFormat("YYYY-MMM-DD");
     format.setTimeZone(TimeZone.getTimeZone("UTC"));
     return format.format(utcDate);
+  }
+
+  static void incrementAppWakeups() {
+    appWakeups++;
   }
 
   static void calculateTimeDiff(long serverTime) {

@@ -263,7 +263,6 @@ class CertificateBlacklist implements Callback {
 
     try {
       serverDate = dateFormat.parse(dateString);
-      Log.e("test", "date: " + serverDate);
     } catch (ParseException exception) {
       exception.printStackTrace();
     }

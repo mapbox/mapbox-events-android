@@ -1,5 +1,7 @@
 package com.mapbox.android.telemetry;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSerializer;
@@ -49,6 +51,7 @@ class TelemetryClient {
   private int eventCountMax;
   private Map<String, Integer> eventCountPerType;
   private Map<String, Integer> failedRequests;
+  private int potentialFailures;
 
   TelemetryClient(String accessToken, String userAgent, TelemetryClientSettings setting, Logger logger,
                   CertificateBlacklist certificateBlacklist) {
@@ -70,13 +73,15 @@ class TelemetryClient {
 
   void sendEvents(List<Event> events, Callback callback) {
     if (metricUtils.isNewDate()) {
-      buildMetricEvent();
+      events.add(buildMetricEvent());
     }
 
     ArrayList<Event> batch = new ArrayList<>();
     batch.addAll(events);
     sendBatch(batch, callback);
     requests++;
+    eventCountTotal = eventCountTotal + events.size();
+    potentialFailures = events.size();
     eventCountPerType = metricUtils.calculateEventCountByType(events, eventCountPerType);
   }
 
@@ -152,7 +157,7 @@ class TelemetryClient {
     }
   }
 
-  private void sendBatch(List<Event> batch, Callback callback) {
+  private void sendBatch(List<Event> batch, final Callback callback) {
     GsonBuilder gsonBuilder = configureGsonBuilder();
     Gson gson = gsonBuilder.create();
     String payload = gson.toJson(batch);
@@ -173,7 +178,23 @@ class TelemetryClient {
       .build();
 
     OkHttpClient client = setting.getClient(certificateBlacklist);
-    client.newCall(request).enqueue(callback);
+    client.newCall(request).enqueue(new Callback() {
+      @Override
+      public void onFailure(Call call, IOException exception) {
+        callback.onFailure(call, exception);
+        eventCountFailed = eventCountFailed + potentialFailures;
+      }
+
+      @Override
+      public void onResponse(Call call, Response response) {
+        try {
+          callback.onResponse(call, response);
+        } catch (IOException exception) {
+          exception.printStackTrace();
+        }
+      }
+    });
+    grabSentBytes(body);
   }
 
   private boolean isExtraDebuggingNeeded() {
@@ -210,7 +231,7 @@ class TelemetryClient {
     return builder.build();
   }
 
-  private void buildMetricEvent() {
+  private MetricEvent buildMetricEvent() {
     MetricEvent metricEvent = new MetricEvent();
     metricEvent.setDateUTC(metricUtils.getDateString());
     metricEvent.setRequests(requests);
@@ -227,6 +248,8 @@ class TelemetryClient {
     metricEvent.setDeviceLon(metricUtils.getLatestLocation().getLongitude());
     metricEvent.setDeviceTimeDrift(metricUtils.getTimeDrift());
     metricEvent.setConfigResponse(metricUtils.getConfigResponse());
+
+    return metricEvent;
   }
 
   private void resetCounters() {
@@ -239,5 +262,20 @@ class TelemetryClient {
     eventCountFailed = 0;
     eventCountTotal = 0;
     eventCountMax = 0;
+  }
+
+  private void grabSentBytes(RequestBody requestBody) {
+    try {
+      int sentBytes = (int) requestBody.contentLength();
+      totalDataTransfer = totalDataTransfer + sentBytes;
+
+      if (metricUtils.connectedToWifi(MapboxTelemetry.applicationContext)) {
+        wifiDataTransfer = wifiDataTransfer + sentBytes;
+      } else {
+        cellDataTransfer = cellDataTransfer + sentBytes;
+      }
+    } catch (IOException exception) {
+      exception.printStackTrace();
+    }
   }
 }
