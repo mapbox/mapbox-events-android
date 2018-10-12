@@ -36,6 +36,10 @@ class MapLoadEvent extends Event implements Parcelable {
   private String cellularNetworkType;
   @SerializedName("wifi")
   private Boolean wifi = null;
+  @SerializedName("sdkIdentifier")
+  private String sdkIdentifier = null;
+  @SerializedName("sdkVersion")
+  private String sdkVersion = null;
 
   MapLoadEvent(String userId) {
     this.event = MAP_LOAD;
@@ -73,6 +77,14 @@ class MapLoadEvent extends Event implements Parcelable {
     this.wifi = wifi;
   }
 
+  void setSdkIdentifier(String sdkIdentifier) {
+    this.sdkIdentifier = sdkIdentifier;
+  }
+
+  void setSdkVersion(String sdkVersion) {
+    this.sdkVersion = sdkVersion;
+  }
+
   private MapLoadEvent(Parcel in) {
     event = in.readString();
     created = in.readString();
@@ -88,6 +100,8 @@ class MapLoadEvent extends Event implements Parcelable {
     cellularNetworkType = in.readString();
     byte wifiVal = in.readByte();
     wifi = wifiVal == 0x02 ? null : wifiVal != 0x00;
+    sdkIdentifier = in.readString();
+    sdkVersion = in.readString();
   }
 
   @Override
@@ -124,6 +138,8 @@ class MapLoadEvent extends Event implements Parcelable {
     } else {
       dest.writeByte((byte) (wifi ? 0x01 : 0x00));
     }
+    dest.writeString(sdkIdentifier);
+    dest.writeString(sdkVersion);
   }
 
   @SuppressWarnings("unused")
