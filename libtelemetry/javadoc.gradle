@@ -5,7 +5,7 @@ android.libraryVariants.all { variant ->
         failOnError = false
         destinationDir = new File(destinationDir, variant.baseName)
         source = files(variant.javaCompile.source)
-        classpath = files(variant.javaCompile.classpath.files) + files(android.bootClasspath)
+        classpath = files(variant.javaCompile.classpath) + files(android.bootClasspath)
         options.windowTitle("Mapbox Android Telemetry SDK $VERSION_NAME Reference")
         options.docTitle("Mapbox Android Telemetry SDK $VERSION_NAME")
         options.header("Mapbox Android Telemetry SDK $VERSION_NAME Reference")

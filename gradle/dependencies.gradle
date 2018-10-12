@@ -23,8 +23,8 @@ ext {
 
     pluginVersion = [
             checkstyle     : '8.4',
-            gradle         : '3.0.1',
-            dependencyGraph: '0.3.0'
+            gradle         : '3.2.0',
+            dependencyGraph: '0.5.0'
     ]
 
     dependenciesList = [
