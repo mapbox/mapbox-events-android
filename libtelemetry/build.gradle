@@ -30,26 +30,26 @@ android {
 }
 
 dependencies {
-    compile project(':libcore')
-    compile dependenciesList.okhttp3
-    compile dependenciesList.gson
-    compile dependenciesList.archLifecycleExtensions
+    implementation project(':libcore')
+    implementation dependenciesList.okhttp3
+    implementation dependenciesList.gson
+    implementation dependenciesList.archLifecycleExtensions
+
     annotationProcessor dependenciesList.archLifecycleCompiler
 
-    testCompile dependenciesList.junit
-    testCompile dependenciesList.mockito
-    testCompile dependenciesList.okhttp3Mockwebserver
-    testCompile dependenciesList.commonsIO
+    testImplementation dependenciesList.junit
+    testImplementation dependenciesList.mockito
+    testImplementation dependenciesList.okhttp3Mockwebserver
+    testImplementation dependenciesList.commonsIO
 
-    androidTestCompile dependenciesList.mockitoAndroid
-    androidTestCompile dependenciesList.supportAnnotation
-    androidTestCompile dependenciesList.testRunner
-    androidTestCompile dependenciesList.testRules
-    androidTestCompile dependenciesList.gmsLocation
+    androidTestImplementation dependenciesList.mockitoAndroid
+    androidTestImplementation dependenciesList.supportAnnotation
+    androidTestImplementation dependenciesList.testRunner
+    androidTestImplementation dependenciesList.testRules
+    androidTestImplementation dependenciesList.gmsLocation
 }
 
 apply from: 'javadoc.gradle'
 apply from: "${rootDir}/gradle/mvn-push-android.gradle"
 apply from: "${rootDir}/gradle/checkstyle.gradle"
-apply from: "${rootDir}/gradle/dependencies-graph.gradle"
 apply from: "${rootDir}/gradle/download-schema.gradle"
