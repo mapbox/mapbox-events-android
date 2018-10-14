@@ -44,12 +44,14 @@ public class LocationEngineRequest {
   private final int priority;
   private final float displacement;
   private final long maxWaitTime;
+  private final long fastestInterval;
 
   private LocationEngineRequest(Builder builder) {
     this.interval = builder.interval;
     this.priority = builder.priority;
     this.displacement = builder.displacement;
     this.maxWaitTime = builder.maxWaitTime;
+    this.fastestInterval = builder.fastestInterval;
   }
 
   /**
@@ -93,12 +95,23 @@ public class LocationEngineRequest {
     return maxWaitTime;
   }
 
+  /**
+   * Returns fastest interval in milliseconds for location updates.
+   *
+   * @return fastest interval in milliseconds.
+   * @since 3.0.0
+   */
+  public long getFastestInterval() {
+    return fastestInterval;
+  }
+
   public static final class Builder {
     private final long interval;
 
     private int priority;
     private float displacement;
     private long maxWaitTime;
+    private long fastestInterval;
 
     /**
      * Default builder constructor.
@@ -111,6 +124,7 @@ public class LocationEngineRequest {
       this.priority = PRIORITY_HIGH_ACCURACY;
       this.displacement = 3.0f;
       this.maxWaitTime = 0L;
+      this.fastestInterval = 0L;
     }
 
     /**
@@ -150,6 +164,18 @@ public class LocationEngineRequest {
      */
     public Builder setMaxWaitTime(long maxWaitTime) {
       this.maxWaitTime = maxWaitTime;
+      return this;
+    }
+
+    /**
+     * Sets the fastest interval in milliseconds for location updates.
+     *
+     * @param interval fastest interval in milliseconds.
+     * @return reference to builder
+     * @since 3.0.0
+     */
+    public Builder setFastestInterval(long interval) {
+      this.fastestInterval = interval;
       return this;
     }
 

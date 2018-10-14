@@ -35,8 +35,16 @@ class LocationReceiver extends BroadcastReceiver {
   static Intent supplyIntent(List<Location> locations) {
     Intent locationIntent = new Intent(LOCATION_RECEIVER_INTENT);
     locationIntent.putExtra(LOCATION_RECEIVED_INTENT_KEY, ON_LOCATION_INTENT_EXTRA);
-    locationIntent.putParcelableArrayListExtra(LocationManager.KEY_LOCATION_CHANGED, (ArrayList<Location>)locations);
+    locationIntent.putParcelableArrayListExtra(LocationManager.KEY_LOCATION_CHANGED, getListOfLocations(locations));
     return locationIntent;
+  }
+
+  private static ArrayList<Location> getListOfLocations(List<Location> locations) {
+    ArrayList<Location> locationsList = new ArrayList<>();
+    for (Location location: locations) {
+      locationsList.add(location);
+    }
+    return locationsList;
   }
 
   void updateSessionIdentifier(SessionIdentifier sessionIdentifier) {

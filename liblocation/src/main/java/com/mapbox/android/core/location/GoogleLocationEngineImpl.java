@@ -125,7 +125,8 @@ class GoogleLocationEngineImpl extends AbstractLocationEngineImpl<LocationCallba
 
   private static LocationRequest toGMSLocationRequest(LocationEngineRequest request) {
     LocationRequest locationRequest = new LocationRequest();
-    locationRequest.setFastestInterval(request.getInterval());
+    locationRequest.setInterval(request.getInterval());
+    locationRequest.setFastestInterval(request.getFastestInterval());
     locationRequest.setSmallestDisplacement(request.getDisplacemnt());
     locationRequest.setMaxWaitTime(request.getMaxWaitTime());
     locationRequest.setPriority(toGMSLocationPriority(request.getPriority()));
