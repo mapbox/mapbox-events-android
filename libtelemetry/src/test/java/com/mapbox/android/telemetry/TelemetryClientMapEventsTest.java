@@ -3,12 +3,14 @@ package com.mapbox.android.telemetry;
 
 import android.app.AlarmManager;
 import android.content.Context;
+import android.net.ConnectivityManager;
 import android.telephony.TelephonyManager;
 import android.view.WindowManager;
 
 import com.google.gson.GsonBuilder;
 
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.util.HashMap;
 import java.util.List;
@@ -119,6 +121,8 @@ public class TelemetryClientMapEventsTest extends MockWebServerTest {
 
   private Context obtainMockedContext() {
     Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    final ConnectivityManager manager = mock(ConnectivityManager.class);
+    Mockito.when(mockedContext.getSystemService(Context.CONNECTIVITY_SERVICE)).thenReturn(manager);
     TelephonyManager mockedTelephonyManager = mock(TelephonyManager.class, RETURNS_DEEP_STUBS);
     when(mockedContext.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(mockedTelephonyManager);
     return mockedContext;

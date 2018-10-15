@@ -3,10 +3,12 @@ package com.mapbox.android.telemetry;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.net.ConnectivityManager;
 
 import com.google.gson.GsonBuilder;
 
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.util.List;
 
@@ -21,6 +23,8 @@ public class TelemetryClientLocationEventTest extends MockWebServerTest {
   @Test
   public void sendsTheCorrectBodyPostingLocationEvent() throws Exception {
     Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    final ConnectivityManager manager = mock(ConnectivityManager.class);
+    Mockito.when(mockedContext.getSystemService(Context.CONNECTIVITY_SERVICE)).thenReturn(manager);
     MapboxTelemetry.applicationContext = mockedContext;
     ActivityManager mockedActivityManager = mock(ActivityManager.class, RETURNS_DEEP_STUBS);
     when(mockedContext.getSystemService(Context.ACTIVITY_SERVICE)).thenReturn(mockedActivityManager);

@@ -5,12 +5,14 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.location.Location;
 import android.media.AudioManager;
+import android.net.ConnectivityManager;
 import android.telephony.TelephonyManager;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSerializer;
 
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -389,6 +391,8 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
 
   private void setupMockedContext() {
     Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    final ConnectivityManager manager = mock(ConnectivityManager.class);
+    Mockito.when(mockedContext.getSystemService(Context.CONNECTIVITY_SERVICE)).thenReturn(manager);
     MapboxTelemetry.applicationContext = mockedContext;
     AudioManager mockedAudioManager = mock(AudioManager.class, RETURNS_DEEP_STUBS);
     when(mockedContext.getSystemService(Context.AUDIO_SERVICE)).thenReturn(mockedAudioManager);
