@@ -1,6 +1,6 @@
 package com.mapbox.android.telemetry;
 
-import android.util.Log;
+import android.location.Location;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -244,10 +244,14 @@ class TelemetryClient {
     metricEvent.setEventCountFailed(eventCountFailed);
     metricEvent.setEventCountTotal(eventCountTotal);
     metricEvent.setEventCountMax(eventCountMax);
-    metricEvent.setDeviceLat(metricUtils.getLatestLocation().getLatitude());
-    metricEvent.setDeviceLon(metricUtils.getLatestLocation().getLongitude());
     metricEvent.setDeviceTimeDrift(metricUtils.getTimeDrift());
     metricEvent.setConfigResponse(metricUtils.getConfigResponse());
+
+    Location latestLocation = metricUtils.getLatestLocation();
+    if (latestLocation != null) {
+      metricEvent.setDeviceLat(latestLocation.getLatitude());
+      metricEvent.setDeviceLon(latestLocation.getLongitude());
+    }
 
     return metricEvent;
   }
