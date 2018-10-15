@@ -1,12 +1,10 @@
 package com.mapbox.android.core.location;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 
-import java.lang.ref.WeakReference;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 /**
  * Maintains callbacks mappings location engine callback to implementation specific callbacks.
@@ -14,10 +12,10 @@ import java.util.WeakHashMap;
  * @param <T> listener object type
  */
 abstract class AbstractLocationEngineImpl<T> {
-  private final Map<WeakReference<LocationEngineCallback<LocationEngineResult>>, T> listeners;
+  private final Map<LocationEngineCallback<LocationEngineResult>, T> listeners;
 
   AbstractLocationEngineImpl() {
-    listeners = new WeakHashMap<>();
+    listeners = new HashMap<>();
   }
 
   @NonNull
@@ -30,42 +28,22 @@ abstract class AbstractLocationEngineImpl<T> {
       throw new IllegalArgumentException("Callback can't be null");
     }
 
-    WeakReference<LocationEngineCallback<LocationEngineResult>> weakReference = findWeakReference(callback);
-    if (weakReference == null) {
-      weakReference = new WeakReference<>(callback);
-    } else {
+    if (listeners.containsKey(callback)) {
       // Remove listener for existing callback
-      destroyListener(listeners.get(weakReference));
+      destroyListener(listeners.get(callback));
     }
 
     T listener = createListener(callback);
-    listeners.put(weakReference, listener);
+    listeners.put(callback, listener);
     return listener;
   }
 
   T unmapLocationListener(@NonNull LocationEngineCallback<LocationEngineResult> callback) {
-    WeakReference<LocationEngineCallback<LocationEngineResult>> weakReference = findWeakReference(callback);
-    return weakReference != null ? listeners.remove(weakReference) : null;
+    return listeners.remove(callback);
   }
 
   @VisibleForTesting
   int registeredListeners() {
     return listeners.size();
-  }
-
-  @Nullable
-  private WeakReference<LocationEngineCallback<LocationEngineResult>> findWeakReference(
-          LocationEngineCallback<LocationEngineResult> callback) {
-    for (final WeakReference<LocationEngineCallback<LocationEngineResult>> weakReference : listeners.keySet()) {
-      if (weakReference == null) {
-        continue;
-      }
-
-      final LocationEngineCallback<LocationEngineResult> curCallback = weakReference.get();
-      if (curCallback != null && curCallback == callback) {
-        return weakReference;
-      }
-    }
-    return null;
   }
 }
