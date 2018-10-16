@@ -21,7 +21,9 @@ public class MapEventFactory {
   private static final int NO_NETWORK = -1;
   private static final String NOT_A_LOAD_MAP_EVENT_TYPE = "Type must be a load map event.";
   private static final String NOT_A_GESTURE_MAP_EVENT_TYPE = "Type must be a gesture map event.";
+  private static final String NOT_OFFLINEDOWNLOAD_EVENT_TYPE = "Type must be an offline download map event.";
   private static final String MAP_STATE_ILLEGAL_NULL = "MapState cannot be null.";
+
   private static final Map<Integer, String> ORIENTATIONS = new HashMap<Integer, String>() {
     {
       put(Configuration.ORIENTATION_LANDSCAPE, LANDSCAPE);
@@ -61,15 +63,29 @@ public class MapEventFactory {
     return BUILD_EVENT_MAP_GESTURE.get(type).build(mapState);
   }
 
-  public Event buildMapOfflineEvent(double minZoom, double maxZoom,
-                                    String shapeForOfflineRegion,
-                                    String[] sources) {
-    MapOfflineEvent mapOfflineEvent = new MapOfflineEvent();
-    mapOfflineEvent.setMinZoom(minZoom);
-    mapOfflineEvent.setMaxZoom(maxZoom);
-    mapOfflineEvent.setShapeForOfflineRegion(shapeForOfflineRegion);
-    mapOfflineEvent.setSources(sources);
-    return mapOfflineEvent;
+  public Event createOfflineDownloadStartEvent(String shapeForOfflineRegion,
+                                               Double minZoom, Double maxZoom,
+                                               String styleURL) {
+
+    OfflineDownloadStartEvent offlineEvent =
+      new OfflineDownloadStartEvent(shapeForOfflineRegion, minZoom, maxZoom);
+    offlineEvent.setStyleURL(styleURL);
+    return offlineEvent;
+  }
+
+  public Event createOfflineDownloadCompleteEvent(String shapeForOfflineRegion,
+                                                  Double minZoom, Double maxZoom,
+                                                  String styleURL,
+                                                  Long sizeOfResourcesCompleted,
+                                                  Long numberOfTilesCompleted,
+                                                  String state) {
+
+    OfflineDownloadEndEvent offlineEvent =
+      new OfflineDownloadEndEvent(shapeForOfflineRegion, minZoom, maxZoom);
+    offlineEvent.setStyleURL(styleURL);
+    offlineEvent.setSizeOfResourcesCompleted(sizeOfResourcesCompleted);
+    offlineEvent.setNumberOfTilesCompleted(numberOfTilesCompleted);
+    return offlineEvent;
   }
 
   private MapClickEvent buildMapClickEvent(MapState mapState) {
