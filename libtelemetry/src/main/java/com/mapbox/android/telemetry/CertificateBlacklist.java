@@ -156,8 +156,11 @@ class CertificateBlacklist implements Callback {
 
   @Override
   public void onResponse(Call call, Response response) throws IOException {
-    List<String> revokedKeys = extractResponse(response);
+    String responseData = response.body().string();
 
+    List<String> revokedKeys = extractResponse(responseData);
+
+    setupMetrics(obtainServerTime(response), responseData);
     saveBlackList(revokedKeys);
   }
 
@@ -228,12 +231,7 @@ class CertificateBlacklist implements Callback {
     return COM_CONFIG_ENDPOINT;
   }
 
-  private List<String> extractResponse(Response response) throws IOException {
-    String responseData = response.body().string();
-    long serverTime = obtainServerTime(response);
-
-    setupMetrics(serverTime, responseData);
-
+  private List<String> extractResponse(String responseData) throws IOException {
     Gson gson = new Gson();
     JsonObject jsonObject = gson.fromJson(responseData, JsonObject.class);
 
@@ -248,7 +246,7 @@ class CertificateBlacklist implements Callback {
     return url.split(BACKSLASH);
   }
 
-  private void setupMetrics(long serverTime, String responseString) {
+  private static void setupMetrics(long serverTime, String responseString) {
     MetricUtils.setConfigResponse(responseString);
     MetricUtils.calculateTimeDiff(serverTime);
   }
