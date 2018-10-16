@@ -273,9 +273,12 @@ public class TelemetryService extends Service implements TelemetryCallback, Even
     if (Build.VERSION.SDK_INT >= API_LEVEL_23) {
       return PermissionsManager.areLocationPermissionsGranted(this);
     } else {
-      int finePermission = PermissionChecker.checkSelfPermission(MapboxTelemetry.applicationContext,
-              Manifest.permission.ACCESS_FINE_LOCATION);
-      return checkFinePermission(finePermission);
+      if (MapboxTelemetry.applicationContext != null) {
+        int finePermission = PermissionChecker.checkSelfPermission(MapboxTelemetry.applicationContext,
+          Manifest.permission.ACCESS_FINE_LOCATION);
+        return checkFinePermission(finePermission);
+      }
+      return false;
     }
   }
 
