@@ -21,9 +21,9 @@ import android.util.Log;
 class AndroidLocationEngineImpl extends AbstractLocationEngineImpl<LocationListener>
         implements LocationEngineImpl<LocationListener> {
   private static final String TAG = "AndroidLocationEngine";
-  private final LocationManager locationManager;
-
   private String currentProvider = LocationManager.PASSIVE_PROVIDER;
+
+  final LocationManager locationManager;
 
   AndroidLocationEngineImpl(@NonNull Context context) {
     locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
@@ -76,24 +76,26 @@ class AndroidLocationEngineImpl extends AbstractLocationEngineImpl<LocationListe
   @Override
   public LocationEngineResult extractResult(Intent intent) {
     return !hasResult(intent) ? null :
-            LocationEngineResult.create((Location)intent.getExtras()
+            LocationEngineResult.create((Location) intent.getExtras()
                     .getParcelable(LocationManager.KEY_LOCATION_CHANGED));
   }
 
   @Override
   public void getLastLocation(@NonNull LocationEngineCallback<LocationEngineResult> callback) throws SecurityException {
-    Location lastLocation = null;
-    try {
-      lastLocation = locationManager.getLastKnownLocation(currentProvider);
-    } catch (IllegalArgumentException iae) {
-      Log.e(TAG, iae.toString());
-    }
-
+    Location lastLocation = getLastLocation(currentProvider);
     if (lastLocation != null) {
       callback.onSuccess(LocationEngineResult.create(lastLocation));
-    } else {
-      callback.onFailure(new Exception("Last location unavailable"));
+      return;
     }
+
+    for (String provider : locationManager.getAllProviders()) {
+      lastLocation = getLastLocation(provider);
+      if (lastLocation != null) {
+        callback.onSuccess(LocationEngineResult.create(lastLocation));
+        return;
+      }
+    }
+    callback.onFailure(new Exception("Last location unavailable"));
   }
 
   @Override
@@ -143,6 +145,16 @@ class AndroidLocationEngineImpl extends AbstractLocationEngineImpl<LocationListe
   @Override
   public int getListenersCount() {
     return registeredListeners();
+  }
+
+  Location getLastLocation(String provider) throws SecurityException {
+    Location location = null;
+    try {
+      location = locationManager.getLastKnownLocation(provider);
+    } catch (IllegalArgumentException iae) {
+      Log.e(TAG, iae.toString());
+    }
+    return location;
   }
 
   private static Criteria getCriteria(int priority) {
