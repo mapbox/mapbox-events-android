@@ -145,22 +145,22 @@ public class VisionObjectDetectionEvent extends Event implements Parcelable {
 
   @Override
   Event.Type obtainType() {
-    return Event.Type.VIS_GENERAL;
+    return Type.VIS_OBJ_DETECTION;
   }
 
   private VisionObjectDetectionEvent(Parcel in) {
     this.event = in.readString();
     this.created = in.readString();
-    this.object_lat = in.readDouble();
-    this.object_lon = in.readDouble();
-    this.vehicle_lat = in.readDouble();
-    this.vehicle_lon = in.readDouble();
-    this.clazz = in.readString();
-    this.sign_value = in.readString();
-    this.object_size_width = in.readDouble();
-    this.object_size_height = in.readDouble();
-    this.object_pos_height = in.readDouble();
-    this.distance_from_camera = in.readDouble();
+    this.object_lat = readDoubleIfNotNull(in);
+    this.object_lon = readDoubleIfNotNull(in);
+    this.vehicle_lat = readDoubleIfNotNull(in);
+    this.vehicle_lon = readDoubleIfNotNull(in);
+    this.clazz = readStringIfNotNull(in);
+    this.sign_value = readStringIfNotNull(in);
+    this.object_size_width = readDoubleIfNotNull(in);
+    this.object_size_height = readDoubleIfNotNull(in);
+    this.object_pos_height = readDoubleIfNotNull(in);
+    this.distance_from_camera = readDoubleIfNotNull(in);
   }
 
   @Override
@@ -186,15 +186,25 @@ public class VisionObjectDetectionEvent extends Event implements Parcelable {
   }
 
   private static void writeDoubleIfNotNull(Parcel parcel, Double value) {
+    parcel.writeByte((byte) (value != null ? 1 : 0));
     if (value != null) {
-      parcel.writeDouble(value.doubleValue());
+      parcel.writeDouble(value);
     }
   }
 
   private static void writeStringIfNotNull(Parcel parcel, String value) {
+    parcel.writeByte((byte) (value != null ? 1 : 0));
     if (value != null) {
       parcel.writeString(value);
     }
+  }
+
+  private static Double readDoubleIfNotNull(Parcel parcel) {
+    return parcel.readByte() == 0 ? null : parcel.readDouble();
+  }
+
+  private static String readStringIfNotNull(Parcel parcel) {
+    return parcel.readByte() == 0 ? null : parcel.readString();
   }
 
   public static final Parcelable.Creator<VisionObjectDetectionEvent> CREATOR =
