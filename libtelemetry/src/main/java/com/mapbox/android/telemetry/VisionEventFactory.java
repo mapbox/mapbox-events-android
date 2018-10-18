@@ -28,6 +28,10 @@ public class VisionEventFactory {
   }
 
   public Event createVisionEvent(Event.Type type) {
+    // Prevent vision event instantiation via this factory
+    if (type == Event.Type.VIS_OBJ_DETECTION) {
+      throw new UnsupportedOperationException("Unsupported event type: " + type.name());
+    }
     checkVisionEvent(type);
     return BUILD_EVENT_VISION.get(type).build();
   }

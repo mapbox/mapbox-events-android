@@ -258,6 +258,14 @@ public class SchemaTest {
     schemaContainsFields(schema, fields);
   }
 
+  @Test
+  public void validateVisionEventFormat() {
+    JsonObject schema = grabSchema(VisionObjectDetectionEvent.VIS_OBJECT_DETECTION);
+    List<Field> fields = grabClassFields(VisionObjectDetectionEvent.class);
+    assertEquals(schema.size(), fields.size());
+    schemaContainsFields(schema, fields);
+  }
+
   private void schemaContainsFields(JsonObject schema, List<Field> fields) {
     int distanceRemainingCount = 0;
     int durationRemainingCount = 0;

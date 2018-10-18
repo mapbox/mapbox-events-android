@@ -35,6 +35,13 @@ public class VisionEventFactoryTest {
     assertTrue(visonEvent instanceof VisionEvent);
   }
 
+  @Test(expected = UnsupportedOperationException.class)
+  public void checksVisionObjectDetectionEvent() {
+    initializeMapboxTelemetry();
+    VisionEventFactory aVisionEventFactory = new VisionEventFactory();
+    aVisionEventFactory.createVisionEvent(Event.Type.VIS_OBJ_DETECTION);
+  }
+
   @Test
   public void checksVisionsAttachmentEvent() {
     initializeMapboxTelemetry();
