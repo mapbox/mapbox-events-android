@@ -40,7 +40,7 @@ public class VisionObjectDetectionEvent extends Event implements Parcelable {
   @SerializedName("distance_from_camera")
   private Double distance_from_camera;
 
-  VisionObjectDetectionEvent(String created) {
+  public VisionObjectDetectionEvent(String created) {
     this.event = VIS_OBJECT_DETECTION;
     this.created = created;
     this.object_lat = null;
@@ -83,7 +83,7 @@ public class VisionObjectDetectionEvent extends Event implements Parcelable {
     return vehicle_lat;
   }
 
-  public void getVehicleLatitude(double latitude) {
+  public void setVehicleLatitude(double latitude) {
     this.vehicle_lat = latitude;
   }
 
