@@ -21,9 +21,9 @@ import android.util.Log;
 class AndroidLocationEngineImpl extends AbstractLocationEngineImpl<LocationListener>
         implements LocationEngineImpl<LocationListener> {
   private static final String TAG = "AndroidLocationEngine";
-  private String currentProvider = LocationManager.PASSIVE_PROVIDER;
-
   final LocationManager locationManager;
+
+  String currentProvider = LocationManager.PASSIVE_PROVIDER;
 
   AndroidLocationEngineImpl(@NonNull Context context) {
     locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
@@ -81,21 +81,32 @@ class AndroidLocationEngineImpl extends AbstractLocationEngineImpl<LocationListe
   }
 
   @Override
-  public void getLastLocation(@NonNull LocationEngineCallback<LocationEngineResult> callback) throws SecurityException {
-    Location lastLocation = getLastLocation(currentProvider);
+  public void getLastLocation(@NonNull LocationEngineCallback<LocationEngineResult> callback)
+          throws SecurityException {
+    Location lastLocation = getLastLocationFor(currentProvider);
     if (lastLocation != null) {
       callback.onSuccess(LocationEngineResult.create(lastLocation));
       return;
     }
 
     for (String provider : locationManager.getAllProviders()) {
-      lastLocation = getLastLocation(provider);
+      lastLocation = getLastLocationFor(provider);
       if (lastLocation != null) {
         callback.onSuccess(LocationEngineResult.create(lastLocation));
         return;
       }
     }
     callback.onFailure(new Exception("Last location unavailable"));
+  }
+
+  Location getLastLocationFor(String provider) throws SecurityException {
+    Location location = null;
+    try {
+      location = locationManager.getLastKnownLocation(provider);
+    } catch (IllegalArgumentException iae) {
+      Log.e(TAG, iae.toString());
+    }
+    return location;
   }
 
   @Override
@@ -147,17 +158,8 @@ class AndroidLocationEngineImpl extends AbstractLocationEngineImpl<LocationListe
     return registeredListeners();
   }
 
-  Location getLastLocation(String provider) throws SecurityException {
-    Location location = null;
-    try {
-      location = locationManager.getLastKnownLocation(provider);
-    } catch (IllegalArgumentException iae) {
-      Log.e(TAG, iae.toString());
-    }
-    return location;
-  }
-
-  private static Criteria getCriteria(int priority) {
+  @VisibleForTesting
+  static Criteria getCriteria(int priority) {
     Criteria criteria = new Criteria();
     criteria.setAccuracy(priorityToAccuracy(priority));
     criteria.setCostAllowed(true);
@@ -184,10 +186,9 @@ class AndroidLocationEngineImpl extends AbstractLocationEngineImpl<LocationListe
       case LocationEngineRequest.PRIORITY_BALANCED_POWER_ACCURACY:
         return Criteria.POWER_MEDIUM;
       case LocationEngineRequest.PRIORITY_LOW_POWER:
-        return Criteria.POWER_LOW;
       case LocationEngineRequest.PRIORITY_NO_POWER:
       default:
-        return Criteria.NO_REQUIREMENT;
+        return Criteria.POWER_LOW;
     }
   }
 
