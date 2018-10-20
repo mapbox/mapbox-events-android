@@ -117,7 +117,9 @@ class MapboxFusedLocationEngineImpl extends AndroidLocationEngineImpl implements
       currentBestLocation = location;
     }
 
-    this.callback.onSuccess(LocationEngineResult.create(currentBestLocation));
+    if (callback != null) {
+      callback.onSuccess(LocationEngineResult.create(currentBestLocation));
+    }
   }
 
   @Override
