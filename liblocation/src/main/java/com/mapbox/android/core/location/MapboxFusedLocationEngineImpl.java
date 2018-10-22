@@ -19,29 +19,47 @@ import static com.mapbox.android.core.location.Utils.isBetterLocation;
  * <p>
  * Note: optimize engine logic for availability
  */
-class MapboxFusedLocationEngineImpl extends AndroidLocationEngineImpl implements LocationListener {
+class MapboxFusedLocationEngineImpl extends AndroidLocationEngineImpl {
   private static final String TAG = "MapboxLocationEngine";
 
-  private LocationEngineCallback<LocationEngineResult> callback;
   private Location currentBestLocation;
+  private LocationListener locationListener;
 
   MapboxFusedLocationEngineImpl(@NonNull Context context) {
     super(context);
-    this.callback = null;
   }
 
   @NonNull
   @Override
   LocationListener createListener(final LocationEngineCallback<LocationEngineResult> callback) {
-    this.callback = callback;
-    return this;
-  }
+    this.locationListener = new LocationListener() {
+      @Override
+      public void onLocationChanged(Location location) {
+        if (isBetterLocation(location, currentBestLocation)) {
+          currentBestLocation = location;
+        }
 
-  @Nullable
-  @Override
-  public LocationListener removeLocationListener(@NonNull LocationEngineCallback<LocationEngineResult> callback) {
-    this.callback = null;
-    return super.removeLocationListener(callback);
+        if (callback != null) {
+          callback.onSuccess(LocationEngineResult.create(currentBestLocation));
+        }
+      }
+
+      @Override
+      public void onStatusChanged(String provider, int status, Bundle extras) {
+        Log.d(TAG, "onStatusChanged: " + provider);
+      }
+
+      @Override
+      public void onProviderEnabled(String provider) {
+        Log.d(TAG, "onProviderEnabled: " + provider);
+      }
+
+      @Override
+      public void onProviderDisabled(String provider) {
+        Log.d(TAG, "onProviderDisabled: " + provider);
+      }
+    };
+    return locationListener;
   }
 
   @Override
@@ -74,7 +92,7 @@ class MapboxFusedLocationEngineImpl extends AndroidLocationEngineImpl implements
     // Fetch best last location
     Location bestLastLocation = getBestLastLocation();
     if (bestLastLocation != null) {
-      onLocationChanged(bestLastLocation);
+      locationListener.onLocationChanged(bestLastLocation);
     }
   }
 
@@ -109,32 +127,6 @@ class MapboxFusedLocationEngineImpl extends AndroidLocationEngineImpl implements
       currentBestLocation = location;
     }
     return LocationEngineResult.create(currentBestLocation);
-  }
-
-  @Override
-  public void onLocationChanged(Location location) {
-    if (isBetterLocation(location, currentBestLocation)) {
-      currentBestLocation = location;
-    }
-
-    if (callback != null) {
-      callback.onSuccess(LocationEngineResult.create(currentBestLocation));
-    }
-  }
-
-  @Override
-  public void onStatusChanged(String provider, int status, Bundle extras) {
-    Log.d(TAG, "onStatusChanged: " + provider);
-  }
-
-  @Override
-  public void onProviderEnabled(String provider) {
-    Log.d(TAG, "onProviderEnabled: " + provider);
-  }
-
-  @Override
-  public void onProviderDisabled(String provider) {
-    Log.d(TAG, "onProviderEnabled: " + provider);
   }
 
   private Location getBestLastLocation() {

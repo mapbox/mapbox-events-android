@@ -55,14 +55,9 @@ class AndroidLocationEngineImpl extends AbstractLocationEngineImpl<LocationListe
     };
   }
 
-  @Override
-  void destroyListener(@NonNull LocationListener listener) {
-    locationManager.removeUpdates(listener);
-  }
-
   @NonNull
   @Override
-  public LocationListener getLocationListener(@NonNull LocationEngineCallback<LocationEngineResult> callback) {
+  public LocationListener setLocationListener(@NonNull LocationEngineCallback<LocationEngineResult> callback) {
     return mapLocationListener(callback);
   }
 
