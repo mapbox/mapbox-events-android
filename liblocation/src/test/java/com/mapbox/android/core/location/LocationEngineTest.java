@@ -70,7 +70,7 @@ public class LocationEngineTest {
 
     setupDoAnswer(expectedResult).when(locationEngineImpl)
             .requestLocationUpdates(getRequest(INTERVAL),
-                    locationEngineImpl.getLocationListener(callback), looper);
+                    locationEngineImpl.setLocationListener(callback), looper);
 
     engine.requestLocationUpdates(getRequest(INTERVAL), callback, looper);
     assertTrue(latch.await(5, SECONDS));

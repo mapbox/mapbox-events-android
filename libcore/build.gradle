@@ -20,6 +20,11 @@ android {
             java.srcDirs = ['src/main/java', '../liblocation/src/main/java']
         }
     }
+
+    lintOptions {
+        warningsAsErrors true
+        abortOnError true
+    }
 }
 
 dependencies {

@@ -49,7 +49,7 @@ public final class LocationEngineProvider {
 
   private static LocationEngineImpl getEngineImplementation(Context context, boolean hasGoogleLocationServices) {
     return hasGoogleLocationServices ? new GoogleLocationEngineImpl(context.getApplicationContext()) :
-            new AndroidLocationEngineImpl(context.getApplicationContext());
+            new MapboxFusedLocationEngineImpl(context.getApplicationContext());
   }
 
   private static boolean isOnClasspath(String className) {

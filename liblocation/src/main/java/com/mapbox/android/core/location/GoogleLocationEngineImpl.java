@@ -48,16 +48,9 @@ class GoogleLocationEngineImpl extends AbstractLocationEngineImpl<LocationCallba
     };
   }
 
-  @Override
-  void destroyListener(@NonNull LocationCallback listener) {
-    if (listener != null) {
-      fusedLocationProviderClient.removeLocationUpdates(listener);
-    }
-  }
-
   @NonNull
   @Override
-  public LocationCallback getLocationListener(@NonNull LocationEngineCallback<LocationEngineResult> callback) {
+  public LocationCallback setLocationListener(@NonNull LocationEngineCallback<LocationEngineResult> callback) {
     return mapLocationListener(callback);
   }
 

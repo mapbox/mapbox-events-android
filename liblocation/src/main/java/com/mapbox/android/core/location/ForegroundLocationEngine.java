@@ -26,7 +26,9 @@ class ForegroundLocationEngine implements LocationEngine {
     checkNotNull(request, "request == null");
     checkNotNull(callback, "callback == null");
 
-    locationEngineImpl.requestLocationUpdates(request, locationEngineImpl.getLocationListener(callback),
+    // Remove listener if it already exist
+    removeLocationUpdates(callback);
+    locationEngineImpl.requestLocationUpdates(request, locationEngineImpl.setLocationListener(callback),
             looper == null ? Looper.getMainLooper() : looper);
   }
 
