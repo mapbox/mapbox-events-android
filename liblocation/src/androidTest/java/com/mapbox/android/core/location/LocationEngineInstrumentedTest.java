@@ -20,11 +20,11 @@ import static junit.framework.Assert.assertTrue;
 public class LocationEngineInstrumentedTest {
   private static final long INTERVAL = 1000L;
 
-  private static LocationEngine[] foregroundLocationEngines = { getAndroidEngine(false),
-          getGoogleEngine(false)};
+  private static LocationEngine[] foregroundLocationEngines = {getAndroidEngine(false),
+          getGoogleEngine(false), getMapboxEngine(false)};
 
-  private static LocationEngine[] backgroundLocationEngines = { getAndroidEngine(true),
-          getGoogleEngine(true)};
+  private static LocationEngine[] backgroundLocationEngines = {getAndroidEngine(true),
+          getGoogleEngine(true), getMapboxEngine(true)};
 
   @Rule
   public GrantPermissionRule permissionRule =
@@ -75,6 +75,11 @@ public class LocationEngineInstrumentedTest {
       assertNotNull(result.getLastLocation());
       engine.removeLocationUpdates(callback);
     }
+  }
+
+  private static LocationEngine getMapboxEngine(boolean supportBackground) {
+    Context context = InstrumentationRegistry.getTargetContext();
+    return getEngine(supportBackground, new MapboxFusedLocationEngineImpl(context));
   }
 
   private static LocationEngine getAndroidEngine(boolean supportBackground) {

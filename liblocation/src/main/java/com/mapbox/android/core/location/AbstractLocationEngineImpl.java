@@ -21,16 +21,10 @@ abstract class AbstractLocationEngineImpl<T> {
   @NonNull
   abstract T createListener(LocationEngineCallback<LocationEngineResult> callback);
 
-  abstract void destroyListener(@NonNull T listener);
 
   T mapLocationListener(@NonNull LocationEngineCallback<LocationEngineResult> callback) {
     if (callback == null) {
       throw new IllegalArgumentException("Callback can't be null");
-    }
-
-    if (listeners.containsKey(callback)) {
-      // Remove listener for existing callback
-      destroyListener(listeners.get(callback));
     }
 
     T listener = createListener(callback);

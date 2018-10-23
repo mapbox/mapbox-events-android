@@ -21,9 +21,9 @@ import android.util.Log;
 class AndroidLocationEngineImpl extends AbstractLocationEngineImpl<LocationListener>
         implements LocationEngineImpl<LocationListener> {
   private static final String TAG = "AndroidLocationEngine";
-  private final LocationManager locationManager;
+  final LocationManager locationManager;
 
-  private String currentProvider = LocationManager.PASSIVE_PROVIDER;
+  String currentProvider = LocationManager.PASSIVE_PROVIDER;
 
   AndroidLocationEngineImpl(@NonNull Context context) {
     locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
@@ -55,14 +55,9 @@ class AndroidLocationEngineImpl extends AbstractLocationEngineImpl<LocationListe
     };
   }
 
-  @Override
-  void destroyListener(@NonNull LocationListener listener) {
-    locationManager.removeUpdates(listener);
-  }
-
   @NonNull
   @Override
-  public LocationListener getLocationListener(@NonNull LocationEngineCallback<LocationEngineResult> callback) {
+  public LocationListener setLocationListener(@NonNull LocationEngineCallback<LocationEngineResult> callback) {
     return mapLocationListener(callback);
   }
 
@@ -76,24 +71,37 @@ class AndroidLocationEngineImpl extends AbstractLocationEngineImpl<LocationListe
   @Override
   public LocationEngineResult extractResult(Intent intent) {
     return !hasResult(intent) ? null :
-            LocationEngineResult.create((Location)intent.getExtras()
+            LocationEngineResult.create((Location) intent.getExtras()
                     .getParcelable(LocationManager.KEY_LOCATION_CHANGED));
   }
 
   @Override
-  public void getLastLocation(@NonNull LocationEngineCallback<LocationEngineResult> callback) throws SecurityException {
-    Location lastLocation = null;
+  public void getLastLocation(@NonNull LocationEngineCallback<LocationEngineResult> callback)
+          throws SecurityException {
+    Location lastLocation = getLastLocationFor(currentProvider);
+    if (lastLocation != null) {
+      callback.onSuccess(LocationEngineResult.create(lastLocation));
+      return;
+    }
+
+    for (String provider : locationManager.getAllProviders()) {
+      lastLocation = getLastLocationFor(provider);
+      if (lastLocation != null) {
+        callback.onSuccess(LocationEngineResult.create(lastLocation));
+        return;
+      }
+    }
+    callback.onFailure(new Exception("Last location unavailable"));
+  }
+
+  Location getLastLocationFor(String provider) throws SecurityException {
+    Location location = null;
     try {
-      lastLocation = locationManager.getLastKnownLocation(currentProvider);
+      location = locationManager.getLastKnownLocation(provider);
     } catch (IllegalArgumentException iae) {
       Log.e(TAG, iae.toString());
     }
-
-    if (lastLocation != null) {
-      callback.onSuccess(LocationEngineResult.create(lastLocation));
-    } else {
-      callback.onFailure(new Exception("Last location unavailable"));
-    }
+    return location;
   }
 
   @Override
@@ -145,7 +153,8 @@ class AndroidLocationEngineImpl extends AbstractLocationEngineImpl<LocationListe
     return registeredListeners();
   }
 
-  private static Criteria getCriteria(int priority) {
+  @VisibleForTesting
+  static Criteria getCriteria(int priority) {
     Criteria criteria = new Criteria();
     criteria.setAccuracy(priorityToAccuracy(priority));
     criteria.setCostAllowed(true);
@@ -172,10 +181,9 @@ class AndroidLocationEngineImpl extends AbstractLocationEngineImpl<LocationListe
       case LocationEngineRequest.PRIORITY_BALANCED_POWER_ACCURACY:
         return Criteria.POWER_MEDIUM;
       case LocationEngineRequest.PRIORITY_LOW_POWER:
-        return Criteria.POWER_LOW;
       case LocationEngineRequest.PRIORITY_NO_POWER:
       default:
-        return Criteria.NO_REQUIREMENT;
+        return Criteria.POWER_LOW;
     }
   }
 
