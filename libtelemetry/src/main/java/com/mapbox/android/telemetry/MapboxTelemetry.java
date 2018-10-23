@@ -394,6 +394,8 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
       @Override
       public void onServiceDisconnected(ComponentName className) {
+        telemetryService = null;
+        isServiceBound = false;
       }
     };
   }
