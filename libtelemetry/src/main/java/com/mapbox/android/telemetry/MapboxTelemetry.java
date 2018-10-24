@@ -2,10 +2,6 @@ package com.mapbox.android.telemetry;
 
 
 import android.app.ActivityManager;
-import android.arch.lifecycle.Lifecycle;
-import android.arch.lifecycle.LifecycleObserver;
-import android.arch.lifecycle.OnLifecycleEvent;
-import android.arch.lifecycle.ProcessLifecycleOwner;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -28,8 +24,7 @@ import okhttp3.Callback;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
-public class MapboxTelemetry implements FullQueueCallback, EventCallback, ServiceTaskCallback,
-  LifecycleObserver {
+public class MapboxTelemetry implements FullQueueCallback, EventCallback, ServiceTaskCallback {
   private static final String EVENTS_USER_AGENT = "MapboxEventsAndroid/";
   private static final String TELEMETRY_USER_AGENT = "MapboxTelemetryAndroid/";
   private static final String UNITY_USER_AGENT = "MapboxEventsUnityAndroid/";
@@ -67,6 +62,8 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private CertificateBlacklist certificateBlacklist;
   private CopyOnWriteArraySet<AttachmentListener> attachmentListeners = null;
   static Context applicationContext = null;
+  private boolean isInForeground = false;
+  private boolean isServiceStarted = false;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
@@ -149,6 +146,22 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     }
 
     return false;
+  }
+
+  public void onResume() {
+    if (isLollipopOrHigher()) {
+      isInForeground = true;
+
+      if (!isServiceStarted) {
+        startLocation();
+      }
+    }
+  }
+
+  public void onPause() {
+    if (isLollipopOrHigher()) {
+      isInForeground = false;
+    }
   }
 
   public boolean updateSessionIdRotationInterval(SessionInterval interval) {
@@ -513,11 +526,10 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   private void startLocation() {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      if (ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+    if (isLollipopOrHigher()) {
+      if (isInForeground) {
         applicationContext.startService(obtainLocationServiceIntent());
-      } else {
-        ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
+        isServiceStarted = true;
       }
     } else {
       applicationContext.startService(obtainLocationServiceIntent());
@@ -584,12 +596,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     return isNetworkConnected() && checkRequiredParameters(accessToken, userAgent);
   }
 
-  @OnLifecycleEvent(Lifecycle.Event.ON_START)
-  void onEnterForeground() {
-    startLocation();
-    ProcessLifecycleOwner.get().getLifecycle().removeObserver(this);
-  }
-
   private static Callback getHttpCallback(final Set<TelemetryListener> listeners) {
     return new Callback() {
       @Override
@@ -611,5 +617,9 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
         }
       }
     };
+  }
+
+  private boolean isLollipopOrHigher() {
+    return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
   }
 }

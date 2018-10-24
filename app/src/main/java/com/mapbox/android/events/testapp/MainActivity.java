@@ -64,4 +64,16 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
       mapboxTelemetry.enable();
     }
   }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    mapboxTelemetry.onResume();
+  }
+
+  @Override
+  protected void onPause() {
+    super.onPause();
+    mapboxTelemetry.onPause();
+  }
 }
