@@ -4,6 +4,9 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v3.5.1
+- PermissionChecker NPE - [#241](https://github.com/mapbox/mapbox-events-android/pull/241)
+
 ### v3.5.0
 - Typo fixes - [#246](https://github.com/mapbox/mapbox-events-android/pull/246)
 - Add support for Vision object detection event - [#245](https://github.com/mapbox/mapbox-events-android/pull/245)
