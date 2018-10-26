@@ -4,6 +4,14 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v3.5.0
+- Typo fixes - [#246](https://github.com/mapbox/mapbox-events-android/pull/246)
+- Add support for Vision object detection event - [#245](https://github.com/mapbox/mapbox-events-android/pull/245)
+
+### v3.4.0
+- Add map.offlineDownload.start and map.offlineDownload.complete events - [#239](https://github.com/mapbox/mapbox-events-android/pull/239)
+- Update Load Event with sdkIdentifier and sdkVersion - [#235](https://github.com/mapbox/mapbox-events-android/pull/235)
+
 ### v3.3.0
 - ACCESS_FINE_LOCATION Permission Bug fix - [#227](https://github.com/mapbox/mapbox-events-android/pull/227)
 - Fix FileAttachment Queue Bug - [#226](https://github.com/mapbox/mapbox-events-android/pull/226)

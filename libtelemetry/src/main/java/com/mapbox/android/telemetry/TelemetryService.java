@@ -23,6 +23,7 @@ import com.mapbox.android.core.location.LocationEngineRequest;
 import com.mapbox.android.core.location.LocationEngineResult;
 import com.mapbox.android.core.permissions.PermissionsManager;
 
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import static com.mapbox.android.telemetry.LocationReceiver.LOCATION_RECEIVER_INTENT;
@@ -34,8 +35,11 @@ public class TelemetryService extends Service implements TelemetryCallback, Even
           + " the manifest. This is a required permission for Mapbox."
           + "Please add this permission back into your manifest, "
           + "so our system can work properly";
+  private static final String NULL_APPLICATION_CONTEXT = "MapboxTelemetry.applicationContext is null. Preventing call "
+    + "of methods that require a non-null context.";
   public static final int API_LEVEL_23 = 23;
-  private static final int DEFAULT_INTERVAL_IN_MILLISECONDS = 1000;
+  private static final long DEFAULT_INTERVAL_IN_MILLISECONDS = 1000L;
+  private static final long DEFAULT_MAX_WAIT_TIME = DEFAULT_INTERVAL_IN_MILLISECONDS * 5;
   private static final String TAG = "TelemetryService";
   private LocationReceiver locationReceiver = null;
   private TelemetryReceiver telemetryReceiver = null;
@@ -54,12 +58,16 @@ public class TelemetryService extends Service implements TelemetryCallback, Even
     @Override
     public void onSuccess(LocationEngineResult result) {
       checkApplicationContext();
-      Location location = result.getLastLocation();
-      if (location == null) {
+      List<Location> locations = result.getLocations();
+      Log.d(TAG, "Locations reported: " + locations.size());
+
+      if (locations == null || locations.isEmpty()) {
         Log.e(TAG, "Location is unavailable");
         return;
       }
-      LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(LocationReceiver.supplyIntent(location));
+
+      LocalBroadcastManager.getInstance(getApplicationContext())
+              .sendBroadcast(LocationReceiver.supplyIntent(locations));
     }
 
     @Override
@@ -180,7 +188,7 @@ public class TelemetryService extends Service implements TelemetryCallback, Even
 
   private void registerLocationReceiver() {
     // Instantiate location engine and request updates
-    locationEngine = LocationEngineProvider.getBestLocationEngine(getApplicationContext(), false);
+    locationEngine = LocationEngineProvider.getBestLocationEngine(getApplicationContext(), true);
     if (locationPermissionCheck()) {
       try {
         locationEngine.requestLocationUpdates(getRequest(), callback, getMainLooper());
@@ -196,7 +204,8 @@ public class TelemetryService extends Service implements TelemetryCallback, Even
 
   private static LocationEngineRequest getRequest() {
     return new LocationEngineRequest.Builder(DEFAULT_INTERVAL_IN_MILLISECONDS)
-            .setPriority(LocationEngineRequest.PRIORITY_NO_POWER).build();
+            .setPriority(LocationEngineRequest.PRIORITY_NO_POWER)
+            .setMaxWaitTime(DEFAULT_MAX_WAIT_TIME).build();
   }
 
   private void createTelemetryReceiver() {
@@ -266,8 +275,13 @@ public class TelemetryService extends Service implements TelemetryCallback, Even
     if (Build.VERSION.SDK_INT >= API_LEVEL_23) {
       return PermissionsManager.areLocationPermissionsGranted(this);
     } else {
+      if (MapboxTelemetry.applicationContext == null) {
+        Log.d("Null Context", NULL_APPLICATION_CONTEXT);
+        return false;
+      }
+
       int finePermission = PermissionChecker.checkSelfPermission(MapboxTelemetry.applicationContext,
-              Manifest.permission.ACCESS_FINE_LOCATION);
+        Manifest.permission.ACCESS_FINE_LOCATION);
       return checkFinePermission(finePermission);
     }
   }

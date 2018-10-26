@@ -17,6 +17,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -48,16 +49,9 @@ class GoogleLocationEngineImpl extends AbstractLocationEngineImpl<LocationCallba
     };
   }
 
-  @Override
-  void destroyListener(@NonNull LocationCallback listener) {
-    if (listener != null) {
-      fusedLocationProviderClient.removeLocationUpdates(listener);
-    }
-  }
-
   @NonNull
   @Override
-  public LocationCallback getLocationListener(@NonNull LocationEngineCallback<LocationEngineResult> callback) {
+  public LocationCallback setLocationListener(@NonNull LocationEngineCallback<LocationEngineResult> callback) {
     return mapLocationListener(callback);
   }
 
@@ -80,7 +74,8 @@ class GoogleLocationEngineImpl extends AbstractLocationEngineImpl<LocationCallba
     fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
       @Override
       public void onSuccess(Location location) {
-        callback.onSuccess(LocationEngineResult.create(location));
+        callback.onSuccess(location != null ? LocationEngineResult.create(location) :
+                LocationEngineResult.create(Collections.EMPTY_LIST));
       }
     }).addOnFailureListener(new OnFailureListener() {
       @Override
@@ -125,7 +120,8 @@ class GoogleLocationEngineImpl extends AbstractLocationEngineImpl<LocationCallba
 
   private static LocationRequest toGMSLocationRequest(LocationEngineRequest request) {
     LocationRequest locationRequest = new LocationRequest();
-    locationRequest.setFastestInterval(request.getInterval());
+    locationRequest.setInterval(request.getInterval());
+    locationRequest.setFastestInterval(request.getFastestInterval());
     locationRequest.setSmallestDisplacement(request.getDisplacemnt());
     locationRequest.setMaxWaitTime(request.getMaxWaitTime());
     locationRequest.setPriority(toGMSLocationPriority(request.getPriority()));

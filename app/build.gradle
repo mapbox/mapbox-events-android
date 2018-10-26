@@ -23,18 +23,26 @@ android {
     }
 }
 
-dependencies {
-    compile dependenciesList.supportAppcompatV7
-    compile dependenciesList.supportConstraintLayout
+configurations.all {
+    resolutionStrategy {
+        // Force our version of support-v4 to silence lint
+        force dependenciesList.supportV4
+    }
+}
 
-    testCompile dependenciesList.junit
-    testCompile dependenciesList.mockito
-    androidTestCompile(dependenciesList.testEspressoCore, {
+dependencies {
+    implementation dependenciesList.supportAppcompatV7
+    implementation dependenciesList.supportConstraintLayout
+    implementation dependenciesList.gmsLocation
+
+    testImplementation dependenciesList.junit
+    testImplementation dependenciesList.mockito
+    androidTestImplementation(dependenciesList.testEspressoCore, {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
-    compile project(":libtelemetry")
-    compile project(":libcore")
+    implementation project(":libtelemetry")
+    implementation project(":libcore")
 }
 
 apply from: "${rootDir}/gradle/developer-config.gradle"

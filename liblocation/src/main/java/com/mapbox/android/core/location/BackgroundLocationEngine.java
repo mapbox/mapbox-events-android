@@ -65,6 +65,10 @@ class BackgroundLocationEngine extends ForegroundLocationEngine implements Inten
     }
 
     LocationEngineResult location = locationEngineImpl.extractResult(intent);
+    if (location == null) {
+      return;
+    }
+
     for (LocationEngineCallback<LocationEngineResult> callback : callbacks) {
       callback.onSuccess(location);
     }

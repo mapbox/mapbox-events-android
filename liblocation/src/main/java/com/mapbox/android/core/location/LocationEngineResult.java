@@ -55,7 +55,7 @@ public final class LocationEngineResult {
    * @since 3.0.0
    */
   public Location getLastLocation() {
-    return locations.get(0);
+    return locations.isEmpty() ? null : locations.get(0);
   }
 
   /**

@@ -20,14 +20,19 @@ android {
             java.srcDirs = ['src/main/java', '../liblocation/src/main/java']
         }
     }
+
+    lintOptions {
+        warningsAsErrors true
+        abortOnError true
+    }
 }
 
 dependencies {
-    provided dependenciesList.gmsLocation
+    compileOnly dependenciesList.gmsLocation
 
-    testCompile dependenciesList.junit
-    testCompile dependenciesList.mockito
-    androidTestCompile(dependenciesList.testEspressoCore, {
+    testImplementation dependenciesList.junit
+    testImplementation dependenciesList.mockito
+    androidTestImplementation(dependenciesList.testEspressoCore, {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 }
@@ -35,4 +40,3 @@ dependencies {
 apply from: 'javadoc.gradle'
 apply from: "${rootDir}/gradle/mvn-push-android.gradle"
 apply from: "${rootDir}/gradle/checkstyle.gradle"
-apply from: "${rootDir}/gradle/dependencies-graph.gradle"

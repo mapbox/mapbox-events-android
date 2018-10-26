@@ -7,6 +7,9 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.support.annotation.NonNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 class LocationReceiver extends BroadcastReceiver {
   private static final String LOCATION_RECEIVED_INTENT_KEY = "location_received";
   private static final String ON_LOCATION_INTENT_EXTRA = "onLocation";
@@ -22,16 +25,26 @@ class LocationReceiver extends BroadcastReceiver {
   public void onReceive(Context context, Intent intent) {
     String locationReceived = intent.getStringExtra(LOCATION_RECEIVED_INTENT_KEY);
     if (ON_LOCATION_INTENT_EXTRA.equals(locationReceived)) {
-      Location location = (Location) intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
-      sendEvent(location);
+      ArrayList<Location> locations = intent.getParcelableArrayListExtra(LocationManager.KEY_LOCATION_CHANGED);
+      for (Location location: locations) {
+        sendEvent(location);
+      }
     }
   }
 
-  static Intent supplyIntent(Location location) {
+  static Intent supplyIntent(List<Location> locations) {
     Intent locationIntent = new Intent(LOCATION_RECEIVER_INTENT);
     locationIntent.putExtra(LOCATION_RECEIVED_INTENT_KEY, ON_LOCATION_INTENT_EXTRA);
-    locationIntent.putExtra(LocationManager.KEY_LOCATION_CHANGED, location);
+    locationIntent.putParcelableArrayListExtra(LocationManager.KEY_LOCATION_CHANGED, getListOfLocations(locations));
     return locationIntent;
+  }
+
+  private static ArrayList<Location> getListOfLocations(List<Location> locations) {
+    ArrayList<Location> locationsList = new ArrayList<>();
+    for (Location location: locations) {
+      locationsList.add(location);
+    }
+    return locationsList;
   }
 
   void updateSessionIdentifier(SessionIdentifier sessionIdentifier) {

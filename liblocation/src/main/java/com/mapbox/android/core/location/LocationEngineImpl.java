@@ -14,7 +14,7 @@ import android.support.annotation.VisibleForTesting;
  */
 interface LocationEngineImpl<T> {
   @NonNull
-  T getLocationListener(@NonNull LocationEngineCallback<LocationEngineResult> callback);
+  T setLocationListener(@NonNull LocationEngineCallback<LocationEngineResult> callback);
 
   @Nullable
   T removeLocationListener(@NonNull LocationEngineCallback<LocationEngineResult> callback);

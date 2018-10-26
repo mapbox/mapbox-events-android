@@ -130,15 +130,28 @@ public class MapEventFactoryTest {
   }
 
   @Test
-  public void checksMapOfflineEvent() throws Exception {
+  public void checksOfflineDownloadStartEvent() throws Exception {
     initializeMapboxTelemetry();
     MapEventFactory aMapEventFactory = new MapEventFactory();
 
-    Event mapOfflineEvent = aMapEventFactory.buildMapOfflineEvent(
-      3, 7, "bounds",
-      new String[]{"mapbox.mapbox-streets-v7", "mapbox.mapbox-terrain-v2"});
+    Event offlineEvent =
+      aMapEventFactory.createOfflineDownloadStartEvent("tileregion",
+              3.0, 7.0, "mapbox.mapbox-streets-v7");
 
-    assertTrue(mapOfflineEvent instanceof MapOfflineEvent);
+    assertTrue(offlineEvent instanceof OfflineDownloadStartEvent);
+  }
+
+  @Test
+  public void checksOfflineDownloadCompleteEvent() throws Exception {
+    initializeMapboxTelemetry();
+    MapEventFactory aMapEventFactory = new MapEventFactory();
+
+    Event offlineEvent = aMapEventFactory.createOfflineDownloadCompleteEvent(
+            "tileregion",3.0, 7.0,
+      "mapbox.mapbox-streets-v7",
+            5L, 1000L, "complete");
+
+    assertTrue(offlineEvent instanceof OfflineDownloadEndEvent);
   }
 
   private void initializeMapboxTelemetry() {
