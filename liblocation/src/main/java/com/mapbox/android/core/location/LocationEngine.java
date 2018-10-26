@@ -13,7 +13,7 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
  * Default providers bundled with Mapbox location library:
  * Android location provider and Google Play Services fused location provider
  *
- * @since 3.0.0
+ * @since 1.0.0
  */
 public interface LocationEngine {
 
@@ -24,7 +24,7 @@ public interface LocationEngine {
    *
    * @param callback {@link LocationEngineCallback} for the location result {@link LocationEngineResult}.
    * @throws SecurityException if permission is not granted to access location services.
-   * @since 3.0.0
+   * @since 1.0.0
    */
   @RequiresPermission(anyOf = {ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION})
   void getLastLocation(@NonNull LocationEngineCallback<LocationEngineResult> callback) throws SecurityException;
@@ -37,7 +37,7 @@ public interface LocationEngine {
    * @param looper   The Looper object whose message queue will be used to implement the callback mechanism,
    *                 or null to invoke callbacks on the main thread.
    * @throws SecurityException if permission is not granted to access location services.
-   * @since 3.0.0
+   * @since 1.0.0
    */
   @RequiresPermission(anyOf = {ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION})
   void requestLocationUpdates(@NonNull LocationEngineRequest request,
@@ -51,7 +51,7 @@ public interface LocationEngine {
    * stopped state, doing so helps battery performance.
    *
    * @param callback {@link LocationEngineCallback} to remove.
-   * @since 3.0.0
+   * @since 1.0.0
    */
   void removeLocationUpdates(@NonNull LocationEngineCallback<LocationEngineResult> callback);
 }
