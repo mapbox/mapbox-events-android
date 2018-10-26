@@ -17,6 +17,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -73,7 +74,8 @@ class GoogleLocationEngineImpl extends AbstractLocationEngineImpl<LocationCallba
     fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
       @Override
       public void onSuccess(Location location) {
-        callback.onSuccess(LocationEngineResult.create(location));
+        callback.onSuccess(location != null ? LocationEngineResult.create(location) :
+                LocationEngineResult.create(Collections.EMPTY_LIST));
       }
     }).addOnFailureListener(new OnFailureListener() {
       @Override
