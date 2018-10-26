@@ -4,6 +4,10 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v4.0.0
+- Update dependencies and cleanup gradle scripts - [#237](https://github.com/mapbox/mapbox-events-android/pull/237)
+- Telemetry SDK background location updates + batch locations - [#236](https://github.com/mapbox/mapbox-events-android/pull/236)
+
 ### v3.5.1
 - PermissionChecker NPE - [#241](https://github.com/mapbox/mapbox-events-android/pull/241)
 
@@ -122,6 +126,12 @@ Mapbox welcomes participation and contributions from everyone.
 - Port Location Code from MAS - [#6](https://github.com/mapbox/mapbox-events-android/pull/6)
 
 ## Mapbox Android Core
+
+### v1.0.0
+- Handle potential 'null' last location returned by fused client - [#257](https://github.com/mapbox/mapbox-events-android/pull/257)
+- Mapbox Fused Location Engine - [#247](https://github.com/mapbox/mapbox-events-android/pull/247)
+- Fix background location engine bugs - [#240](https://github.com/mapbox/mapbox-events-android/pull/240)
+- Location API refactor - [#229](https://github.com/mapbox/mapbox-events-android/pull/229)
 
 ### v0.2.1
 - Update Proguard Rules for GMS - [#189](https://github.com/mapbox/mapbox-events-android/pull/189)
