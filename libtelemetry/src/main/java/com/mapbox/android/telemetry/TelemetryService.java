@@ -35,8 +35,6 @@ public class TelemetryService extends Service implements TelemetryCallback, Even
           + " the manifest. This is a required permission for Mapbox."
           + "Please add this permission back into your manifest, "
           + "so our system can work properly";
-  private static final String NULL_APPLICATION_CONTEXT = "MapboxTelemetry.applicationContext is null. Preventing call "
-    + "of methods that require a non-null context.";
   public static final int API_LEVEL_23 = 23;
   private static final long DEFAULT_INTERVAL_IN_MILLISECONDS = 1000L;
   private static final long DEFAULT_MAX_WAIT_TIME = DEFAULT_INTERVAL_IN_MILLISECONDS * 5;
@@ -181,6 +179,16 @@ public class TelemetryService extends Service implements TelemetryCallback, Even
     return isTelemetryReceiverRegistered;
   }
 
+  boolean locationPermissionCheck() {
+    if (Build.VERSION.SDK_INT >= API_LEVEL_23) {
+      return PermissionsManager.areLocationPermissionsGranted(this);
+    } else {
+      int finePermission = PermissionChecker.checkSelfPermission(getApplicationContext(),
+        Manifest.permission.ACCESS_FINE_LOCATION);
+      return checkFinePermission(finePermission);
+    }
+  }
+
   private void createLocationReceiver() {
     locationReceiver = new LocationReceiver(this);
     registerLocationReceiver();
@@ -268,21 +276,6 @@ public class TelemetryService extends Service implements TelemetryCallback, Even
   class TelemetryBinder extends Binder {
     TelemetryService obtainService() {
       return TelemetryService.this;
-    }
-  }
-
-  private boolean locationPermissionCheck() {
-    if (Build.VERSION.SDK_INT >= API_LEVEL_23) {
-      return PermissionsManager.areLocationPermissionsGranted(this);
-    } else {
-      if (MapboxTelemetry.applicationContext == null) {
-        Log.d("Null Context", NULL_APPLICATION_CONTEXT);
-        return false;
-      }
-
-      int finePermission = PermissionChecker.checkSelfPermission(MapboxTelemetry.applicationContext,
-        Manifest.permission.ACCESS_FINE_LOCATION);
-      return checkFinePermission(finePermission);
     }
   }
 
