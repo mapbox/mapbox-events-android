@@ -1,6 +1,7 @@
 package com.mapbox.android.core.location;
 
 import android.location.Location;
+import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,6 +55,7 @@ public final class LocationEngineResult {
    * @return the most recent location {@link Location} or null.
    * @since 1.0.0
    */
+  @Nullable
   public Location getLastLocation() {
     return locations.isEmpty() ? null : locations.get(0);
   }
