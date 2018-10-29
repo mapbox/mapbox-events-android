@@ -41,6 +41,7 @@ dependencies {
     testImplementation dependenciesList.mockito
     testImplementation dependenciesList.okhttp3Mockwebserver
     testImplementation dependenciesList.commonsIO
+    testImplementation dependenciesList.assertJ
 
     androidTestImplementation dependenciesList.mockitoAndroid
     androidTestImplementation dependenciesList.supportAnnotation
