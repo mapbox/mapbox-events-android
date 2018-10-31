@@ -65,10 +65,6 @@ ext {
             mockito                : "org.mockito:mockito-core:${version.mockito}",
             mockitoAndroid         : "org.mockito:mockito-android:${version.mockito}",
             assertJ                : "org.assertj:assertj-core:${version.assertJ}",
-
-            //AndroidX
-            androidXEspresso       : "androidx.test.espresso:espresso-core:${version.espressoVersion}",
-            androidXEspressoIntents: "androidx.test.espresso:espresso-intents:${version.espressoVersion}",
     ]
 
     pluginDependencies = [

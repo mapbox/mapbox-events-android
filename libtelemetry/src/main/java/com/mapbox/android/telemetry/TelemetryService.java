@@ -12,6 +12,8 @@ import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.content.PermissionChecker;
 import android.util.Log;
@@ -179,14 +181,10 @@ public class TelemetryService extends Service implements TelemetryCallback, Even
     return isTelemetryReceiverRegistered;
   }
 
+  @VisibleForTesting
   boolean locationPermissionCheck() {
-    if (Build.VERSION.SDK_INT >= API_LEVEL_23) {
-      return PermissionsManager.areLocationPermissionsGranted(this);
-    } else {
-      int finePermission = PermissionChecker.checkSelfPermission(getApplicationContext(),
-        Manifest.permission.ACCESS_FINE_LOCATION);
-      return checkFinePermission(finePermission);
-    }
+    return ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+      == PackageManager.PERMISSION_GRANTED;
   }
 
   private void createLocationReceiver() {

@@ -25,10 +25,6 @@ import static org.mockito.Mockito.verify;
 public class TelemetryServiceTest {
 
   @Rule
-  public GrantPermissionRule permissionRule =
-    GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION);
-
-  @Rule
   public final ServiceTestRule mServiceRule = new ServiceTestRule();
 
   @Test
