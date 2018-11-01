@@ -67,4 +67,32 @@ public class AlarmSchedulerFlusherTest {
     verify(mockedAlarmManager, times(1)).cancel(eq(theAlarmSchedulerFlusher.obtainPendingIntent()));
     verify(mockedContext, times(1)).unregisterReceiver(mockedAlarmReceiver);
   }
+
+  @Test
+  public void checksAlarmUpdated() {
+    Context context = mock(Context.class);
+    AlarmManager mockedAlarmManager = mock(AlarmManager.class);
+    AlarmReceiver mockedAlarmReceiver = mock(AlarmReceiver.class);
+    int requestCode = (int) System.currentTimeMillis();
+    AlarmSchedulerFlusher theAlarmSchedulerFlusher = new AlarmSchedulerFlusher(context, mockedAlarmManager,
+      mockedAlarmReceiver, requestCode);
+
+    long elapsedMockedTime = 1000;
+    long elapsedMockedTime2 = 1500;
+    long millisInASecond = 1000;
+
+    theAlarmSchedulerFlusher.register();
+    theAlarmSchedulerFlusher.schedule(elapsedMockedTime);
+
+
+    theAlarmSchedulerFlusher.register();
+    theAlarmSchedulerFlusher.schedule(elapsedMockedTime2);
+
+    verify(mockedAlarmManager, times(1)).setInexactRepeating(
+      eq(AlarmManager.ELAPSED_REALTIME),
+      eq(elapsedMockedTime2 + (180 * millisInASecond)),
+      eq(180 * millisInASecond),
+      eq(theAlarmSchedulerFlusher.obtainPendingIntent())
+    );
+  }
 }
