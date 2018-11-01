@@ -544,7 +544,7 @@ public class MapboxTelemetryTest {
     Clock mockedClock = mock(Clock.class);
     TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false);
     TelemetryLocationEnabler telemetryLocationEnabler = new TelemetryLocationEnabler(false);
-    telemetryLocationEnabler.updateTelemetryLocationState(locationState);
+    telemetryLocationEnabler.updateTelemetryLocationState(locationState, mock(Context.class));
     MapboxTelemetry mapboxTelemetry = new MapboxTelemetry(context, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
       isServiceBound, telemetryEnabler, telemetryLocationEnabler);
