@@ -8,6 +8,9 @@ Mapbox welcomes participation and contributions from everyone.
 - Update dependencies and cleanup gradle scripts - [#237](https://github.com/mapbox/mapbox-events-android/pull/237)
 - Telemetry SDK background location updates + batch locations - [#236](https://github.com/mapbox/mapbox-events-android/pull/236)
 
+### v3.5.2
+- Fix TelemetryService and applicationContext issue - [#265](https://github.com/mapbox/mapbox-events-android/pull/265)
+
 ### v3.5.1
 - PermissionChecker NPE - [#241](https://github.com/mapbox/mapbox-events-android/pull/241)
 
