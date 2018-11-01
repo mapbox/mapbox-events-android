@@ -181,33 +181,28 @@ public class TelemetryUtils {
       return updateVendorId();
     }
 
-    SharedPreferences sharedPreferences = obtainSharedPreferences();
+    SharedPreferences sharedPreferences = obtainSharedPreferences(MapboxTelemetry.applicationContext);
     String mapboxVendorId = sharedPreferences.getString(MAPBOX_SHARED_PREFERENCE_KEY_VENDOR_ID, "");
-
     if (TelemetryUtils.isEmpty(mapboxVendorId)) {
       mapboxVendorId = TelemetryUtils.updateVendorId();
     }
-
     return mapboxVendorId;
   }
 
-  static SharedPreferences obtainSharedPreferences() {
-    return MapboxTelemetry.applicationContext.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
+  static SharedPreferences obtainSharedPreferences(Context context) {
+    return context.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
   }
 
   private static String updateVendorId() {
     String uniqueId = obtainUniversalUniqueIdentifier();
-
     if (MapboxTelemetry.applicationContext == null) {
       return uniqueId;
     }
 
-    SharedPreferences sharedPreferences = obtainSharedPreferences();
+    SharedPreferences sharedPreferences = obtainSharedPreferences(MapboxTelemetry.applicationContext);
     SharedPreferences.Editor editor = sharedPreferences.edit();
-
     editor.putString(MAPBOX_SHARED_PREFERENCE_KEY_VENDOR_ID, uniqueId);
     editor.apply();
-
     return uniqueId;
   }
 
