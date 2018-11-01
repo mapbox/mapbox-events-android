@@ -1,6 +1,7 @@
 package com.mapbox.android.telemetry;
 
 
+import android.content.Context;
 import android.content.SharedPreferences;
 
 import java.util.HashMap;
@@ -20,24 +21,23 @@ class TelemetryLocationEnabler {
       put(LocationState.DISABLED.name(), LocationState.DISABLED);
     }
   };
-  private boolean isFromPreferences = true;
+  private boolean isFromPreferences;
   private LocationState currentTelemetryLocationState = LocationState.DISABLED;
 
   TelemetryLocationEnabler(boolean isFromPreferences) {
     this.isFromPreferences = isFromPreferences;
   }
 
-  LocationState obtainTelemetryLocationState() {
+  LocationState obtainTelemetryLocationState(Context context) {
     if (isFromPreferences) {
-      return retrieveTelemetryLocationStateFromPreferences();
+      return retrieveTelemetryLocationStateFromPreferences(context);
     }
-
     return currentTelemetryLocationState;
   }
 
-  LocationState updateTelemetryLocationState(LocationState telemetryLocationState) {
+  LocationState updateTelemetryLocationState(LocationState telemetryLocationState, Context context) {
     if (isFromPreferences) {
-      return updateLocationPreferences(telemetryLocationState);
+      return updateLocationPreferences(telemetryLocationState, context);
     }
 
     currentTelemetryLocationState = telemetryLocationState;
@@ -49,29 +49,20 @@ class TelemetryLocationEnabler {
     currentTelemetryLocationState = locationState;
   }
 
-  private LocationState retrieveTelemetryLocationStateFromPreferences() {
-    if (MapboxTelemetry.applicationContext == null) {
-      return LOCATION_STATES.get(LocationState.DISABLED.name());
-    }
-
-    SharedPreferences sharedPreferences = obtainSharedPreferences();
+  private LocationState retrieveTelemetryLocationStateFromPreferences(Context context) {
+    SharedPreferences sharedPreferences = obtainSharedPreferences(context);
     String telemetryStateName = sharedPreferences.getString(MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE,
       LocationState.DISABLED.name());
 
-    return LOCATION_STATES.get(telemetryStateName);
+    return telemetryStateName != null ? LOCATION_STATES.get(telemetryStateName) :
+      LOCATION_STATES.get(LocationState.DISABLED.name());
   }
 
-  private LocationState updateLocationPreferences(LocationState telemetryLocationState) {
-    if (MapboxTelemetry.applicationContext == null) {
-      return telemetryLocationState;
-    }
-
-    SharedPreferences sharedPreferences = obtainSharedPreferences();
+  private LocationState updateLocationPreferences(LocationState telemetryLocationState, Context context) {
+    SharedPreferences sharedPreferences = obtainSharedPreferences(context);
     SharedPreferences.Editor editor = sharedPreferences.edit();
-
     editor.putString(MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE, telemetryLocationState.name());
     editor.apply();
-
     return telemetryLocationState;
   }
 }

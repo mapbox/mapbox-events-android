@@ -80,7 +80,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     this.telemetryLocationEnabler = new TelemetryLocationEnabler(true);
     initializeTelemetryListeners();
     initializeAttachmentListeners();
-    initializeTelemetryLocationState();
+    initializeTelemetryLocationState(context.getApplicationContext());
   }
 
   // For testing only
@@ -223,7 +223,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   boolean optLocationOut() {
     TelemetryLocationEnabler.LocationState telemetryLocationState = telemetryLocationEnabler
-      .obtainTelemetryLocationState();
+      .obtainTelemetryLocationState(applicationContext);
     if (isServiceBound && telemetryService != null) {
       telemetryService.unbindInstance();
       telemetryService.removeServiceTask(this);
@@ -247,7 +247,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   private void startTelemetryService() {
     TelemetryLocationEnabler.LocationState telemetryLocationState = telemetryLocationEnabler
-      .obtainTelemetryLocationState();
+      .obtainTelemetryLocationState(applicationContext);
     if (TelemetryLocationEnabler.LocationState.DISABLED.equals(telemetryLocationState) && checkLocationPermission()) {
       startLocation();
       isLocationOpted = true;
@@ -377,6 +377,9 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
         applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
       //noinspection MissingPermission
       NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+      if (activeNetwork == null) {
+        return false;
+      }
 
       // TODO We should consider using activeNetwork.isConnectedOrConnecting() instead of activeNetwork.isConnected()
       // See ConnectivityReceiver#isConnected(Context context)
@@ -426,9 +429,9 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     attachmentListeners = new CopyOnWriteArraySet<>();
   }
 
-  private void initializeTelemetryLocationState() {
+  private void initializeTelemetryLocationState(Context context) {
     if (!isMyServiceRunning(TelemetryService.class)) {
-      telemetryLocationEnabler.updateTelemetryLocationState(TelemetryLocationEnabler.LocationState.DISABLED);
+      telemetryLocationEnabler.updateTelemetryLocationState(TelemetryLocationEnabler.LocationState.DISABLED, context);
     }
   }
 
@@ -475,7 +478,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     }
 
     TelemetryLocationEnabler.LocationState telemetryLocationState = telemetryLocationEnabler
-      .obtainTelemetryLocationState();
+      .obtainTelemetryLocationState(applicationContext);
     if (telemetryService.obtainBoundInstances() == 0
       && TelemetryLocationEnabler.LocationState.ENABLED.equals(telemetryLocationState)) {
       stopLocation();
