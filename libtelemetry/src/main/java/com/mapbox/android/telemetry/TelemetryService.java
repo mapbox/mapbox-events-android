@@ -218,7 +218,12 @@ public class TelemetryService extends Service implements TelemetryCallback, Even
   }
 
   private void enableTelemetryLocationState(Intent intent, Context context) {
-    isLocationEnablerFromPreferences = intent.getBooleanExtra(IS_LOCATION_ENABLER_FROM_PREFERENCES, true);
+    if (intent != null) {
+      isLocationEnablerFromPreferences = intent.getBooleanExtra(IS_LOCATION_ENABLER_FROM_PREFERENCES, true);
+    } else {
+      isLocationEnablerFromPreferences = true;
+    }
+
     if (isLocationEnablerFromPreferences) {
       createLocationEnabler();
       telemetryLocationEnabler.updateTelemetryLocationState(TelemetryLocationEnabler.LocationState.ENABLED, context);
