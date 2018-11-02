@@ -3,11 +3,11 @@ package com.mapbox.android.telemetry.location;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 
-abstract class AbstractState implements State {
+class BaseState implements State {
   @LocationEngineControllerMode
   private final int type;
 
-  AbstractState(@LocationEngineControllerMode int type) {
+  BaseState(@LocationEngineControllerMode int type) {
     this.type = type;
   }
 
@@ -37,14 +37,14 @@ abstract class AbstractState implements State {
 
   @Override
   public boolean equals(Object o) {
-    if (o == null || !(o instanceof AbstractState)) {
+    if (o == null || !(o instanceof BaseState)) {
       return false;
     }
 
     if (this == o) {
       return true;
     }
-    AbstractState that = (AbstractState) o;
+    BaseState that = (BaseState) o;
     return that.type == type;
   }
 

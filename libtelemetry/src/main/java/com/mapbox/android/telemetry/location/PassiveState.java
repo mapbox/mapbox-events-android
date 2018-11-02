@@ -6,7 +6,7 @@ import android.util.Log;
 
 import static com.mapbox.android.telemetry.location.LocationEngineControllerMode.PASSIVE;
 
-class PassiveState extends AbstractState {
+class PassiveState extends BaseState {
   private static final String TAG = "PassiveState";
 
   private final State previousState;

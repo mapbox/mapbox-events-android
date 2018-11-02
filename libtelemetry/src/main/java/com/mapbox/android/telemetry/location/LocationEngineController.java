@@ -15,13 +15,15 @@ import com.mapbox.android.core.geofence.GeofenceEngine;
 public class LocationEngineController implements Timer.Callback {
   private static final String TAG = "TelemLocationController";
   /// TODO: move constants to config class
-  private static final long DEFAULT_TIMEOUT_MILLISECONDS = 300000L;
+  private static final int MAX_EVENTS_IN_QUEUE = 10;
+  private static final long DEFAULT_TIMEOUT_MILLISECONDS = 20000L; //300000L;
   private static final long DEFAULT_INTERVAL_IN_MILLISECONDS = 1000L;
   private static final long DEFAULT_MAX_WAIT_TIME = DEFAULT_INTERVAL_IN_MILLISECONDS * 5;
 
   private final LocationEngine locationEngine;
   private final Callback callback;
   private final Timer timer;
+  private final EventDispatcher eventDispatcher;
   private GeofenceEngine geofenceEngine;
 
   private State currentState;
@@ -30,39 +32,51 @@ public class LocationEngineController implements Timer.Callback {
       @Override
       public void onSuccess(LocationEngineResult result) {
         Location location = result.getLastLocation();
-        handleEvent(EventFactory.createLocationUpdatedEvent(location));
+        eventDispatcher.enqueue(EventFactory.createLocationUpdatedEvent(location));
         callback.onLocationUpdated(location);
       }
 
       @Override
       public void onFailure(@NonNull Exception exception) {
-        handleEvent(EventFactory.createStoppedEvent());
+        eventDispatcher.enqueue(EventFactory.createStoppedEvent());
       }
     };
 
   LocationEngineController(LocationEngine locationEngine,
+                           EventDispatcher eventDispatcher,
                            Timer timer,
                            Callback callback) {
     this.currentState = new IdleState();
     this.locationEngine = locationEngine;
+    this.eventDispatcher = eventDispatcher;
+    eventDispatcher.setLocationEngineController(this);
     this.callback = callback;
+
     this.timer = timer;
+    this.timer.setCallback(this);
   }
 
-  public void setGeofenceEngine(GeofenceEngine geofenceEngine) {
+  public static LocationEngineController create(LocationEngine locationEngine, Looper looper,
+                                                LocationEngineController.Callback callback) {
+    return new LocationEngineController(locationEngine, EventDispatcher.create(MAX_EVENTS_IN_QUEUE),
+      new LocationUpdateTrigger(looper), callback);
+  }
+
+  LocationEngineController setGeofenceEngine(GeofenceEngine geofenceEngine) {
     this.geofenceEngine = geofenceEngine;
+    return this;
   }
 
   public void onPause() {
-    this.handleEvent(EventFactory.createBackgroundEvent());
+    eventDispatcher.enqueue(EventFactory.createBackgroundEvent());
   }
 
   public void onResume() {
-    this.handleEvent(EventFactory.createForegroundEvent());
+    eventDispatcher.enqueue(EventFactory.createForegroundEvent());
   }
 
   public void onDestroy() {
-    this.handleEvent(EventFactory.createStoppedEvent());
+    eventDispatcher.enqueue(EventFactory.createStoppedEvent());
   }
 
   @VisibleForTesting
@@ -70,7 +84,6 @@ public class LocationEngineController implements Timer.Callback {
     return currentState;
   }
 
-  @VisibleForTesting
   synchronized void handleEvent(Event event) {
     State nextState;
     try {
@@ -80,7 +93,7 @@ public class LocationEngineController implements Timer.Callback {
       return;
     }
 
-    if (nextState == currentState) {
+    if (nextState.equals(currentState)) {
       return;
     }
 
@@ -106,6 +119,7 @@ public class LocationEngineController implements Timer.Callback {
       case LocationEngineControllerMode.PASSIVE_GEOFENCE:
         // This will effectively cancel active updates
         requestPassiveUpdates();
+        timer.cancel();
         break;
       case LocationEngineControllerMode.IDLE:
         locationEngine.removeLocationUpdates(locationEngineCallback);
@@ -143,7 +157,7 @@ public class LocationEngineController implements Timer.Callback {
 
   @Override
   public void onExpired() {
-    handleEvent(EventFactory.createTimerExpiredEvent());
+    eventDispatcher.enqueue(EventFactory.createTimerExpiredEvent());
   }
 
   public interface Callback {

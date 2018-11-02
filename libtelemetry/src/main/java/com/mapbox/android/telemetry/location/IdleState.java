@@ -5,7 +5,7 @@ import android.util.Log;
 
 import static com.mapbox.android.telemetry.location.LocationEngineControllerMode.IDLE;
 
-class IdleState extends AbstractState {
+class IdleState extends BaseState {
   private static final String TAG = "IdleState";
 
   IdleState() {

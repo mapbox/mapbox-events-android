@@ -6,7 +6,7 @@ import android.util.Log;
 
 import static com.mapbox.android.telemetry.location.LocationEngineControllerMode.ACTIVE;
 
-class ActiveState extends AbstractState {
+class ActiveState extends BaseState {
   private static final String TAG = "ActiveState";
   private static final float ACCURACY_THRESHOLD_METERS = 300f;
   private final Location lastLocation;

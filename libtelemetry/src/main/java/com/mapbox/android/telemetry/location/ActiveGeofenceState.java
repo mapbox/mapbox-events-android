@@ -6,13 +6,17 @@ import android.util.Log;
 
 import static com.mapbox.android.telemetry.location.LocationEngineControllerMode.ACTIVE_GEOFENCE;
 
-class ActiveGeofenceState extends AbstractState {
+class ActiveGeofenceState extends BaseState {
   private static final String TAG = "ActiveGeofenceState";
   private final Location lastLocation;
 
   ActiveGeofenceState(Location location) {
     super(ACTIVE_GEOFENCE);
     this.lastLocation = location;
+  }
+
+  Location getLastLocation() {
+    return lastLocation;
   }
 
   @NonNull

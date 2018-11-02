@@ -2,15 +2,21 @@ package com.mapbox.android.telemetry.location;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 class LocationUpdateTrigger implements Timer {
+  private static final String TAG = "LocationUpdateTrigger";
   private final Handler handler;
   private Callback callback;
 
   private final Runnable onTimerExpired = new Runnable() {
     @Override
     public void run() {
-      callback.onExpired();
+      if (callback != null) {
+        callback.onExpired();
+      } else {
+        Log.e(TAG, "Unregistered timer callback");
+      }
     }
   };
 
@@ -20,6 +26,7 @@ class LocationUpdateTrigger implements Timer {
 
   @Override
   public void start(long timeout) {
+    cancel();
     handler.postDelayed(onTimerExpired, timeout);
   }
 

@@ -6,13 +6,17 @@ import android.util.Log;
 
 import static com.mapbox.android.telemetry.location.LocationEngineControllerMode.PASSIVE_GEOFENCE;
 
-class PassiveGeofenceState extends AbstractState {
+class PassiveGeofenceState extends BaseState {
   private static final String TAG = "PassiveGeofenceState";
   private final Location lastLocation;
 
   PassiveGeofenceState(Location location) {
     super(PASSIVE_GEOFENCE);
     this.lastLocation = location;
+  }
+
+  Location getLastLocation() {
+    return lastLocation;
   }
 
   @NonNull
