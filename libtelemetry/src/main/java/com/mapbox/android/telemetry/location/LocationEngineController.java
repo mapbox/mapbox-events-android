@@ -129,7 +129,6 @@ public class LocationEngineController implements Timer.Callback {
 
   private void requestLocationUpdates(int priority) {
     try {
-      locationEngine.getLastLocation(locationEngineCallback);
       locationEngine.requestLocationUpdates(getRequest(priority), locationEngineCallback, Looper.myLooper());
     } catch (SecurityException se) {
       se.printStackTrace();
