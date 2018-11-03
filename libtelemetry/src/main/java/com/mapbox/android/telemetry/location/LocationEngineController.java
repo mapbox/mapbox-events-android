@@ -17,7 +17,7 @@ import com.mapbox.android.core.location.LocationEngineCallback;
 import com.mapbox.android.core.location.LocationEngineRequest;
 import com.mapbox.android.core.location.LocationEngineResult;
 
-public class LocationEngineController implements Timer.Callback, IntentHandler {
+public class LocationEngineController {
   private static final String TAG = "TelemLocationController";
   /// TODO: move constants to config class
   private static final int MAX_EVENTS_IN_QUEUE = 10;
@@ -61,7 +61,7 @@ public class LocationEngineController implements Timer.Callback, IntentHandler {
     this.callback = callback;
 
     this.timer = timer;
-    this.timer.setCallback(this);
+    this.timer.setCallback(getTimerCallback(this.eventDispatcher));
   }
 
   public static LocationEngineController create(Context context,
@@ -78,7 +78,7 @@ public class LocationEngineController implements Timer.Callback, IntentHandler {
     if (geofenceEngine == null) {
       return this;
     }
-    geofenceEngine.setBroadCastReceiverProxy(proxy, this);
+    geofenceEngine.setBroadCastReceiverProxy(proxy, getIntentHandler(this.eventDispatcher));
     this.geofenceEngine = geofenceEngine;
     return this;
   }
@@ -109,42 +109,40 @@ public class LocationEngineController implements Timer.Callback, IntentHandler {
       return;
     }
 
-    if (nextState.equals(currentState)) {
-      return;
-    }
-
-    switch (nextState.getType()) {
-      case LocationEngineControllerMode.ACTIVE:
-        // 1. Request active updates
-        requestActiveUpdates();
-        // 2. Start timer
-        timer.start(DEFAULT_TIMEOUT_MILLISECONDS);
-        break;
-      case LocationEngineControllerMode.ACTIVE_GEOFENCE:
-        // 1. Start or update geofence
-        Location location = ((ActiveGeofenceState) nextState).getLastLocation();
-        createGeofenceAround(location);
-        // 2. Start timer
-        timer.start(DEFAULT_TIMEOUT_MILLISECONDS);
-        break;
-      case LocationEngineControllerMode.PASSIVE:
-        requestPassiveUpdates();
-        removeGeofence();
-        timer.cancel();
-        break;
-      case LocationEngineControllerMode.PASSIVE_GEOFENCE:
-        // This will effectively cancel active updates
-        requestPassiveUpdates();
-        timer.cancel();
-        break;
-      case LocationEngineControllerMode.IDLE:
-        locationEngine.removeLocationUpdates(locationEngineCallback);
-        // Cancel geofence engine request
-        removeGeofence();
-        timer.cancel();
-        break;
-      default:
-        break;
+    if (!nextState.equals(currentState)) {
+      switch (nextState.getType()) {
+        case LocationEngineControllerMode.ACTIVE:
+          // 1. Request active updates
+          requestActiveUpdates();
+          // 2. Start timer
+          timer.start(DEFAULT_TIMEOUT_MILLISECONDS);
+          break;
+        case LocationEngineControllerMode.ACTIVE_GEOFENCE:
+          // 1. Start or update geofence
+          Location location = ((ActiveGeofenceState) nextState).getLastLocation();
+          createGeofenceAround(location);
+          // 2. Start timer
+          timer.start(DEFAULT_TIMEOUT_MILLISECONDS);
+          break;
+        case LocationEngineControllerMode.PASSIVE:
+          requestPassiveUpdates();
+          removeGeofence();
+          timer.cancel();
+          break;
+        case LocationEngineControllerMode.PASSIVE_GEOFENCE:
+          // This will effectively cancel active updates
+          requestPassiveUpdates();
+          timer.cancel();
+          break;
+        case LocationEngineControllerMode.IDLE:
+          locationEngine.removeLocationUpdates(locationEngineCallback);
+          // Cancel geofence engine request
+          removeGeofence();
+          timer.cancel();
+          break;
+        default:
+          break;
+      }
     }
     currentState = nextState;
   }
@@ -190,14 +188,22 @@ public class LocationEngineController implements Timer.Callback, IntentHandler {
       .setMaxWaitTime(DEFAULT_MAX_WAIT_TIME).build();
   }
 
-  @Override
-  public void onExpired() {
-    eventDispatcher.enqueue(EventFactory.createTimerExpiredEvent());
+  private Timer.Callback getTimerCallback(final EventDispatcher eventDispatcher) {
+    return new Timer.Callback() {
+      @Override
+      public void onExpired() {
+        eventDispatcher.enqueue(EventFactory.createTimerExpiredEvent());
+      }
+    };
   }
 
-  @Override
-  public void handle(Intent intent) {
-    eventDispatcher.enqueue(EventFactory.createGeofenceExiteEvent(null));
+  private IntentHandler getIntentHandler(final EventDispatcher eventDispatcher) {
+    return new IntentHandler() {
+      @Override
+      public void handle(Intent intent) {
+        eventDispatcher.enqueue(EventFactory.createGeofenceExiteEvent());
+      }
+    };
   }
 
   public interface Callback {

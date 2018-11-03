@@ -45,21 +45,21 @@ public class PassiveGeofenceStateTest extends BaseStateTest {
 
   @Test
   public void onGeofenceExitedPassiveGeofenceState() {
-    locationEngineController.handleEvent(EventFactory.createGeofenceExiteEvent(getAccurateLocation()));
+    locationEngineController.handleEvent(EventFactory.createGeofenceExiteEvent());
     State state = locationEngineController.getCurrentState();
     assertThat(state).isInstanceOf(ActiveState.class);
   }
 
   @Test
   public void onBackgroundPassiveGeofenceState() {
-    locationEngineController.onPause();
+    locationEngineController.handleEvent(EventFactory.createBackgroundEvent());
     State state = locationEngineController.getCurrentState();
     assertThat(state).isInstanceOf(PassiveState.class);
   }
 
   @Test
   public void onStopPassiveGeofenceState() {
-    locationEngineController.onDestroy();
+    locationEngineController.handleEvent(EventFactory.createStoppedEvent());
     State state = locationEngineController.getCurrentState();
     assertThat(state).isInstanceOf(IdleState.class);
   }

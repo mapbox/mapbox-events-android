@@ -24,7 +24,7 @@ public class PassiveStateTest extends BaseStateTest {
 
   @Test
   public void onPauseResultsInPassiveState() {
-    locationEngineController.onPause();
+    locationEngineController.handleEvent(EventFactory.createBackgroundEvent());
     State state = locationEngineController.getCurrentState();
     assertThat(state).isInstanceOf(PassiveState.class);
   }
@@ -40,7 +40,7 @@ public class PassiveStateTest extends BaseStateTest {
   @Test
   public void onLocationUpdatedAfterTimerExpiredInBackgroundPassiveState() {
     locationEngineController.handleEvent(EventFactory.createTimerExpiredEvent());
-    locationEngineController.onPause();
+    locationEngineController.handleEvent(EventFactory.createBackgroundEvent());
     locationEngineController.handleEvent(EventFactory.createLocationUpdatedEvent(location));
     State state = locationEngineController.getCurrentState();
     assertThat(state).isInstanceOf(PassiveState.class);
@@ -49,11 +49,11 @@ public class PassiveStateTest extends BaseStateTest {
   @Test
   public void onLocationUpdateInBackgroundPassiveState() {
     State stateBefore = locationEngineController.getCurrentState();
-    locationEngineController.onPause();
+    locationEngineController.handleEvent(EventFactory.createBackgroundEvent());
     locationEngineController.handleEvent(EventFactory.createLocationUpdatedEvent(location));
     State stateIntermediate = locationEngineController.getCurrentState();
     assertThat(stateIntermediate).isInstanceOf(PassiveState.class);
-    locationEngineController.onResume();
+    locationEngineController.handleEvent(EventFactory.createForegroundEvent());
     State stateAfter = locationEngineController.getCurrentState();
     assertThat(stateBefore).isEqualTo(stateAfter);
   }
@@ -69,7 +69,7 @@ public class PassiveStateTest extends BaseStateTest {
 
   @Test
   public void onStoppedPassiveState() {
-    locationEngineController.onDestroy();
+    locationEngineController.handleEvent(EventFactory.createStoppedEvent());
     State state = locationEngineController.getCurrentState();
     assertThat(state).isInstanceOf(IdleState.class);
   }

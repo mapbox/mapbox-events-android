@@ -4,13 +4,14 @@ import android.location.Location;
 
 class EventFactory {
   private EventFactory() {
+    // Prevent instantiation
   }
 
   static Event createLocationUpdatedEvent(Location location) {
     return new LocationUpdatedEvent(location);
   }
 
-  static Event createGeofenceExiteEvent(Location location) {
+  static Event createGeofenceExiteEvent() {
     return new Event(EventType.GeofenceExited);
   }
 

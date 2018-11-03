@@ -51,7 +51,7 @@ public class ActiveStateTest extends BaseStateTest {
 
   @Test
   public void onStoppedEventInActiveState() {
-    locationEngineController.onDestroy();
+    locationEngineController.handleEvent(EventFactory.createStoppedEvent());
     State state = locationEngineController.getCurrentState();
     assertThat(state).isInstanceOf(IdleState.class);
   }

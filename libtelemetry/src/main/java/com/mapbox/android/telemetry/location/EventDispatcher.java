@@ -1,10 +1,17 @@
 package com.mapbox.android.telemetry.location;
 
+import android.util.Log;
+
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.LinkedBlockingDeque;
 
 class EventDispatcher {
+  private static final String TAG = "EventDispatcher";
   private static final int MAX_POOL_SIZE = 1;
   private static final int KEEP_ALIVE_TIME_SEC = 5;
 
@@ -31,6 +38,11 @@ class EventDispatcher {
 
   synchronized void enqueue(Event event) {
     if (eventQueue.size() >= maxEvents) {
+      return;
+    }
+
+    if (locationEngineController == null) {
+      Log.e(TAG, "LocationEngineController == null");
       return;
     }
 

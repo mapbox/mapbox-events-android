@@ -11,6 +11,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -24,23 +25,27 @@ public class BaseStateTest {
   @Mock
   private Timer timer;
 
+  @Mock
+  private EventDispatcher dispatcher;
+
   LocationEngineController locationEngineController;
 
   @Before
   public void setUp() {
-    locationEngineController = new LocationEngineController(locationEngine, timer, callback);
-    locationEngineController.onResume();
+    locationEngineController = new LocationEngineController(locationEngine, dispatcher, timer, callback);
+    locationEngineController.handleEvent(EventFactory.createForegroundEvent());
   }
 
   @Test
   public void onDestroyResultInIdleState() {
-    locationEngineController.onDestroy();
+    locationEngineController.handleEvent(EventFactory.createStoppedEvent());
     State state = locationEngineController.getCurrentState();
     assertThat(state).isInstanceOf(IdleState.class);
   }
 
   @After
   public void tearDown() {
+    reset(dispatcher);
     locationEngineController = null;
   }
 
