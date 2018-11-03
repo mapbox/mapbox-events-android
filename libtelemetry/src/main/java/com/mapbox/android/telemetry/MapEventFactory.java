@@ -89,8 +89,7 @@ public class MapEventFactory {
   }
 
   private MapClickEvent buildMapClickEvent(MapState mapState) {
-    MapClickEvent mapClickEvent = new MapClickEvent(mapState);
-
+    MapClickEvent mapClickEvent = new MapClickEvent(mapState).setDeviceInfo(MapboxTelemetry.applicationContext);
     mapClickEvent.setOrientation(obtainOrientation(MapboxTelemetry.applicationContext));
     mapClickEvent.setCarrier(obtainCellularCarrier(MapboxTelemetry.applicationContext));
     mapClickEvent.setWifi(obtainConnectedToWifi(MapboxTelemetry.applicationContext));
@@ -99,8 +98,7 @@ public class MapEventFactory {
   }
 
   private MapDragendEvent buildMapDragendEvent(MapState mapState) {
-    MapDragendEvent mapDragendEvent = new MapDragendEvent(mapState);
-
+    MapDragendEvent mapDragendEvent = new MapDragendEvent(mapState).setDeviceInfo(MapboxTelemetry.applicationContext);
     mapDragendEvent.setOrientation(obtainOrientation(MapboxTelemetry.applicationContext));
     mapDragendEvent.setCarrier(obtainCellularCarrier(MapboxTelemetry.applicationContext));
     mapDragendEvent.setWifi(obtainConnectedToWifi(MapboxTelemetry.applicationContext));
@@ -163,14 +161,12 @@ public class MapEventFactory {
 
   private MapLoadEvent buildMapLoadEvent() {
     String userId = TelemetryUtils.retrieveVendorId();
-    MapLoadEvent mapLoadEvent = new MapLoadEvent(userId);
-
+    MapLoadEvent mapLoadEvent = new MapLoadEvent(userId).setDeviceInfo(MapboxTelemetry.applicationContext);
     mapLoadEvent.setOrientation(obtainOrientation(MapboxTelemetry.applicationContext));
     mapLoadEvent.setAccessibilityFontScale(obtainAccessibilityFontScaleSize(MapboxTelemetry.applicationContext));
     mapLoadEvent.setCarrier(obtainCellularCarrier(MapboxTelemetry.applicationContext));
     mapLoadEvent.setResolution(obtainDisplayDensity(MapboxTelemetry.applicationContext));
     mapLoadEvent.setWifi(obtainConnectedToWifi(MapboxTelemetry.applicationContext));
-
     return mapLoadEvent;
   }
 
