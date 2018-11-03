@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.mapbox.android.core.location.Utils.checkNotNull;
+import static com.mapbox.android.core.Utils.checkNotNull;
 
 /**
  * A wrapper class representing location result from the location engine.

@@ -9,7 +9,7 @@ import android.support.annotation.Nullable;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static com.mapbox.android.core.location.Utils.checkNotNull;
+import static com.mapbox.android.core.Utils.checkNotNull;
 
 class BackgroundLocationEngine extends ForegroundLocationEngine implements IntentHandler {
   private final BroadcastReceiverProxy broadcastReceiverProxy;

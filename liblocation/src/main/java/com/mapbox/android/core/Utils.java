@@ -1,9 +1,10 @@
-package com.mapbox.android.core.location;
+package com.mapbox.android.core;
 
 import android.location.Location;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
-final class Utils {
+public final class Utils {
   private static final int TWO_MINUTES = 1000 * 60 * 2;
   private static final int ACCURACY_THRESHOLD_METERS = 200;
 
@@ -19,7 +20,7 @@ final class Utils {
    * @param <T>       object type.
    * @return validated non-null reference.
    */
-  static <T> T checkNotNull(@Nullable T reference, String message) {
+  public static <T> T checkNotNull(@Nullable T reference, String message) {
     if (reference == null) {
       throw new NullPointerException(message);
     }
@@ -34,7 +35,7 @@ final class Utils {
    * @param location            The new Location that you want to evaluate
    * @param currentBestLocation The current Location fix, to which you want to compare the new one
    */
-  static boolean isBetterLocation(Location location, Location currentBestLocation) {
+  public static boolean isBetterLocation(Location location, Location currentBestLocation) {
     if (currentBestLocation == null) {
       // A new location is always better than no location
       return true;
@@ -63,7 +64,7 @@ final class Utils {
 
     // Check if the old and new location are from the same provider
     boolean isFromSameProvider = isSameProvider(location.getProvider(),
-            currentBestLocation.getProvider());
+      currentBestLocation.getProvider());
 
     // Determine location quality using a combination of timeliness and accuracy
     if (isMoreAccurate) {
@@ -74,6 +75,23 @@ final class Utils {
       return true;
     }
     return false;
+  }
+
+  /**
+   * Checks if class is on classpath.
+   *
+   * @param className of the class to check.
+   * @return true if class on classpath false otherwise
+   */
+  public static boolean isOnClasspath(String className) {
+    boolean isOnClassPath = true;
+    try {
+      Class.forName(className);
+    } catch (ClassNotFoundException exception) {
+      Log.w("MapboxCore", "Missing " + className);
+      isOnClassPath = false;
+    }
+    return isOnClassPath;
   }
 
   /**

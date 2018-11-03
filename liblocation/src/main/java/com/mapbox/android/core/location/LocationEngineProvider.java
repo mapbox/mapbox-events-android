@@ -2,11 +2,11 @@ package com.mapbox.android.core.location;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
-import static com.mapbox.android.core.location.Utils.checkNotNull;
+import static com.mapbox.android.core.Utils.checkNotNull;
+import static com.mapbox.android.core.Utils.isOnClasspath;
 
 /**
  * The main entry point for location engine integration.
@@ -50,16 +50,5 @@ public final class LocationEngineProvider {
   private static LocationEngineImpl getEngineImplementation(Context context, boolean hasGoogleLocationServices) {
     return hasGoogleLocationServices ? new GoogleLocationEngineImpl(context.getApplicationContext()) :
             new MapboxFusedLocationEngineImpl(context.getApplicationContext());
-  }
-
-  private static boolean isOnClasspath(String className) {
-    boolean isOnClassPath = true;
-    try {
-      Class.forName(className);
-    } catch (ClassNotFoundException exception) {
-      Log.w("LocationEngineProvider", "Missing " + className);
-      isOnClassPath = false;
-    }
-    return isOnClassPath;
   }
 }

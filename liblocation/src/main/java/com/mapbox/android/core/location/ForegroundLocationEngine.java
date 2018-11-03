@@ -4,7 +4,7 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import static com.mapbox.android.core.location.Utils.checkNotNull;
+import static com.mapbox.android.core.Utils.checkNotNull;
 
 class ForegroundLocationEngine implements LocationEngine {
   final LocationEngineImpl locationEngineImpl;
