@@ -98,41 +98,35 @@ public class TelemetryUtils {
     return universalUniqueIdentifier;
   }
 
-  static String obtainApplicationState() {
-    ActivityManager activityManager = (ActivityManager) MapboxTelemetry.applicationContext
-      .getSystemService(Context.ACTIVITY_SERVICE);
-
+  static String obtainApplicationState(Context context) {
+    ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
     List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
     if (appProcesses == null) {
       return NO_STATE;
     }
 
-    String packageName = MapboxTelemetry.applicationContext.getPackageName();
+    String packageName = context.getPackageName();
     for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
       if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
         && appProcess.processName.equals(packageName)) {
         return FOREGROUND;
       }
     }
-
     return BACKGROUND;
   }
 
-  static int obtainBatteryLevel() {
-    Intent batteryStatus = registerBatteryUpdates(MapboxTelemetry.applicationContext);
-
+  static int obtainBatteryLevel(Context context) {
+    Intent batteryStatus = registerBatteryUpdates(context);
     if (batteryStatus == null) {
       return UNAVAILABLE_BATTERY_LEVEL;
     }
-
     int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, DEFAULT_BATTERY_LEVEL);
     int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, DEFAULT_BATTERY_LEVEL);
     return Math.round((level / (float) scale) * PERCENT_SCALE);
   }
 
-  static boolean isPluggedIn() {
-    Intent batteryStatus = registerBatteryUpdates(MapboxTelemetry.applicationContext);
-
+  static boolean isPluggedIn(Context context) {
+    Intent batteryStatus = registerBatteryUpdates(context);
     if (batteryStatus == null) {
       return false;
     }
@@ -140,14 +134,11 @@ public class TelemetryUtils {
     int chargePlug = batteryStatus.getIntExtra(BatteryManager.EXTRA_PLUGGED, DEFAULT_BATTERY_LEVEL);
     final boolean pluggedIntoUSB = chargePlug == BatteryManager.BATTERY_PLUGGED_USB;
     final boolean pluggedIntoAC = chargePlug == BatteryManager.BATTERY_PLUGGED_AC;
-
     return pluggedIntoUSB || pluggedIntoAC;
   }
 
-  static String obtainCellularNetworkType() {
-    TelephonyManager telephonyManager = (TelephonyManager) MapboxTelemetry.applicationContext
-        .getSystemService(Context.TELEPHONY_SERVICE);
-
+  static String obtainCellularNetworkType(Context context) {
+    TelephonyManager telephonyManager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
     return NETWORKS.get(telephonyManager.getNetworkType());
   }
 
@@ -176,6 +167,9 @@ public class TelemetryUtils {
     }
   }
 
+  /**
+   * Do not call this method outside of activity!!!
+   */
   static String retrieveVendorId() {
     if (MapboxTelemetry.applicationContext == null) {
       return updateVendorId();
@@ -224,9 +218,11 @@ public class TelemetryUtils {
     return context.registerReceiver(null, filter);
   }
 
-  static boolean isServiceRunning(Class<?> serviceClass) {
-    ActivityManager manager = (ActivityManager) MapboxTelemetry.applicationContext
-      .getSystemService(Context.ACTIVITY_SERVICE);
+  static boolean isServiceRunning(Class<?> serviceClass, Context context) {
+    ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+    if (manager == null) {
+      return false;
+    }
     for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
       if (serviceClass.getName().equals(service.service.getClassName())) {
         return true;
@@ -235,10 +231,9 @@ public class TelemetryUtils {
     return false;
   }
 
-  static boolean adjustWakeUpMode() {
+  static boolean adjustWakeUpMode(Context context) {
     try {
-      ApplicationInfo appInformation = MapboxTelemetry.applicationContext.getPackageManager()
-        .getApplicationInfo(MapboxTelemetry.applicationContext.getPackageName(),
+      ApplicationInfo appInformation = context.getPackageManager().getApplicationInfo(context.getPackageName(),
           PackageManager.GET_META_DATA);
       if (appInformation != null && appInformation.metaData != null) {
         boolean adjustWakeUp = appInformation.metaData.getBoolean(KEY_META_DATA_WAKE_UP, false);
@@ -247,7 +242,6 @@ public class TelemetryUtils {
     } catch (PackageManager.NameNotFoundException exception) {
       exception.printStackTrace();
     }
-
     return false;
   }
 }

@@ -1,5 +1,6 @@
 package com.mapbox.android.telemetry;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -37,9 +38,15 @@ class MapDragendEvent extends Event implements Parcelable {
     this.longitude = mapState.getLongitude();
     this.zoom = mapState.getZoom();
     this.created = TelemetryUtils.obtainCurrentDate();
-    this.batteryLevel = TelemetryUtils.obtainBatteryLevel();
-    this.pluggedIn = TelemetryUtils.isPluggedIn();
-    this.cellularNetworkType = TelemetryUtils.obtainCellularNetworkType();
+    this.batteryLevel = 0;
+    this.pluggedIn = false;
+    this.cellularNetworkType = "";
+  }
+
+  MapDragendEvent setDeviceInfo(Context context) {
+    this.batteryLevel = TelemetryUtils.obtainBatteryLevel(context);
+    this.pluggedIn = TelemetryUtils.isPluggedIn(context);
+    return this;
   }
 
   @Override

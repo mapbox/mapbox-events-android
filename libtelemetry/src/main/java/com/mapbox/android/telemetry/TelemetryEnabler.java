@@ -11,6 +11,9 @@ import java.util.Map;
 
 import static com.mapbox.android.telemetry.TelemetryUtils.obtainSharedPreferences;
 
+/**
+ * Do not use this class outside of activity!!!
+ */
 public class TelemetryEnabler {
   public enum State {
     ENABLED, DISABLED
