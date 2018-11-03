@@ -1,4 +1,4 @@
-package com.mapbox.android.core.location;
+package com.mapbox.android.telemetry.location;
 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -8,13 +8,13 @@ import android.content.IntentFilter;
 import com.mapbox.android.core.api.BroadcastReceiverProxy;
 import com.mapbox.android.core.api.IntentHandler;
 
-class LocationUpdatesBroadcastReceiverProxy implements BroadcastReceiverProxy {
+class GeofenceEventBroadcastReceiverProxy implements BroadcastReceiverProxy {
   private static final String ACTION_PROCESS_UPDATES =
-          "com.mapbox.android.core.location.LocationUpdatesBroadcastReceiver";
+    "com.mapbox.android.telemetry.location.GeofenceEventBroadcastReceiverProxy";
 
   private final Context context;
 
-  LocationUpdatesBroadcastReceiverProxy(Context context) {
+  GeofenceEventBroadcastReceiverProxy(Context context) {
     this.context = context;
   }
 

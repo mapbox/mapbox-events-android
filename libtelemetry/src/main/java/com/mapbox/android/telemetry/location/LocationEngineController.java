@@ -1,29 +1,37 @@
 package com.mapbox.android.telemetry.location;
 
+import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 
+import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
+import com.google.android.gms.location.GeofencingRequest;
+import com.mapbox.android.core.api.BroadcastReceiverProxy;
+import com.mapbox.android.core.api.IntentHandler;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineCallback;
 import com.mapbox.android.core.location.LocationEngineRequest;
 import com.mapbox.android.core.location.LocationEngineResult;
-import com.mapbox.android.core.geofence.GeofenceEngine;
 
-public class LocationEngineController implements Timer.Callback {
+public class LocationEngineController implements Timer.Callback, IntentHandler {
   private static final String TAG = "TelemLocationController";
   /// TODO: move constants to config class
   private static final int MAX_EVENTS_IN_QUEUE = 10;
   private static final long DEFAULT_TIMEOUT_MILLISECONDS = 20000L; //300000L;
   private static final long DEFAULT_INTERVAL_IN_MILLISECONDS = 1000L;
   private static final long DEFAULT_MAX_WAIT_TIME = DEFAULT_INTERVAL_IN_MILLISECONDS * 5;
+  private static final float DEFAULT_GEOFENCE_RADIUS_METERS = 300.0f;
 
   private final LocationEngine locationEngine;
   private final Callback callback;
   private final Timer timer;
   private final EventDispatcher eventDispatcher;
+
+  @Nullable
   private GeofenceEngine geofenceEngine;
 
   private State currentState;
@@ -56,13 +64,21 @@ public class LocationEngineController implements Timer.Callback {
     this.timer.setCallback(this);
   }
 
-  public static LocationEngineController create(LocationEngine locationEngine, Looper looper,
+  public static LocationEngineController create(Context context,
+                                                LocationEngine locationEngine,
+                                                Looper looper,
                                                 LocationEngineController.Callback callback) {
-    return new LocationEngineController(locationEngine, EventDispatcher.create(MAX_EVENTS_IN_QUEUE),
-      new LocationUpdateTrigger(looper), callback);
+    return new LocationEngineController(locationEngine,
+      EventDispatcher.create(MAX_EVENTS_IN_QUEUE), new LocationUpdateTrigger(looper), callback)
+      .setGeofenceEngine(GoogleGeofenceEngine.create(context), new GeofenceEventBroadcastReceiverProxy(context));
   }
 
-  LocationEngineController setGeofenceEngine(GeofenceEngine geofenceEngine) {
+  @VisibleForTesting
+  LocationEngineController setGeofenceEngine(GeofenceEngine geofenceEngine, BroadcastReceiverProxy proxy) {
+    if (geofenceEngine == null) {
+      return this;
+    }
+    geofenceEngine.setBroadCastReceiverProxy(proxy, this);
     this.geofenceEngine = geofenceEngine;
     return this;
   }
@@ -106,14 +122,14 @@ public class LocationEngineController implements Timer.Callback {
         break;
       case LocationEngineControllerMode.ACTIVE_GEOFENCE:
         // 1. Start or update geofence
-        //geofenceEngine.addGeofences();
+        Location location = ((ActiveGeofenceState) nextState).getLastLocation();
+        createGeofenceAround(location);
         // 2. Start timer
         timer.start(DEFAULT_TIMEOUT_MILLISECONDS);
         break;
       case LocationEngineControllerMode.PASSIVE:
         requestPassiveUpdates();
-        // cancel geofence ?
-        //geofenceEngine.removeGeofences();
+        removeGeofence();
         timer.cancel();
         break;
       case LocationEngineControllerMode.PASSIVE_GEOFENCE:
@@ -124,13 +140,32 @@ public class LocationEngineController implements Timer.Callback {
       case LocationEngineControllerMode.IDLE:
         locationEngine.removeLocationUpdates(locationEngineCallback);
         // Cancel geofence engine request
-        //geofenceEngine.removeGeofences();
+        removeGeofence();
         timer.cancel();
         break;
       default:
         break;
     }
     currentState = nextState;
+  }
+
+  private void createGeofenceAround(Location location) {
+    if (geofenceEngine == null) {
+      Log.w(TAG, "Geofencing is not supported");
+      return;
+    }
+    GeofencingRequest request = geofenceEngine.getGeofencingRequest(location, DEFAULT_GEOFENCE_RADIUS_METERS);
+    geofenceEngine.addGeofences(request);
+    geofenceEngine.subscribe();
+  }
+
+  private void removeGeofence() {
+    if (geofenceEngine == null) {
+      Log.w(TAG, "Geofencing is not supported");
+      return;
+    }
+    geofenceEngine.removeGeofences();
+    geofenceEngine.unsubscribe();
   }
 
   private void requestPassiveUpdates() {
@@ -158,6 +193,11 @@ public class LocationEngineController implements Timer.Callback {
   @Override
   public void onExpired() {
     eventDispatcher.enqueue(EventFactory.createTimerExpiredEvent());
+  }
+
+  @Override
+  public void handle(Intent intent) {
+    eventDispatcher.enqueue(EventFactory.createGeofenceExiteEvent(null));
   }
 
   public interface Callback {

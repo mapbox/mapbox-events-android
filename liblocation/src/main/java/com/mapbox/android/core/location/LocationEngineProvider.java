@@ -37,7 +37,6 @@ public final class LocationEngineProvider {
       hasGoogleLocationServices &= GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context)
               == ConnectionResult.SUCCESS;
     }
-
     return getLocationEngine(context, hasGoogleLocationServices, background);
   }
 

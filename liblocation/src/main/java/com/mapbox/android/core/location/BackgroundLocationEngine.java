@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import com.mapbox.android.core.api.BroadcastReceiverProxy;
+import com.mapbox.android.core.api.IntentHandler;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
