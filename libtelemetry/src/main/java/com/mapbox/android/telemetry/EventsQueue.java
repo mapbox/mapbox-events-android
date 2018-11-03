@@ -15,7 +15,7 @@ class EventsQueue {
   }
 
   boolean push(Event event) {
-    if (checkMaximumSize()) {
+    if (queue.size() >= SIZE_LIMIT) {
       if (!isTelemetryInitialized) {
         return enqueue(event);
       }
@@ -36,9 +36,5 @@ class EventsQueue {
 
   private boolean enqueue(Event event) {
     return queue.enqueue(event);
-  }
-
-  private boolean checkMaximumSize() {
-    return queue.size() >= SIZE_LIMIT;
   }
 }

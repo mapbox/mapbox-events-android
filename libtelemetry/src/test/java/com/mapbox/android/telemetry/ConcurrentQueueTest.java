@@ -24,13 +24,29 @@ public class ConcurrentQueueTest {
   }
 
   @Test
-  public void checksFlushing() throws Exception {
+  public void checksOneEventFlushing() throws Exception {
     ConcurrentQueue<Event> theQueue = new ConcurrentQueue<>();
     Event mockedEvent = mock(Event.class);
     List<Event> expectedEventsFlushed = new ArrayList<>(1);
     expectedEventsFlushed.add(mockedEvent);
     theQueue.add(mockedEvent);
 
+    List<Event> eventsFlushed = theQueue.flush();
+
+    assertEquals(expectedEventsFlushed, eventsFlushed);
+    assertEquals(0, theQueue.size());
+  }
+
+  @Test
+  public void checksMultiEventFlushing() throws Exception {
+    ConcurrentQueue<Event> theQueue = new ConcurrentQueue<>();
+
+    List<Event> expectedEventsFlushed = new ArrayList<>(10);
+    for (int i = 0; i < 10; i++) {
+      Event mockedEvent = mock(Event.class);
+      expectedEventsFlushed.add(mockedEvent);
+      theQueue.add(mockedEvent);
+    }
     List<Event> eventsFlushed = theQueue.flush();
 
     assertEquals(expectedEventsFlushed, eventsFlushed);
@@ -54,6 +70,23 @@ public class ConcurrentQueueTest {
     theQueue.add(firstEvent);
     Event secondEvent = mock(Event.class);
 
+    theQueue.enqueue(secondEvent);
+
+    assertFalse(theQueue.obtainQueue().contains(firstEvent));
+    assertTrue(theQueue.obtainQueue().contains(secondEvent));
+    assertEquals(1, theQueue.size());
+  }
+
+  @Test
+  public void checksEmptyEnqueuing() throws Exception {
+    ConcurrentQueue<Event> theQueue = new ConcurrentQueue<>();
+    Event firstEvent = mock(Event.class);
+    theQueue.enqueue(firstEvent);
+
+    assertTrue(theQueue.obtainQueue().contains(firstEvent));
+    assertEquals(1, theQueue.size());
+
+    Event secondEvent = mock(Event.class);
     theQueue.enqueue(secondEvent);
 
     assertFalse(theQueue.obtainQueue().contains(firstEvent));

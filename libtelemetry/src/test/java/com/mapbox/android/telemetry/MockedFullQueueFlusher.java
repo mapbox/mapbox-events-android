@@ -13,7 +13,7 @@ class MockedFullQueueFlusher extends FullQueueFlusher {
   }
 
   @Override
-  public void onFullQueueFlush(ConcurrentQueue queue, Event event) {
+  public void onFullQueueFlush(ConcurrentQueue<Event> queue, Event event) {
     queuedEvents = new ArrayList<>(queue.obtainQueue());
     eventRightAfterReachingFullCapacity = event;
     super.onFullQueueFlush(queue, event);

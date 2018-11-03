@@ -11,7 +11,7 @@ class FullQueueFlusher implements FlushQueueCallback {
   }
 
   @Override
-  public void onFullQueueFlush(ConcurrentQueue queue, Event event) {
+  public void onFullQueueFlush(ConcurrentQueue<Event> queue, Event event) {
     List<Event> fullQueue = queue.flush();
     queue.add(event);
     fullQueueCallback.onFullQueue(fullQueue);

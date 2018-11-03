@@ -8,35 +8,32 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 class ConcurrentQueue<T> {
   private final Queue<T> queue;
-  private int count = 0;
 
   ConcurrentQueue() {
     this.queue = new ConcurrentLinkedQueue<>();
   }
 
   boolean add(T event) {
-    boolean isAdded = queue.add(event);
-    count++;
-    return isAdded;
+    return queue.add(event);
   }
 
   List<T> flush() {
+    int count = queue.size();
     List<T> queuedEvents = new ArrayList<>(count);
     for (int i = 0; i < count; i++) {
-      T event = queue.remove();
+      T event = queue.poll();
       queuedEvents.add(event);
     }
-    count = 0;
     return queuedEvents;
   }
 
   boolean enqueue(T event) {
-    queue.remove();
+    queue.poll();
     return queue.add(event);
   }
 
   int size() {
-    return count;
+    return queue.size();
   }
 
   // For testing only
