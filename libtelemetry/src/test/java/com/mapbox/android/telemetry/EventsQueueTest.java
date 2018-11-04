@@ -16,19 +16,19 @@ public class EventsQueueTest {
 
   @Test
   public void checksAddingAnEventToTheQueue() throws Exception {
-    FlushQueueCallback mockedFlushCallback = mock(FlushQueueCallback.class);
-    EventsQueue aQueue = new EventsQueue(mockedFlushCallback);
+    FullQueueCallback mockedFullCallback = mock(FullQueueCallback.class);
+    EventsQueue aQueue = new EventsQueue(mockedFullCallback);
     Event anEvent = mock(Event.class);
 
     assertTrue(aQueue.push(anEvent));
-    assertEquals(1, aQueue.queue.size());
+    assertEquals(1, aQueue.size());
     assertEquals(anEvent, obtainFirst(aQueue));
   }
 
   @Test
   public void checksMaximumSizeOfTheQueueWhenTelemetryInitialized() throws Exception {
-    FlushQueueCallback mockedFlushCallback = mock(FlushQueueCallback.class);
-    EventsQueue aQueue = new EventsQueue(mockedFlushCallback);
+    FullQueueCallback mockedFullCallback = mock(FullQueueCallback.class);
+    EventsQueue aQueue = new EventsQueue(mockedFullCallback);
     aQueue.setTelemetryInitialized(true);
     Event anEvent = mock(Event.class);
     for (int i = 0; i < EventsQueue.SIZE_LIMIT; i++) {
@@ -40,8 +40,8 @@ public class EventsQueueTest {
 
   @Test
   public void checksEnqueueWhenTelemetryNotInitialized() throws Exception {
-    FlushQueueCallback mockedFlushCallback = mock(FlushQueueCallback.class);
-    EventsQueue aQueue = new EventsQueue(mockedFlushCallback);
+    FullQueueCallback mockedFullCallback = mock(FullQueueCallback.class);
+    EventsQueue aQueue = new EventsQueue(mockedFullCallback);
     Event firstEvent = mock(Event.class);
     aQueue.push(firstEvent);
     Event secondEvent = mock(Event.class);
@@ -54,49 +54,50 @@ public class EventsQueueTest {
 
     aQueue.push(lastEvent);
 
-    assertFalse(aQueue.queue.obtainQueue().contains(firstEvent));
+    assertFalse(aQueue.obtainQueue().contains(firstEvent));
     assertEquals(secondEvent, obtainFirst(aQueue));
     assertEquals(lastEvent, obtainLast(aQueue));
   }
 
   @Test
   public void checksQueueFlushing() throws Exception {
-    FlushQueueCallback mockedFlushCallback = mock(FlushQueueCallback.class);
-    EventsQueue aQueue = new EventsQueue(mockedFlushCallback);
+    FullQueueCallback mockedFullCallback = mock(FullQueueCallback.class);
+    EventsQueue aQueue = new EventsQueue(mockedFullCallback);
     aQueue.setTelemetryInitialized(true);
     Event anEvent = mock(Event.class);
     for (int i = 0; i < EventsQueue.SIZE_LIMIT; i++) {
       aQueue.push(anEvent);
     }
-    List<Event> originalQueue = new ArrayList<>(aQueue.queue.obtainQueue());
+    List<Event> originalQueue = new ArrayList<>(aQueue.obtainQueue());
 
     List<Event> actualQueue = aQueue.flush();
 
     assertEquals(originalQueue, actualQueue);
-    assertEquals(0, aQueue.queue.size());
+    assertEquals(0, aQueue.size());
   }
 
   @Test
   public void checksOnFullQueueFlushCalled() throws Exception {
-    FlushQueueCallback mockedFlushCallback = mock(FlushQueueCallback.class);
-    EventsQueue aQueue = new EventsQueue(mockedFlushCallback);
+    FullQueueCallback mockedFullCallback = mock(FullQueueCallback.class);
+    EventsQueue aQueue = new EventsQueue(mockedFullCallback);
     aQueue.setTelemetryInitialized(true);
     Event anEvent = mock(Event.class);
+    List<Event> list = new ArrayList<>(EventsQueue.SIZE_LIMIT);
     for (int i = 0; i < EventsQueue.SIZE_LIMIT; i++) {
       aQueue.push(anEvent);
+      list.add(anEvent);
     }
     Event theEventRightAfterReachingFullCapacity = mock(Event.class);
 
     aQueue.push(theEventRightAfterReachingFullCapacity);
 
-    verify(mockedFlushCallback).onFullQueueFlush(aQueue.queue, theEventRightAfterReachingFullCapacity);
+    verify(mockedFullCallback).onFullQueue(list);
   }
 
   @Test
   public void checksPushingTheEventRightAfterReachingFullCapacity() throws Exception {
     FullQueueCallback mockedFullCallback = mock(FullQueueCallback.class);
-    FullQueueFlusher eventsFlusher = new FullQueueFlusher(mockedFullCallback);
-    EventsQueue aQueue = new EventsQueue(eventsFlusher);
+    EventsQueue aQueue = new EventsQueue(mockedFullCallback);
     aQueue.setTelemetryInitialized(true);
     Event anEvent = mock(Event.class);
     for (int i = 0; i < EventsQueue.SIZE_LIMIT; i++) {
@@ -106,18 +107,18 @@ public class EventsQueueTest {
 
     aQueue.push(theEventRightAfterReachingFullCapacity);
 
-    assertEquals(1, aQueue.queue.size());
+    assertEquals(1, aQueue.size());
     assertEquals(theEventRightAfterReachingFullCapacity, obtainFirst(aQueue));
-    assertEquals(0, aQueue.queue.obtainQueue().size());
+    assertEquals(0, aQueue.obtainQueue().size());
   }
 
   private Event obtainFirst(EventsQueue eventsQueue) {
-    return eventsQueue.queue.obtainQueue().remove();
+    return eventsQueue.obtainQueue().remove();
   }
 
   private Event obtainLast(EventsQueue eventsQueue) {
     Event lastEvent = null;
-    Queue<Event> queue = eventsQueue.queue.obtainQueue();
+    Queue<Event> queue = eventsQueue.obtainQueue();
     int count = queue.size();
     for (int i = 0; i < count; i++) {
       lastEvent = queue.remove();

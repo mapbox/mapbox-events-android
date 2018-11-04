@@ -14,8 +14,7 @@ public class FullQueueFlusherTest {
   @Test
   public void checksQueuedEventsWhenFullCapacityReached() throws Exception {
     FullQueueCallback mockedFullCallback = mock(FullQueueCallback.class);
-    MockedFullQueueFlusher mockedEventsFlusher = new MockedFullQueueFlusher(mockedFullCallback);
-    EventsQueue aQueue = new EventsQueue(mockedEventsFlusher);
+    EventsQueue aQueue = new EventsQueue(mockedFullCallback);
     aQueue.setTelemetryInitialized(true);
     List<Event> expectedQueuedEvents = new ArrayList<>(EventsQueue.SIZE_LIMIT);
     Event anEvent = mock(Event.class);
@@ -26,16 +25,13 @@ public class FullQueueFlusherTest {
     Event eventRightAfterReachingFullCapacity = mock(Event.class);
 
     aQueue.push(eventRightAfterReachingFullCapacity);
-    List<Event> actualQueuedEvents = mockedEventsFlusher.queuedEvents;
-
-    assertEquals(expectedQueuedEvents, actualQueuedEvents);
+    verify(mockedFullCallback).onFullQueue(expectedQueuedEvents);
   }
 
   @Test
   public void checksEventRightAfterReachingFullCapacity() throws Exception {
     FullQueueCallback mockedFullCallback = mock(FullQueueCallback.class);
-    MockedFullQueueFlusher mockedEventsFlusher = new MockedFullQueueFlusher(mockedFullCallback);
-    EventsQueue aQueue = new EventsQueue(mockedEventsFlusher);
+    EventsQueue aQueue = new EventsQueue(mockedFullCallback);
     aQueue.setTelemetryInitialized(true);
     Event anEvent = mock(Event.class);
     for (int i = 0; i < EventsQueue.SIZE_LIMIT; i++) {
@@ -44,16 +40,14 @@ public class FullQueueFlusherTest {
     Event expectedEventRightAfterReachingFullCapacity = mock(Event.class);
 
     aQueue.push(expectedEventRightAfterReachingFullCapacity);
-    Event actualEventRightAfterReachingFullCapacity = mockedEventsFlusher.eventRightAfterReachingFullCapacity;
 
-    assertEquals(expectedEventRightAfterReachingFullCapacity, actualEventRightAfterReachingFullCapacity);
+    assertEquals(expectedEventRightAfterReachingFullCapacity, aQueue.obtainQueue().peek());
   }
 
   @Test
   public void checksOnFullQueueCalled() throws Exception {
     FullQueueCallback mockedFullCallback = mock(FullQueueCallback.class);
-    MockedFullQueueFlusher mockedEventsFlusher = new MockedFullQueueFlusher(mockedFullCallback);
-    EventsQueue aQueue = new EventsQueue(mockedEventsFlusher);
+    EventsQueue aQueue = new EventsQueue(mockedFullCallback);
     aQueue.setTelemetryInitialized(true);
     List<Event> expectedQueuedEvents = new ArrayList<>(EventsQueue.SIZE_LIMIT);
     Event anEvent = mock(Event.class);
@@ -64,8 +58,7 @@ public class FullQueueFlusherTest {
 
     Event eventRightAfterReachingFullCapacity = mock(Event.class);
     aQueue.push(eventRightAfterReachingFullCapacity);
-    List<Event> actualQueuedEvents = mockedEventsFlusher.queuedEvents;
 
-    verify(mockedFullCallback).onFullQueue(actualQueuedEvents);
+    verify(mockedFullCallback).onFullQueue(expectedQueuedEvents);
   }
 }

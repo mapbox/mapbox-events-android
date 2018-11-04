@@ -1,17 +1,20 @@
 package com.mapbox.android.telemetry;
 
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 class EventsQueue {
   static final int SIZE_LIMIT = 180;
-  private final FlushQueueCallback callback;
-  final ConcurrentQueue<Event> queue;
+  private final FullQueueCallback callback;
+  private final Queue<Event> queue;
   private boolean isTelemetryInitialized = false;
 
-  EventsQueue(FlushQueueCallback callback) {
+  EventsQueue(FullQueueCallback callback) {
     this.callback = callback;
-    this.queue = new ConcurrentQueue<>();
+    this.queue = new ConcurrentLinkedQueue<>();
   }
 
   boolean push(Event event) {
@@ -19,7 +22,10 @@ class EventsQueue {
       if (!isTelemetryInitialized) {
         return enqueue(event);
       }
-      callback.onFullQueueFlush(queue, event);
+
+      List<Event> fullQueue = flush();
+      queue.add(event);
+      callback.onFullQueue(fullQueue);
       return false;
     }
 
@@ -27,7 +33,13 @@ class EventsQueue {
   }
 
   List<Event> flush() {
-    return queue.flush();
+    int count = queue.size();
+    List<Event> queuedEvents = new ArrayList<>(count);
+    for (int i = 0; i < count; i++) {
+      queuedEvents.add(queue.poll());
+    }
+    queue.clear();
+    return queuedEvents;
   }
 
   void setTelemetryInitialized(boolean telemetryInitialized) {
@@ -35,6 +47,15 @@ class EventsQueue {
   }
 
   private boolean enqueue(Event event) {
-    return queue.enqueue(event);
+    queue.poll();
+    return queue.add(event);
+  }
+
+  public int size() {
+    return queue.size();
+  }
+
+  public Queue<Event> obtainQueue() {
+    return queue;
   }
 }

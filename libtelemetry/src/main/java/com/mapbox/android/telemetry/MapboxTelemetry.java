@@ -224,7 +224,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   boolean isQueueEmpty() {
-    return queue.queue.size() == 0;
+    return queue.size() == 0;
   }
 
   private void startTelemetryService() {
@@ -275,7 +275,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   private void initializeQueue() {
-    queue = new EventsQueue(new FullQueueFlusher(this));
+    queue = new EventsQueue(this);
   }
 
   private boolean areRequiredParametersValid(String accessToken, String userAgent) {
