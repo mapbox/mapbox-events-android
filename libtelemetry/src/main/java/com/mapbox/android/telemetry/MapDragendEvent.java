@@ -46,6 +46,7 @@ class MapDragendEvent extends Event implements Parcelable {
   MapDragendEvent setDeviceInfo(Context context) {
     this.batteryLevel = TelemetryUtils.obtainBatteryLevel(context);
     this.pluggedIn = TelemetryUtils.isPluggedIn(context);
+    this.cellularNetworkType = TelemetryUtils.obtainCellularNetworkType(context);
     return this;
   }
 
