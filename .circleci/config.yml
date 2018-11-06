@@ -6,6 +6,13 @@ workflows:
     jobs:
       - build
       - release
+
+
+dependencies:
+  pre: |
+    - npm install @octokit/rest
+    - npm install jsonwebtoken
+    - npm install pretty-bytes
 jobs:
   build:
     working_directory: ~/code

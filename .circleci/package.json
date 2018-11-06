@@ -21,6 +21,7 @@
     "npm-run-all": "^4.0.2"
   },
   "devDependencies": {
+    "express": "^4.11.1",
     "@octokit/rest": "^15.15.1",
     "jsonwebtoken": "^8.3.0",
     "pretty-bytes": "^5.1.0"
