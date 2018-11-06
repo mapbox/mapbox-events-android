@@ -64,6 +64,10 @@ jobs:
           destination: reports
       - store_test_results:
           path: app/build/test-results
+      - run:
+          name: Record size
+          command: platform/android/scripts/metrics.sh
+
 
 # ------------------------------------------------------------------------------
   release:
@@ -107,3 +111,6 @@ jobs:
       - store_artifacts:
           path: app/build/reports
           destination: reports
+      - run:
+          name: Record size
+          command: platform/android/scripts/metrics.sh
