@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
-import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 import static com.mapbox.android.telemetry.SchedulerFlusherFactory.flushingPeriod;
 import static com.mapbox.android.telemetry.SchedulerFlusherFactory.SCHEDULER_FLUSHER_INTENT;
 
@@ -28,7 +27,7 @@ class AlarmSchedulerFlusher implements SchedulerFlusher {
   @Override
   public void register() {
     Intent alarmIntent = receiver.supplyIntent(requestCode);
-    pendingIntent = PendingIntent.getBroadcast(context, requestCode, alarmIntent, FLAG_UPDATE_CURRENT);
+    pendingIntent = PendingIntent.getBroadcast(context, requestCode, alarmIntent, 0);
     String action = SCHEDULER_FLUSHER_INTENT + Integer.toString(requestCode);
     IntentFilter filter = new IntentFilter(action);
     context.registerReceiver(receiver, filter);

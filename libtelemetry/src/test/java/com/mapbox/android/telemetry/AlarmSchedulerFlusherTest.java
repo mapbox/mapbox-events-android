@@ -84,7 +84,6 @@ public class AlarmSchedulerFlusherTest {
     theAlarmSchedulerFlusher.register();
     theAlarmSchedulerFlusher.schedule(elapsedMockedTime);
 
-
     theAlarmSchedulerFlusher.register();
     theAlarmSchedulerFlusher.schedule(elapsedMockedTime2);
 
