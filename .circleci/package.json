@@ -1,0 +1,41 @@
+{
+  "name": "@mapbox/mapbox-events-android",
+  "version": "4.0.0",
+  "description": "Telemetry and Location Services",
+  "keywords": [
+    "mapbox",
+    "telemetry",
+    "location",
+    "core",
+    "events"
+  ],
+  "main": "platform/node/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mapbox/mapbox-events-android.git"
+  },
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "@mapbox/cmake-node-module": "^1.1.0",
+    "node-pre-gyp": "^0.10.2",
+    "npm-run-all": "^4.0.2"
+  },
+  "devDependencies": {
+    "@octokit/rest": "^15.15.1",
+    "jsonwebtoken": "^8.3.0",
+    "pretty-bytes": "^5.1.0"
+  },
+  "engines": {
+    "node": ">=6"
+  },
+  "scripts": {
+    "install": "node-pre-gyp install --fallback-to-build=false || make node",
+    "test": "tape platform/node/test/js/**/*.test.js",
+    "test-memory": "node --expose-gc platform/node/test/memory.test.js",
+    "test-suite": "run-s test-render test-query test-expressions",
+    "test-expressions": "node -r esm platform/node/test/expression.test.js",
+    "test-render": "node -r esm platform/node/test/render.test.js",
+    "test-query": "node -r esm platform/node/test/query.test.js"
+  },
+  "gypfile": true
+}
