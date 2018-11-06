@@ -66,7 +66,10 @@ jobs:
           path: app/build/test-results
       - run:
           name: Record size
-          command: ./scripts/metrics.sh
+          command: |
+            sudo chmod +x scripts/metrics.sh
+            sudo chmod +x scripts/check_binary_size.js
+            ./scripts/metrics.sh
 
 
 # ------------------------------------------------------------------------------
@@ -113,4 +116,8 @@ jobs:
           destination: reports
       - run:
           name: Record size
-          command: ./scripts/metrics.sh
+          command: |
+            sudo chmod +x scripts/metrics.sh
+            sudo chmod +x scripts/check_binary_size.js
+            ./scripts/metrics.sh
+
