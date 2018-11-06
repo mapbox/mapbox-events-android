@@ -4,6 +4,8 @@ workflows:
   version: 2
   default:
     jobs:
+      - save-node_modules-cache
+      - restore-node_modules-cache
       - build
       - release
 jobs:
@@ -13,13 +15,15 @@ jobs:
           name: Save node_modules cache
           key: 'node_modules/v1/{{ arch }}/{{ checksum "/.circleci/package.json" }}'
           paths: [ "node_modules" ]
-    restore-node_modules-cache:
+  restore-node_modules-cache:
       steps:
       - restore_cache:
           name: Restore node_modules cache
           keys:
             - 'node_modules/v1/{{ arch }}/{{ checksum ".circleci/package.json" }}'
             - 'node_modules/v1/{{ arch }}'
+
+# ------------------------------------------------------------------------------
   build:
     working_directory: ~/code
     docker:
