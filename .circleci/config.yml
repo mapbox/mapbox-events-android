@@ -67,7 +67,7 @@ jobs:
           path: app/build/test-results
       - save_cache:
           name: Save node_modules cache
-          key: 'node_modules/v1/{{ arch }}/{{ checksum ".circleci/package.json" }}'
+          key: 'node_modules/v1/{{ arch }}/{{ checksum "package.json" }}'
           paths: [ "node_modules" ]
       - run:
           name: chmod permissions
@@ -123,14 +123,8 @@ jobs:
           destination: reports
       - save_cache:
           name: Save node_modules cache
-          key: 'node_modules/v1/{{ arch }}/{{ checksum ".circleci/package.json" }}'
+          key: 'node_modules/v1/{{ arch }}/{{ checksum "package.json" }}'
           paths: [ "node_modules" ]
-      - run:
-          name: download node dependencies
-          command: |
-            npm install @octokit/rest
-            npm install jsonwebtoken
-            npm install pretty-bytes
       - run:
           name: chmod permissions
           command: |
