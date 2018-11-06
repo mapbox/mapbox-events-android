@@ -122,9 +122,9 @@ jobs:
           path: app/build/reports
           destination: reports
       - save_cache:
-          name: Save node_modules cache
-          key: 'node_modules/v1/{{ arch }}/{{ checksum "package.json" }}'
-          paths: [ "node_modules" ]
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
       - run:
           name: chmod permissions
           command: |
