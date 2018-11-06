@@ -65,14 +65,14 @@ jobs:
       - store_test_results:
           path: app/build/test-results
       - save_cache:
-        name: Save node_modules cache
-        key: 'node_modules/v1/{{ arch }}/{{ checksum "/.circleci/package.json" }}'
-        paths: [ "node_modules" ]
+          name: Save node_modules cache
+          key: 'node_modules/v1/{{ arch }}/{{ checksum "/.circleci/package.json" }}'
+          paths: [ "node_modules" ]
       - restore_cache:
-        name: Restore node_modules cache
-        keys:
-          - 'node_modules/v1/{{ arch }}/{{ checksum ".circleci/package.json" }}'
-          - 'node_modules/v1/{{ arch }}'
+          name: Restore node_modules cache
+          keys:
+            - 'node_modules/v1/{{ arch }}/{{ checksum ".circleci/package.json" }}'
+            - 'node_modules/v1/{{ arch }}'
       - run:
           name: chmod permissions
           command: |
