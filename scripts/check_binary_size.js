@@ -32,7 +32,7 @@ github.apps.createInstallationToken({installation_id: SIZE_CHECK_APP_INSTALLATIO
         github.authenticate({type: 'token', token: data.token});
         return github.checks.create({
             owner: 'mapbox',
-            repo: 'mapbox-gl-native',
+            repo: 'mapbox-events-android',
             name: `Size - ${label}`,
             head_branch: process.env['CIRCLE_BRANCH'],
             head_sha: process.env['CIRCLE_SHA1'],
