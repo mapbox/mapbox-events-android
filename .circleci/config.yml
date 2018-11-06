@@ -113,4 +113,4 @@ jobs:
           destination: reports
       - run:
           name: Record size
-          command: ~/scripts/metrics.sh
+          command: ./scripts/metrics.sh
