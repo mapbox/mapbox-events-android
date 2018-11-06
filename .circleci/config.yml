@@ -4,26 +4,9 @@ workflows:
   version: 2
   default:
     jobs:
-      - save-node_modules-cache
-      - restore-node_modules-cache
       - build
       - release
 jobs:
-  save-node_modules-cache:
-      steps:
-      - save_cache:
-          name: Save node_modules cache
-          key: 'node_modules/v1/{{ arch }}/{{ checksum "/.circleci/package.json" }}'
-          paths: [ "node_modules" ]
-  restore-node_modules-cache:
-      steps:
-      - restore_cache:
-          name: Restore node_modules cache
-          keys:
-            - 'node_modules/v1/{{ arch }}/{{ checksum ".circleci/package.json" }}'
-            - 'node_modules/v1/{{ arch }}'
-
-# ------------------------------------------------------------------------------
   build:
     working_directory: ~/code
     docker:
@@ -81,6 +64,15 @@ jobs:
           destination: reports
       - store_test_results:
           path: app/build/test-results
+      - save_cache:
+        name: Save node_modules cache
+        key: 'node_modules/v1/{{ arch }}/{{ checksum "/.circleci/package.json" }}'
+        paths: [ "node_modules" ]
+      - restore_cache:
+        name: Restore node_modules cache
+        keys:
+          - 'node_modules/v1/{{ arch }}/{{ checksum ".circleci/package.json" }}'
+          - 'node_modules/v1/{{ arch }}'
       - run:
           name: chmod permissions
           command: |
