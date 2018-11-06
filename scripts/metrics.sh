@@ -10,4 +10,4 @@ scripts/check_binary_size.js "libtelemetry/build/intermediates/intermediate-jars
 scripts/check_binary_size.js "libtelemetry/build/intermediates/intermediate-jars/release/jni/x86_64/libmapbox-gl.so"      "Android x86_64"
 
 # Track overall library size
-scripts/check_binary_size.js "platform/android/MapboxGLAndroidSDK/build/outputs/aar/MapboxGLAndroidSDK-release.aar" "Android AAR"
+scripts/check_binary_size.js "libtelemetry/build/outputs/aar/libtelemetry-release.aar" "Android AAR"
