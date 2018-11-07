@@ -6,6 +6,7 @@ workflows:
     jobs:
       - build
       - release
+
 jobs:
   build:
     working_directory: ~/code
@@ -70,6 +71,7 @@ jobs:
       - store_test_results:
           path: app/build/test-results
 
+
 # ------------------------------------------------------------------------------
   release:
     branch:
@@ -112,3 +114,16 @@ jobs:
       - store_artifacts:
           path: app/build/reports
           destination: reports
+      - restore_cache: # special step to restore the dependency cache
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run:
+          name: setup environment
+          command: npm install
+      - save_cache: # special step to save the dependency cache
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - ./node_modules
+      - run:
+          name: Record size
+          command: ./scripts/metrics.sh
+
