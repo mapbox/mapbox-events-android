@@ -17,15 +17,14 @@ process.on('unhandledRejection', error => {
     process.exit(1)
 });
 
-const key = Buffer.from(process.env['SIZE_CHECK_APP_PRIVATE_KEY'], 'base64').toString('binary');
+const key = Buffer.from(process.env['SIZE_CHECK_APP_PRIVATE_KEY'], 'base64').toString('utf-8');
 const payload = {
     exp: Math.floor(Date.now() / 1000) + 60,
     iat: Math.floor(Date.now() / 1000),
     iss: SIZE_CHECK_APP_ID
 };
 
-//const token = jwt.sign(payload, key, {algorithm: 'RS256'});
-const token = key;
+const token = jwt.sign(payload, key, {algorithm: 'RS256'});
 github.authenticate({type: 'app', token});
 
 github.apps.createInstallationToken({installation_id: SIZE_CHECK_APP_INSTALLATION_ID})
