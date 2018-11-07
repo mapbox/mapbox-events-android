@@ -65,18 +65,6 @@ jobs:
           destination: reports
       - store_test_results:
           path: app/build/test-results
-      - save_cache:
-          name: Save node_modules cache
-          key: 'node_modules/v1/{{ arch }}/{{ checksum "package.json" }}'
-          paths: [ "node_modules" ]
-      - run:
-          name: chmod permissions
-          command: |
-            chmod +x scripts/metrics.sh
-            chmod +x scripts/check_binary_size.js
-      - run:
-          name: Record size
-          command: ./scripts/metrics.sh
 
 
 # ------------------------------------------------------------------------------
