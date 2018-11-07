@@ -9,16 +9,9 @@
     "core",
     "events"
   ],
-  "main": "platform/node/index.js",
   "repository": {
     "type": "git",
     "url": "git://github.com/mapbox/mapbox-events-android.git"
-  },
-  "license": "BSD-2-Clause",
-  "dependencies": {
-    "@mapbox/cmake-node-module": "^1.1.0",
-    "node-pre-gyp": "^0.10.2",
-    "npm-run-all": "^4.0.2"
   },
   "devDependencies": {
     "express": "^4.11.1",
@@ -28,15 +21,5 @@
   },
   "engines": {
     "node": ">=6"
-  },
-  "scripts": {
-    "install": "node-pre-gyp install --fallback-to-build=false || make node",
-    "test": "tape platform/node/test/js/**/*.test.js",
-    "test-memory": "node --expose-gc platform/node/test/memory.test.js",
-    "test-suite": "run-s test-render test-query test-expressions",
-    "test-expressions": "node -r esm platform/node/test/expression.test.js",
-    "test-render": "node -r esm platform/node/test/render.test.js",
-    "test-query": "node -r esm platform/node/test/query.test.js"
-  },
-  "gypfile": true
+  }
 }

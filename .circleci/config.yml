@@ -109,9 +109,6 @@ jobs:
       - store_artifacts:
           path: app/build/reports
           destination: reports
-      - run:
-          name: update-npm
-          command: 'npm install -g npm@latest'
       - restore_cache: # special step to restore the dependency cache
           key: dependency-cache-{{ checksum "package.json" }}
       - run:
@@ -121,11 +118,6 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
             - ./node_modules
-      - run:
-          name: chmod permissions
-          command: |
-            chmod +x scripts/metrics.sh
-            chmod +x scripts/check_binary_size.js
       - run:
           name: Record size
           command: ./scripts/metrics.sh
