@@ -12,6 +12,16 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
+    buildTypes {
+        debug {
+            testCoverageEnabled true
+        }
+
+        release {
+            testCoverageEnabled true
+        }
+    }
+
     lintOptions {
         warningsAsErrors true
         abortOnError true
@@ -32,3 +42,4 @@ dependencies {
 }
 
 apply from: "${rootDir}/gradle/checkstyle.gradle"
+apply from: "${rootDir}/gradle/jacoco.gradle"
