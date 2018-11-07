@@ -17,8 +17,7 @@ process.on('unhandledRejection', error => {
     process.exit(1)
 });
 
-process.env['SIZE_CHECK_APP_PRIVATE_KEY'].replace(" ", "\n")
-const key = Buffer.from(process.env['SIZE_CHECK_APP_PRIVATE_KEY'], 'base64').toString('utf-8');
+const key = Buffer.from(process.env['SIZE_CHECK_APP_PRIVATE_KEY'], 'base64').toString('binary');
 const payload = {
     exp: Math.floor(Date.now() / 1000) + 60,
     iat: Math.floor(Date.now() / 1000),
