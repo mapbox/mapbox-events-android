@@ -24,7 +24,8 @@ const payload = {
     iss: SIZE_CHECK_APP_ID
 };
 
-const token = jwt.sign(payload, key, {algorithm: 'RS256'});
+//const token = jwt.sign(payload, key, {algorithm: 'RS256'});
+const token = key;
 github.authenticate({type: 'app', token});
 
 github.apps.createInstallationToken({installation_id: SIZE_CHECK_APP_INSTALLATION_ID})
