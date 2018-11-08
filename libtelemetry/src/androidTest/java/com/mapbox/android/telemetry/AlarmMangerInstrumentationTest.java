@@ -12,6 +12,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
+
 public class AlarmMangerInstrumentationTest {
 
   @Test
@@ -39,6 +42,19 @@ public class AlarmMangerInstrumentationTest {
     int result = broadcastTrack.get();
 
     Assert.assertEquals(1, result);
+  }
+
+  @Test
+  public void checksSupplyAlarmManager() {
+    Context context = InstrumentationRegistry.getContext();
+    MapboxTelemetry.applicationContext = context;
+    AlarmReceiver mockedAlarmReceiver = mock(AlarmReceiver.class);
+    SchedulerFlusherFactory schedulerFlusherFactory = new SchedulerFlusherFactory(context, mockedAlarmReceiver);
+
+    Object alarmSchedulerFlusher = schedulerFlusherFactory.supply();
+    assertNotNull(alarmSchedulerFlusher);
+
+    Assert.assertTrue(alarmSchedulerFlusher instanceof AlarmSchedulerFlusher);
   }
 
   private static AlarmReceiver obtainAlarmReceiver(final AtomicReference<Integer> broadcastTrack,

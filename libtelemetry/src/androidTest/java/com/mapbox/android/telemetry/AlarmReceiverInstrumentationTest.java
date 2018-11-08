@@ -6,6 +6,7 @@ import android.support.test.runner.AndroidJUnit4;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -22,5 +23,16 @@ public class AlarmReceiverInstrumentationTest {
 
     assertTrue(alarmIntent.filterEquals(expectedAlarmIntent));
     assertTrue(alarmIntent.getAction().equals("com.mapbox.scheduler_flusher"));
+  }
+
+  @Test
+  public void checksSupplyIntent() throws Exception {
+    SchedulerCallback mockedSchedulerCallback = mock(SchedulerCallback.class);
+    AlarmReceiver theAlarmReceiver = new AlarmReceiver(mockedSchedulerCallback);
+
+    Intent actualAlarmIntent = theAlarmReceiver.supplyIntent();
+    Intent expectedAlarmIntent = new Intent("com.mapbox.scheduler_flusher");
+
+    assertEquals(expectedAlarmIntent.getAction(), actualAlarmIntent.getAction());
   }
 }

@@ -39,6 +39,7 @@ class AlarmSchedulerFlusher implements SchedulerFlusher {
       flushingPeriod, pendingIntent);
   }
 
+  /* only exposed for testing not dealing directly with alarm logic */
   @VisibleForTesting
   void scheduleExact(long interval) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {

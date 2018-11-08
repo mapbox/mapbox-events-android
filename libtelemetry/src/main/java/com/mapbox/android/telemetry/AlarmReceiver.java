@@ -22,7 +22,6 @@ class AlarmReceiver extends BroadcastReceiver {
   }
 
   Intent supplyIntent() {
-    Intent alarmIntent = new Intent(SCHEDULER_FLUSHER_INTENT);
-    return alarmIntent;
+    return new Intent(SCHEDULER_FLUSHER_INTENT);
   }
 }
