@@ -7,8 +7,6 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.support.annotation.NonNull;
 
-import java.util.ArrayList;
-
 class LocationReceiver extends BroadcastReceiver {
   private static final String LOCATION_RECEIVED_INTENT_KEY = "location_received";
   private static final String ON_LOCATION_INTENT_EXTRA = "onLocation";
@@ -24,10 +22,8 @@ class LocationReceiver extends BroadcastReceiver {
   public void onReceive(Context context, Intent intent) {
     String locationReceived = intent.getStringExtra(LOCATION_RECEIVED_INTENT_KEY);
     if (ON_LOCATION_INTENT_EXTRA.equals(locationReceived)) {
-      ArrayList<Location> locations = intent.getParcelableArrayListExtra(LocationManager.KEY_LOCATION_CHANGED);
-      for (Location location: locations) {
-        sendEvent(location, context);
-      }
+      Location location = (Location) intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
+      sendEvent(location, context);
     }
   }
 
