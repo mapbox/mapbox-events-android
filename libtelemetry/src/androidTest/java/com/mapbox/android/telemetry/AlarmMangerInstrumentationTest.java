@@ -1,11 +1,9 @@
 package com.mapbox.android.telemetry;
 
 import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
-import android.util.Log;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -15,7 +13,6 @@ public class AlarmMangerInstrumentationTest {
 
   @Test
   public void checksAlarmCancelledProperly() {
-    Log.e("test", "trigger1");
     broadcastTrack = 0;
     Context context = InstrumentationRegistry.getContext();
     AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -36,8 +33,8 @@ public class AlarmMangerInstrumentationTest {
     try {
       Thread.sleep(30000);
       Assert.assertEquals(1, broadcastTrack);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
+    } catch (InterruptedException exception) {
+      exception.printStackTrace();
     }
   }
 
@@ -52,11 +49,10 @@ public class AlarmMangerInstrumentationTest {
       public void onError() {
 
       }
-    }){
+    }) {
       @Override
       public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
-        Log.e("test", "trigger2");
         broadcastTrack++;
       }
     };

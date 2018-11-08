@@ -1,6 +1,5 @@
 package com.mapbox.android.telemetry;
 
-
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;

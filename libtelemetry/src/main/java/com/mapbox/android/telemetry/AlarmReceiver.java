@@ -1,6 +1,5 @@
 package com.mapbox.android.telemetry;
 
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
