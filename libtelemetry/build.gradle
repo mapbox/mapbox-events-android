@@ -15,6 +15,16 @@ android {
         consumerProguardFiles 'proguard-consumer.pro'
     }
 
+    buildTypes {
+        debug {
+            testCoverageEnabled true
+        }
+
+        release {
+            testCoverageEnabled true
+        }
+    }
+
     testOptions {
         unitTests.returnDefaultValues = true
     }
@@ -22,10 +32,6 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
-    }
-
-    testOptions {
-        unitTests.returnDefaultValues = true
     }
 }
 
@@ -53,3 +59,4 @@ apply from: 'javadoc.gradle'
 apply from: "${rootDir}/gradle/mvn-push-android.gradle"
 apply from: "${rootDir}/gradle/checkstyle.gradle"
 apply from: "${rootDir}/gradle/download-schema.gradle"
+apply from: "${rootDir}/gradle/jacoco.gradle"
