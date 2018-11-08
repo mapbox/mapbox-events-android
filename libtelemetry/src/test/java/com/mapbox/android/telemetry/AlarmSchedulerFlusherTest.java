@@ -19,13 +19,12 @@ public class AlarmSchedulerFlusherTest {
     Context mockedContext = mock(Context.class);
     AlarmManager mockedAlarmManager = mock(AlarmManager.class);
     AlarmReceiver mockedAlarmReceiver = mock(AlarmReceiver.class);
-    int requestCode = (int) System.currentTimeMillis();
     AlarmSchedulerFlusher theAlarmSchedulerFlusher = new AlarmSchedulerFlusher(mockedContext, mockedAlarmManager,
-      mockedAlarmReceiver, requestCode);
+      mockedAlarmReceiver);
 
     theAlarmSchedulerFlusher.register();
 
-    IntentFilter expectedFilter = new IntentFilter("com.mapbox.scheduler_flusher" + Integer.toString(requestCode));
+    IntentFilter expectedFilter = new IntentFilter("com.mapbox.scheduler_flusher");
     verify(mockedContext, times(1)).registerReceiver(
       eq(mockedAlarmReceiver),
       refEq(expectedFilter)
@@ -37,9 +36,8 @@ public class AlarmSchedulerFlusherTest {
     Context mockedContext = mock(Context.class);
     AlarmManager mockedAlarmManager = mock(AlarmManager.class);
     AlarmReceiver mockedAlarmReceiver = mock(AlarmReceiver.class);
-    int requestCode = (int) System.currentTimeMillis();
     AlarmSchedulerFlusher theAlarmSchedulerFlusher = new AlarmSchedulerFlusher(mockedContext, mockedAlarmManager,
-      mockedAlarmReceiver, requestCode);
+      mockedAlarmReceiver);
     long elapsedMockedTime = 1000;
     long millisInASecond = 1000;
 
@@ -58,9 +56,8 @@ public class AlarmSchedulerFlusherTest {
     Context mockedContext = mock(Context.class);
     AlarmManager mockedAlarmManager = mock(AlarmManager.class);
     AlarmReceiver mockedAlarmReceiver = mock(AlarmReceiver.class);
-    int requestCode = (int) System.currentTimeMillis();
     AlarmSchedulerFlusher theAlarmSchedulerFlusher = new AlarmSchedulerFlusher(mockedContext, mockedAlarmManager,
-      mockedAlarmReceiver, requestCode);
+      mockedAlarmReceiver);
 
     theAlarmSchedulerFlusher.unregister();
 
@@ -73,9 +70,8 @@ public class AlarmSchedulerFlusherTest {
     Context context = mock(Context.class);
     AlarmManager mockedAlarmManager = mock(AlarmManager.class);
     AlarmReceiver mockedAlarmReceiver = mock(AlarmReceiver.class);
-    int requestCode = (int) System.currentTimeMillis();
     AlarmSchedulerFlusher theAlarmSchedulerFlusher = new AlarmSchedulerFlusher(context, mockedAlarmManager,
-      mockedAlarmReceiver, requestCode);
+      mockedAlarmReceiver);
 
     long elapsedMockedTime = 1000;
     long elapsedMockedTime2 = 1500;

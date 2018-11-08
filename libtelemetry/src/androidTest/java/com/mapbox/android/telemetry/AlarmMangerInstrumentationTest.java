@@ -14,44 +14,27 @@ public class AlarmMangerInstrumentationTest {
   private int broadcastTrack;
 
   @Test
-  public void checksAlarmManagerCreatesAlarm() {
-    Context context = InstrumentationRegistry.getContext();
-    AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-    AlarmReceiver alarmReceiver = obtainAlarmReceiver();
-    int requestCode = (int) System.currentTimeMillis();
-
-    AlarmSchedulerFlusher theAlarmSchedulerFlusher = new AlarmSchedulerFlusher(context, alarmManager, alarmReceiver,
-      requestCode);
-    long elapsedMockedTime = 1000;
-
-    theAlarmSchedulerFlusher.register();
-    theAlarmSchedulerFlusher.schedule(elapsedMockedTime);
-
-    Assert.assertTrue(isAlarmSet(theAlarmSchedulerFlusher));
-  }
-
-  @Test
   public void checksAlarmCancelledProperly() {
     Log.e("test", "trigger1");
     broadcastTrack = 0;
     Context context = InstrumentationRegistry.getContext();
     AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
     AlarmReceiver alarmReceiver = obtainAlarmReceiver();
-    int requestCode = (int) System.currentTimeMillis();
+
     AlarmSchedulerFlusher theAlarmSchedulerFlusher = new AlarmSchedulerFlusher(context, alarmManager,
-      alarmReceiver, requestCode);
+      alarmReceiver);
 
     long elapsedMockedTime = 2000;
     long elapsedMockedTime2 = 5000;
 
     theAlarmSchedulerFlusher.register();
-    theAlarmSchedulerFlusher.schedule(elapsedMockedTime);
+    theAlarmSchedulerFlusher.scheduleExact(elapsedMockedTime);
 
     theAlarmSchedulerFlusher.register();
-    theAlarmSchedulerFlusher.schedule(elapsedMockedTime2);
+    theAlarmSchedulerFlusher.scheduleExact(elapsedMockedTime2);
 
     try {
-      Thread.sleep(40000);
+      Thread.sleep(30000);
       Assert.assertEquals(1, broadcastTrack);
     } catch (InterruptedException e) {
       e.printStackTrace();
@@ -77,10 +60,5 @@ public class AlarmMangerInstrumentationTest {
         broadcastTrack++;
       }
     };
-  }
-
-  private boolean isAlarmSet(AlarmSchedulerFlusher alarmSchedulerFlusher) {
-    PendingIntent service = alarmSchedulerFlusher.obtainPendingIntent();
-    return service != null;
   }
 }

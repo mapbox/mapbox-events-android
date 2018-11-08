@@ -25,8 +25,8 @@ class AlarmReceiver extends BroadcastReceiver {
     }
   }
 
-  Intent supplyIntent(int requestCode) {
-    Intent alarmIntent = new Intent(SCHEDULER_FLUSHER_INTENT + Integer.toString(requestCode));
+  Intent supplyIntent() {
+    Intent alarmIntent = new Intent(SCHEDULER_FLUSHER_INTENT);
     alarmIntent.putExtra(ALARM_FIRED_INTENT_KEY, ON_ALARM_INTENT_EXTRA);
     return alarmIntent;
   }
