@@ -47,7 +47,6 @@ public class AlarmMangerInstrumentationTest {
   @Test
   public void checksSupplyAlarmManager() {
     Context context = InstrumentationRegistry.getContext();
-    MapboxTelemetry.applicationContext = context;
     AlarmReceiver mockedAlarmReceiver = mock(AlarmReceiver.class);
     SchedulerFlusherFactory schedulerFlusherFactory = new SchedulerFlusherFactory(context, mockedAlarmReceiver);
 
@@ -55,6 +54,17 @@ public class AlarmMangerInstrumentationTest {
     assertNotNull(alarmSchedulerFlusher);
 
     Assert.assertTrue(alarmSchedulerFlusher instanceof AlarmSchedulerFlusher);
+  }
+
+  @Test
+  public void checksScheduleExact() throws Exception {
+    Context mockedContext = InstrumentationRegistry.getContext();
+    AlarmManager mockedAlarmManager = mock(AlarmManager.class);
+    AlarmReceiver mockedAlarmReceiver = mock(AlarmReceiver.class);
+    AlarmSchedulerFlusher theAlarmSchedulerFlusher = new AlarmSchedulerFlusher(mockedContext, mockedAlarmManager,
+      mockedAlarmReceiver);
+
+    Assert.assertTrue(theAlarmSchedulerFlusher.scheduleExact(25));
   }
 
   private static AlarmReceiver obtainAlarmReceiver(final AtomicReference<Integer> broadcastTrack,

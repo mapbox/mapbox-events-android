@@ -41,11 +41,14 @@ class AlarmSchedulerFlusher implements SchedulerFlusher {
 
   /* only exposed for testing not dealing directly with alarm logic */
   @VisibleForTesting
-  void scheduleExact(long interval) {
+  boolean scheduleExact(long interval) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       manager.setExact(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + interval,
         pendingIntent);
+      return true;
     }
+
+    return false;
   }
 
   @Override
