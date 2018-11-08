@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
+import android.os.SystemClock;
 import android.support.annotation.VisibleForTesting;
 
 import static com.mapbox.android.telemetry.SchedulerFlusherFactory.flushingPeriod;
@@ -15,7 +16,6 @@ class AlarmSchedulerFlusher implements SchedulerFlusher {
   private final Context context;
   private final AlarmManager manager;
   private final AlarmReceiver receiver;
-  private final int REQUEST_CODE = 5328;
   private PendingIntent pendingIntent;
 
   AlarmSchedulerFlusher(Context context, AlarmManager manager, AlarmReceiver receiver) {
@@ -27,9 +27,8 @@ class AlarmSchedulerFlusher implements SchedulerFlusher {
   @Override
   public void register() {
     Intent alarmIntent = receiver.supplyIntent();
-    pendingIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, alarmIntent, 0);
-    String action = SCHEDULER_FLUSHER_INTENT;
-    IntentFilter filter = new IntentFilter(action);
+    pendingIntent = PendingIntent.getBroadcast(context, AlarmReceiver.getRequestCode(), alarmIntent, 0);
+    IntentFilter filter = new IntentFilter(SCHEDULER_FLUSHER_INTENT);
     context.registerReceiver(receiver, filter);
   }
 
@@ -41,9 +40,10 @@ class AlarmSchedulerFlusher implements SchedulerFlusher {
   }
 
   @VisibleForTesting
-  void scheduleExact(long elapsedRealTime) {
+  void scheduleExact(long interval) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      manager.setExact(AlarmManager.ELAPSED_REALTIME, elapsedRealTime, pendingIntent);
+      manager.setExact(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + interval,
+        pendingIntent);
     }
   }
 

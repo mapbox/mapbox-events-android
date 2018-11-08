@@ -18,6 +18,7 @@ public class AlarmReceiverTest {
     Context mockedContext = mock(Context.class);
     Intent mockedIntent = mock(Intent.class);
     when(mockedIntent.getStringExtra(eq("alarm_fired"))).thenReturn("onAlarm");
+    when(mockedIntent.getIntExtra(eq("requestCode"), eq(0))).thenReturn(5328);
     SchedulerCallback mockedSchedulerCallback = mock(SchedulerCallback.class);
     AlarmReceiver theAlarmReceiver = new AlarmReceiver(mockedSchedulerCallback);
 

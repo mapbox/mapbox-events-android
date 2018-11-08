@@ -8,15 +8,22 @@ import android.support.test.InstrumentationRegistry;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+
 public class AlarmMangerInstrumentationTest {
-  private int broadcastTrack;
+  private static int increment;
 
   @Test
-  public void checksAlarmCancelledProperly() {
-    broadcastTrack = 0;
+  public void checksAlarmCancelledProperly() throws InterruptedException {
+    increment = 0;
+    final CountDownLatch latch = new CountDownLatch(2);
+    final AtomicReference<Integer> broadcastTrack = new AtomicReference<>();
+
     Context context = InstrumentationRegistry.getContext();
     AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-    AlarmReceiver alarmReceiver = obtainAlarmReceiver();
+    AlarmReceiver alarmReceiver = obtainAlarmReceiver(broadcastTrack, latch);
 
     AlarmSchedulerFlusher theAlarmSchedulerFlusher = new AlarmSchedulerFlusher(context, alarmManager,
       alarmReceiver);
@@ -30,30 +37,26 @@ public class AlarmMangerInstrumentationTest {
     theAlarmSchedulerFlusher.register();
     theAlarmSchedulerFlusher.scheduleExact(elapsedMockedTime2);
 
-    try {
-      Thread.sleep(30000);
-      Assert.assertEquals(1, broadcastTrack);
-    } catch (InterruptedException exception) {
-      exception.printStackTrace();
-    }
+    Assert.assertFalse(latch.await(30, TimeUnit.SECONDS));
+    int result = broadcastTrack.get();
+
+    Assert.assertEquals(1, result);
   }
 
-  private AlarmReceiver obtainAlarmReceiver() {
+  private static AlarmReceiver obtainAlarmReceiver(final AtomicReference<Integer> broadcastTrack,
+                                                   final CountDownLatch latch) {
     return new AlarmReceiver(new SchedulerCallback() {
       @Override
-      public void onPeriodRaised() {
-
-      }
+      public void onPeriodRaised() {}
 
       @Override
-      public void onError() {
-
-      }
+      public void onError() {}
     }) {
       @Override
       public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
-        broadcastTrack++;
+        broadcastTrack.set(increment + 1);
+        latch.countDown();
       }
     };
   }
