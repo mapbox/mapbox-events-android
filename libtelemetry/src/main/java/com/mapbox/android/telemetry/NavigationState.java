@@ -1,5 +1,7 @@
 package com.mapbox.android.telemetry;
 
+import android.content.Context;
+
 public class NavigationState {
   private NavigationMetadata navigationMetadata;
   private NavigationStepMetadata navigationStepMetadata;
@@ -9,8 +11,13 @@ public class NavigationState {
   private FeedbackEventData feedbackEventData;
   private FeedbackData feedbackData;
 
+  @Deprecated
   public NavigationState(NavigationMetadata navigationMetadata) {
     this.navigationMetadata = navigationMetadata;
+  }
+
+  public static NavigationState create(NavigationMetadata navigationMetadata, Context context) {
+    return new NavigationState(navigationMetadata.setDeviceInfo(context));
   }
 
   NavigationMetadata getNavigationMetadata() {

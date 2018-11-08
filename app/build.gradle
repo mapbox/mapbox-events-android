@@ -18,7 +18,7 @@ android {
             minifyEnabled false
         }
         release {
-            minifyEnabled true
+            minifyEnabled false // Proguard complains about jacoco
         }
     }
 }

@@ -6,6 +6,7 @@ workflows:
     jobs:
       - build
       - release
+
 jobs:
   build:
     working_directory: ~/code
@@ -59,11 +60,17 @@ jobs:
           shell: /bin/bash -euo pipefail
           command: |
             gcloud firebase test android run --type instrumentation --app app/build/outputs/apk/debug/app-debug.apk --test libtelemetry/build/outputs/apk/androidTest/debug/libtelemetry-debug-androidTest.apk --device model=Nexus5,version=23,locale=en,orientation=portrait --timeout 10m
+      - run:
+          name: Post code coverage report to Codecov.io
+          command: |
+            ./gradlew testDebugUnitTestCoverage
+            pip install --user codecov && /root/.local/bin/codecov
       - store_artifacts:
           path: app/build/reports
           destination: reports
       - store_test_results:
           path: app/build/test-results
+
 
 # ------------------------------------------------------------------------------
   release:
@@ -107,3 +114,16 @@ jobs:
       - store_artifacts:
           path: app/build/reports
           destination: reports
+      - restore_cache: # special step to restore the dependency cache
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run:
+          name: setup environment
+          command: npm install
+      - save_cache: # special step to save the dependency cache
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - ./node_modules
+      - run:
+          name: Record size
+          command: ./scripts/metrics.sh
+

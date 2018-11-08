@@ -14,13 +14,10 @@ class HeadphonesAudioType implements AudioTypeResolver {
 
   @Override
   public String obtainAudioType(Context context) {
-    AudioManager audioManager = (AudioManager) MapboxTelemetry.applicationContext
-      .getSystemService(Context.AUDIO_SERVICE);
-
-    if (audioManager.isWiredHeadsetOn()) {
-      return HEADPHONES;
-    } else {
-      return chain.obtainAudioType(context);
+    AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+    if (audioManager == null) {
+      return "unknown";
     }
+    return audioManager.isWiredHeadsetOn() ? HEADPHONES : chain.obtainAudioType(context);
   }
 }

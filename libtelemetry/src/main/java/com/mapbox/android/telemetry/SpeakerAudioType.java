@@ -14,13 +14,10 @@ class SpeakerAudioType implements AudioTypeResolver {
 
   @Override
   public String obtainAudioType(Context context) {
-    AudioManager audioManager = (AudioManager) MapboxTelemetry.applicationContext
-      .getSystemService(Context.AUDIO_SERVICE);
-
-    if (audioManager.isSpeakerphoneOn()) {
-      return SPEAKER;
-    } else {
-      return chain.obtainAudioType(context);
+    AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+    if (audioManager == null) {
+      return "unknown";
     }
+    return audioManager.isSpeakerphoneOn() ? SPEAKER : chain.obtainAudioType(context);
   }
 }

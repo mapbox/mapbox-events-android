@@ -33,7 +33,7 @@ class LocationEvent extends Event implements Parcelable {
   @SerializedName("horizontalAccuracy")
   private Float accuracy = null;
 
-  LocationEvent(String sessionId, double latitude, double longitude) {
+  LocationEvent(String sessionId, double latitude, double longitude, String applicationState) {
     this.event = LOCATION;
     this.created = TelemetryUtils.obtainCurrentDate();
     this.source = SOURCE_MAPBOX;
@@ -41,7 +41,7 @@ class LocationEvent extends Event implements Parcelable {
     this.latitude = latitude;
     this.longitude = longitude;
     this.operatingSystem = OPERATING_SYSTEM;
-    this.applicationState = TelemetryUtils.obtainApplicationState();
+    this.applicationState = applicationState;
   }
 
   @Override
