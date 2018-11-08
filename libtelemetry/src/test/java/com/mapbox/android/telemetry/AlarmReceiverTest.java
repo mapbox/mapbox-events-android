@@ -5,7 +5,6 @@ import android.content.Intent;
 
 import org.junit.Test;
 
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -17,8 +16,7 @@ public class AlarmReceiverTest {
   public void checksOnPeriodRaisedCall() throws Exception {
     Context mockedContext = mock(Context.class);
     Intent mockedIntent = mock(Intent.class);
-    when(mockedIntent.getStringExtra(eq("alarm_fired"))).thenReturn("onAlarm");
-    when(mockedIntent.getIntExtra(eq("requestCode"), eq(0))).thenReturn(5328);
+    when(mockedIntent.getAction()).thenReturn("com.mapbox.scheduler_flusher");
     SchedulerCallback mockedSchedulerCallback = mock(SchedulerCallback.class);
     AlarmReceiver theAlarmReceiver = new AlarmReceiver(mockedSchedulerCallback);
 

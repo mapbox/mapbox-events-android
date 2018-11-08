@@ -13,11 +13,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class AlarmMangerInstrumentationTest {
-  private static int increment;
 
   @Test
   public void checksAlarmCancelledProperly() throws InterruptedException {
-    increment = 0;
     final CountDownLatch latch = new CountDownLatch(2);
     final AtomicReference<Integer> broadcastTrack = new AtomicReference<>();
 
@@ -55,7 +53,8 @@ public class AlarmMangerInstrumentationTest {
       @Override
       public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
-        broadcastTrack.set(increment + 1);
+        int count = broadcastTrack.get() == null ? 0 : broadcastTrack.get();
+        broadcastTrack.set(count + 1);
         latch.countDown();
       }
     };
