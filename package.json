@@ -19,7 +19,7 @@
     "jsonwebtoken": "^8.3.0",
     "pretty-bytes": "^5.1.0",
     "aws-sdk": "^2.285.1",
-    "zlib ": "^1.2.11"
+    "zlib": "^1.2.11"
   },
   "engines": {
     "node": ">=6"
