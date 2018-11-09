@@ -13,7 +13,7 @@
                             "Statement": {
                                 "Effect": "Allow",
                                 "Action": "s3:PutObject*",
-                                "Resource": "arn:aws:s3:::mapbox-loading-lock/raw/mobile_*/*"
+                                "Resource": "arn:aws:s3:::mapbox-loading-dock/raw/mobile_*/*"
                             }
                         }
                     }
