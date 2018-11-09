@@ -14,13 +14,10 @@ class BluetoothAudioType implements AudioTypeResolver {
 
   @Override
   public String obtainAudioType(Context context) {
-    AudioManager audioManager = (AudioManager) MapboxTelemetry.applicationContext
-      .getSystemService(Context.AUDIO_SERVICE);
-
-    if (audioManager.isBluetoothScoOn()) {
-      return BLUETOOTH;
-    } else {
-      return chain.obtainAudioType(context);
+    AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+    if (audioManager == null) {
+      return "unknown";
     }
+    return audioManager.isBluetoothScoOn() ? BLUETOOTH : chain.obtainAudioType(context);
   }
 }

@@ -27,7 +27,7 @@ class LocationReceiver extends BroadcastReceiver {
     if (ON_LOCATION_INTENT_EXTRA.equals(locationReceived)) {
       ArrayList<Location> locations = intent.getParcelableArrayListExtra(LocationManager.KEY_LOCATION_CHANGED);
       for (Location location: locations) {
-        sendEvent(location);
+        sendEvent(location, context);
       }
     }
   }
@@ -51,13 +51,13 @@ class LocationReceiver extends BroadcastReceiver {
     locationMapper.updateSessionIdentifier(sessionIdentifier);
   }
 
-  private boolean sendEvent(Location location) {
+  private boolean sendEvent(Location location, Context context) {
     if (isThereAnyNaN(location) || isThereAnyInfinite(location)) {
       return false;
     }
 
     LocationMapper obtainLocationEvent = obtainLocationMapper();
-    LocationEvent locationEvent = obtainLocationEvent.from(location);
+    LocationEvent locationEvent = obtainLocationEvent.from(location, TelemetryUtils.obtainApplicationState(context));
     callback.onEventReceived(locationEvent);
     return true;
   }
