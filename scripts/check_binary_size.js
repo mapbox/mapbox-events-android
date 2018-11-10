@@ -50,7 +50,7 @@ github.apps.createInstallationToken({installation_id: SIZE_CHECK_APP_INSTALLATIO
 
 const json = {};
 json.sdk = "telemetry";
-json.platform = platform;
+json.platform = "android-total";
 json.size = size;
 json.created_at = new Date().toISOString();
 
@@ -63,4 +63,4 @@ const aws = new AWS.S3({region: 'us-east-1'}).putObject({
                             Body: zlib.gzipSync(JSON.stringify(json)),
                             Bucket: 'mapbox',
                             Key: awsKey
-                        }).promise(); 
+                        }).promise();
