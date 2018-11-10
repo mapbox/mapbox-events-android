@@ -48,34 +48,19 @@ github.apps.createInstallationToken({installation_id: SIZE_CHECK_APP_INSTALLATIO
         });
     });
 
-const json = formatJson(size, "Android-Total");
-const awsKey = generateKey();
+const json = {};
+json.sdk = "telemetry";
+json.platform = platform;
+json.size = size;
+json.created_at = new Date().toISOString();
+
+const dateString = new Date().toISOString().split('T')[0]
+const awsKey = 'mapbox-loading-dock/raw/mobile.binarysize/' + dateString + '/android_total_size.json.gz';
 
 console.log(json);
 
-publish(json, awsKey);
-
-function publish(json, awsKey) {
-    new AWS.S3({region: 'us-east-1'}).putObject({
-                    Body: zlib.gzipSync(JSON.stringify(json)),
-                    Bucket: 'mapbox',
-                    Key: awsKey,
-                }).promise();
-}
-
-function formatJson(size, platform) {
-    const json = {};
-    json.sdk = "telemetry";
-    json.platform = platform;
-    json.size = size;
-    json.created_at = new Date().toISOString();
-
-    return formatJson;
-}
-
-function generateKey() {
-    const dateString = new Date().toISOString().split('T')[0]
-    const key = 'mapbox-loading-dock/raw/mobile.binarysize/' + dateString + '/android_total_size.json.gz';
-
-    return key;
-}
+const aws = new AWS.S3({region: 'us-east-1'}).putObject({
+                            Body: zlib.gzipSync(JSON.stringify(json)),
+                            Bucket: 'mapbox',
+                            Key: awsKey
+                        }).promise(); 
