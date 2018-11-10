@@ -59,9 +59,8 @@ const awsKey = 'mapbox-loading-dock/raw/mobile.binarysize/' + dateString + '/and
 
 console.log(json);
 
-const aws = new AWS.S3().putObject({
+const aws = new AWS.S3({region: 'us-east-1'}).putObject({
                             Body: zlib.gzipSync(JSON.stringify(json)),
                             Bucket: 'mapbox',
-                            Key: awsKey,
-                            region: 'us-east-1'
+                            Key: awsKey
                         }).promise();
