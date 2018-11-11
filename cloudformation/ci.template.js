@@ -27,7 +27,8 @@ AWSTemplateFormatVersion: '2010-09-09',
                   Action: ['s3:PutObject',
                            's3:PutObjectAcl'],
                   Effect: 'Allow',
-                  Resource: 'arn:aws:s3:::mapbox-loading-dock/raw/mobile_*/*'
+                  Resource: ['arn:aws:s3:::mapbox-loading-dock/raw/mobile_binarysize/*',
+                             'arn:aws:s3:::mapbox-loading-dock/raw/mobile_codecoverage/*']
                 }
               ]  
             }
