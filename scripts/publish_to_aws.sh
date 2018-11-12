@@ -11,4 +11,5 @@ if [ -z "$file_path" ] || [ -z "$source" ] || [ -z "$date" ]; then
 fi
 
 filename="${file_path##*/}"
+aws sts get-caller-identity
 aws s3 cp $file_path s3://mapbox-loading-dock/raw/$source/$date/$filename
