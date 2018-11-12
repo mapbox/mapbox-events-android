@@ -6,6 +6,7 @@ set -o pipefail
 file_path="libtelemetry/build/outputs/aar/libtelemetry-release.aar"
 file_size=$(wc -c <"$file_path" | sed -e 's/^[[:space:]]*//')
 date=`date '+%Y-%m-%d'`
+utc_iso_date=`date -u +'%Y-%m-%dT%H:%M:%SZ'`
 label="Telemetry AAR"
 source="mobile_binarysize"
 scripts_path="scripts"
@@ -17,7 +18,7 @@ json_gz="$scripts_path/android-binarysize.json.gz"
 
 # Write binary size to json file
 cat >"$json_name" <<EOL
-{"sdk": "telemetry", "platform": "android", "size": ${file_size}, "created_at": "${date}"}
+{"sdk": "telemetry", "platform": "android", "size": ${file_size}, "created_at": "${utc_iso_date}"}
 EOL
 
 # Compress json file
