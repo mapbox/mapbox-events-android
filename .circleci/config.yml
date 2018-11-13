@@ -117,13 +117,12 @@ jobs:
       - restore_cache: # special step to restore the dependency cache
           key: dependency-cache-{{ checksum "package.json" }}
       - run:
-          name: setup environment
+          name: Setup Environment
           command: npm install
       - save_cache: # special step to save the dependency cache
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
             - ./node_modules
       - run:
-          name: Record size
-          command: ./scripts/metrics.sh
-
+          name: Check & Publish Binary Size
+          command: ./scripts/check_binary_size.sh

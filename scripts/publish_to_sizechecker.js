@@ -3,14 +3,13 @@
 const jwt = require('jsonwebtoken');
 const github = require('@octokit/rest')();
 const prettyBytes = require('pretty-bytes');
-const fs = require('fs');
 
 const SIZE_CHECK_APP_ID = 14028;
 const SIZE_CHECK_APP_INSTALLATION_ID = 229425;
 
-const file = process.argv[2];
+const size_str = process.argv[2];
 const label = process.argv[3];
-const {size} = fs.statSync(file);
+const size = parseInt(size_str, 10);
 
 process.on('unhandledRejection', error => {
     console.log(error);
@@ -41,7 +40,7 @@ github.apps.createInstallationToken({installation_id: SIZE_CHECK_APP_INSTALLATIO
             completed_at: new Date().toISOString(),
             output: {
                 title: prettyBytes(size),
-                summary: `\`${file}\` is ${size} bytes (${prettyBytes(size)})`
+                summary: `\`${label}\` is ${size} bytes (${prettyBytes(size)})`
             }
         });
     });
