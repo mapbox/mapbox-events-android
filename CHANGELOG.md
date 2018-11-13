@@ -8,6 +8,14 @@ Mapbox welcomes participation and contributions from everyone.
 - Update dependencies and cleanup gradle scripts - [#237](https://github.com/mapbox/mapbox-events-android/pull/237)
 - Telemetry SDK background location updates + batch locations - [#236](https://github.com/mapbox/mapbox-events-android/pull/236)
 
+### v3.5.4
+- Fix missed cellNetworkType field in map drag event - [#276](https://github.com/mapbox/mapbox-events-android/pull/276)
+- Fix crash due to null context reference in LocationBroadcastReceiver - [#272](https://github.com/mapbox/mapbox-events-android/pull/272)
+- Update AlarmManager flag - [#267](https://github.com/mapbox/mapbox-events-android/pull/267)
+
+### v3.5.2
+- Fix TelemetryService and applicationContext issue - [#265](https://github.com/mapbox/mapbox-events-android/pull/265)
+
 ### v3.5.1
 - PermissionChecker NPE - [#241](https://github.com/mapbox/mapbox-events-android/pull/241)
 
