@@ -24,11 +24,22 @@ AWSTemplateFormatVersion: '2010-09-09',
             PolicyDocument: {
               Statement: [              
                 {
-                  Action: ['s3:PutObject',
-                           's3:PutObjectAcl'],
+                  Action: ['s3:PutObject'],
                   Effect: 'Allow',
                   Resource: ['arn:aws:s3:::mapbox-loading-dock/raw/mobile.binarysize/*',
                              'arn:aws:s3:::mapbox-loading-dock/raw/mobile.codecoverage/*']
+                }
+              ]  
+            }
+          },
+          {
+            PolicyName: 'get-signing-key',
+            PolicyDocument: {
+              Statement: [              
+                {
+                  Action: ['s3:GetObject'],
+                  Effect: 'Allow',
+                  Resource: ['arn:aws:s3:::mapbox/android/signing-credentials/secring.gpg']
                 }
               ]  
             }
