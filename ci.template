@@ -1,0 +1,47 @@
+
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "mapbox-events-android",
+    "Resources": {
+        "CIUser": {
+            "Type": "AWS::IAM::User",
+            "Properties": {
+                "Policies": [
+                    {
+                        "PolicyName": "publish-metrics",
+                        "PolicyDocument": {
+                            "Statement": {
+                                "Effect": "Allow",
+                                "Action": "s3:PutObject*",
+                                "Resource": "arn:aws:s3:::mapbox-loading-dock/raw/mobile_*/*"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "AccessKey": {
+            "Type": "AWS::IAM::AccessKey",
+            "Properties": {
+                "UserName": {
+                    "Ref": "CIUser"
+                }
+            }
+        },
+        "Outputs": {
+            "AccessKeyId": {
+                "Value": {
+                    "Ref": "AccessKey"
+                }
+            },
+            "SecretAccessKey": {
+                "Value": {
+                    "Fn::GetAtt": [
+                        "AccessKey",
+                        "SecretAccessKey"
+                    ]
+                }
+            }
+        }
+    }
+}
