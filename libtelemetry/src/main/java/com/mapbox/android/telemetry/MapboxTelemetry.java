@@ -2,6 +2,7 @@ package com.mapbox.android.telemetry;
 
 
 import android.app.ActivityManager;
+import android.arch.lifecycle.LifecycleObserver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -24,7 +25,7 @@ import okhttp3.Callback;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
-public class MapboxTelemetry implements FullQueueCallback, EventCallback, ServiceTaskCallback {
+public class MapboxTelemetry implements FullQueueCallback, EventCallback, ServiceTaskCallback, LifecycleObserver {
   private static final String EVENTS_USER_AGENT = "MapboxEventsAndroid/";
   private static final String TELEMETRY_USER_AGENT = "MapboxTelemetryAndroid/";
   private static final String UNITY_USER_AGENT = "MapboxEventsUnityAndroid/";
@@ -58,12 +59,11 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private boolean isLocationOpted = false;
   private boolean isServiceBound = false;
   private PermissionCheckRunnable permissionCheckRunnable = null;
+  private ForegroundCheckRunnable foregroundCheckRunnable = null;
   private CopyOnWriteArraySet<TelemetryListener> telemetryListeners = null;
   private CertificateBlacklist certificateBlacklist;
   private CopyOnWriteArraySet<AttachmentListener> attachmentListeners = null;
   static Context applicationContext = null;
-  private boolean isInForeground = false;
-  private boolean isServiceStarted = false;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
@@ -149,22 +149,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     return false;
   }
 
-  public void onResume() {
-    if (isLollipopOrHigher()) {
-      isInForeground = true;
-
-      if (!isServiceStarted) {
-        startLocation();
-      }
-    }
-  }
-
-  public void onPause() {
-    if (isLollipopOrHigher()) {
-      isInForeground = false;
-    }
-  }
-
   public boolean updateSessionIdRotationInterval(SessionInterval interval) {
     if (isServiceBound && telemetryService != null) {
       int hour = interval.obtainInterval();
@@ -239,6 +223,31 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   boolean isQueueEmpty() {
     return queue.queue.size() == 0;
+  }
+
+  boolean isAppInForeground(Context context) {
+    boolean isInForeground = false;
+    ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT_WATCH) {
+      List<ActivityManager.RunningAppProcessInfo> runningProcesses = am.getRunningAppProcesses();
+      for (ActivityManager.RunningAppProcessInfo processInfo : runningProcesses) {
+        if (processInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+          for (String activeProcess : processInfo.pkgList) {
+            if (activeProcess.equals(context.getPackageName())) {
+              isInForeground = true;
+            }
+          }
+        }
+      }
+    } else {
+      List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
+      ComponentName componentInfo = taskInfo.get(0).topActivity;
+      if (componentInfo.getPackageName().equals(context.getPackageName())) {
+        isInForeground = true;
+      }
+    }
+
+    return isInForeground;
   }
 
   private void startTelemetryService() {
@@ -529,11 +538,25 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     return permissionCheckRunnable;
   }
 
+  private void foregroundBackoff() {
+    ForegroundCheckRunnable foregroundCheckRunnable = obtainForegroundCheckRunnable();
+    foregroundCheckRunnable.run();
+  }
+
+  private ForegroundCheckRunnable obtainForegroundCheckRunnable() {
+    if (foregroundCheckRunnable == null) {
+      foregroundCheckRunnable = new ForegroundCheckRunnable(applicationContext, this);
+    }
+
+    return foregroundCheckRunnable;
+  }
+
   private void startLocation() {
     if (isLollipopOrHigher()) {
-      if (isInForeground) {
+      if (isAppInForeground(applicationContext)) {
         applicationContext.startService(obtainLocationServiceIntent());
-        isServiceStarted = true;
+      } else {
+        foregroundBackoff();
       }
     } else {
       applicationContext.startService(obtainLocationServiceIntent());
