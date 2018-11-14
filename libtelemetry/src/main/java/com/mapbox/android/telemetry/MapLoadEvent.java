@@ -1,5 +1,6 @@
 package com.mapbox.android.telemetry;
 
+import android.content.Context;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -47,9 +48,16 @@ class MapLoadEvent extends Event implements Parcelable {
     this.operatingSystem = OPERATING_SYSTEM;
     this.created = TelemetryUtils.obtainCurrentDate();
     this.userId = userId;
-    this.batteryLevel = TelemetryUtils.obtainBatteryLevel();
-    this.pluggedIn = TelemetryUtils.isPluggedIn();
-    this.cellularNetworkType = TelemetryUtils.obtainCellularNetworkType();
+    this.batteryLevel = 0;
+    this.pluggedIn = false;
+    this.cellularNetworkType = "";
+  }
+
+  MapLoadEvent setDeviceInfo(Context context) {
+    this.batteryLevel = TelemetryUtils.obtainBatteryLevel(context);
+    this.pluggedIn = TelemetryUtils.isPluggedIn(context);
+    this.cellularNetworkType = TelemetryUtils.obtainCellularNetworkType(context);
+    return this;
   }
 
   @Override

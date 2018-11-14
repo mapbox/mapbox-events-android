@@ -4,14 +4,14 @@ package com.mapbox.android.core.location;
  * Data model that contains parameters for location
  * engine requests.
  *
- * @since 3.0.0
+ * @since 1.0.0
  */
 public class LocationEngineRequest {
   /**
    * Used with {@link LocationEngineRequest.Builder#setPriority(int)} to request
    * the most accurate location.
    *
-   * @since 3.0.0
+   * @since 1.0.0
    */
   public static final int PRIORITY_HIGH_ACCURACY = 0;
 
@@ -19,7 +19,7 @@ public class LocationEngineRequest {
    * Used with {@link LocationEngineRequest.Builder#setPriority(int)} to request
    * coarse location that is battery optimized.
    *
-   * @since 3.0.0
+   * @since 1.0.0
    */
   public static final int PRIORITY_BALANCED_POWER_ACCURACY = 1;
 
@@ -27,7 +27,7 @@ public class LocationEngineRequest {
    * Used with {@link LocationEngineRequest.Builder#setPriority(int)} to request
    * coarse ~ 10 km accuracy location.
    *
-   * @since 3.0.0
+   * @since 1.0.0
    */
   public static final int PRIORITY_LOW_POWER = 2;
 
@@ -36,7 +36,7 @@ public class LocationEngineRequest {
    * passive location: no locations will be returned unless a different client
    * has requested location updates.
    *
-   * @since 3.0.0
+   * @since 1.0.0
    */
   public static final int PRIORITY_NO_POWER = 3;
 
@@ -59,7 +59,7 @@ public class LocationEngineRequest {
    * in milliseconds.
    *
    * @return desired interval in milliseconds.
-   * @since 3.0.0
+   * @since 1.0.0
    */
   public long getInterval() {
     return interval;
@@ -69,7 +69,7 @@ public class LocationEngineRequest {
    * Returns desired quality of the request.
    *
    * @return accuracy constant.
-   * @since 3.0.0
+   * @since 1.0.0
    */
   public int getPriority() {
     return priority;
@@ -79,7 +79,7 @@ public class LocationEngineRequest {
    * Returns distance between location updates.
    *
    * @return distance between location updates in meters.
-   * @since 3.0.0
+   * @since 1.0.0
    */
   public float getDisplacemnt() {
     return displacement;
@@ -89,7 +89,7 @@ public class LocationEngineRequest {
    * Returns maximum wait time in milliseconds for location updates.
    *
    * @return maximum wait time in milliseconds.
-   * @since 3.0.0
+   * @since 1.0.0
    */
   public long getMaxWaitTime() {
     return maxWaitTime;
@@ -99,7 +99,7 @@ public class LocationEngineRequest {
    * Returns fastest interval in milliseconds for location updates.
    *
    * @return fastest interval in milliseconds.
-   * @since 3.0.0
+   * @since 1.0.0
    */
   public long getFastestInterval() {
     return fastestInterval;
@@ -117,7 +117,7 @@ public class LocationEngineRequest {
      * Default builder constructor.
      *
      * @param interval default interval between location updates
-     * @since 3.0.0
+     * @since 1.0.0
      */
     public Builder(long interval) {
       this.interval = interval;
@@ -133,7 +133,7 @@ public class LocationEngineRequest {
      *
      * @param priority constant
      * @return reference to builder
-     * @since 3.0.0
+     * @since 1.0.0
      */
     public Builder setPriority(int priority) {
       this.priority = priority;
@@ -145,7 +145,7 @@ public class LocationEngineRequest {
      *
      * @param displacement distance between locations in meters.
      * @return reference to builder
-     * @since 3.0.0
+     * @since 1.0.0
      */
     public Builder setDisplacement(float displacement) {
       this.displacement = displacement;
@@ -160,7 +160,7 @@ public class LocationEngineRequest {
      *
      * @param maxWaitTime wait time in milliseconds.
      * @return reference to builder
-     * @since 3.0.0
+     * @since 1.0.0
      */
     public Builder setMaxWaitTime(long maxWaitTime) {
       this.maxWaitTime = maxWaitTime;
@@ -172,7 +172,7 @@ public class LocationEngineRequest {
      *
      * @param interval fastest interval in milliseconds.
      * @return reference to builder
-     * @since 3.0.0
+     * @since 1.0.0
      */
     public Builder setFastestInterval(long interval) {
       this.fastestInterval = interval;
@@ -183,7 +183,7 @@ public class LocationEngineRequest {
      * Builds request object.
      *
      * @return instance of location request.
-     * @since 3.0.0
+     * @since 1.0.0
      */
     public LocationEngineRequest build() {
       return new LocationEngineRequest(this);

@@ -11,6 +11,9 @@ import java.util.Map;
 
 import static com.mapbox.android.telemetry.TelemetryUtils.obtainSharedPreferences;
 
+/**
+ * Do not use this class outside of activity!!!
+ */
 public class TelemetryEnabler {
   public enum State {
     ENABLED, DISABLED
@@ -43,7 +46,7 @@ public class TelemetryEnabler {
       return STATES.get(State.ENABLED.name());
     }
 
-    SharedPreferences sharedPreferences = obtainSharedPreferences();
+    SharedPreferences sharedPreferences = obtainSharedPreferences(MapboxTelemetry.applicationContext);
     String telemetryStateName = sharedPreferences.getString(MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE,
       State.ENABLED.name());
 
@@ -55,7 +58,7 @@ public class TelemetryEnabler {
       return telemetryState;
     }
 
-    SharedPreferences sharedPreferences = obtainSharedPreferences();
+    SharedPreferences sharedPreferences = obtainSharedPreferences(MapboxTelemetry.applicationContext);
     SharedPreferences.Editor editor = sharedPreferences.edit();
 
     editor.putString(MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE, telemetryState.name());

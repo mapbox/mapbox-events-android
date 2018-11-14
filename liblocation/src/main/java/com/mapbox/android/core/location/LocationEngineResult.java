@@ -1,6 +1,7 @@
 package com.mapbox.android.core.location;
 
 import android.location.Location;
+import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,7 +14,7 @@ import static com.mapbox.android.core.location.Utils.checkNotNull;
  * <p>
  * TODO: Override default equals(), hashCode() and toString()
  *
- * @since 3.0.0
+ * @since 1.0.0
  */
 public final class LocationEngineResult {
   private final List<Location> locations;
@@ -27,7 +28,7 @@ public final class LocationEngineResult {
    *
    * @param location default location added to the result.
    * @return instance of the new location result.
-   * @since 3.0.0
+   * @since 1.0.0
    */
   public static LocationEngineResult create(Location location) {
     checkNotNull(location, "location can't be null");
@@ -41,7 +42,7 @@ public final class LocationEngineResult {
    *
    * @param locations list of locations.
    * @return instance of the new location result.
-   * @since 3.0.0
+   * @since 1.0.0
    */
   public static LocationEngineResult create(List<Location> locations) {
     checkNotNull(locations, "locations can't be null");
@@ -52,17 +53,18 @@ public final class LocationEngineResult {
    * Returns most recent location available in this result.
    *
    * @return the most recent location {@link Location} or null.
-   * @since 3.0.0
+   * @since 1.0.0
    */
+  @Nullable
   public Location getLastLocation() {
-    return locations.get(0);
+    return locations.isEmpty() ? null : locations.get(0);
   }
 
   /**
    * Returns locations computed, ordered from oldest to newest.
    *
    * @return ordered list of locations.
-   * @since 3.0.0
+   * @since 1.0.0
    */
   public List<Location> getLocations() {
     return Collections.unmodifiableList(locations);

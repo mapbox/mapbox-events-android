@@ -23,14 +23,13 @@ public class SerializerTest {
 
   @Test
   public void checkArriveSerializing() throws Exception {
-    setupMockedContext();
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22, 180, "sdkIdentifier", "sdkVersion",
       3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "AndroidLocationEngine", 50,
       "tripIdentifier", 3, 5, 2, 3, 10);
     metadata.setCreated(testDate);
+    NavigationState navigationState = NavigationState.create(metadata, getMockedContext());
     metadata.setBatteryLevel(50);
-    NavigationState navigationState = new NavigationState(metadata);
 
     NavigationArriveEvent navigationArriveEvent = new NavigationArriveEvent(navigationState);
     GsonBuilder gsonBuilder = new GsonBuilder();
@@ -57,14 +56,13 @@ public class SerializerTest {
 
   @Test
   public void checkDepartSerializing() throws Exception {
-    setupMockedContext();
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22, 180, "sdkIdentifier", "sdkVersion",
       3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "AndroidLocationEngine", 50,
       "tripIdentifier", 3, 5, 2, 3, 10);
     metadata.setCreated(testDate);
+    NavigationState navigationState = NavigationState.create(metadata, getMockedContext());
     metadata.setBatteryLevel(50);
-    NavigationState navigationState = new NavigationState(metadata);
 
     NavigationDepartEvent navigationDepartEvent = new NavigationDepartEvent(navigationState);
 
@@ -93,7 +91,6 @@ public class SerializerTest {
 
   @Test
   public void checkCancelSerializing() throws Exception {
-    setupMockedContext();
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22,
       180, "sdkIdentifier", "sdkVersion", 3, "sessionID", 10.5,
@@ -101,13 +98,13 @@ public class SerializerTest {
       "AndroidLocationEngine", 50,
       "tripIdentifier", 3, 5, 2, 3, 10);
     metadata.setCreated(testDate);
-    metadata.setBatteryLevel(50);
 
     NavigationCancelData navigationCancelData = new NavigationCancelData();
     navigationCancelData.setComment("Test");
     navigationCancelData.setRating(75);
 
-    NavigationState navigationState = new NavigationState(metadata);
+    NavigationState navigationState = NavigationState.create(metadata, getMockedContext());
+    metadata.setBatteryLevel(50);
     navigationState.setNavigationCancelData(navigationCancelData);
 
     NavigationCancelEvent navigationCancelEvent = new NavigationCancelEvent(navigationState);
@@ -136,13 +133,11 @@ public class SerializerTest {
 
   @Test
   public void checkFeedbackSerializing() throws Exception {
-    setupMockedContext();
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22, 180, "sdkIdentifier", "sdkVersion",
       3, "sessionID", 10.5, 15.67, "geometry", "profile", false, "AndroidLocationEngine", 50,
       "tripIdentifier", 3, 5, 2, 3, 10);
     metadata.setCreated(testDate);
-    metadata.setBatteryLevel(50);
     FeedbackEventData navigationFeedbackData = new FeedbackEventData("userId", "general",
       "unknown");
     FeedbackData feedbackData = new FeedbackData();
@@ -152,7 +147,8 @@ public class SerializerTest {
     locationsAfter[0] = mock(Location.class);
     NavigationLocationData navigationLocationData = new NavigationLocationData(locationsBefore, locationsAfter);
 
-    NavigationState navigationState = new NavigationState(metadata);
+    NavigationState navigationState = NavigationState.create(metadata, getMockedContext());
+    metadata.setBatteryLevel(50);
     navigationState.setNavigationLocationData(navigationLocationData);
     navigationState.setFeedbackEventData(navigationFeedbackData);
     navigationState.setFeedbackData(feedbackData);
@@ -185,7 +181,6 @@ public class SerializerTest {
 
   @Test
   public void checkRerouteSerializing() throws Exception {
-    setupMockedContext();
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22,
       180, "sdkIdent", "sdkversion", 3, "sessionID", 10.5,
@@ -193,7 +188,6 @@ public class SerializerTest {
       "MockLocationEngine", 1300,
       "tripIdentifier", 3, 5, 2, 3, 10);
     metadata.setCreated(testDate);
-    metadata.setBatteryLevel(50);
     NavigationNewData navigationNewData = new NavigationNewData(100, 750,
       "mewGeometry");
     NavigationRerouteData navigationRerouteData = new NavigationRerouteData(navigationNewData, 12000);
@@ -218,7 +212,9 @@ public class SerializerTest {
     Location[] locationsAfter = new Location[1];
     NavigationLocationData navigationLocationData = new NavigationLocationData(locationsBefore, locationsAfter);
 
-    NavigationState navigationState = new NavigationState(metadata);
+    NavigationState navigationState = NavigationState.create(metadata, getMockedContext());
+    metadata.setBatteryLevel(50);
+
     navigationState.setNavigationLocationData(navigationLocationData);
     navigationState.setNavigationRerouteData(navigationRerouteData);
     navigationState.setFeedbackData(feedbackData);
@@ -257,7 +253,6 @@ public class SerializerTest {
 
   @Test
   public void checkFasterRouteSerializing() throws Exception {
-    setupMockedContext();
     Date testDate = new Date();
     NavigationMetadata metadata = new NavigationMetadata(testDate, 13, 22,
       180, "sdkIdent", "sdkversion", 3, "sessionID", 10.5,
@@ -265,7 +260,6 @@ public class SerializerTest {
       "MockLocationEngine", 1300,
       "tripIdentifier", 3, 5, 2, 3, 10);
     metadata.setCreated(testDate);
-    metadata.setBatteryLevel(50);
     NavigationNewData navigationNewData = new NavigationNewData(100, 750,
       "mewGeometry");
     NavigationRerouteData navigationRerouteData = new NavigationRerouteData(navigationNewData, 12000);
@@ -284,7 +278,8 @@ public class SerializerTest {
     navigationStepMetadata.setDistanceRemaining(250);
     navigationStepMetadata.setDurationRemaining(2200);
 
-    NavigationState navigationState = new NavigationState(metadata);
+    NavigationState navigationState = NavigationState.create(metadata, getMockedContext());
+    metadata.setBatteryLevel(50);
     navigationState.setNavigationRerouteData(navigationRerouteData);
     navigationState.setNavigationStepMetadata(navigationStepMetadata);
 
@@ -318,14 +313,14 @@ public class SerializerTest {
     assertEquals(expectedJson, payload);
   }
 
-  private void setupMockedContext() {
+  private Context getMockedContext() {
     Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
-    MapboxTelemetry.applicationContext = mockedContext;
     AudioManager mockedAudioManager = mock(AudioManager.class, RETURNS_DEEP_STUBS);
     when(mockedContext.getSystemService(Context.AUDIO_SERVICE)).thenReturn(mockedAudioManager);
     TelephonyManager mockedTelephonyManager = mock(TelephonyManager.class, RETURNS_DEEP_STUBS);
     when(mockedContext.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(mockedTelephonyManager);
     ActivityManager mockedActivityManager = mock(ActivityManager.class, RETURNS_DEEP_STUBS);
     when(mockedContext.getSystemService(Context.ACTIVITY_SERVICE)).thenReturn(mockedActivityManager);
+    return mockedContext;
   }
 }
