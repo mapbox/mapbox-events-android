@@ -1,6 +1,5 @@
 package com.mapbox.android.telemetry;
 
-
 import android.app.AlarmManager;
 import android.content.Context;
 
@@ -13,7 +12,7 @@ class SchedulerFlusherFactory {
   SchedulerFlusherFactory(Context context, AlarmReceiver alarmReceiver) {
     this.context = context;
     this.alarmReceiver = alarmReceiver;
-    checkUpdatePeriod();
+    checkUpdatePeriod(context);
   }
 
   SchedulerFlusher supply() {
@@ -22,13 +21,12 @@ class SchedulerFlusherFactory {
     // return new JobSchedulerFlusher(context, callback);
     // } else {
     AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-    int requestCode = (int) System.currentTimeMillis();
-    return new AlarmSchedulerFlusher(context, alarmManager, alarmReceiver, requestCode);
+    return new AlarmSchedulerFlusher(context, alarmManager, alarmReceiver);
     // }
   }
 
-  private void checkUpdatePeriod() {
-    if (TelemetryUtils.adjustWakeUpMode()) {
+  private void checkUpdatePeriod(Context context) {
+    if (TelemetryUtils.adjustWakeUpMode(context)) {
       flushingPeriod = 600 * 1000;
     }
   }
