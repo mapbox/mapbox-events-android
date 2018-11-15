@@ -29,7 +29,7 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 public class MapboxTelemetry implements FullQueueCallback, EventCallback, ServiceTaskCallback,
-  LifecycleObserver, Callback {
+  LifecycleObserver {
   private static final String EVENTS_USER_AGENT = "MapboxEventsAndroid/";
   private static final String TELEMETRY_USER_AGENT = "MapboxTelemetryAndroid/";
   private static final String UNITY_USER_AGENT = "MapboxEventsUnityAndroid/";
@@ -83,7 +83,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     initializeTelemetryLocationState(context.getApplicationContext());
 
     // Initializing callback after listeners object is instantiated
-    this.httpCallback = getHttpCallback(telemetryListeners);
+    this.httpCallback = getHttpCallback(telemetryListeners, telemetryClient);
   }
 
   // For testing only
@@ -123,22 +123,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   public void onTaskRemoved() {
     flushEnqueuedEvents();
     unregisterTelemetry();
-  }
-
-  @Override
-  public void onFailure(Call call, IOException exception) {
-    for (TelemetryListener telemetryListener : telemetryListeners) {
-      telemetryListener.onHttpFailure(exception.getMessage());
-    }
-  }
-
-  @Override
-  public void onResponse(Call call, Response response) {
-    telemetryClient.updateFailedRequests(response.code());
-    response.body().close();
-    for (TelemetryListener telemetryListener : telemetryListeners) {
-      telemetryListener.onHttpResponse(response.isSuccessful(), response.code());
-    }
   }
 
   public boolean push(Event event) {
@@ -610,7 +594,8 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     ProcessLifecycleOwner.get().getLifecycle().removeObserver(this);
   }
 
-  private static Callback getHttpCallback(final Set<TelemetryListener> listeners) {
+  private static Callback getHttpCallback(final Set<TelemetryListener> listeners,
+                                          final TelemetryClient telemetryClient) {
     return new Callback() {
       @Override
       public void onFailure(Call call, IOException e) {
@@ -621,6 +606,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
       @Override
       public void onResponse(Call call, Response response) throws IOException {
+        telemetryClient.updateFailedRequests(response.code());
         ResponseBody body = response.body();
         if (body != null) {
           body.close();
