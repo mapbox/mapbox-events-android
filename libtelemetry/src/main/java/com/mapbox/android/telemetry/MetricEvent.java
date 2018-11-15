@@ -96,8 +96,16 @@ class MetricEvent extends Event implements Parcelable {
     this.deviceLat = deviceLat;
   }
 
+  public Double getDeviceLat() {
+    return deviceLat;
+  }
+
   public void setDeviceLon(Double deviceLon) {
     this.deviceLon = deviceLon;
+  }
+
+  public Double getDeviceLon() {
+    return deviceLon;
   }
 
   public void setDeviceTimeDrift(Integer deviceTimeDrift) {

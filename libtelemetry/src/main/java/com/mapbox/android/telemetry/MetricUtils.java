@@ -6,6 +6,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
 import com.google.gson.Gson;
 
@@ -65,6 +66,16 @@ class MetricUtils {
     return latestLocation;
   }
 
+  @VisibleForTesting
+  Map<String, Integer> getFailedRequests() {
+    return failedRequests;
+  }
+
+  @VisibleForTesting
+  Date getUtcDate() {
+    return utcDate;
+  }
+
   Map<String, Integer> calculateEventCountByType(List<Event> eventsQueue,
                                                  @Nullable Map<String, Integer> eventCountByType) {
     if (eventsQueue.size() > 0) {
@@ -116,6 +127,9 @@ class MetricUtils {
 
   MetricEvent buildMetricEvent() {
     MetricEvent metricEvent = new MetricEvent();
+    if (utcDate == null) {
+      isNewDate();
+    }
     metricEvent.setDateUTC(getDateString());
     metricEvent.setRequests(requests);
     metricEvent.setFailedRequests(convertMapToJson(failedRequests));

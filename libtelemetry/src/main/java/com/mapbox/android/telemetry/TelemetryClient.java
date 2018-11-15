@@ -50,6 +50,10 @@ class TelemetryClient {
     this.metricUtils = new MetricUtils();
   }
 
+  MetricUtils getMetricUtils() {
+    return metricUtils;
+  }
+
   void updateAccessToken(String accessToken) {
     this.accessToken = accessToken;
   }

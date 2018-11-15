@@ -28,6 +28,7 @@ import okhttp3.mockwebserver.internal.tls.SslClient;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
@@ -198,6 +199,16 @@ public class TelemetryClientTest extends MockWebServerTest {
 
     latch.await();
     assertTrue(failureRef.get());
+  }
+
+  @Test
+  public void checksUpdateFailedRequests() throws Exception {
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
+
+    telemetryClient.updateFailedRequests(400);
+    MetricUtils metricUtils = telemetryClient.getMetricUtils();
+
+    assertNotNull(metricUtils.getFailedRequests());
   }
 
   private Callback provideACallback(final CountDownLatch latch, final AtomicReference<String> bodyRef,
