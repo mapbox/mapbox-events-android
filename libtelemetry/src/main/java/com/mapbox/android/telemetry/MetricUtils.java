@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -17,12 +18,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import okhttp3.RequestBody;
+
 class MetricUtils {
   private Date utcDate;
   private static int timeDrift;
   private static String configResponse;
-  private static int appWakeups = 0;
+  private static int appWakeUps = 0;
   private static Location latestLocation;
+  private int requests;
+  private int totalDataTransfer;
+  private int cellDataTransfer;
+  private int wifiDataTransfer;
+  private int eventCountFailed;
+  private int eventCountTotal;
+  private int eventCountMax;
+  private Map<String, Integer> eventCountPerType;
+  private Map<String, Integer> failedRequests;
+  private int potentialFailures;
+
+  MetricUtils() {
+    resetCounters();
+  }
 
   static void setConfigResponse(String response) {
     configResponse = response;
@@ -33,7 +50,7 @@ class MetricUtils {
   }
 
   int getAppWakeups() {
-    return appWakeups;
+    return appWakeUps;
   }
 
   int getTimeDrift() {
@@ -97,8 +114,83 @@ class MetricUtils {
     return format.format(utcDate);
   }
 
+  MetricEvent buildMetricEvent() {
+    MetricEvent metricEvent = new MetricEvent();
+    metricEvent.setDateUTC(getDateString());
+    metricEvent.setRequests(requests);
+    metricEvent.setFailedRequests(convertMapToJson(failedRequests));
+    metricEvent.setTotalDataTransfer(totalDataTransfer);
+    metricEvent.setCellDataTransfer(cellDataTransfer);
+    metricEvent.setWifiDataTransfer(wifiDataTransfer);
+    metricEvent.setAppWakeups(appWakeUps);
+    metricEvent.setEventCountPerType(convertMapToJson(eventCountPerType));
+    metricEvent.setEventCountFailed(eventCountFailed);
+    metricEvent.setEventCountTotal(eventCountTotal);
+    metricEvent.setEventCountMax(eventCountMax);
+    metricEvent.setDeviceTimeDrift(getTimeDrift());
+    metricEvent.setConfigResponse(getConfigResponse());
+
+    Location latestLocation = getLatestLocation();
+    if (latestLocation != null) {
+      metricEvent.setDeviceLat(latestLocation.getLatitude());
+      metricEvent.setDeviceLon(latestLocation.getLongitude());
+    }
+
+    return metricEvent;
+  }
+
+  void resetCounters() {
+    requests = 0;
+    totalDataTransfer = 0;
+    cellDataTransfer = 0;
+    wifiDataTransfer = 0;
+    appWakeUps = 0;
+    eventCountFailed = 0;
+    eventCountTotal = 0;
+    eventCountMax = 0;
+  }
+
+  void grabSentBytes(RequestBody requestBody) {
+    try {
+      int sentBytes = (int) requestBody.contentLength();
+      totalDataTransfer = totalDataTransfer + sentBytes;
+
+      if (connectedToWifi(MapboxTelemetry.applicationContext)) {
+        wifiDataTransfer = wifiDataTransfer + sentBytes;
+      } else {
+        cellDataTransfer = cellDataTransfer + sentBytes;
+      }
+    } catch (IOException exception) {
+      exception.printStackTrace();
+    }
+  }
+
+  void incrementRequests() {
+    requests++;
+  }
+
+  void updateEventCountTotal(int eventsSize) {
+    eventCountTotal = eventCountTotal + eventsSize;
+  }
+
+  void setPotentialFailures(int potentialFailures) {
+    this.potentialFailures = potentialFailures;
+  }
+
+  void updateEventCountyPerType(List<Event> events) {
+    eventCountPerType = calculateEventCountByType(events, eventCountPerType);
+  }
+
+  void updateFailedRequests(int code) {
+    failedRequests = calculateFailedRequests(code, failedRequests);
+  }
+
+  void updateEventCountFailed() {
+    eventCountFailed = eventCountFailed + potentialFailures;
+  }
+
   static void incrementAppWakeups() {
-    appWakeups++;
+    appWakeUps++;
   }
 
   static void calculateTimeDiff(long serverTime) {

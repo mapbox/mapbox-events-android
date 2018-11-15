@@ -1,7 +1,5 @@
 package com.mapbox.android.telemetry;
 
-import android.location.Location;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSerializer;
@@ -11,7 +9,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import okhttp3.Call;
@@ -42,17 +39,6 @@ class TelemetryClient {
   private final Logger logger;
   private CertificateBlacklist certificateBlacklist;
   private MetricUtils metricUtils;
-  private int requests;
-  private int totalDataTransfer;
-  private int cellDataTransfer;
-  private int wifiDataTransfer;
-  private int appWakeups;
-  private int eventCountFailed;
-  private int eventCountTotal;
-  private int eventCountMax;
-  private Map<String, Integer> eventCountPerType;
-  private Map<String, Integer> failedRequests;
-  private int potentialFailures;
 
   TelemetryClient(String accessToken, String userAgent, TelemetryClientSettings setting, Logger logger,
                   CertificateBlacklist certificateBlacklist) {
@@ -61,7 +47,7 @@ class TelemetryClient {
     this.setting = setting;
     this.logger = logger;
     this.certificateBlacklist = certificateBlacklist;
-    resetCounters();
+    this.metricUtils = new MetricUtils();
   }
 
   void updateAccessToken(String accessToken) {
@@ -74,16 +60,16 @@ class TelemetryClient {
 
   void sendEvents(List<Event> events, Callback callback) {
     if (metricUtils.isNewDate()) {
-      events.add(buildMetricEvent());
+      events.add(metricUtils.buildMetricEvent());
     }
 
     ArrayList<Event> batch = new ArrayList<>();
     batch.addAll(events);
     sendBatch(batch, callback);
-    requests++;
-    eventCountTotal = eventCountTotal + events.size();
-    potentialFailures = events.size();
-    eventCountPerType = metricUtils.calculateEventCountByType(events, eventCountPerType);
+    metricUtils.incrementRequests();
+    metricUtils.updateEventCountTotal(events.size());
+    metricUtils.setPotentialFailures(events.size());
+    metricUtils.updateEventCountyPerType(events);
   }
 
   void sendAttachment(Attachment attachment, final CopyOnWriteArraySet<AttachmentListener> attachmentListeners) {
@@ -154,7 +140,7 @@ class TelemetryClient {
 
   void updateFailedRequests(int code) {
     if (code >= FAIL_CODE) {
-      failedRequests = metricUtils.calculateFailedRequests(code, failedRequests);
+      metricUtils.updateFailedRequests(code);
     }
   }
 
@@ -183,7 +169,8 @@ class TelemetryClient {
       @Override
       public void onFailure(Call call, IOException exception) {
         callback.onFailure(call, exception);
-        eventCountFailed = eventCountFailed + potentialFailures;
+
+        metricUtils.updateEventCountFailed();
       }
 
       @Override
@@ -195,7 +182,7 @@ class TelemetryClient {
         }
       }
     });
-    grabSentBytes(body);
+    metricUtils.grabSentBytes(body);
   }
 
   private boolean isExtraDebuggingNeeded() {
@@ -230,57 +217,5 @@ class TelemetryClient {
     }
 
     return builder.build();
-  }
-
-  private MetricEvent buildMetricEvent() {
-    MetricEvent metricEvent = new MetricEvent();
-    metricEvent.setDateUTC(metricUtils.getDateString());
-    metricEvent.setRequests(requests);
-    metricEvent.setFailedRequests(metricUtils.convertMapToJson(failedRequests));
-    metricEvent.setTotalDataTransfer(totalDataTransfer);
-    metricEvent.setCellDataTransfer(cellDataTransfer);
-    metricEvent.setWifiDataTransfer(wifiDataTransfer);
-    metricEvent.setAppWakeups(appWakeups);
-    metricEvent.setEventCountPerType(metricUtils.convertMapToJson(eventCountPerType));
-    metricEvent.setEventCountFailed(eventCountFailed);
-    metricEvent.setEventCountTotal(eventCountTotal);
-    metricEvent.setEventCountMax(eventCountMax);
-    metricEvent.setDeviceTimeDrift(metricUtils.getTimeDrift());
-    metricEvent.setConfigResponse(metricUtils.getConfigResponse());
-
-    Location latestLocation = metricUtils.getLatestLocation();
-    if (latestLocation != null) {
-      metricEvent.setDeviceLat(latestLocation.getLatitude());
-      metricEvent.setDeviceLon(latestLocation.getLongitude());
-    }
-
-    return metricEvent;
-  }
-
-  private void resetCounters() {
-    metricUtils = new MetricUtils();
-    requests = 0;
-    totalDataTransfer = 0;
-    cellDataTransfer = 0;
-    wifiDataTransfer = 0;
-    appWakeups = 0;
-    eventCountFailed = 0;
-    eventCountTotal = 0;
-    eventCountMax = 0;
-  }
-
-  private void grabSentBytes(RequestBody requestBody) {
-    try {
-      int sentBytes = (int) requestBody.contentLength();
-      totalDataTransfer = totalDataTransfer + sentBytes;
-
-      if (metricUtils.connectedToWifi(MapboxTelemetry.applicationContext)) {
-        wifiDataTransfer = wifiDataTransfer + sentBytes;
-      } else {
-        cellDataTransfer = cellDataTransfer + sentBytes;
-      }
-    } catch (IOException exception) {
-      exception.printStackTrace();
-    }
   }
 }
