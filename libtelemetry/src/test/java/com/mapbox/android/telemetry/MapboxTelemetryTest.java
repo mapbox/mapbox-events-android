@@ -8,12 +8,15 @@ import android.net.NetworkInfo;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import okhttp3.Callback;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -495,6 +498,30 @@ public class MapboxTelemetryTest {
     assertTrue(theMapboxTelemetry.isQueueEmpty());
   }
 
+  @Test
+  public void checksObtainForegroundCheckRunnable() throws Exception {
+    Context mockedContext = mock(Context.class);
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext);
+
+    assertEquals(ForegroundCheckRunnable.class, theMapboxTelemetry.obtainForegroundCheckRunnable().getClass());
+  }
+
+  @Test
+  public void checksForegroundCheckRunnableSet() throws Exception {
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryForForeground();
+
+    theMapboxTelemetry.foregroundBackoff();
+
+    assertNotNull(theMapboxTelemetry.getForegroundCheckRunnable());
+  }
+
+  @Test
+  public void checksIsAppInBackground() throws Exception {
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryForForeground();
+
+    assertFalse(theMapboxTelemetry.isAppInForeground(theMapboxTelemetry.applicationContext));
+  }
+
   private MapboxTelemetry obtainMapboxTelemetry() {
     MapboxTelemetry.applicationContext = obtainNetworkConnectedMockedContext();
     String aValidAccessToken = "validAccessToken";
@@ -713,6 +740,19 @@ public class MapboxTelemetryTest {
     if (isServiceBound) {
       theMapboxTelemetry.injectTelemetryService(telemetryService);
     }
+    return theMapboxTelemetry;
+  }
+
+  private MapboxTelemetry obtainMapboxTelemetryForForeground() {
+    Context mockedContext = mock(Context.class);
+    ActivityManager mockedActivityManager = mock(ActivityManager.class, RETURNS_DEEP_STUBS);
+    when(mockedContext.getSystemService(Context.ACTIVITY_SERVICE)).thenReturn(mockedActivityManager);
+    ActivityManager.RunningTaskInfo mockedRunningTaskInfo = mock(ActivityManager.RunningTaskInfo.class);
+    List mockedTaskInfo = new ArrayList(Arrays.asList(mockedRunningTaskInfo));
+    when(mockedActivityManager.getRunningTasks(1)).thenReturn(mockedTaskInfo);
+
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext);
+
     return theMapboxTelemetry;
   }
 

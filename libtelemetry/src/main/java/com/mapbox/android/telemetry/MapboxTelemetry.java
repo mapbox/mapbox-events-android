@@ -11,6 +11,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.IBinder;
+import android.support.annotation.VisibleForTesting;
 
 import com.mapbox.android.core.permissions.PermissionsManager;
 
@@ -242,7 +243,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     } else {
       List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
       ComponentName componentInfo = taskInfo.get(0).topActivity;
-      if (componentInfo.getPackageName().equals(context.getPackageName())) {
+      if (componentInfo != null && componentInfo.getPackageName().equals(context.getPackageName())) {
         isInForeground = true;
       }
     }
@@ -285,6 +286,26 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   // Package private (no modifier) for testing purposes
   void injectTelemetryService(TelemetryService telemetryService) {
     this.telemetryService = telemetryService;
+  }
+
+  @VisibleForTesting
+  void foregroundBackoff() {
+    ForegroundCheckRunnable foregroundCheckRunnable = obtainForegroundCheckRunnable();
+    foregroundCheckRunnable.run();
+  }
+
+  @VisibleForTesting
+  ForegroundCheckRunnable obtainForegroundCheckRunnable() {
+    if (foregroundCheckRunnable == null) {
+      foregroundCheckRunnable = new ForegroundCheckRunnable(applicationContext, this);
+    }
+
+    return foregroundCheckRunnable;
+  }
+
+  @VisibleForTesting
+  ForegroundCheckRunnable getForegroundCheckRunnable() {
+    return foregroundCheckRunnable;
   }
 
   private void initializeContext(Context context) {
@@ -536,19 +557,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     }
 
     return permissionCheckRunnable;
-  }
-
-  private void foregroundBackoff() {
-    ForegroundCheckRunnable foregroundCheckRunnable = obtainForegroundCheckRunnable();
-    foregroundCheckRunnable.run();
-  }
-
-  private ForegroundCheckRunnable obtainForegroundCheckRunnable() {
-    if (foregroundCheckRunnable == null) {
-      foregroundCheckRunnable = new ForegroundCheckRunnable(applicationContext, this);
-    }
-
-    return foregroundCheckRunnable;
   }
 
   private void startLocation() {
