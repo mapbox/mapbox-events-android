@@ -29,7 +29,7 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 public class MapboxTelemetry implements FullQueueCallback, EventCallback, ServiceTaskCallback,
-  LifecycleObserver {
+  LifecycleObserver, Callback {
   private static final String EVENTS_USER_AGENT = "MapboxEventsAndroid/";
   private static final String TELEMETRY_USER_AGENT = "MapboxTelemetryAndroid/";
   private static final String UNITY_USER_AGENT = "MapboxEventsUnityAndroid/";

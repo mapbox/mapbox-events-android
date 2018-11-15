@@ -56,7 +56,7 @@ class LocationReceiver extends BroadcastReceiver {
       return false;
     }
 
-    recordLastLocation(location);
+    MetricUtils.setLatestLocation(location);
 
     LocationMapper obtainLocationEvent = obtainLocationMapper();
     LocationEvent locationEvent = obtainLocationEvent.from(location, TelemetryUtils.obtainApplicationState(context));
@@ -80,9 +80,5 @@ class LocationReceiver extends BroadcastReceiver {
     }
 
     return locationMapper;
-  }
-
-  private void recordLastLocation(Location location) {
-    MetricUtils.setLatestLocation(location);
   }
 }

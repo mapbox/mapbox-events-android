@@ -34,6 +34,7 @@ class TelemetryClient {
   private static final String EXTRA_DEBUGGING_LOG = "Sending POST to %s with %d event(s) (user agent: %s) "
     + "with payload: %s";
   private static final String BOUNDARY = "--01ead4a5-7a67-4703-ad02-589886e00923";
+  private static final int FAIL_CODE = 400;
 
   private String accessToken;
   private String userAgent;
@@ -152,7 +153,7 @@ class TelemetryClient {
   }
 
   void updateFailedRequests(int code) {
-    if (code >= 400) {
+    if (code >= FAIL_CODE) {
       failedRequests = metricUtils.calculateFailedRequests(code, failedRequests);
     }
   }

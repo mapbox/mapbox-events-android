@@ -254,10 +254,14 @@ class CertificateBlacklist implements Callback {
   private long obtainServerTime(Response response) {
     Headers headers = response.headers();
 
+    if (headers.get("Date") == null) {
+      return Long.parseLong(null);
+    }
+
     String dateString = headers.get("Date");
 
     SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
-    Date serverDate = new Date();
+    Date serverDate = null;
 
     try {
       serverDate = dateFormat.parse(dateString);
