@@ -16,8 +16,6 @@ import org.junit.runner.RunWith;
 import java.util.concurrent.CountDownLatch;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -138,21 +136,6 @@ public class TelemetryServiceTest {
     boundService[0].onTaskRemoved(serviceIntent);
 
     verify(mockedCallback, times(1)).onTaskRemoved();
-  }
-
-  @Test
-  public void checksLocationReceiverUnregistered() throws Exception {
-    MapboxTelemetry.applicationContext = InstrumentationRegistry.getTargetContext();
-    Intent serviceIntent = new Intent(MapboxTelemetry.applicationContext, TelemetryService.class);
-
-    IBinder binder = mServiceRule.bindService(serviceIntent);
-    TelemetryService.TelemetryBinder telemetryBinder = (TelemetryService.TelemetryBinder) binder;
-    TelemetryService telemetryService = telemetryBinder.obtainService();
-
-    assertNotNull(telemetryService.getLocationReceiver());
-    telemetryService.onDestroy();
-
-    assertNull(telemetryService.getLocationReceiver());
   }
 
   @Test
