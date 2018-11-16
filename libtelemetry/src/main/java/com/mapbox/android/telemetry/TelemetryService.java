@@ -179,11 +179,6 @@ public class TelemetryService extends Service implements TelemetryCallback, Even
       == PackageManager.PERMISSION_GRANTED;
   }
 
-  @VisibleForTesting
-  LocationReceiver getLocationReceiver() {
-    return locationReceiver;
-  }
-
   private void createLocationReceiver(Context context) {
     locationReceiver = new LocationReceiver(this);
     registerLocationReceiver(context);

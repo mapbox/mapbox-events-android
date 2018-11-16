@@ -14,7 +14,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.IBinder;
-import android.support.annotation.VisibleForTesting;
 
 import com.mapbox.android.core.permissions.PermissionsManager;
 
@@ -227,16 +226,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   boolean isQueueEmpty() {
     return queue.queue.size() == 0;
-  }
-
-  @VisibleForTesting
-  void setServiceConnection(ServiceConnection serviceConnection) {
-    this.serviceConnection = serviceConnection;
-  }
-
-  @VisibleForTesting
-  TelemetryService getTelemetryService() {
-    return telemetryService;
   }
 
   private void startTelemetryService() {
