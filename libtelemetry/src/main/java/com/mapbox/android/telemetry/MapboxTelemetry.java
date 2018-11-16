@@ -1,6 +1,5 @@
 package com.mapbox.android.telemetry;
 
-
 import android.app.ActivityManager;
 import android.arch.lifecycle.LifecycleObserver;
 import android.content.ComponentName;
@@ -11,7 +10,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.IBinder;
-import android.support.annotation.VisibleForTesting;
 
 import com.mapbox.android.core.permissions.PermissionsManager;
 
@@ -60,7 +58,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private boolean isLocationOpted = false;
   private boolean isServiceBound = false;
   private PermissionCheckRunnable permissionCheckRunnable = null;
-  private ForegroundCheckRunnable foregroundCheckRunnable = null;
+  private ForegroundBackoff foregroundBackoff = null;
   private CopyOnWriteArraySet<TelemetryListener> telemetryListeners = null;
   private CertificateBlacklist certificateBlacklist;
   private CopyOnWriteArraySet<AttachmentListener> attachmentListeners = null;
@@ -226,29 +224,22 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     return queue.queue.size() == 0;
   }
 
-  boolean isAppInForeground(Context context) {
-    boolean isInForeground = false;
-    ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT_WATCH) {
-      List<ActivityManager.RunningAppProcessInfo> runningProcesses = am.getRunningAppProcesses();
-      for (ActivityManager.RunningAppProcessInfo processInfo : runningProcesses) {
-        if (processInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
-          for (String activeProcess : processInfo.pkgList) {
-            if (activeProcess.equals(context.getPackageName())) {
-              isInForeground = true;
-            }
-          }
-        }
+  boolean isAppInForeground() {
+    ActivityManager activityManager = (ActivityManager) applicationContext.getSystemService(Context.ACTIVITY_SERVICE);
+    assert activityManager != null;
+
+    if (isLollipopOrHigher()) {
+      List<ActivityManager.RunningAppProcessInfo> runningProcesses = activityManager.getRunningAppProcesses();
+      if (runningProcesses != null) {
+        return checkRunningProcessesForegroundPkgList(runningProcesses);
       }
     } else {
-      List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
+      List<ActivityManager.RunningTaskInfo> taskInfo = activityManager.getRunningTasks(1);
       ComponentName componentInfo = taskInfo.get(0).topActivity;
-      if (componentInfo != null && componentInfo.getPackageName().equals(context.getPackageName())) {
-        isInForeground = true;
-      }
+      return componentInfo != null && componentInfo.getPackageName().equals(applicationContext.getPackageName());
     }
 
-    return isInForeground;
+    return false;
   }
 
   private void startTelemetryService() {
@@ -288,24 +279,12 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     this.telemetryService = telemetryService;
   }
 
-  @VisibleForTesting
-  void foregroundBackoff() {
-    ForegroundCheckRunnable foregroundCheckRunnable = obtainForegroundCheckRunnable();
-    foregroundCheckRunnable.run();
-  }
-
-  @VisibleForTesting
-  ForegroundCheckRunnable obtainForegroundCheckRunnable() {
-    if (foregroundCheckRunnable == null) {
-      foregroundCheckRunnable = new ForegroundCheckRunnable(applicationContext, this);
+  private void startForegroundBackoff() {
+    if (foregroundBackoff == null) {
+      foregroundBackoff = new ForegroundBackoff(this);
     }
 
-    return foregroundCheckRunnable;
-  }
-
-  @VisibleForTesting
-  ForegroundCheckRunnable getForegroundCheckRunnable() {
-    return foregroundCheckRunnable;
+    foregroundBackoff.start();
   }
 
   private void initializeContext(Context context) {
@@ -561,10 +540,10 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   private void startLocation() {
     if (isLollipopOrHigher()) {
-      if (isAppInForeground(applicationContext)) {
+      if (isAppInForeground()) {
         applicationContext.startService(obtainLocationServiceIntent());
       } else {
-        foregroundBackoff();
+        startForegroundBackoff();
       }
     } else {
       applicationContext.startService(obtainLocationServiceIntent());
@@ -656,5 +635,36 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   private boolean isLollipopOrHigher() {
     return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
+  }
+
+  private boolean isImportanceForeground(ActivityManager.RunningAppProcessInfo processInfo) {
+    return processInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
+  }
+
+  private boolean isActiveProcessEqualToPackage(String activeProcess) {
+    return activeProcess.equals(applicationContext.getPackageName());
+  }
+
+  private boolean checkRunningProcessesForegroundPkgList(List<ActivityManager.RunningAppProcessInfo> runningProcesses) {
+    for (ActivityManager.RunningAppProcessInfo processInfo : runningProcesses) {
+      if (isImportanceForeground(processInfo)) {
+        if (processInfo.pkgList != null) {
+          return checkPackageListForMatchingActiveProcess(processInfo.pkgList);
+        }
+        break;
+      }
+    }
+
+    return false;
+  }
+
+  private boolean checkPackageListForMatchingActiveProcess(String[] packageList) {
+    for (String activeProcess : packageList) {
+      if (isActiveProcessEqualToPackage(activeProcess)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }

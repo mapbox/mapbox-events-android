@@ -16,7 +16,6 @@ import okhttp3.Callback;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -499,27 +498,10 @@ public class MapboxTelemetryTest {
   }
 
   @Test
-  public void checksObtainForegroundCheckRunnable() throws Exception {
-    Context mockedContext = mock(Context.class);
-    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext);
-
-    assertEquals(ForegroundCheckRunnable.class, theMapboxTelemetry.obtainForegroundCheckRunnable().getClass());
-  }
-
-  @Test
-  public void checksForegroundCheckRunnableSet() throws Exception {
-    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryForForeground();
-
-    theMapboxTelemetry.foregroundBackoff();
-
-    assertNotNull(theMapboxTelemetry.getForegroundCheckRunnable());
-  }
-
-  @Test
   public void checksIsAppInBackground() throws Exception {
     MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryForForeground();
 
-    assertFalse(theMapboxTelemetry.isAppInForeground(theMapboxTelemetry.applicationContext));
+    assertFalse(theMapboxTelemetry.isAppInForeground());
   }
 
   private MapboxTelemetry obtainMapboxTelemetry() {
