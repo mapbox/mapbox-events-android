@@ -25,7 +25,7 @@ public final class LocationEngineProvider {
    * @param context    {@link Context}.
    * @param background true if background optimized engine is desired.
    * @return a unique instance of {@link LocationEngine} every time method is called.
-   * @since 3.0.0
+   * @since 1.0.0
    */
   @NonNull
   public static LocationEngine getBestLocationEngine(@NonNull Context context, boolean background) {

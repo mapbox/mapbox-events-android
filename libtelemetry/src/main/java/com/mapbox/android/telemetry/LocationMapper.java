@@ -14,8 +14,8 @@ class LocationMapper {
     sessionIdentifier = new SessionIdentifier();
   }
 
-  LocationEvent from(Location location) {
-    LocationEvent locationEvent = createLocationEvent(location);
+  LocationEvent from(Location location, String applicationState) {
+    LocationEvent locationEvent = createLocationEvent(location, applicationState);
     return locationEvent;
   }
 
@@ -23,13 +23,12 @@ class LocationMapper {
     this.sessionIdentifier = sessionIdentifier;
   }
 
-  private LocationEvent createLocationEvent(Location location) {
+  private LocationEvent createLocationEvent(Location location, String applicationState) {
     String sessionId = sessionIdentifier.getSessionId();
-
     double latitudeScaled = round(location.getLatitude());
     double longitudeScaled = round(location.getLongitude());
     double longitudeWrapped = wrapLongitude(longitudeScaled);
-    LocationEvent locationEvent = new LocationEvent(sessionId, latitudeScaled, longitudeWrapped);
+    LocationEvent locationEvent = new LocationEvent(sessionId, latitudeScaled, longitudeWrapped, applicationState);
     addAltitudeIfPresent(location, locationEvent);
     addAccuracyIfPresent(location, locationEvent);
     return locationEvent;

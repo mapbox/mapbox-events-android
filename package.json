@@ -1,0 +1,28 @@
+{
+  "name": "@mapbox/mapbox-events-android",
+  "version": "4.0.0",
+  "description": "Telemetry and Location Services",
+  "keywords": [
+    "mapbox",
+    "telemetry",
+    "location",
+    "core",
+    "events"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mapbox/mapbox-events-android.git"
+  },
+  "devDependencies": {
+    "express": "^4.11.1",
+    "@octokit/rest": "^15.15.1",
+    "jsonwebtoken": "^8.3.0",
+    "pretty-bytes": "^5.1.0"
+  },
+  "engines": {
+    "node": ">=6"
+  },
+  "dependencies": {
+    "@mapbox/cloudfriend": "^2.5.0"
+  }
+}

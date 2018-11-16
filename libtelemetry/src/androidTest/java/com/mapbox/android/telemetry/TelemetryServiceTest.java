@@ -8,6 +8,7 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.GrantPermissionRule;
+import android.support.test.rule.ServiceTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.junit.Rule;
@@ -29,10 +30,12 @@ import static org.mockito.Mockito.when;
 
 @RunWith(AndroidJUnit4.class)
 public class TelemetryServiceTest {
-
   @Rule
   public GrantPermissionRule permissionRule =
     GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION);
+
+  @Rule
+  public final ServiceTestRule mServiceRule = new ServiceTestRule();
 
   @Test
   public void checksLocationReceiverIsUpWhenServiceStarted() throws Exception {
@@ -151,6 +154,17 @@ public class TelemetryServiceTest {
 //    assertNull(mapboxTelemetry.getTelemetryService());
     mapboxTelemetry.optLocationIn();
     assertNotNull(mapboxTelemetry.getTelemetryService());
+  }
+  
+  @Test
+  public void checksLocationPermission() throws Exception {
+    Intent serviceIntent = new Intent(InstrumentationRegistry.getTargetContext(), TelemetryService.class);
+    serviceIntent.putExtra("isLocationEnablerFromPreferences", false);
+
+    IBinder binder = mServiceRule.bindService(serviceIntent);
+    TelemetryService service = ((TelemetryService.TelemetryBinder) binder).obtainService();
+
+    assertTrue(service.locationPermissionCheck());
   }
 
   private ServiceConnection setupServiceConnection(final TelemetryService[] boundService,

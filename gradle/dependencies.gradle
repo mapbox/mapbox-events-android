@@ -64,7 +64,7 @@ ext {
             junit                  : "junit:junit:${version.junit}",
             mockito                : "org.mockito:mockito-core:${version.mockito}",
             mockitoAndroid         : "org.mockito:mockito-android:${version.mockito}",
-            assertJ                : "org.assertj:assertj-core:${version.assertJ}"
+            assertJ                : "org.assertj:assertj-core:${version.assertJ}",
     ]
 
     pluginDependencies = [

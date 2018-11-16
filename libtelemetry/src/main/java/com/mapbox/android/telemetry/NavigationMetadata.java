@@ -1,5 +1,6 @@
 package com.mapbox.android.telemetry;
 
+import android.content.Context;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -76,19 +77,30 @@ public class NavigationMetadata implements Parcelable {
     this.device = Build.MODEL;
     this.locationEngine = locationEngine;
     this.absoluteDistanceToDestination = absoluteDistanceToDestination;
-    this.volumeLevel = NavigationUtils.obtainVolumeLevel();
-    this.batteryLevel = TelemetryUtils.obtainBatteryLevel();
-    this.screenBrightness = NavigationUtils.obtainScreenBrightness();
-    this.batteryPluggedIn = TelemetryUtils.isPluggedIn();
-    this.connectivity = TelemetryUtils.obtainCellularNetworkType();
-    this.audioType = NavigationUtils.obtainAudioType();
-    this.applicationState = TelemetryUtils.obtainApplicationState();
+    this.volumeLevel = 0;
+    this.batteryLevel = 0;
+    this.screenBrightness = 0;
+    this.batteryPluggedIn = false;
+    this.connectivity = "";
+    this.audioType = "";
+    this.applicationState = "";
     this.tripIdentifier = tripIdentifier;
     this.legIndex = legIndex;
     this.legCount = legCount;
     this.stepIndex = stepIndex;
     this.stepCount = stepCount;
     this.totalStepCount = totalStepCount;
+  }
+
+  NavigationMetadata setDeviceInfo(Context context) {
+    this.volumeLevel = NavigationUtils.obtainVolumeLevel(context);
+    this.batteryLevel = TelemetryUtils.obtainBatteryLevel(context);
+    this.screenBrightness = NavigationUtils.obtainScreenBrightness(context);
+    this.batteryPluggedIn = TelemetryUtils.isPluggedIn(context);
+    this.connectivity = TelemetryUtils.obtainCellularNetworkType(context);
+    this.audioType = NavigationUtils.obtainAudioType(context);
+    this.applicationState = TelemetryUtils.obtainApplicationState(context);
+    return this;
   }
 
   public void setCreated(Date created) {
