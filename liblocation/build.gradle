@@ -34,6 +34,7 @@ dependencies {
     testImplementation dependenciesList.junit
     testImplementation dependenciesList.mockito
     testImplementation dependenciesList.assertJ
+    testImplementation dependenciesList.gmsLocation
 
     androidTestImplementation(dependenciesList.testEspressoCore, {
         exclude group: 'com.android.support', module: 'support-annotations'

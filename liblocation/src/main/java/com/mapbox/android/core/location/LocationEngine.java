@@ -1,5 +1,6 @@
 package com.mapbox.android.core.location;
 
+import android.app.PendingIntent;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -45,6 +46,18 @@ public interface LocationEngine {
                               @Nullable Looper looper) throws SecurityException;
 
   /**
+   * Requests location updates with callback on the specified PendingIntent.
+   *
+   * @param request       {@link LocationEngineRequest} for the updates.
+   * @param pendingIntent {@link PendingIntent} for the location result {@link LocationEngineResult}.
+   * @throws SecurityException if permission is not granted to access location services.
+   * @since 1.1.0
+   */
+  @RequiresPermission(anyOf = {ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION})
+  void requestLocationUpdates(@NonNull LocationEngineRequest request,
+                              PendingIntent pendingIntent) throws SecurityException;
+
+  /**
    * Removes location updates for the given location engine callback.
    * <p>
    * It is recommended to remove location requests when the activity is in a paused or
@@ -54,4 +67,15 @@ public interface LocationEngine {
    * @since 1.0.0
    */
   void removeLocationUpdates(@NonNull LocationEngineCallback<LocationEngineResult> callback);
+
+  /**
+   * Removes location updates for the given pending intent.
+   * <p>
+   * It is recommended to remove location requests when the activity is in a paused or
+   * stopped state, doing so helps battery performance.
+   *
+   * @param pendingIntent {@link PendingIntent} to remove.
+   * @since 1.1.0
+   */
+  void removeLocationUpdates(PendingIntent pendingIntent);
 }

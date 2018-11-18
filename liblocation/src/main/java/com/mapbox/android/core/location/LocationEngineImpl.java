@@ -1,11 +1,9 @@
 package com.mapbox.android.core.location;
 
 import android.app.PendingIntent;
-import android.content.Intent;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
 
 /**
  * Internal location engine implementation interface.
@@ -14,13 +12,7 @@ import android.support.annotation.VisibleForTesting;
  */
 interface LocationEngineImpl<T> {
   @NonNull
-  T setLocationListener(@NonNull LocationEngineCallback<LocationEngineResult> callback);
-
-  @Nullable
-  T removeLocationListener(@NonNull LocationEngineCallback<LocationEngineResult> callback);
-
-  @Nullable
-  LocationEngineResult extractResult(Intent intent);
+  T createListener(LocationEngineCallback<LocationEngineResult> callback);
 
   void getLastLocation(@NonNull LocationEngineCallback<LocationEngineResult> callback) throws SecurityException;
 
@@ -33,7 +25,4 @@ interface LocationEngineImpl<T> {
   void removeLocationUpdates(T listener);
 
   void removeLocationUpdates(PendingIntent pendingIntent);
-
-  @VisibleForTesting
-  int getListenersCount();
 }
