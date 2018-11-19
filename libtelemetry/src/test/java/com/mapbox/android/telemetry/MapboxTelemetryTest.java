@@ -750,7 +750,8 @@ public class MapboxTelemetryTest {
     List mockedTaskInfo = new ArrayList(Arrays.asList(mockedRunningTaskInfo));
     when(mockedActivityManager.getRunningTasks(1)).thenReturn(mockedTaskInfo);
 
-    ActivityManager.RunningAppProcessInfo mockedRunningAppProcessInfo = mock(ActivityManager.RunningAppProcessInfo.class);
+    ActivityManager.RunningAppProcessInfo mockedRunningAppProcessInfo =
+      mock(ActivityManager.RunningAppProcessInfo.class);
     List mockedRunningProcesses = new ArrayList(Arrays.asList(mockedRunningAppProcessInfo));
     when(mockedActivityManager.getRunningAppProcesses()).thenReturn(mockedRunningProcesses);
 
