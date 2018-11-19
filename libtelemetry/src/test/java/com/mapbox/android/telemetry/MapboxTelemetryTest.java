@@ -513,6 +513,14 @@ public class MapboxTelemetryTest {
     assertFalse(theMapboxTelemetry.isAppInForeground());
   }
 
+  @Test
+  public void checksIsAppInBackgroundOptLocationIn() throws Exception {
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryForForeground();
+    theMapboxTelemetry.setBuildVersion(Build.VERSION_CODES.LOLLIPOP);
+
+    assertTrue(theMapboxTelemetry.optLocationIn());
+  }
+
   private MapboxTelemetry obtainMapboxTelemetry() {
     MapboxTelemetry.applicationContext = obtainNetworkConnectedMockedContext();
     String aValidAccessToken = "validAccessToken";
@@ -741,6 +749,10 @@ public class MapboxTelemetryTest {
     ActivityManager.RunningTaskInfo mockedRunningTaskInfo = mock(ActivityManager.RunningTaskInfo.class);
     List mockedTaskInfo = new ArrayList(Arrays.asList(mockedRunningTaskInfo));
     when(mockedActivityManager.getRunningTasks(1)).thenReturn(mockedTaskInfo);
+
+    ActivityManager.RunningAppProcessInfo mockedRunningAppProcessInfo = mock(ActivityManager.RunningAppProcessInfo.class);
+    List mockedRunningProcesses = new ArrayList(Arrays.asList(mockedRunningAppProcessInfo));
+    when(mockedActivityManager.getRunningAppProcesses()).thenReturn(mockedRunningProcesses);
 
     MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext);
 
