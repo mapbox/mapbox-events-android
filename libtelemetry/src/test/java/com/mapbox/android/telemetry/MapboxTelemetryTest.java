@@ -4,6 +4,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -500,6 +501,14 @@ public class MapboxTelemetryTest {
   @Test
   public void checksIsAppInBackground() throws Exception {
     MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryForForeground();
+
+    assertFalse(theMapboxTelemetry.isAppInForeground());
+  }
+
+  @Test
+  public void checksIsAppInBackgroundLollipop() throws Exception {
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryForForeground();
+    theMapboxTelemetry.setBuildVersion(Build.VERSION_CODES.LOLLIPOP);
 
     assertFalse(theMapboxTelemetry.isAppInForeground());
   }

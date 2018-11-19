@@ -11,7 +11,7 @@ class ForegroundBackoff {
     this.mapboxTelemetry = mapboxTelemetry;
   }
 
-  void start() {
+  Thread start() {
     Thread thread = new Thread() {
       @Override
       public void run() {
@@ -26,5 +26,7 @@ class ForegroundBackoff {
     };
 
     thread.start();
+
+    return thread;
   }
 }

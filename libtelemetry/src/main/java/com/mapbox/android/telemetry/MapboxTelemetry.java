@@ -10,6 +10,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.IBinder;
+import android.support.annotation.VisibleForTesting;
 
 import com.mapbox.android.core.permissions.PermissionsManager;
 
@@ -62,6 +63,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private CopyOnWriteArraySet<TelemetryListener> telemetryListeners = null;
   private CertificateBlacklist certificateBlacklist;
   private CopyOnWriteArraySet<AttachmentListener> attachmentListeners = null;
+  private int buildVersion = 0;
   static Context applicationContext = null;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
@@ -192,6 +194,11 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   public boolean removeAttachmentListener(AttachmentListener listener) {
     return attachmentListeners.remove(listener);
+  }
+
+  @VisibleForTesting
+  void setBuildVersion(int buildVersion) {
+    this.buildVersion = buildVersion;
   }
 
   boolean optLocationIn() {
@@ -634,6 +641,10 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   private boolean isLollipopOrHigher() {
+    if (buildVersion != 0) {
+      return buildVersion >= Build.VERSION_CODES.LOLLIPOP;
+    }
+
     return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
   }
 
