@@ -92,6 +92,7 @@ class TelemetryClient {
 
     Request request = new Request.Builder()
       .url(requestUrl)
+      .header(USER_AGENT_REQUEST_HEADER, userAgent)
       .post(requestBody)
       .build();
 
