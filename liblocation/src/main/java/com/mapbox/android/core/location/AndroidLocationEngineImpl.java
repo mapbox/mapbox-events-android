@@ -35,7 +35,7 @@ class AndroidLocationEngineImpl implements LocationEngineImpl<LocationListener> 
 
   @Override
   public void getLastLocation(@NonNull LocationEngineCallback<LocationEngineResult> callback)
-          throws SecurityException {
+    throws SecurityException {
     Location lastLocation = getLastLocationFor(currentProvider);
     if (lastLocation != null) {
       callback.onSuccess(LocationEngineResult.create(lastLocation));
@@ -67,28 +67,18 @@ class AndroidLocationEngineImpl implements LocationEngineImpl<LocationListener> 
                                      @NonNull LocationListener listener,
                                      @Nullable Looper looper) throws SecurityException {
     // Pick best provider only if user has not explicitly chosen passive mode
-    if (request.getPriority() != LocationEngineRequest.PRIORITY_NO_POWER) {
-      String provider = locationManager.getBestProvider(getCriteria(request.getPriority()), true);
-
-      if (provider != null) {
-        currentProvider = provider;
-      }
-    }
-
+    currentProvider = getBestProvider(request.getPriority());
     locationManager.requestLocationUpdates(currentProvider, request.getInterval(), request.getDisplacemnt(),
-            listener, looper);
+      listener, looper);
   }
 
   @Override
   public void requestLocationUpdates(@NonNull LocationEngineRequest request,
                                      @NonNull PendingIntent pendingIntent) throws SecurityException {
     // Pick best provider only if user has not explicitly chosen passive mode
-    if (request.getPriority() != LocationEngineRequest.PRIORITY_NO_POWER) {
-      currentProvider = locationManager.getBestProvider(getCriteria(request.getPriority()), true);
-    }
-
+    currentProvider = getBestProvider(request.getPriority());
     locationManager.requestLocationUpdates(currentProvider, request.getInterval(),
-            request.getDisplacemnt(), pendingIntent);
+      request.getDisplacemnt(), pendingIntent);
   }
 
   @Override
@@ -103,6 +93,15 @@ class AndroidLocationEngineImpl implements LocationEngineImpl<LocationListener> 
     if (pendingIntent != null) {
       locationManager.removeUpdates(pendingIntent);
     }
+  }
+
+  private String getBestProvider(int priority) {
+    String provider = null;
+    // Pick best provider only if user has not explicitly chosen passive mode
+    if (priority != LocationEngineRequest.PRIORITY_NO_POWER) {
+      provider = locationManager.getBestProvider(getCriteria(priority), true);
+    }
+    return provider != null ? provider : LocationManager.PASSIVE_PROVIDER;
   }
 
   @VisibleForTesting
