@@ -153,7 +153,9 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   public void updateUserAgent(String userAgent) {
-    telemetryClient.updateUserAgent(TelemetryUtils.createFullUserAgent(userAgent, applicationContext));
+    if (isUserAgentValid(userAgent)) {
+      telemetryClient.updateUserAgent(TelemetryUtils.createFullUserAgent(userAgent, applicationContext));
+    }
   }
 
   public boolean updateAccessToken(String accessToken) {
