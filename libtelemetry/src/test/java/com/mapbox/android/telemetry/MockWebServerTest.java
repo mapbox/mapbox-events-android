@@ -168,7 +168,7 @@ class MockWebServerTest {
     return result;
   }
 
-  private TelemetryClientSettings provideDefaultTelemetryClientSettings() {
+  TelemetryClientSettings provideDefaultTelemetryClientSettings() {
     HttpUrl localUrl = obtainBaseEndpointUrl();
     SslClient sslClient = SslClient.localhost();
 
