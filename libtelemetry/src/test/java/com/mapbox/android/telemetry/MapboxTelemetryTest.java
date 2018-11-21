@@ -376,19 +376,6 @@ public class MapboxTelemetryTest {
   }
 
   @Test
-  public void checksInvalidUserAgent() throws Exception {
-    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
-    String aValidAccessToken = "validAccessToken";
-    String aInvalidUserAgent = "invalidUserAgent";
-    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext, aValidAccessToken, aInvalidUserAgent);
-    theMapboxTelemetry.enable();
-
-    boolean validRequiredParameters = theMapboxTelemetry.checkRequiredParameters(aValidAccessToken, aInvalidUserAgent);
-
-    assertFalse(validRequiredParameters);
-  }
-
-  @Test
   public void checksNullUserAgent() throws Exception {
     Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     MapboxTelemetry.applicationContext = mockedContext;
