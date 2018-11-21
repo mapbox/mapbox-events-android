@@ -9,6 +9,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -213,7 +214,7 @@ public class TelemetryClientTest extends MockWebServerTest {
   }
 
   @Test
-  public void checksDebugLoggingEnabled() throws Exception {
+  public void checksDebugLoggingEnabledBatch() throws Exception {
     Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     MapboxTelemetry.applicationContext = mockedContext;
     TelemetryClientSettings clientSettings = provideDefaultTelemetryClientSettings();
@@ -229,7 +230,28 @@ public class TelemetryClientTest extends MockWebServerTest {
 
     verify(mockedLogger, times(1))
       .debug(eq("TelemetryClient"), contains(" with 1 event(s) (user agent: anyUserAgent) with payload:"));
+  }
 
+  @Test
+  public void checksDebugLoggingEnabledAttachment() throws Exception {
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    MapboxTelemetry.applicationContext = mockedContext;
+    TelemetryClientSettings clientSettings = provideDefaultTelemetryClientSettings();
+    Logger mockedLogger = mock(Logger.class);
+
+    TelemetryClient telemetryClient = new TelemetryClient("anyAccessToken", "anyUserAgent", clientSettings,
+      mockedLogger, mock(CertificateBlacklist.class));
+    telemetryClient.updateDebugLoggingEnabled(true);
+
+    AttachmentListener attachmentListener = mock(AttachmentListener.class);
+    CopyOnWriteArraySet<AttachmentListener> attachmentListeners = new CopyOnWriteArraySet<>();
+    attachmentListeners.add(attachmentListener);
+
+    saveFile(mockedContext, "test");
+    telemetryClient.sendAttachment(createAttachment("test"), attachmentListeners);
+
+    verify(mockedLogger, times(1))
+      .debug(eq("TelemetryClient"), contains(" with 1 event(s) (user agent: anyUserAgent) with payload:"));
   }
 
   private Callback provideACallback(final CountDownLatch latch, final AtomicReference<String> bodyRef,
