@@ -131,7 +131,7 @@ class GoogleLocationEngineImpl implements LocationEngineImpl<LocationCallback> {
     @Override
     public void onSuccess(Location location) {
       callback.onSuccess(location != null ? LocationEngineResult.create(location) :
-        LocationEngineResult.create(Collections.EMPTY_LIST));
+        LocationEngineResult.create(Collections.<Location>emptyList()));
     }
 
     @Override

@@ -27,7 +27,7 @@ class MapboxFusedLocationEngineImpl extends AndroidLocationEngineImpl {
 
   @NonNull
   @Override
-  public LocationListener createListener(final LocationEngineCallback<LocationEngineResult> callback) {
+  public LocationListener createListener(LocationEngineCallback<LocationEngineResult> callback) {
     return new MapboxLocationEngineCallbackTransport(callback);
   }
 

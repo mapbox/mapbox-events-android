@@ -28,7 +28,20 @@ public final class LocationEngineProvider {
    * @since 1.0.0
    */
   @NonNull
+  @Deprecated
   public static LocationEngine getBestLocationEngine(@NonNull Context context, boolean background) {
+    return getBestLocationEngine(context);
+  }
+
+  /**
+   * Returns instance to the best location engine, given the included libraries.
+   *
+   * @param context    {@link Context}.
+   * @return a unique instance of {@link LocationEngine} every time method is called.
+   * @since 1.1.0
+   */
+  @NonNull
+  public static LocationEngine getBestLocationEngine(@NonNull Context context) {
     checkNotNull(context, "context == null");
 
     boolean hasGoogleLocationServices = isOnClasspath(GOOGLE_LOCATION_SERVICES);

@@ -22,7 +22,6 @@ import static com.mapbox.android.core.location.Utils.isOnClasspath;
  */
 public final class LocationEngineResult {
   private static final String GOOGLE_PLAY_LOCATION_RESULT = "com.google.android.gms.location.LocationResult";
-  private static final String GOOGLE_API_AVAILABILITY = "com.google.android.gms.common.GoogleApiAvailability";
 
   private final List<Location> locations;
 
