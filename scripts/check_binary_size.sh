@@ -6,6 +6,7 @@ set -o pipefail
 file_path="libtelemetry/build/outputs/aar/libtelemetry-release.aar"
 file_size=$(wc -c <"$file_path" | sed -e 's/^[[:space:]]*//')
 label="Telemetry AAR"
+scripts_path="scripts"
 
 # Publish to github
 "$scripts_path"/publish_to_sizechecker.js "$file_size" "$label"
@@ -14,7 +15,6 @@ if [[ $CIRCLE_BRANCH == master ]] || [[ $CIRCLE_BRANCH == release-* ]]; then
   date=`date '+%Y-%m-%d'`
   utc_iso_date=`date -u +'%Y-%m-%dT%H:%M:%SZ'`
   source="mobile.binarysize"
-  scripts_path="scripts"
   json_name="$scripts_path/android-binarysize.json"
   json_gz="$scripts_path/android-binarysize.json.gz"
 
