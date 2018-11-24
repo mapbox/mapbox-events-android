@@ -20,11 +20,8 @@ import static junit.framework.Assert.assertTrue;
 public class LocationEngineInstrumentedTest {
   private static final long INTERVAL = 1000L;
 
-  private static LocationEngine[] foregroundLocationEngines = {getAndroidEngine(false),
-          getGoogleEngine(false), getMapboxEngine(false)};
-
-  private static LocationEngine[] backgroundLocationEngines = {getAndroidEngine(true),
-          getGoogleEngine(true), getMapboxEngine(true)};
+  private static LocationEngine[] foregroundLocationEngines = { getAndroidEngine(),
+    getGoogleEngine(), getMapboxEngine()};
 
   @Rule
   public GrantPermissionRule permissionRule =
@@ -60,43 +57,23 @@ public class LocationEngineInstrumentedTest {
     }
   }
 
-  @Test
-  public void requestAndRemoveBackgroundLocationUpdates() throws Exception {
-    for (LocationEngine engine : backgroundLocationEngines) {
-      final CountDownLatch latch = new CountDownLatch(1);
-      final AtomicReference<LocationEngineResult> resultRef = new AtomicReference<>();
-      LocationEngineCallback<LocationEngineResult> callback = getCallback(resultRef, latch);
-
-
-      engine.requestLocationUpdates(getRequest(INTERVAL), callback, null);
-      assertTrue(latch.await(5, SECONDS));
-
-      LocationEngineResult result = resultRef.get();
-      assertNotNull(result.getLastLocation());
-      engine.removeLocationUpdates(callback);
-    }
+  private static LocationEngine getMapboxEngine() {
+    Context context = InstrumentationRegistry.getTargetContext();
+    return getEngine(new MapboxFusedLocationEngineImpl(context));
   }
 
-  private static LocationEngine getMapboxEngine(boolean supportBackground) {
+  private static LocationEngine getAndroidEngine() {
     Context context = InstrumentationRegistry.getTargetContext();
-    return getEngine(supportBackground, new MapboxFusedLocationEngineImpl(context));
+    return getEngine(new AndroidLocationEngineImpl(context));
   }
 
-  private static LocationEngine getAndroidEngine(boolean supportBackground) {
+  private static LocationEngine getGoogleEngine() {
     Context context = InstrumentationRegistry.getTargetContext();
-    return getEngine(supportBackground, new AndroidLocationEngineImpl(context));
+    return getEngine(new GoogleLocationEngineImpl(context));
   }
 
-  private static LocationEngine getGoogleEngine(boolean supportBackground) {
-    Context context = InstrumentationRegistry.getTargetContext();
-    return getEngine(supportBackground, new GoogleLocationEngineImpl(context));
-  }
-
-  private static LocationEngine getEngine(boolean supportBackground, LocationEngineImpl implementation) {
-    Context context = InstrumentationRegistry.getTargetContext();
-    return supportBackground ? new BackgroundLocationEngine(implementation,
-            new LocationUpdatesBroadcastReceiverProxy(context)) :
-            new ForegroundLocationEngine(implementation);
+  private static LocationEngine getEngine(LocationEngineImpl implementation) {
+    return new LocationEngineProxy<>(implementation);
   }
 
   private static LocationEngineRequest getRequest(long interval) {
