@@ -90,8 +90,14 @@ class TelemetryClient {
       .addQueryParameter(ACCESS_TOKEN_QUERY_PARAMETER, accessToken)
       .build();
 
+    if (isExtraDebuggingNeeded()) {
+      logger.debug(LOG_TAG, String.format(Locale.US, EXTRA_DEBUGGING_LOG, requestUrl, visionAttachments.size(),
+        userAgent, metadataList));
+    }
+
     Request request = new Request.Builder()
       .url(requestUrl)
+      .header(USER_AGENT_REQUEST_HEADER, userAgent)
       .post(requestBody)
       .build();
 

@@ -30,22 +30,6 @@ import okhttp3.ResponseBody;
 
 public class MapboxTelemetry implements FullQueueCallback, EventCallback, ServiceTaskCallback,
   LifecycleObserver {
-  private static final String EVENTS_USER_AGENT = "MapboxEventsAndroid/";
-  private static final String TELEMETRY_USER_AGENT = "MapboxTelemetryAndroid/";
-  private static final String UNITY_USER_AGENT = "MapboxEventsUnityAndroid/";
-  private static final String NAVIGATION_USER_AGENT = "mapbox-navigation-android/";
-  private static final String NAVIGATION_UI_USER_AGENT = "mapbox-navigation-ui-android/";
-  private static final String MAPS_USER_AGENT = "mapbox-maps-android/";
-  private static final List<String> VALID_USER_AGENTS = new ArrayList<String>() {
-    {
-      add(EVENTS_USER_AGENT);
-      add(TELEMETRY_USER_AGENT);
-      add(UNITY_USER_AGENT);
-      add(NAVIGATION_USER_AGENT);
-      add(NAVIGATION_UI_USER_AGENT);
-      add(MAPS_USER_AGENT);
-    }
-  };
   private static final String NON_NULL_APPLICATION_CONTEXT_REQUIRED = "Non-null application context required.";
   private static final int NO_FLAGS = 0;
   private String accessToken;
@@ -294,12 +278,8 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   private boolean isUserAgentValid(String userAgent) {
     if (!TelemetryUtils.isEmpty(userAgent)) {
-      for (String userAgentPrefix : VALID_USER_AGENTS) {
-        if (userAgent.startsWith(userAgentPrefix)) {
-          this.userAgent = userAgent;
-          return true;
-        }
-      }
+      this.userAgent = userAgent;
+      return true;
     }
     return false;
   }
