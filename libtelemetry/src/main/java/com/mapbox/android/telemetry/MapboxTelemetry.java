@@ -547,7 +547,8 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   private void checkBlacklist(Context context, String accessToken) {
-    certificateBlacklist = new CertificateBlacklist(context, accessToken);
+    String fullUserAgent = TelemetryUtils.createFullUserAgent(userAgent, applicationContext);
+    certificateBlacklist = new CertificateBlacklist(context, accessToken, fullUserAgent);
 
     if (certificateBlacklist.daySinceLastUpdate()) {
       certificateBlacklist.updateBlacklist();

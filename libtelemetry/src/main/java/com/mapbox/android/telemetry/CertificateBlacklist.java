@@ -52,6 +52,7 @@ class CertificateBlacklist implements Callback {
   private static final String REQUEST_FAIL = "Request failed to download blacklist";
   private static final String READLINE_FAIL = "Unable to read line of Blacklist file";
   private static final String HTTPS_SCHEME = "https";
+  private static final String USER_AGENT_REQUEST_HEADER = "User-Agent";
   private static final Map<Environment, String> ENDPOINTS = new HashMap<Environment, String>() {
     {
       put(Environment.COM, COM_CONFIG_ENDPOINT);
@@ -61,11 +62,13 @@ class CertificateBlacklist implements Callback {
   };
   private final Context context;
   private final String accessToken;
+  private String userAgent;
   private Logger logger;
 
-  CertificateBlacklist(Context context, String accessToken) {
+  CertificateBlacklist(Context context, String accessToken, String userAgent) {
     this.context = context;
     this.accessToken = accessToken;
+    this.userAgent = userAgent;
     this.logger = new Logger();
   }
 
@@ -121,6 +124,7 @@ class CertificateBlacklist implements Callback {
 
     Request request = new Request.Builder()
       .url(requestUrl)
+      .header(USER_AGENT_REQUEST_HEADER, userAgent)
       .build();
 
     OkHttpClient client = new OkHttpClient();
