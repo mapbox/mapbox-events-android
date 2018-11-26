@@ -27,6 +27,21 @@ final class Utils {
   }
 
   /**
+   * Checks if class is on class path
+   * @param className of the class to check.
+   * @return true if class in on class path, false otherwise.
+   */
+  static boolean isOnClasspath(String className) {
+    boolean isOnClassPath = true;
+    try {
+      Class.forName(className);
+    } catch (ClassNotFoundException exception) {
+      isOnClassPath = false;
+    }
+    return isOnClassPath;
+  }
+
+  /**
    * Determines whether one Location reading is better than the current Location fix
    * <p>
    * (c) https://developer.android.com/guide/topics/location/strategies

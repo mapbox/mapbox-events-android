@@ -2,7 +2,6 @@ package com.mapbox.android.core.location;
 
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -18,8 +17,7 @@ import android.util.Log;
  * A location engine that uses core android.location and has no external dependencies
  * https://developer.android.com/guide/topics/location/strategies.html
  */
-class AndroidLocationEngineImpl extends AbstractLocationEngineImpl<LocationListener>
-        implements LocationEngineImpl<LocationListener> {
+class AndroidLocationEngineImpl implements LocationEngineImpl<LocationListener> {
   private static final String TAG = "AndroidLocationEngine";
   final LocationManager locationManager;
 
@@ -31,53 +29,13 @@ class AndroidLocationEngineImpl extends AbstractLocationEngineImpl<LocationListe
 
   @NonNull
   @Override
-  LocationListener createListener(final LocationEngineCallback<LocationEngineResult> callback) {
-    return new LocationListener() {
-      @Override
-      public void onLocationChanged(Location location) {
-        callback.onSuccess(LocationEngineResult.create(location));
-      }
-
-      @Override
-      public void onStatusChanged(String s, int i, Bundle bundle) {
-        // noop
-      }
-
-      @Override
-      public void onProviderEnabled(String s) {
-        // noop
-      }
-
-      @Override
-      public void onProviderDisabled(String s) {
-        callback.onFailure(new Exception("Current provider disabled"));
-      }
-    };
-  }
-
-  @NonNull
-  @Override
-  public LocationListener setLocationListener(@NonNull LocationEngineCallback<LocationEngineResult> callback) {
-    return mapLocationListener(callback);
-  }
-
-  @Nullable
-  @Override
-  public LocationListener removeLocationListener(@NonNull LocationEngineCallback<LocationEngineResult> callback) {
-    return unmapLocationListener(callback);
-  }
-
-  @Nullable
-  @Override
-  public LocationEngineResult extractResult(Intent intent) {
-    return !hasResult(intent) ? null :
-            LocationEngineResult.create((Location) intent.getExtras()
-                    .getParcelable(LocationManager.KEY_LOCATION_CHANGED));
+  public LocationListener createListener(LocationEngineCallback<LocationEngineResult> callback) {
+    return new AndroidLocationEngineCallbackTransport(callback);
   }
 
   @Override
   public void getLastLocation(@NonNull LocationEngineCallback<LocationEngineResult> callback)
-          throws SecurityException {
+    throws SecurityException {
     Location lastLocation = getLastLocationFor(currentProvider);
     if (lastLocation != null) {
       callback.onSuccess(LocationEngineResult.create(lastLocation));
@@ -109,28 +67,18 @@ class AndroidLocationEngineImpl extends AbstractLocationEngineImpl<LocationListe
                                      @NonNull LocationListener listener,
                                      @Nullable Looper looper) throws SecurityException {
     // Pick best provider only if user has not explicitly chosen passive mode
-    if (request.getPriority() != LocationEngineRequest.PRIORITY_NO_POWER) {
-      String provider = locationManager.getBestProvider(getCriteria(request.getPriority()), true);
-
-      if (provider != null) {
-        currentProvider = provider;
-      }
-    }
-
+    currentProvider = getBestProvider(request.getPriority());
     locationManager.requestLocationUpdates(currentProvider, request.getInterval(), request.getDisplacemnt(),
-            listener, looper);
+      listener, looper);
   }
 
   @Override
   public void requestLocationUpdates(@NonNull LocationEngineRequest request,
                                      @NonNull PendingIntent pendingIntent) throws SecurityException {
     // Pick best provider only if user has not explicitly chosen passive mode
-    if (request.getPriority() != LocationEngineRequest.PRIORITY_NO_POWER) {
-      currentProvider = locationManager.getBestProvider(getCriteria(request.getPriority()), true);
-    }
-
+    currentProvider = getBestProvider(request.getPriority());
     locationManager.requestLocationUpdates(currentProvider, request.getInterval(),
-            request.getDisplacemnt(), pendingIntent);
+      request.getDisplacemnt(), pendingIntent);
   }
 
   @Override
@@ -141,16 +89,19 @@ class AndroidLocationEngineImpl extends AbstractLocationEngineImpl<LocationListe
   }
 
   @Override
-  public void removeLocationUpdates(@NonNull PendingIntent pendingIntent) {
+  public void removeLocationUpdates(PendingIntent pendingIntent) {
     if (pendingIntent != null) {
       locationManager.removeUpdates(pendingIntent);
     }
   }
 
-  @VisibleForTesting
-  @Override
-  public int getListenersCount() {
-    return registeredListeners();
+  private String getBestProvider(int priority) {
+    String provider = null;
+    // Pick best provider only if user has not explicitly chosen passive mode
+    if (priority != LocationEngineRequest.PRIORITY_NO_POWER) {
+      provider = locationManager.getBestProvider(getCriteria(priority), true);
+    }
+    return provider != null ? provider : LocationManager.PASSIVE_PROVIDER;
   }
 
   @VisibleForTesting
@@ -187,7 +138,32 @@ class AndroidLocationEngineImpl extends AbstractLocationEngineImpl<LocationListe
     }
   }
 
-  private static boolean hasResult(Intent intent) {
-    return intent != null && intent.hasExtra(LocationManager.KEY_LOCATION_CHANGED);
+  @VisibleForTesting
+  static final class AndroidLocationEngineCallbackTransport implements LocationListener {
+    private final LocationEngineCallback<LocationEngineResult> callback;
+
+    AndroidLocationEngineCallbackTransport(LocationEngineCallback<LocationEngineResult> callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+      callback.onSuccess(LocationEngineResult.create(location));
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+      // noop
+    }
+
+    @Override
+    public void onProviderEnabled(String s) {
+      // noop
+    }
+
+    @Override
+    public void onProviderDisabled(String s) {
+      callback.onFailure(new Exception("Current provider disabled"));
+    }
   }
 }

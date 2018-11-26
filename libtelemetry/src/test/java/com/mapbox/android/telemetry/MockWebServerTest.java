@@ -1,6 +1,9 @@
 package com.mapbox.android.telemetry;
 
 
+import android.content.Context;
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -10,6 +13,7 @@ import org.junit.Before;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.util.Arrays;
 import java.util.List;
@@ -18,11 +22,12 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
 
 import okhttp3.HttpUrl;
-import okhttp3.mockwebserver.internal.tls.SslClient;
+import okhttp3.MediaType;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import okhttp3.mockwebserver.SocketPolicy;
+import okhttp3.mockwebserver.internal.tls.SslClient;
 import okio.Buffer;
 import okio.GzipSource;
 
@@ -168,7 +173,7 @@ class MockWebServerTest {
     return result;
   }
 
-  private TelemetryClientSettings provideDefaultTelemetryClientSettings() {
+  TelemetryClientSettings provideDefaultTelemetryClientSettings() {
     HttpUrl localUrl = obtainBaseEndpointUrl();
     SslClient sslClient = SslClient.localhost();
 
@@ -183,5 +188,33 @@ class MockWebServerTest {
         }
       })
       .build();
+  }
+
+  Attachment createAttachment(String filepath) {
+    String testFilePath = filepath;
+    AttachmentMetadata attachmentMetadata = new AttachmentMetadata("test.jpg", "eventId", "jpg",
+      "image", "sessionId-test");
+
+    VisionEventFactory visionEventFactory = new VisionEventFactory();
+
+    FileAttachment visionsAttachment = visionEventFactory.createFileAttachment(testFilePath,
+      MediaType.parse("image/jpg"), attachmentMetadata);
+
+    Attachment attachment = visionEventFactory.createAttachment(Event.Type.VIS_ATTACHMENT);
+    attachment.addAttachment(visionsAttachment);
+
+    return attachment;
+  }
+
+  void saveFile(Context context, String data) throws IOException {
+
+    try {
+      OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("config.txt",
+        Context.MODE_PRIVATE));
+      outputStreamWriter.write(data);
+      outputStreamWriter.close();
+    } catch (IOException exception) {
+      Log.e("Exception", "File write failed: " + exception.toString());
+    }
   }
 }

@@ -2,18 +2,18 @@ package com.mapbox.android.core.location;
 
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.location.Location;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationRequest;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
@@ -23,66 +23,30 @@ import java.util.List;
 /**
  * Wraps implementation of Fused Location Provider
  */
-class GoogleLocationEngineImpl extends AbstractLocationEngineImpl<LocationCallback>
-        implements LocationEngineImpl<LocationCallback> {
+class GoogleLocationEngineImpl implements LocationEngineImpl<LocationCallback> {
   private final FusedLocationProviderClient fusedLocationProviderClient;
 
+  @VisibleForTesting
+  GoogleLocationEngineImpl(FusedLocationProviderClient fusedLocationProviderClient) {
+    this.fusedLocationProviderClient = fusedLocationProviderClient;
+  }
+
   GoogleLocationEngineImpl(@NonNull Context context) {
-    fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
+    this.fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
   }
 
   @NonNull
   @Override
-  LocationCallback createListener(final LocationEngineCallback<LocationEngineResult> callback) {
-    return new LocationCallback() {
-      @Override
-      public void onLocationResult(LocationResult locationResult) {
-        super.onLocationResult(locationResult);
-
-        List<Location> locations = locationResult.getLocations();
-        if (!locations.isEmpty()) {
-          callback.onSuccess(LocationEngineResult.create(locations));
-        } else {
-          callback.onFailure(new Exception("Unavailable location"));
-        }
-      }
-    };
-  }
-
-  @NonNull
-  @Override
-  public LocationCallback setLocationListener(@NonNull LocationEngineCallback<LocationEngineResult> callback) {
-    return mapLocationListener(callback);
-  }
-
-  @Nullable
-  @Override
-  public LocationCallback removeLocationListener(@NonNull LocationEngineCallback<LocationEngineResult> callback) {
-    return unmapLocationListener(callback);
-  }
-
-  @Nullable
-  @Override
-  public LocationEngineResult extractResult(Intent intent) {
-    LocationResult result = LocationResult.extractResult(intent);
-    return result != null ? LocationEngineResult.create(result.getLocations()) : null;
+  public LocationCallback createListener(LocationEngineCallback<LocationEngineResult> callback) {
+    return new GoogleLocationEngineCallbackTransport(callback);
   }
 
   @Override
-  public void getLastLocation(@NonNull final LocationEngineCallback<LocationEngineResult> callback)
-          throws SecurityException {
-    fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
-      @Override
-      public void onSuccess(Location location) {
-        callback.onSuccess(location != null ? LocationEngineResult.create(location) :
-                LocationEngineResult.create(Collections.EMPTY_LIST));
-      }
-    }).addOnFailureListener(new OnFailureListener() {
-      @Override
-      public void onFailure(@NonNull Exception e) {
-        callback.onFailure(e);
-      }
-    });
+  public void getLastLocation(@NonNull LocationEngineCallback<LocationEngineResult> callback)
+    throws SecurityException {
+    GoogleLastLocationEngineCallbackTransport transport =
+      new GoogleLastLocationEngineCallbackTransport(callback);
+    fusedLocationProviderClient.getLastLocation().addOnSuccessListener(transport).addOnFailureListener(transport);
   }
 
   @Override
@@ -106,16 +70,10 @@ class GoogleLocationEngineImpl extends AbstractLocationEngineImpl<LocationCallba
   }
 
   @Override
-  public void removeLocationUpdates(@NonNull PendingIntent pendingIntent) {
+  public void removeLocationUpdates(PendingIntent pendingIntent) {
     if (pendingIntent != null) {
       fusedLocationProviderClient.removeLocationUpdates(pendingIntent);
     }
-  }
-
-  @VisibleForTesting
-  @Override
-  public int getListenersCount() {
-    return registeredListeners();
   }
 
   private static LocationRequest toGMSLocationRequest(LocationEngineRequest request) {
@@ -139,6 +97,46 @@ class GoogleLocationEngineImpl extends AbstractLocationEngineImpl<LocationCallba
       case LocationEngineRequest.PRIORITY_NO_POWER:
       default:
         return LocationRequest.PRIORITY_NO_POWER;
+    }
+  }
+
+  private static final class GoogleLocationEngineCallbackTransport extends LocationCallback {
+    private final LocationEngineCallback<LocationEngineResult> callback;
+
+    GoogleLocationEngineCallbackTransport(LocationEngineCallback<LocationEngineResult> callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onLocationResult(LocationResult locationResult) {
+      super.onLocationResult(locationResult);
+      List<Location> locations = locationResult.getLocations();
+      if (!locations.isEmpty()) {
+        callback.onSuccess(LocationEngineResult.create(locations));
+      } else {
+        callback.onFailure(new Exception("Unavailable location"));
+      }
+    }
+  }
+
+  @VisibleForTesting
+  static final class GoogleLastLocationEngineCallbackTransport
+    implements OnSuccessListener<Location>, OnFailureListener {
+    private final LocationEngineCallback<LocationEngineResult> callback;
+
+    GoogleLastLocationEngineCallbackTransport(LocationEngineCallback<LocationEngineResult> callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Location location) {
+      callback.onSuccess(location != null ? LocationEngineResult.create(location) :
+        LocationEngineResult.create(Collections.<Location>emptyList()));
+    }
+
+    @Override
+    public void onFailure(@NonNull Exception e) {
+      callback.onFailure(e);
     }
   }
 }
