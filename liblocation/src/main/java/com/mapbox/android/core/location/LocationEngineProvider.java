@@ -2,11 +2,11 @@ package com.mapbox.android.core.location;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
 import static com.mapbox.android.core.location.Utils.checkNotNull;
+import static com.mapbox.android.core.location.Utils.isOnClasspath;
 
 /**
  * The main entry point for location engine integration.
@@ -23,43 +23,38 @@ public final class LocationEngineProvider {
    * Returns instance to the best location engine, given the included libraries.
    *
    * @param context    {@link Context}.
-   * @param background true if background optimized engine is desired.
+   * @param background true if background optimized engine is desired (note: parameter deprecated)
    * @return a unique instance of {@link LocationEngine} every time method is called.
    * @since 1.0.0
    */
   @NonNull
+  @Deprecated
   public static LocationEngine getBestLocationEngine(@NonNull Context context, boolean background) {
+    return getBestLocationEngine(context);
+  }
+
+  /**
+   * Returns instance to the best location engine, given the included libraries.
+   *
+   * @param context    {@link Context}.
+   * @return a unique instance of {@link LocationEngine} every time method is called.
+   * @since 1.1.0
+   */
+  @NonNull
+  public static LocationEngine getBestLocationEngine(@NonNull Context context) {
     checkNotNull(context, "context == null");
 
     boolean hasGoogleLocationServices = isOnClasspath(GOOGLE_LOCATION_SERVICES);
     if (isOnClasspath(GOOGLE_API_AVAILABILITY)) {
       // Check Google Play services APK is available and up-to-date on this device
       hasGoogleLocationServices &= GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context)
-              == ConnectionResult.SUCCESS;
+        == ConnectionResult.SUCCESS;
     }
-
-    return getLocationEngine(context, hasGoogleLocationServices, background);
+    return getLocationEngine(context, hasGoogleLocationServices);
   }
 
-  private static LocationEngine getLocationEngine(Context context, boolean isGoogle, boolean background) {
-    return background ? new BackgroundLocationEngine(getEngineImplementation(context, isGoogle),
-            new LocationUpdatesBroadcastReceiverProxy(context)) :
-            new ForegroundLocationEngine(getEngineImplementation(context, isGoogle));
-  }
-
-  private static LocationEngineImpl getEngineImplementation(Context context, boolean hasGoogleLocationServices) {
-    return hasGoogleLocationServices ? new GoogleLocationEngineImpl(context.getApplicationContext()) :
-            new MapboxFusedLocationEngineImpl(context.getApplicationContext());
-  }
-
-  private static boolean isOnClasspath(String className) {
-    boolean isOnClassPath = true;
-    try {
-      Class.forName(className);
-    } catch (ClassNotFoundException exception) {
-      Log.w("LocationEngineProvider", "Missing " + className);
-      isOnClassPath = false;
-    }
-    return isOnClassPath;
+  private static LocationEngine getLocationEngine(Context context, boolean isGoogle) {
+    return isGoogle ? new LocationEngineProxy<>(new GoogleLocationEngineImpl(context.getApplicationContext())) :
+      new LocationEngineProxy<>(new MapboxFusedLocationEngineImpl(context.getApplicationContext()));
   }
 }

@@ -1,13 +1,17 @@
 package com.mapbox.android.core.location;
 
+import android.content.Intent;
 import android.location.Location;
+import android.location.LocationManager;
 import android.support.annotation.Nullable;
+import com.google.android.gms.location.LocationResult;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static com.mapbox.android.core.location.Utils.checkNotNull;
+import static com.mapbox.android.core.location.Utils.isOnClasspath;
 
 /**
  * A wrapper class representing location result from the location engine.
@@ -17,6 +21,8 @@ import static com.mapbox.android.core.location.Utils.checkNotNull;
  * @since 1.0.0
  */
 public final class LocationEngineResult {
+  private static final String GOOGLE_PLAY_LOCATION_RESULT = "com.google.android.gms.location.LocationResult";
+
   private final List<Location> locations;
 
   private LocationEngineResult(List<Location> locations) {
@@ -68,5 +74,36 @@ public final class LocationEngineResult {
    */
   public List<Location> getLocations() {
     return Collections.unmodifiableList(locations);
+  }
+
+  /**
+   * Extracts location result from intent object
+   *
+   * @param intent valid intent object
+   * @return location result.
+   * @since 1.1.0
+   */
+  @Nullable
+  public static LocationEngineResult extractResult(Intent intent) {
+    LocationEngineResult result = null;
+    if (isOnClasspath(GOOGLE_PLAY_LOCATION_RESULT)) {
+      result = extractGooglePlayResult(intent);
+    }
+    return result == null ? extractAndroidResult(intent) : result;
+  }
+
+  private static LocationEngineResult extractGooglePlayResult(Intent intent) {
+    LocationResult result = LocationResult.extractResult(intent);
+    return result != null ? LocationEngineResult.create(result.getLocations()) : null;
+  }
+
+  private static LocationEngineResult extractAndroidResult(Intent intent) {
+    return !hasResult(intent) ? null :
+      LocationEngineResult.create((Location) intent.getExtras()
+        .getParcelable(LocationManager.KEY_LOCATION_CHANGED));
+  }
+
+  private static boolean hasResult(Intent intent) {
+    return intent != null && intent.hasExtra(LocationManager.KEY_LOCATION_CHANGED);
   }
 }
