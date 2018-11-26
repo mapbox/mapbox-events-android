@@ -499,21 +499,6 @@ public class MapboxTelemetryTest {
   }
 
   @Test
-  public void checksIsAppInBackground() throws Exception {
-    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryForForeground();
-
-    assertFalse(theMapboxTelemetry.isAppInForeground());
-  }
-
-  @Test
-  public void checksIsAppInBackgroundLollipop() throws Exception {
-    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryForForeground();
-    theMapboxTelemetry.setBuildVersion(Build.VERSION_CODES.LOLLIPOP);
-
-    assertFalse(theMapboxTelemetry.isAppInForeground());
-  }
-
-  @Test
   public void checksIsAppInBackgroundOptLocationIn() throws Exception {
     MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryForForeground();
     theMapboxTelemetry.setBuildVersion(Build.VERSION_CODES.LOLLIPOP);

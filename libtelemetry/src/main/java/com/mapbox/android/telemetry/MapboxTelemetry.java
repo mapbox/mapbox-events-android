@@ -43,6 +43,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     }
   };
   private static final String NON_NULL_APPLICATION_CONTEXT_REQUIRED = "Non-null application context required.";
+  private static final String START_SERVICE_FAIL = "Unable to start service";
   private static final int NO_FLAGS = 0;
   private String accessToken;
   private String userAgent;
@@ -59,12 +60,12 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private boolean isLocationOpted = false;
   private boolean isServiceBound = false;
   private PermissionCheckRunnable permissionCheckRunnable = null;
-  private ForegroundBackoff foregroundBackoff = null;
   private CopyOnWriteArraySet<TelemetryListener> telemetryListeners = null;
   private CertificateBlacklist certificateBlacklist;
   private CopyOnWriteArraySet<AttachmentListener> attachmentListeners = null;
   private int buildVersion = 0;
   static Context applicationContext = null;
+  private Logger logger;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
@@ -79,6 +80,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     initializeTelemetryListeners();
     initializeAttachmentListeners();
     initializeTelemetryLocationState(context.getApplicationContext());
+    this.logger = new Logger();
 
     // Initializing callback after listeners object is instantiated
     this.httpCallback = getHttpCallback(telemetryListeners);
@@ -101,6 +103,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     this.isServiceBound = isServiceBound;
     initializeTelemetryListeners();
     initializeAttachmentListeners();
+    this.logger = new Logger();
   }
 
   @Override
@@ -231,24 +234,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     return queue.queue.size() == 0;
   }
 
-  boolean isAppInForeground() {
-    ActivityManager activityManager = (ActivityManager) applicationContext.getSystemService(Context.ACTIVITY_SERVICE);
-    assert activityManager != null;
-
-    if (isLollipopOrHigher()) {
-      List<ActivityManager.RunningAppProcessInfo> runningProcesses = activityManager.getRunningAppProcesses();
-      if (runningProcesses != null) {
-        return checkRunningProcessesForegroundPkgList(runningProcesses);
-      }
-    } else {
-      List<ActivityManager.RunningTaskInfo> taskInfo = activityManager.getRunningTasks(1);
-      ComponentName componentInfo = taskInfo.get(0).topActivity;
-      return componentInfo != null && componentInfo.getPackageName().equals(applicationContext.getPackageName());
-    }
-
-    return false;
-  }
-
   private void startTelemetryService() {
     TelemetryLocationEnabler.LocationState telemetryLocationState = telemetryLocationEnabler
       .obtainTelemetryLocationState(applicationContext);
@@ -284,14 +269,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   // Package private (no modifier) for testing purposes
   void injectTelemetryService(TelemetryService telemetryService) {
     this.telemetryService = telemetryService;
-  }
-
-  private void startForegroundBackoff() {
-    if (foregroundBackoff == null) {
-      foregroundBackoff = new ForegroundBackoff(this);
-    }
-
-    foregroundBackoff.start();
   }
 
   private void initializeContext(Context context) {
@@ -547,10 +524,10 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   private void startLocation() {
     if (isLollipopOrHigher()) {
-      if (isAppInForeground()) {
+      try {
         applicationContext.startService(obtainLocationServiceIntent());
-      } else {
-        startForegroundBackoff();
+      } catch (IllegalStateException exception) {
+        logger.error(START_SERVICE_FAIL, exception.getMessage());
       }
     } else {
       applicationContext.startService(obtainLocationServiceIntent());
