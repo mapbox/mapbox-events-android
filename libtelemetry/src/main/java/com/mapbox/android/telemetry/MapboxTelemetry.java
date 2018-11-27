@@ -618,35 +618,4 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
     return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
   }
-
-  private boolean isImportanceForeground(ActivityManager.RunningAppProcessInfo processInfo) {
-    return processInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
-  }
-
-  private boolean isActiveProcessEqualToPackage(String activeProcess) {
-    return activeProcess.equals(applicationContext.getPackageName());
-  }
-
-  private boolean checkRunningProcessesForegroundPkgList(List<ActivityManager.RunningAppProcessInfo> runningProcesses) {
-    for (ActivityManager.RunningAppProcessInfo processInfo : runningProcesses) {
-      if (isImportanceForeground(processInfo)) {
-        if (processInfo.pkgList != null) {
-          return checkPackageListForMatchingActiveProcess(processInfo.pkgList);
-        }
-        break;
-      }
-    }
-
-    return false;
-  }
-
-  private boolean checkPackageListForMatchingActiveProcess(String[] packageList) {
-    for (String activeProcess : packageList) {
-      if (isActiveProcessEqualToPackage(activeProcess)) {
-        return true;
-      }
-    }
-
-    return false;
-  }
 }
