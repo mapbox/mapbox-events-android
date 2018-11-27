@@ -5,7 +5,9 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 
 import java.util.ArrayList;
@@ -28,6 +30,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class MapboxTelemetryTest {
+
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
+
 
   @Test(expected = IllegalArgumentException.class)
   public void checksNonNullContextRequired() throws Exception {
@@ -509,6 +515,40 @@ public class MapboxTelemetryTest {
     theMapboxTelemetry.onEnterForeground();
 
     verify(mockedContext, times(1)).startService(eq(theMapboxTelemetry.obtainLocationServiceIntent()));
+  }
+
+  @Test
+  public void checkAddTelemetryListener() throws Exception {
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetry();
+    TelemetryListener telemetryListener = mock(TelemetryListener.class);
+
+    assertTrue(theMapboxTelemetry.addTelemetryListener(telemetryListener));
+  }
+
+  @Test
+  public void checkRemoveTelemetryListener() throws Exception {
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetry();
+    TelemetryListener telemetryListener = mock(TelemetryListener.class);
+    theMapboxTelemetry.addTelemetryListener(telemetryListener);
+
+    assertTrue(theMapboxTelemetry.removeTelemetryListener(telemetryListener));
+  }
+
+  @Test
+  public void checkAddAttachmentListener() throws Exception {
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetry();
+    AttachmentListener attachmentListener = mock(AttachmentListener.class);
+
+    assertTrue(theMapboxTelemetry.addAttachmentListener(attachmentListener));
+  }
+
+  @Test
+  public void checkRemoveAttachmentListener() throws Exception {
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetry();
+    AttachmentListener attachmentListener = mock(AttachmentListener.class);
+    theMapboxTelemetry.addAttachmentListener(attachmentListener);
+
+    assertTrue(theMapboxTelemetry.removeAttachmentListener(attachmentListener));
   }
 
   private MapboxTelemetry obtainMapboxTelemetry() {
