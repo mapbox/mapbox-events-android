@@ -80,7 +80,7 @@ class CertificateBlacklist implements Callback {
         try {
           blacklist = obtainBlacklistContents(file);
           blacklist.remove(BLACKLIST_HEAD);
-        } catch (IOException exception) {
+        } catch (IOException | IndexOutOfBoundsException exception) {
           logger.error(RETRIEVE_BLACKLIST_FAIL, exception.getMessage());
         }
       }
