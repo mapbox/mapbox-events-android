@@ -1,7 +1,10 @@
 package com.mapbox.android.telemetry;
 
 import android.app.ActivityManager;
+import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.LifecycleObserver;
+import android.arch.lifecycle.OnLifecycleEvent;
+import android.arch.lifecycle.ProcessLifecycleOwner;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -505,13 +508,16 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   private void startLocation() {
     if (isLollipopOrHigher()) {
-      try {
-        applicationContext.startService(obtainLocationServiceIntent());
-      } catch (IllegalStateException exception) {
-        logger.error(START_SERVICE_FAIL, exception.getMessage());
+      if (!ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+        ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
+        return;
       }
-    } else {
+    }
+
+    try {
       applicationContext.startService(obtainLocationServiceIntent());
+    } catch (IllegalStateException exception) {
+      logger.error(START_SERVICE_FAIL, exception.getMessage());
     }
   }
 
@@ -573,6 +579,13 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   private Boolean checkNetworkAndParameters() {
     return isNetworkConnected() && checkRequiredParameters(accessToken, userAgent);
+  }
+
+  @OnLifecycleEvent(Lifecycle.Event.ON_START)
+  void onEnterForeground() {
+    logger.error("test", "enter foreground");
+    startLocation();
+    ProcessLifecycleOwner.get().getLifecycle().removeObserver(this);
   }
 
   private static Callback getHttpCallback(final Set<TelemetryListener> listeners) {
