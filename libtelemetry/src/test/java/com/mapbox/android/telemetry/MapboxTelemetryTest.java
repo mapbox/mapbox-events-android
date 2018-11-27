@@ -501,6 +501,16 @@ public class MapboxTelemetryTest {
     verify(mockedContext, times(0)).startService(eq(theMapboxTelemetry.obtainLocationServiceIntent()));
   }
 
+  @Test
+  public void checkOnEnterForegroundStartsService() throws Exception {
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext);
+    theMapboxTelemetry.onEnterForeground();
+
+    verify(mockedContext, times(1)).startService(eq(theMapboxTelemetry.obtainLocationServiceIntent()));
+  }
+
   private MapboxTelemetry obtainMapboxTelemetry() {
     MapboxTelemetry.applicationContext = obtainNetworkConnectedMockedContext();
     String aValidAccessToken = "validAccessToken";
