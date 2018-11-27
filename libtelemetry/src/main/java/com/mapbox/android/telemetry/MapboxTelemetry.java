@@ -583,7 +583,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   @OnLifecycleEvent(Lifecycle.Event.ON_START)
   void onEnterForeground() {
-    logger.error("test", "enter foreground");
     startLocation();
     ProcessLifecycleOwner.get().getLifecycle().removeObserver(this);
   }
