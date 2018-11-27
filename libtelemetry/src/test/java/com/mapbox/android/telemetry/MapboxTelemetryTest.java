@@ -4,7 +4,6 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Build;
 
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -488,9 +487,18 @@ public class MapboxTelemetryTest {
   @Test
   public void checksIsAppInBackgroundOptLocationIn() throws Exception {
     MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryForForeground();
-    theMapboxTelemetry.setBuildVersion(Build.VERSION_CODES.LOLLIPOP);
 
     assertTrue(theMapboxTelemetry.optLocationIn());
+  }
+
+  @Test
+  public void checkLifecycleObserverStarted() throws Exception {
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext);
+
+    theMapboxTelemetry.startLocation(true);
+
+    verify(mockedContext, times(0)).startService(eq(theMapboxTelemetry.obtainLocationServiceIntent()));
   }
 
   private MapboxTelemetry obtainMapboxTelemetry() {

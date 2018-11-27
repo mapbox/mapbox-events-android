@@ -13,7 +13,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.IBinder;
-import android.support.annotation.VisibleForTesting;
+import android.util.Log;
 
 import com.mapbox.android.core.permissions.PermissionsManager;
 
@@ -51,9 +51,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private CopyOnWriteArraySet<TelemetryListener> telemetryListeners = null;
   private CertificateBlacklist certificateBlacklist;
   private CopyOnWriteArraySet<AttachmentListener> attachmentListeners = null;
-  private int buildVersion = 0;
   static Context applicationContext = null;
-  private Logger logger;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
@@ -68,7 +66,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     initializeTelemetryListeners();
     initializeAttachmentListeners();
     initializeTelemetryLocationState(context.getApplicationContext());
-    this.logger = new Logger();
 
     // Initializing callback after listeners object is instantiated
     this.httpCallback = getHttpCallback(telemetryListeners);
@@ -91,7 +88,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     this.isServiceBound = isServiceBound;
     initializeTelemetryListeners();
     initializeAttachmentListeners();
-    this.logger = new Logger();
   }
 
   @Override
@@ -187,11 +183,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     return attachmentListeners.remove(listener);
   }
 
-  @VisibleForTesting
-  void setBuildVersion(int buildVersion) {
-    this.buildVersion = buildVersion;
-  }
-
   boolean optLocationIn() {
     startTelemetryService();
     bindTelemetryService();
@@ -226,7 +217,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     TelemetryLocationEnabler.LocationState telemetryLocationState = telemetryLocationEnabler
       .obtainTelemetryLocationState(applicationContext);
     if (TelemetryLocationEnabler.LocationState.DISABLED.equals(telemetryLocationState) && checkLocationPermission()) {
-      startLocation();
+      startLocation(isLollipopOrHigher());
       isLocationOpted = true;
     }
   }
@@ -506,8 +497,8 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     return permissionCheckRunnable;
   }
 
-  private void startLocation() {
-    if (isLollipopOrHigher()) {
+  void startLocation(boolean isLollipopOrHigher) {
+    if (isLollipopOrHigher) {
       if (!ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
         ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
         return;
@@ -517,7 +508,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     try {
       applicationContext.startService(obtainLocationServiceIntent());
     } catch (IllegalStateException exception) {
-      logger.error(START_SERVICE_FAIL, exception.getMessage());
+      Log.e(START_SERVICE_FAIL, exception.getMessage());
     }
   }
 
@@ -583,7 +574,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   @OnLifecycleEvent(Lifecycle.Event.ON_START)
   void onEnterForeground() {
-    startLocation();
+    startLocation(isLollipopOrHigher());
     ProcessLifecycleOwner.get().getLifecycle().removeObserver(this);
   }
 
@@ -611,10 +602,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   private boolean isLollipopOrHigher() {
-    if (buildVersion != 0) {
-      return buildVersion >= Build.VERSION_CODES.LOLLIPOP;
-    }
-
     return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
   }
 }
