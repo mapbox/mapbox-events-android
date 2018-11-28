@@ -8,6 +8,9 @@ Mapbox welcomes participation and contributions from everyone.
 - Update dependencies and cleanup gradle scripts - [#237](https://github.com/mapbox/mapbox-events-android/pull/237)
 - Telemetry SDK background location updates + batch locations - [#236](https://github.com/mapbox/mapbox-events-android/pull/236)
 
+### v3.5.5
+- Add Vision UserAgent - [#292](https://github.com/mapbox/mapbox-events-android/pull/292)
+
 ### v3.5.4
 - Fix missed cellNetworkType field in map drag event - [#276](https://github.com/mapbox/mapbox-events-android/pull/276)
 - Fix crash due to null context reference in LocationBroadcastReceiver - [#272](https://github.com/mapbox/mapbox-events-android/pull/272)
