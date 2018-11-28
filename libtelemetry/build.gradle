@@ -19,10 +19,6 @@ android {
         debug {
             testCoverageEnabled true
         }
-
-        release {
-            testCoverageEnabled true
-        }
     }
 
     testOptions {
