@@ -499,7 +499,7 @@ public class MapboxTelemetryTest {
 
     verify(mockedContext, times(1)).getFilesDir();
   }
-  
+
   @Test
   public void checksIsAppInBackgroundOptLocationIn() throws Exception {
     MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryForForeground();
