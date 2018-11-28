@@ -8,6 +8,8 @@ import android.net.NetworkInfo;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import okhttp3.Callback;
@@ -482,6 +484,67 @@ public class MapboxTelemetryTest {
     assertTrue(theMapboxTelemetry.isQueueEmpty());
   }
 
+  @Test
+  public void checksIsAppInBackgroundOptLocationIn() throws Exception {
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryForForeground();
+
+    assertTrue(theMapboxTelemetry.optLocationIn());
+  }
+
+  @Test
+  public void checkLifecycleObserverStarted() {
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext);
+
+    theMapboxTelemetry.startLocation(true);
+
+    verify(mockedContext, never()).startService(eq(theMapboxTelemetry.obtainLocationServiceIntent()));
+  }
+
+  @Test
+  public void checkOnEnterForegroundStartsService() throws Exception {
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext);
+    theMapboxTelemetry.onEnterForeground();
+
+    verify(mockedContext, times(1)).startService(eq(theMapboxTelemetry.obtainLocationServiceIntent()));
+  }
+
+  @Test
+  public void checkAddTelemetryListener() throws Exception {
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetry();
+    TelemetryListener telemetryListener = mock(TelemetryListener.class);
+
+    assertTrue(theMapboxTelemetry.addTelemetryListener(telemetryListener));
+  }
+
+  @Test
+  public void checkRemoveTelemetryListener() throws Exception {
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetry();
+    TelemetryListener telemetryListener = mock(TelemetryListener.class);
+    theMapboxTelemetry.addTelemetryListener(telemetryListener);
+
+    assertTrue(theMapboxTelemetry.removeTelemetryListener(telemetryListener));
+  }
+
+  @Test
+  public void checkAddAttachmentListener() throws Exception {
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetry();
+    AttachmentListener attachmentListener = mock(AttachmentListener.class);
+
+    assertTrue(theMapboxTelemetry.addAttachmentListener(attachmentListener));
+  }
+
+  @Test
+  public void checkRemoveAttachmentListener() throws Exception {
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetry();
+    AttachmentListener attachmentListener = mock(AttachmentListener.class);
+    theMapboxTelemetry.addAttachmentListener(attachmentListener);
+
+    assertTrue(theMapboxTelemetry.removeAttachmentListener(attachmentListener));
+  }
+
   private MapboxTelemetry obtainMapboxTelemetry() {
     MapboxTelemetry.applicationContext = obtainNetworkConnectedMockedContext();
     String aValidAccessToken = "validAccessToken";
@@ -700,6 +763,24 @@ public class MapboxTelemetryTest {
     if (isServiceBound) {
       theMapboxTelemetry.injectTelemetryService(telemetryService);
     }
+    return theMapboxTelemetry;
+  }
+
+  private MapboxTelemetry obtainMapboxTelemetryForForeground() {
+    Context mockedContext = mock(Context.class);
+    ActivityManager mockedActivityManager = mock(ActivityManager.class, RETURNS_DEEP_STUBS);
+    when(mockedContext.getSystemService(Context.ACTIVITY_SERVICE)).thenReturn(mockedActivityManager);
+    ActivityManager.RunningTaskInfo mockedRunningTaskInfo = mock(ActivityManager.RunningTaskInfo.class);
+    List mockedTaskInfo = new ArrayList(Arrays.asList(mockedRunningTaskInfo));
+    when(mockedActivityManager.getRunningTasks(1)).thenReturn(mockedTaskInfo);
+
+    ActivityManager.RunningAppProcessInfo mockedRunningAppProcessInfo =
+      mock(ActivityManager.RunningAppProcessInfo.class);
+    List mockedRunningProcesses = new ArrayList(Arrays.asList(mockedRunningAppProcessInfo));
+    when(mockedActivityManager.getRunningAppProcesses()).thenReturn(mockedRunningProcesses);
+
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext);
+
     return theMapboxTelemetry;
   }
 

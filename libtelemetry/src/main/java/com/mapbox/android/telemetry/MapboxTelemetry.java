@@ -1,6 +1,5 @@
 package com.mapbox.android.telemetry;
 
-
 import android.app.ActivityManager;
 import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.LifecycleObserver;
@@ -14,6 +13,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.IBinder;
+import android.support.annotation.VisibleForTesting;
+import android.util.Log;
 
 import com.mapbox.android.core.permissions.PermissionsManager;
 
@@ -31,6 +32,7 @@ import okhttp3.ResponseBody;
 public class MapboxTelemetry implements FullQueueCallback, EventCallback, ServiceTaskCallback,
   LifecycleObserver {
   private static final String NON_NULL_APPLICATION_CONTEXT_REQUIRED = "Non-null application context required.";
+  private static final String START_SERVICE_FAIL = "Unable to start service";
   private static final int NO_FLAGS = 0;
   private String accessToken;
   private String userAgent;
@@ -216,7 +218,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     TelemetryLocationEnabler.LocationState telemetryLocationState = telemetryLocationEnabler
       .obtainTelemetryLocationState(applicationContext);
     if (TelemetryLocationEnabler.LocationState.DISABLED.equals(telemetryLocationState) && checkLocationPermission()) {
-      startLocation();
+      startLocation(isLollipopOrHigher());
       isLocationOpted = true;
     }
   }
@@ -496,15 +498,19 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     return permissionCheckRunnable;
   }
 
-  private void startLocation() {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      if (ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
-        applicationContext.startService(obtainLocationServiceIntent());
-      } else {
+  @VisibleForTesting
+  void startLocation(boolean isLollipopOrHigher) {
+    if (isLollipopOrHigher) {
+      if (!ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
         ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
+        return;
       }
-    } else {
+    }
+
+    try {
       applicationContext.startService(obtainLocationServiceIntent());
+    } catch (IllegalStateException exception) {
+      Log.e(START_SERVICE_FAIL, exception.getMessage());
     }
   }
 
@@ -570,7 +576,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   @OnLifecycleEvent(Lifecycle.Event.ON_START)
   void onEnterForeground() {
-    startLocation();
+    startLocation(isLollipopOrHigher());
     ProcessLifecycleOwner.get().getLifecycle().removeObserver(this);
   }
 
@@ -595,5 +601,9 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
         }
       }
     };
+  }
+
+  private boolean isLollipopOrHigher() {
+    return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
   }
 }
