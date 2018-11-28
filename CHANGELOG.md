@@ -4,6 +4,17 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v4.1.0
+- Publish metrics to AWS on master and release only - [#293](https://github.com/mapbox/mapbox-events-android/pull/293)
+- Push mobile metrics to loading dock - [#288](https://github.com/mapbox/mapbox-events-android/pull/288)
+- Add new CI user template - [#286](https://github.com/mapbox/mapbox-events-android/pull/286)
+- Add codecov.yml - [#285](https://github.com/mapbox/mapbox-events-android/pull/285)
+- Add codecov badge to readme - [#282](https://github.com/mapbox/mapbox-events-android/pull/282)
+- Add codecov.io to CI - [#280](https://github.com/mapbox/mapbox-events-android/pull/280)
+- Integrate jacoco plugin with events repo - [#279](https://github.com/mapbox/mapbox-events-android/pull/279)
+- Record binary size - [#278](https://github.com/mapbox/mapbox-events-android/pull/278)
+- Add lifecycle methods to track lifecycle of parent activity - [#254](https://github.com/mapbox/mapbox-events-android/pull/254)
+
 ### v4.0.0
 - Update dependencies and cleanup gradle scripts - [#237](https://github.com/mapbox/mapbox-events-android/pull/237)
 - Telemetry SDK background location updates + batch locations - [#236](https://github.com/mapbox/mapbox-events-android/pull/236)
@@ -137,6 +148,10 @@ Mapbox welcomes participation and contributions from everyone.
 - Port Location Code from MAS - [#6](https://github.com/mapbox/mapbox-events-android/pull/6)
 
 ## Mapbox Android Core
+
+### v1.1.0
+- Refactor listener management infrastructure & background mode support - [#290](https://github.com/mapbox/mapbox-events-android/pull/290)
+- Add @Nullable annotation to getLastLocation method - [#264](https://github.com/mapbox/mapbox-events-android/pull/264)
 
 ### v1.0.0
 - Handle potential 'null' last location returned by fused client - [#257](https://github.com/mapbox/mapbox-events-android/pull/257)
