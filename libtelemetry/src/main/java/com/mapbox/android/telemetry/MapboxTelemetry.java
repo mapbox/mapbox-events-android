@@ -13,6 +13,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.IBinder;
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 
 import com.mapbox.android.core.permissions.PermissionsManager;
@@ -497,6 +498,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     return permissionCheckRunnable;
   }
 
+  @VisibleForTesting
   void startLocation(boolean isLollipopOrHigher) {
     if (isLollipopOrHigher) {
       if (!ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {

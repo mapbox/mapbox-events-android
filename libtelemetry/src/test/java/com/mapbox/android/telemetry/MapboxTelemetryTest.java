@@ -5,9 +5,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 
 import java.util.ArrayList;
@@ -30,10 +28,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class MapboxTelemetryTest {
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
-
 
   @Test(expected = IllegalArgumentException.class)
   public void checksNonNullContextRequired() throws Exception {
@@ -498,13 +492,13 @@ public class MapboxTelemetryTest {
   }
 
   @Test
-  public void checkLifecycleObserverStarted() throws Exception {
+  public void checkLifecycleObserverStarted() {
     Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext);
 
     theMapboxTelemetry.startLocation(true);
 
-    verify(mockedContext, times(0)).startService(eq(theMapboxTelemetry.obtainLocationServiceIntent()));
+    verify(mockedContext, never()).startService(eq(theMapboxTelemetry.obtainLocationServiceIntent()));
   }
 
   @Test
