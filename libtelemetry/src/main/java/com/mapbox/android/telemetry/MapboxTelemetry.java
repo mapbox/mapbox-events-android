@@ -14,6 +14,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.IBinder;
+import android.support.annotation.VisibleForTesting;
 
 import com.mapbox.android.core.permissions.PermissionsManager;
 
@@ -546,12 +547,13 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     return false;
   }
 
-  private void checkBlacklist(Context context, String accessToken, String userAgent) {
+  @VisibleForTesting
+  void checkBlacklist(Context context, String accessToken, String userAgent) {
     String fullUserAgent = TelemetryUtils.createFullUserAgent(userAgent, applicationContext);
     certificateBlacklist = new CertificateBlacklist(context, accessToken, fullUserAgent);
 
     if (certificateBlacklist.daySinceLastUpdate()) {
-      certificateBlacklist.updateBlacklist();
+      certificateBlacklist.updateBlacklist(certificateBlacklist.generateRequestUrl());
     }
   }
 

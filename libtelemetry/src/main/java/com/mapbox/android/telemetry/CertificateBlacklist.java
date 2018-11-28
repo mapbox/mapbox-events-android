@@ -3,6 +3,7 @@ package com.mapbox.android.telemetry;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -64,12 +65,23 @@ class CertificateBlacklist implements Callback {
   private final String accessToken;
   private String userAgent;
   private Logger logger;
+  private OkHttpClient client;
 
   CertificateBlacklist(Context context, String accessToken, String userAgent) {
     this.context = context;
     this.accessToken = accessToken;
     this.userAgent = userAgent;
     this.logger = new Logger();
+    this.client = new OkHttpClient();
+  }
+
+  @VisibleForTesting
+  CertificateBlacklist(Context context, String accessToken, String userAgent, OkHttpClient client) {
+    this.context = context;
+    this.accessToken = accessToken;
+    this.userAgent = userAgent;
+    this.logger = new Logger();
+    this.client = client;
   }
 
   List<String> retrieveBlackList() {
@@ -115,20 +127,23 @@ class CertificateBlacklist implements Callback {
     return lastUpdateTime;
   }
 
-  void updateBlacklist() {
+  void updateBlacklist(HttpUrl requestUrl) {
+    Request request = new Request.Builder()
+      .url(requestUrl)
+      .header(USER_AGENT_REQUEST_HEADER, userAgent)
+      .build();
+
+    client.newCall(request).enqueue(this);
+  }
+
+  HttpUrl generateRequestUrl() {
     HttpUrl requestUrl = new HttpUrl.Builder().scheme(HTTPS_SCHEME)
       .host(determineConfigEndpoint())
       .addPathSegment("events-config")
       .addQueryParameter(ACCESS_TOKEN_QUERY_PARAMETER, accessToken)
       .build();
 
-    Request request = new Request.Builder()
-      .url(requestUrl)
-      .header(USER_AGENT_REQUEST_HEADER, userAgent)
-      .build();
-
-    OkHttpClient client = new OkHttpClient();
-    client.newCall(request).enqueue(this);
+    return requestUrl;
   }
 
   private void saveBlackList(List<String> revokedKeys) {
