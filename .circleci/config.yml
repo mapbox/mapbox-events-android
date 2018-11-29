@@ -127,7 +127,7 @@ jobs:
           name: Check & Publish Binary Size
           command: |
             binary_path="libtelemetry/build/outputs/aar/libtelemetry-release.aar"
-            label="Telemetry AAR"
+            label="Telemetry-AAR"
             archive_name="mapbox-events-android"
             if [[ $CIRCLE_BRANCH == master ]] || [[ $CIRCLE_BRANCH == release-* ]]; then
               ./scripts/capture_binary_size_for_aws.sh $binary_path $archive_name
