@@ -43,6 +43,7 @@ class CertificateBlacklist implements Callback {
   private static final String COM_CONFIG_ENDPOINT = "api.mapbox.com";
   private static final String CHINA_CONFIG_ENDPOINT = "api.mapbox.cn";
   private static final String ACCESS_TOKEN_QUERY_PARAMETER = "access_token";
+  private static final String REQUEST_FAIL = "Request failed to download blacklist";
   private static final String HTTPS_SCHEME = "https";
   private static final String USER_AGENT_REQUEST_HEADER = "User-Agent";
   private static final String EVENT_CONFIG_SEGMENT = "events-config";
@@ -145,7 +146,7 @@ class CertificateBlacklist implements Callback {
 
   @Override
   public void onFailure(Call call, IOException exception) {
-    Log.e(LOG_TAG, exception.getMessage());
+    Log.e(LOG_TAG, REQUEST_FAIL, exception);
   }
 
   @Override
