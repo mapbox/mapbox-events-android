@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
 public class MapboxTelemetryTest {
 
   @Rule
-  public TemporaryFolder mTempFolder = new TemporaryFolder();
+  public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   @Test(expected = IllegalArgumentException.class)
   public void checksNonNullContextRequired() throws Exception {
@@ -495,7 +495,7 @@ public class MapboxTelemetryTest {
     Context mockedContext = obtainBlacklistContext();
     MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext);
 
-    theMapboxTelemetry.checkBlacklist(mockedContext, "anAccessToken", "anUserAgent");
+    theMapboxTelemetry.checkBlacklistLastUpdateTime();
 
     verify(mockedContext, times(1)).getFilesDir();
   }
@@ -830,7 +830,7 @@ public class MapboxTelemetryTest {
 
   private Context obtainBlacklistContext() throws IOException {
     Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
-    when(mockedContext.getFilesDir()).thenReturn(mTempFolder.newFolder());
+    when(mockedContext.getFilesDir()).thenReturn(temporaryFolder.newFolder());
     return mockedContext;
   }
 }

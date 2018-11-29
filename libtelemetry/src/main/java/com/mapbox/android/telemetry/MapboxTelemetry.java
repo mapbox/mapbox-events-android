@@ -26,6 +26,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
@@ -50,14 +51,16 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private boolean isServiceBound = false;
   private PermissionCheckRunnable permissionCheckRunnable = null;
   private CopyOnWriteArraySet<TelemetryListener> telemetryListeners = null;
-  private CertificateBlacklist certificateBlacklist;
+  private final CertificateBlacklist certificateBlacklist;
   private CopyOnWriteArraySet<AttachmentListener> attachmentListeners = null;
   static Context applicationContext = null;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
     initializeQueue();
-    checkBlacklist(context, accessToken, userAgent);
+    this.certificateBlacklist = new CertificateBlacklist(context, accessToken,
+      TelemetryUtils.createFullUserAgent(userAgent, applicationContext), new OkHttpClient());
+    checkBlacklistLastUpdateTime();
     checkRequiredParameters(accessToken, userAgent);
     AlarmReceiver alarmReceiver = obtainAlarmReceiver();
     this.schedulerFlusher = new SchedulerFlusherFactory(applicationContext, alarmReceiver).supply();
@@ -89,6 +92,8 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     this.isServiceBound = isServiceBound;
     initializeTelemetryListeners();
     initializeAttachmentListeners();
+    this.certificateBlacklist = new CertificateBlacklist(context, accessToken,
+      TelemetryUtils.createFullUserAgent(userAgent, applicationContext), new OkHttpClient());
   }
 
   @Override
@@ -553,12 +558,9 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   @VisibleForTesting
-  void checkBlacklist(Context context, String accessToken, String userAgent) {
-    String fullUserAgent = TelemetryUtils.createFullUserAgent(userAgent, applicationContext);
-    certificateBlacklist = new CertificateBlacklist(context, accessToken, fullUserAgent);
-
+  void checkBlacklistLastUpdateTime() {
     if (certificateBlacklist.daySinceLastUpdate()) {
-      certificateBlacklist.updateBlacklist(certificateBlacklist.generateRequestUrl());
+      certificateBlacklist.requestBlacklist(certificateBlacklist.generateRequestUrl());
     }
   }
 
