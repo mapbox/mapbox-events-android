@@ -101,7 +101,7 @@ class CertificateBlacklist implements Callback {
       try {
         List<String> blacklist = obtainBlacklistContents(file);
         lastUpdateTime = Long.valueOf(blacklist.get(BLACKLIST_HEAD));
-      } catch (IOException exception) {
+      } catch (IOException | IndexOutOfBoundsException exception) {
         Log.e(LOG_TAG, exception.getMessage());
       }
     }
