@@ -43,15 +43,10 @@ class CertificateBlacklist implements Callback {
   private static final String COM_CONFIG_ENDPOINT = "api.mapbox.com";
   private static final String CHINA_CONFIG_ENDPOINT = "api.mapbox.cn";
   private static final String ACCESS_TOKEN_QUERY_PARAMETER = "access_token";
-  private static final String NAME_NOT_FOUND_EXCEPTION = "Name Not Found";
-  private static final String SAVE_BLACKLIST_FAIL = "Unable to save blacklist to file";
-  private static final String RETRIEVE_TIME_FAIL = "Unable to retrieve last update time from blacklist";
-  private static final String RETRIEVE_BLACKLIST_FAIL = "Unable to retrieve blacklist contents from file";
-  private static final String CLOSE_STREAM_FAIL = "Unable to close stream";
-  private static final String CLOSE_BUFFER_READER_FAIL = "Unable to close BufferedReader";
   private static final String REQUEST_FAIL = "Request failed to download blacklist";
-  private static final String READLINE_FAIL = "Unable to read line of Blacklist file";
   private static final String HTTPS_SCHEME = "https";
+  private static final String USER_AGENT_REQUEST_HEADER = "User-Agent";
+  private static final String EVENT_CONFIG_SEGMENT = "events-config";
   private static final Map<Environment, String> ENDPOINTS = new HashMap<Environment, String>() {
     {
       put(Environment.COM, COM_CONFIG_ENDPOINT);
@@ -61,12 +56,14 @@ class CertificateBlacklist implements Callback {
   };
   private final Context context;
   private final String accessToken;
-  private Logger logger;
+  private final String userAgent;
+  private final OkHttpClient client;
 
-  CertificateBlacklist(Context context, String accessToken) {
+  CertificateBlacklist(Context context, String accessToken, String userAgent, OkHttpClient client) {
     this.context = context;
     this.accessToken = accessToken;
-    this.logger = new Logger();
+    this.userAgent = userAgent;
+    this.client = client;
   }
 
   List<String> retrieveBlackList() {
@@ -80,8 +77,8 @@ class CertificateBlacklist implements Callback {
         try {
           blacklist = obtainBlacklistContents(file);
           blacklist.remove(BLACKLIST_HEAD);
-        } catch (IOException exception) {
-          logger.error(RETRIEVE_BLACKLIST_FAIL, exception.getMessage());
+        } catch (IOException | IndexOutOfBoundsException exception) {
+          Log.e(LOG_TAG, exception.getMessage());
         }
       }
     }
@@ -104,27 +101,29 @@ class CertificateBlacklist implements Callback {
       try {
         List<String> blacklist = obtainBlacklistContents(file);
         lastUpdateTime = Long.valueOf(blacklist.get(BLACKLIST_HEAD));
-      } catch (IOException exception) {
-        logger.error(RETRIEVE_TIME_FAIL, exception.getMessage());
+      } catch (IOException | IndexOutOfBoundsException exception) {
+        Log.e(LOG_TAG, exception.getMessage());
       }
     }
 
     return lastUpdateTime;
   }
 
-  void updateBlacklist() {
-    HttpUrl requestUrl = new HttpUrl.Builder().scheme(HTTPS_SCHEME)
-      .host(determineConfigEndpoint())
-      .addPathSegment("events-config")
-      .addQueryParameter(ACCESS_TOKEN_QUERY_PARAMETER, accessToken)
-      .build();
-
+  void requestBlacklist(HttpUrl requestUrl) {
     Request request = new Request.Builder()
       .url(requestUrl)
+      .header(USER_AGENT_REQUEST_HEADER, userAgent)
       .build();
 
-    OkHttpClient client = new OkHttpClient();
     client.newCall(request).enqueue(this);
+  }
+
+  HttpUrl generateRequestUrl() {
+    return new HttpUrl.Builder().scheme(HTTPS_SCHEME)
+      .host(determineConfigEndpoint())
+      .addPathSegment(EVENT_CONFIG_SEGMENT)
+      .addQueryParameter(ACCESS_TOKEN_QUERY_PARAMETER, accessToken)
+      .build();
   }
 
   private void saveBlackList(List<String> revokedKeys) {
@@ -135,12 +134,12 @@ class CertificateBlacklist implements Callback {
       outputStream = context.openFileOutput(BLACKLIST_FILE, Context.MODE_PRIVATE);
       outputStream.write(fileContents.getBytes());
     } catch (IOException exception) {
-      logger.error(SAVE_BLACKLIST_FAIL, exception.getMessage());
+      Log.e(LOG_TAG, exception.getMessage());
     } finally {
       try {
         outputStream.close();
       } catch (IOException exception) {
-        logger.error(CLOSE_STREAM_FAIL, exception.getMessage());
+        Log.e(LOG_TAG, exception.getMessage());
       }
     }
   }
@@ -187,18 +186,18 @@ class CertificateBlacklist implements Callback {
       }
 
     } catch (IOException exception) {
-      logger.error(READLINE_FAIL, exception.getMessage());
+      Log.e(LOG_TAG, exception.getMessage());
     } finally {
       try {
         inputStream.close();
       } catch (IOException exception) {
-        logger.error(CLOSE_STREAM_FAIL, exception.getMessage());
+        Log.e(LOG_TAG, exception.getMessage());
       }
 
       try {
         reader.close();
       } catch (IOException exception) {
-        logger.error(CLOSE_BUFFER_READER_FAIL, exception.getMessage());
+        Log.e(LOG_TAG, exception.getMessage());
       }
     }
 
@@ -218,7 +217,7 @@ class CertificateBlacklist implements Callback {
         return ENDPOINTS.get(serverInformation.getEnvironment());
       }
     } catch (PackageManager.NameNotFoundException exception) {
-      logger.error(NAME_NOT_FOUND_EXCEPTION, exception.getMessage());
+      Log.e(LOG_TAG, exception.getMessage());
     }
 
     return COM_CONFIG_ENDPOINT;
