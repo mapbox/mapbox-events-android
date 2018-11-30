@@ -5,9 +5,12 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.mockito.ArgumentCaptor;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,6 +31,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class MapboxTelemetryTest {
+
+  @Rule
+  public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   @Test(expected = IllegalArgumentException.class)
   public void checksNonNullContextRequired() throws Exception {
@@ -485,6 +491,16 @@ public class MapboxTelemetryTest {
   }
 
   @Test
+  public void checkCertificateBlacklistUpdateCalled() throws Exception {
+    Context mockedContext = obtainBlacklistContext();
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext);
+
+    theMapboxTelemetry.checkBlacklistLastUpdateTime();
+
+    verify(mockedContext, times(1)).getFilesDir();
+  }
+
+  @Test
   public void checksIsAppInBackgroundOptLocationIn() throws Exception {
     MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryForForeground();
 
@@ -809,6 +825,12 @@ public class MapboxTelemetryTest {
     NetworkInfo mockedNetworkInfo = mock(NetworkInfo.class);
     when(mockedConnectivityManager.getActiveNetworkInfo()).thenReturn(mockedNetworkInfo);
     when(mockedNetworkInfo.isConnected()).thenReturn(false);
+    return mockedContext;
+  }
+
+  private Context obtainBlacklistContext() throws IOException {
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    when(mockedContext.getFilesDir()).thenReturn(temporaryFolder.newFolder());
     return mockedContext;
   }
 }
