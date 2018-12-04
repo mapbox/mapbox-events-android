@@ -2,6 +2,7 @@ package com.mapbox.android.telemetry;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
@@ -17,6 +18,8 @@ import java.util.List;
 
 import okhttp3.Callback;
 
+import static com.mapbox.android.telemetry.CertificateBlacklist.MAPBOX_SHARED_PREFERENCE_KEY_BLACKLIST_TIMESTAMP;
+import static com.mapbox.android.telemetry.TelemetryUtils.MAPBOX_SHARED_PREFERENCES;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -491,16 +494,6 @@ public class MapboxTelemetryTest {
   }
 
   @Test
-  public void checkCertificateBlacklistUpdateCalled() throws Exception {
-    Context mockedContext = obtainBlacklistContext();
-    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext);
-
-    theMapboxTelemetry.checkBlacklistLastUpdateTime();
-
-    verify(mockedContext, times(1)).getFilesDir();
-  }
-
-  @Test
   public void checksIsAppInBackgroundOptLocationIn() throws Exception {
     MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryForForeground();
 
@@ -830,7 +823,13 @@ public class MapboxTelemetryTest {
 
   private Context obtainBlacklistContext() throws IOException {
     Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
-    when(mockedContext.getFilesDir()).thenReturn(temporaryFolder.newFolder());
+
+    SharedPreferences mockedSharedPreferences = mock(SharedPreferences.class);
+    when(mockedContext.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE))
+      .thenReturn(mockedSharedPreferences);
+    when(mockedSharedPreferences.getLong(MAPBOX_SHARED_PREFERENCE_KEY_BLACKLIST_TIMESTAMP,0))
+      .thenReturn(Long.valueOf(0));
+
     return mockedContext;
   }
 }

@@ -1,6 +1,7 @@
 package com.mapbox.android.telemetry;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -14,9 +15,12 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import okhttp3.mockwebserver.internal.tls.SslClient;
 
+import static com.mapbox.android.telemetry.CertificateBlacklist.MAPBOX_SHARED_PREFERENCE_KEY_BLACKLIST_TIMESTAMP;
+import static com.mapbox.android.telemetry.TelemetryUtils.MAPBOX_SHARED_PREFERENCES;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class CertificateBlacklistTest {
   private MockWebServer server;
@@ -32,6 +36,12 @@ public class CertificateBlacklistTest {
     CertificateBlacklist mockedBlacklist = mock(CertificateBlacklist.class);
     OkHttpClient client = settings.getClient(mockedBlacklist);
     Context mockedContext = mock(Context.class);
+
+    SharedPreferences mockedSharedPreferences = mock(SharedPreferences.class);
+    when(mockedContext.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE))
+      .thenReturn(mockedSharedPreferences);
+    when(mockedSharedPreferences.getLong(MAPBOX_SHARED_PREFERENCE_KEY_BLACKLIST_TIMESTAMP,0))
+      .thenReturn(Long.valueOf(0));
 
     this.certificateBlacklist = new CertificateBlacklist(mockedContext, "anAccessToken",
       "AnUserAgent", client);

@@ -1,6 +1,7 @@
 package com.mapbox.android.telemetry;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
@@ -35,10 +36,6 @@ class CertificateBlacklist implements Callback {
   private static final String BLACKLIST_FILE = "MapboxBlacklist";
   private static final String SHA256 = "sha256/";
   private static final String NEW_LINE = "\n";
-  private static final String HTTPS = "https://";
-  private static final String BACKSLASH = "/";
-  private static final String EMPTY_STRING = "";
-  private static final int BLACKLIST_HEAD = 0;
   private static final long DAY_IN_MILLIS = 86400000;
   private static final String COM_CONFIG_ENDPOINT = "api.mapbox.com";
   private static final String CHINA_CONFIG_ENDPOINT = "api.mapbox.cn";
@@ -47,6 +44,7 @@ class CertificateBlacklist implements Callback {
   private static final String HTTPS_SCHEME = "https";
   private static final String USER_AGENT_REQUEST_HEADER = "User-Agent";
   private static final String EVENT_CONFIG_SEGMENT = "events-config";
+  static final String MAPBOX_SHARED_PREFERENCE_KEY_BLACKLIST_TIMESTAMP = "mapboxBlacklistTimestamp";
   private static final Map<Environment, String> ENDPOINTS = new HashMap<Environment, String>() {
     {
       put(Environment.COM, COM_CONFIG_ENDPOINT);
@@ -58,12 +56,14 @@ class CertificateBlacklist implements Callback {
   private final String accessToken;
   private final String userAgent;
   private final OkHttpClient client;
+  private  SharedPreferences sharedPreferences;
 
   CertificateBlacklist(Context context, String accessToken, String userAgent, OkHttpClient client) {
     this.context = context;
     this.accessToken = accessToken;
     this.userAgent = userAgent;
     this.client = client;
+    this.sharedPreferences = TelemetryUtils.obtainSharedPreferences(context);
   }
 
   List<String> retrieveBlackList() {
@@ -76,7 +76,6 @@ class CertificateBlacklist implements Callback {
       if (file.exists()) {
         try {
           blacklist = obtainBlacklistContents(file);
-          blacklist.remove(BLACKLIST_HEAD);
         } catch (IOException | IndexOutOfBoundsException exception) {
           Log.e(LOG_TAG, exception.getMessage());
         }
@@ -92,21 +91,7 @@ class CertificateBlacklist implements Callback {
   }
 
   private long retrieveLastUpdateTime() {
-    File directory = context.getFilesDir();
-    File file = new File(directory, BLACKLIST_FILE);
-
-    long lastUpdateTime = 0;
-
-    if (file.exists()) {
-      try {
-        List<String> blacklist = obtainBlacklistContents(file);
-        lastUpdateTime = Long.valueOf(blacklist.get(BLACKLIST_HEAD));
-      } catch (IOException | IndexOutOfBoundsException exception) {
-        Log.e(LOG_TAG, exception.getMessage());
-      }
-    }
-
-    return lastUpdateTime;
+    return sharedPreferences.getLong(MAPBOX_SHARED_PREFERENCE_KEY_BLACKLIST_TIMESTAMP, 0);
   }
 
   void requestBlacklist(HttpUrl requestUrl) {
@@ -129,6 +114,7 @@ class CertificateBlacklist implements Callback {
   private void saveBlackList(List<String> revokedKeys) {
     String fileContents = createListContent(revokedKeys);
     FileOutputStream outputStream = null;
+    saveTimestamp();
 
     try {
       outputStream = context.openFileOutput(BLACKLIST_FILE, Context.MODE_PRIVATE);
@@ -157,9 +143,7 @@ class CertificateBlacklist implements Callback {
   }
 
   private String createListContent(List<String> revokedKeys) {
-    Date date = new Date();
-
-    StringBuilder content = new StringBuilder(date.getTime() + NEW_LINE);
+    StringBuilder content = new StringBuilder();
 
     for (String key : revokedKeys) {
       content.append(SHA256).append(key).append(NEW_LINE);
@@ -235,8 +219,11 @@ class CertificateBlacklist implements Callback {
     return revokedKeys;
   }
 
-  private String[] separateUrlSegments(String url) {
-    url = url.replace(HTTPS, EMPTY_STRING);
-    return url.split(BACKSLASH);
+  private void saveTimestamp() {
+    Date date = new Date();
+    SharedPreferences.Editor editor = sharedPreferences.edit();
+
+    editor.putLong(MAPBOX_SHARED_PREFERENCE_KEY_BLACKLIST_TIMESTAMP, date.getTime());
+    editor.apply();
   }
 }
