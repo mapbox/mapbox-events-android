@@ -7,7 +7,12 @@ import android.content.pm.PackageManager;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.BufferedReader;
@@ -76,7 +81,7 @@ class CertificateBlacklist implements Callback {
       if (file.exists()) {
         try {
           blacklist = obtainBlacklistContents(file);
-        } catch (IOException | IndexOutOfBoundsException exception) {
+        } catch (IOException exception) {
           Log.e(LOG_TAG, exception.getMessage());
         }
       }
@@ -111,14 +116,17 @@ class CertificateBlacklist implements Callback {
       .build();
   }
 
-  private void saveBlackList(List<String> revokedKeys) {
-    String fileContents = createListContent(revokedKeys);
+  private void saveBlackList(Response response) throws IOException {
+    Gson gson = new GsonBuilder().create();
+    JsonObject responseJson = gson.fromJson(response.body().string(), JsonObject.class);
+
+    responseJson = addSHAtoKeys(responseJson);
     FileOutputStream outputStream = null;
     saveTimestamp();
 
     try {
       outputStream = context.openFileOutput(BLACKLIST_FILE, Context.MODE_PRIVATE);
-      outputStream.write(fileContents.getBytes());
+      outputStream.write(responseJson.toString().getBytes());
     } catch (IOException exception) {
       Log.e(LOG_TAG, exception.getMessage());
     } finally {
@@ -137,52 +145,43 @@ class CertificateBlacklist implements Callback {
 
   @Override
   public void onResponse(Call call, Response response) throws IOException {
-    List<String> revokedKeys = extractResponse(response);
-
-    saveBlackList(revokedKeys);
+    saveBlackList(response);
   }
 
-  private String createListContent(List<String> revokedKeys) {
+  private JsonObject addSHAtoKeys(JsonObject jsonObject) {
     StringBuilder content = new StringBuilder();
 
-    for (String key : revokedKeys) {
+    JsonArray jsonArray = jsonObject.getAsJsonArray("RevokedCertKeys");
+    JsonArray shaKeys = new JsonArray();
+
+    for (JsonElement key : jsonArray) {
+      shaKeys.add(SHA256 + key.getAsString());
+
       content.append(SHA256).append(key).append(NEW_LINE);
     }
 
-    return content.toString();
+    jsonObject.add("RevokedCertKeys", shaKeys);
+
+    return jsonObject;
   }
 
   private List<String> obtainBlacklistContents(File file) throws IOException {
     InputStream inputStream = new FileInputStream(file);
     BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-
     List<String> blacklist = new ArrayList<>();
+    Gson gson = new Gson();
 
     try {
-      boolean done = false;
-      while (!done) {
-        String line = reader.readLine();
-        done = (line == null);
+      JsonObject jsonObject = gson.fromJson(reader, JsonObject.class);
+      if (jsonObject != null) {
+        JsonArray jsonArray = jsonObject.getAsJsonArray("RevokedCertKeys");
 
-        if (line != null && !line.isEmpty()) {
-          blacklist.add(line);
-        }
+        Type listType = new TypeToken<List<String>>(){}.getType();
+        blacklist = gson.fromJson(jsonArray.toString(),listType);
       }
 
-    } catch (IOException exception) {
+    } catch (JsonIOException | JsonSyntaxException exception) {
       Log.e(LOG_TAG, exception.getMessage());
-    } finally {
-      try {
-        inputStream.close();
-      } catch (IOException exception) {
-        Log.e(LOG_TAG, exception.getMessage());
-      }
-
-      try {
-        reader.close();
-      } catch (IOException exception) {
-        Log.e(LOG_TAG, exception.getMessage());
-      }
     }
 
     return blacklist;
@@ -205,18 +204,6 @@ class CertificateBlacklist implements Callback {
     }
 
     return COM_CONFIG_ENDPOINT;
-  }
-
-  private List<String> extractResponse(Response response) throws IOException {
-    String responseData = response.body().string();
-
-    Gson gson = new Gson();
-    JsonObject jsonObject = gson.fromJson(responseData, JsonObject.class);
-
-    Type listType = new TypeToken<List<String>>() {}.getType();
-    List revokedKeys = gson.fromJson(jsonObject.get("RevokedCertKeys"), listType);
-
-    return revokedKeys;
   }
 
   private void saveTimestamp() {
