@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
+
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
 
@@ -36,6 +38,9 @@ public class CertificateBlacklistTest {
     CertificateBlacklist mockedBlacklist = mock(CertificateBlacklist.class);
     OkHttpClient client = settings.getClient(mockedBlacklist);
     Context mockedContext = mock(Context.class);
+
+    File mockedFile = mock(File.class);
+    when(mockedContext.getFilesDir()).thenReturn(mockedFile);
 
     SharedPreferences mockedSharedPreferences = mock(SharedPreferences.class);
     when(mockedContext.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE))

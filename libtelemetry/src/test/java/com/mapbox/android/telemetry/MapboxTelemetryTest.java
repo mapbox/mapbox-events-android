@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.ArgumentCaptor;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -615,6 +616,8 @@ public class MapboxTelemetryTest {
 
   private MapboxTelemetry obtainMapboxTelemetryWith(TelemetryClient telemetryClient) {
     Context mockedContext = mock(Context.class);
+    File mockedFile = mock(File.class);
+    when(mockedContext.getFilesDir()).thenReturn(mockedFile);
     MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
@@ -756,6 +759,8 @@ public class MapboxTelemetryTest {
 
   private MapboxTelemetry obtainMapboxTelemetryWith(boolean isServiceBound, TelemetryService telemetryService) {
     Context mockedContext = mock(Context.class);
+    File mockedFile = mock(File.class);
+    when(mockedContext.getFilesDir()).thenReturn(mockedFile);
     MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
@@ -777,6 +782,8 @@ public class MapboxTelemetryTest {
 
   private MapboxTelemetry obtainMapboxTelemetryForForeground() {
     Context mockedContext = mock(Context.class);
+    File mockedFile = mock(File.class);
+    when(mockedContext.getFilesDir()).thenReturn(mockedFile);
     ActivityManager mockedActivityManager = mock(ActivityManager.class, RETURNS_DEEP_STUBS);
     when(mockedContext.getSystemService(Context.ACTIVITY_SERVICE)).thenReturn(mockedActivityManager);
     ActivityManager.RunningTaskInfo mockedRunningTaskInfo = mock(ActivityManager.RunningTaskInfo.class);

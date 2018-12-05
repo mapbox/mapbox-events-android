@@ -61,7 +61,8 @@ class CertificateBlacklist implements Callback {
   private final String accessToken;
   private final String userAgent;
   private final OkHttpClient client;
-  private  SharedPreferences sharedPreferences;
+  private final SharedPreferences sharedPreferences;
+  private final List<String> revokedKeys;
 
   CertificateBlacklist(Context context, String accessToken, String userAgent, OkHttpClient client) {
     this.context = context;
@@ -69,9 +70,14 @@ class CertificateBlacklist implements Callback {
     this.userAgent = userAgent;
     this.client = client;
     this.sharedPreferences = TelemetryUtils.obtainSharedPreferences(context);
+    this.revokedKeys = retrieveBlackList();
   }
 
-  List<String> retrieveBlackList() {
+  List<String> getRevokedKeys() {
+    return revokedKeys;
+  }
+
+  private List<String> retrieveBlackList() {
     File directory = context.getFilesDir();
     List<String> blacklist = new ArrayList<>();
 
