@@ -87,7 +87,7 @@ public class CertificateBlacklistTest {
   }
 
   @Test
-  public void CheckBlacklistSaved() throws Exception {
+  public void checkBlacklistSaved() throws Exception {
     List<String> emptyList = new ArrayList<>();
     List<String> oneItemList = new ArrayList<>();
     oneItemList.add("sha256/test12345");
