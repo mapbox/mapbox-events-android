@@ -40,7 +40,6 @@ class CertificateBlacklist implements Callback {
   private static final String LOG_TAG = "MapboxBlacklist";
   private static final String BLACKLIST_FILE = "MapboxBlacklist";
   private static final String SHA256 = "sha256/";
-  private static final String NEW_LINE = "\n";
   private static final long DAY_IN_MILLIS = 86400000;
   private static final String COM_CONFIG_ENDPOINT = "api.mapbox.com";
   private static final String CHINA_CONFIG_ENDPOINT = "api.mapbox.cn";
@@ -62,7 +61,7 @@ class CertificateBlacklist implements Callback {
   private final String userAgent;
   private final OkHttpClient client;
   private final SharedPreferences sharedPreferences;
-  private final List<String> revokedKeys;
+  private List<String> revokedKeys;
 
   CertificateBlacklist(Context context, String accessToken, String userAgent, OkHttpClient client) {
     this.context = context;
@@ -70,30 +69,28 @@ class CertificateBlacklist implements Callback {
     this.userAgent = userAgent;
     this.client = client;
     this.sharedPreferences = TelemetryUtils.obtainSharedPreferences(context);
-    this.revokedKeys = retrieveBlackList();
+    retrieveBlackList();
   }
 
   List<String> getRevokedKeys() {
     return revokedKeys;
   }
 
-  private List<String> retrieveBlackList() {
+  private void retrieveBlackList() {
     File directory = context.getFilesDir();
-    List<String> blacklist = new ArrayList<>();
+    revokedKeys = new ArrayList<>();
 
     if (directory.isDirectory()) {
       File file = new File(directory, BLACKLIST_FILE);
 
       if (file.exists()) {
         try {
-          blacklist = obtainBlacklistContents(file);
+          revokedKeys = obtainBlacklistContents(file);
         } catch (IOException exception) {
           Log.e(LOG_TAG, exception.getMessage());
         }
       }
     }
-
-    return blacklist;
   }
 
   boolean daySinceLastUpdate() {
@@ -155,16 +152,17 @@ class CertificateBlacklist implements Callback {
   }
 
   private JsonObject addSHAtoKeys(JsonObject jsonObject) {
-    StringBuilder content = new StringBuilder();
+    Gson gson = new Gson();
 
     JsonArray jsonArray = jsonObject.getAsJsonArray("RevokedCertKeys");
     JsonArray shaKeys = new JsonArray();
 
     for (JsonElement key : jsonArray) {
       shaKeys.add(SHA256 + key.getAsString());
-
-      content.append(SHA256).append(key).append(NEW_LINE);
     }
+
+    Type listType = new TypeToken<List<String>>(){}.getType();
+    revokedKeys = gson.fromJson(shaKeys.toString(),listType);
 
     jsonObject.add("RevokedCertKeys", shaKeys);
 
