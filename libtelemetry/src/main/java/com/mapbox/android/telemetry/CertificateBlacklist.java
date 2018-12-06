@@ -60,7 +60,6 @@ class CertificateBlacklist implements Callback {
   private final String accessToken;
   private final String userAgent;
   private final OkHttpClient client;
-  private final SharedPreferences sharedPreferences;
   private List<String> revokedKeys;
 
   CertificateBlacklist(Context context, String accessToken, String userAgent, OkHttpClient client) {
@@ -68,7 +67,6 @@ class CertificateBlacklist implements Callback {
     this.accessToken = accessToken;
     this.userAgent = userAgent;
     this.client = client;
-    this.sharedPreferences = TelemetryUtils.obtainSharedPreferences(context);
     retrieveBlackList();
   }
 
@@ -99,6 +97,7 @@ class CertificateBlacklist implements Callback {
   }
 
   private long retrieveLastUpdateTime() {
+    SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences(context);
     return sharedPreferences.getLong(MAPBOX_SHARED_PREFERENCE_KEY_BLACKLIST_TIMESTAMP, 0);
   }
 
@@ -212,6 +211,7 @@ class CertificateBlacklist implements Callback {
 
   private void saveTimestamp() {
     Date date = new Date();
+    SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences(context);
     SharedPreferences.Editor editor = sharedPreferences.edit();
 
     editor.putLong(MAPBOX_SHARED_PREFERENCE_KEY_BLACKLIST_TIMESTAMP, date.getTime());
