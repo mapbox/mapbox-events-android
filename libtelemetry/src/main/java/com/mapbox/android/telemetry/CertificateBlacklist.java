@@ -22,9 +22,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.RandomAccessFile;
 import java.lang.reflect.Type;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.channels.OverlappingFileLockException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +36,8 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 class CertificateBlacklist implements Callback {
   private static final String LOG_TAG = "MapboxBlacklist";
@@ -58,20 +61,18 @@ class CertificateBlacklist implements Callback {
   };
   private final Context context;
   private final String accessToken;
-  private final String userAgent;
-  private final OkHttpClient client;
+  private  final BlacklistClient blacklistClient;
   private List<String> revokedKeys;
 
   CertificateBlacklist(Context context, String accessToken, String userAgent, OkHttpClient client) {
     this.context = context;
     this.accessToken = accessToken;
-    this.userAgent = userAgent;
-    this.client = client;
+    this.blacklistClient = new BlacklistClient(userAgent, client, this);
     retrieveBlackList();
   }
 
-  List<String> getRevokedKeys() {
-    return revokedKeys;
+  Boolean isBlacklisted(String hash) {
+    return revokedKeys.contains(hash);
   }
 
   private void retrieveBlackList() {
@@ -83,7 +84,9 @@ class CertificateBlacklist implements Callback {
 
       if (file.exists()) {
         try {
-          revokedKeys = obtainBlacklistContents(file);
+          if (!isFileOpened(file)) {
+            revokedKeys = obtainBlacklistContents(file);
+          }
         } catch (IOException exception) {
           Log.e(LOG_TAG, exception.getMessage());
         }
@@ -92,22 +95,15 @@ class CertificateBlacklist implements Callback {
   }
 
   boolean daySinceLastUpdate() {
-    long millisecondDiff = System.currentTimeMillis() - retrieveLastUpdateTime();
+    SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences(context);
+    long lastUpdateTime = sharedPreferences.getLong(MAPBOX_SHARED_PREFERENCE_KEY_BLACKLIST_TIMESTAMP, 0);
+
+    long millisecondDiff = System.currentTimeMillis() - lastUpdateTime;
     return millisecondDiff >= DAY_IN_MILLIS;
   }
 
-  private long retrieveLastUpdateTime() {
-    SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences(context);
-    return sharedPreferences.getLong(MAPBOX_SHARED_PREFERENCE_KEY_BLACKLIST_TIMESTAMP, 0);
-  }
-
   void requestBlacklist(HttpUrl requestUrl) {
-    Request request = new Request.Builder()
-      .url(requestUrl)
-      .header(USER_AGENT_REQUEST_HEADER, userAgent)
-      .build();
-
-    client.newCall(request).enqueue(this);
+    blacklistClient.requestBlacklist(requestUrl);
   }
 
   HttpUrl generateRequestUrl() {
@@ -118,13 +114,12 @@ class CertificateBlacklist implements Callback {
       .build();
   }
 
-  private void saveBlackList(Response response) throws IOException {
+  private void saveBlackList(ResponseBody responseBody) throws IOException {
     Gson gson = new GsonBuilder().create();
-    JsonObject responseJson = gson.fromJson(response.body().string(), JsonObject.class);
+    JsonObject responseJson = gson.fromJson(responseBody.string(), JsonObject.class);
 
     responseJson = addSHAtoKeys(responseJson);
     FileOutputStream outputStream = null;
-    saveTimestamp();
 
     try {
       outputStream = context.openFileOutput(BLACKLIST_FILE, Context.MODE_PRIVATE);
@@ -138,16 +133,22 @@ class CertificateBlacklist implements Callback {
         Log.e(LOG_TAG, exception.getMessage());
       }
     }
+
+    saveTimestamp();
   }
 
   @Override
   public void onFailure(Call call, IOException exception) {
     Log.e(LOG_TAG, REQUEST_FAIL, exception);
+    saveTimestamp();
   }
 
   @Override
   public void onResponse(Call call, Response response) throws IOException {
-    saveBlackList(response);
+    Log.e("test", "onResponse: " + response);
+    if (response.body() != null) {
+      saveBlackList(response.body());
+    }
   }
 
   private JsonObject addSHAtoKeys(JsonObject jsonObject) {
@@ -210,11 +211,27 @@ class CertificateBlacklist implements Callback {
   }
 
   private void saveTimestamp() {
-    Date date = new Date();
     SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences(context);
     SharedPreferences.Editor editor = sharedPreferences.edit();
 
-    editor.putLong(MAPBOX_SHARED_PREFERENCE_KEY_BLACKLIST_TIMESTAMP, date.getTime());
+    editor.putLong(MAPBOX_SHARED_PREFERENCE_KEY_BLACKLIST_TIMESTAMP, System.currentTimeMillis());
     editor.apply();
+  }
+
+  private boolean isFileOpened(File file) throws IOException {
+    boolean fileOpen = false;
+    FileChannel channel = new RandomAccessFile(file, "rw").getChannel();
+    FileLock lock = channel.lock();
+
+    try {
+      lock = channel.tryLock();
+    } catch (OverlappingFileLockException exception) {
+      fileOpen = true;
+    } catch (IOException exception) {
+      exception.printStackTrace();
+    } finally {
+      lock.release();
+    }
+    return fileOpen;
   }
 }

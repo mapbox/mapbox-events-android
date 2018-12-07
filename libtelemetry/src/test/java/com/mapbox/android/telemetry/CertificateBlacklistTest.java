@@ -27,7 +27,7 @@ import okhttp3.mockwebserver.internal.tls.SslClient;
 import static com.mapbox.android.telemetry.CertificateBlacklist.MAPBOX_SHARED_PREFERENCE_KEY_BLACKLIST_TIMESTAMP;
 import static com.mapbox.android.telemetry.TelemetryUtils.MAPBOX_SHARED_PREFERENCES;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -82,17 +82,11 @@ public class CertificateBlacklistTest {
   }
 
   @Test
-  public void checkGetRevokedKeysSetAtInit() throws Exception {
-    assertNotNull(certificateBlacklist.getRevokedKeys());
-  }
-
-  @Test
   public void checkBlacklistSaved() throws Exception {
-    List<String> emptyList = new ArrayList<>();
     List<String> oneItemList = new ArrayList<>();
     oneItemList.add("sha256/test12345");
 
-    assertEquals(emptyList, certificateBlacklist.getRevokedKeys());
+    assertFalse(certificateBlacklist.isBlacklisted(oneItemList.get(0)));
 
     Call mockedCall = mock(Call.class);
     Response mockedResponse = mock(Response.class);
@@ -104,7 +98,7 @@ public class CertificateBlacklistTest {
 
     certificateBlacklist.onResponse(mockedCall, mockedResponse);
 
-    assertEquals(oneItemList, certificateBlacklist.getRevokedKeys());
+    assertTrue(certificateBlacklist.isBlacklisted(oneItemList.get(0)));
   }
 
   private TelemetryClientSettings provideDefaultTelemetryClientSettings() {
