@@ -76,7 +76,9 @@ class CertificateBlacklist implements Callback {
       if (file.exists()) {
         try {
           blacklist = obtainBlacklistContents(file);
-          blacklist.remove(BLACKLIST_HEAD);
+          if (blacklist.size() > 0) {
+            blacklist.remove(BLACKLIST_HEAD);
+          }
         } catch (IOException | IndexOutOfBoundsException exception) {
           Log.e(LOG_TAG, exception.getMessage());
         }
