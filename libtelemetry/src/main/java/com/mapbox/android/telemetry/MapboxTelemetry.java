@@ -26,7 +26,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
@@ -59,7 +58,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     initializeContext(context);
     initializeQueue();
     this.certificateBlacklist = new CertificateBlacklist(context, accessToken,
-      TelemetryUtils.createFullUserAgent(userAgent, applicationContext), new OkHttpClient());
+      TelemetryUtils.createFullUserAgent(userAgent, applicationContext));
     checkBlacklistLastUpdateTime();
     checkRequiredParameters(accessToken, userAgent);
     AlarmReceiver alarmReceiver = obtainAlarmReceiver();
@@ -93,7 +92,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     initializeTelemetryListeners();
     initializeAttachmentListeners();
     this.certificateBlacklist = new CertificateBlacklist(context, accessToken,
-      TelemetryUtils.createFullUserAgent(userAgent, applicationContext), new OkHttpClient());
+      TelemetryUtils.createFullUserAgent(userAgent, applicationContext));
   }
 
   @Override
@@ -560,7 +559,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   @VisibleForTesting
   void checkBlacklistLastUpdateTime() {
     if (certificateBlacklist.daySinceLastUpdate()) {
-      certificateBlacklist.requestBlacklist(certificateBlacklist.generateRequestUrl());
+      certificateBlacklist.requestBlacklist();
     }
   }
 

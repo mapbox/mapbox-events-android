@@ -16,6 +16,7 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
 
 import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
@@ -35,12 +36,15 @@ import static org.mockito.Mockito.when;
 public class CertificateBlacklistTest {
   private MockWebServer server;
   private CertificateBlacklist certificateBlacklist;
+  private BlacklistClient blacklistClient;
 
   @Before
   public void setUp() throws Exception {
     this.server = new MockWebServer();
     server.useHttps(SslClient.localhost().socketFactory, false);
     server.start();
+
+    Callback mockedCallback = mock(Callback.class);
 
     TelemetryClientSettings settings = provideDefaultTelemetryClientSettings();
     CertificateBlacklist mockedBlacklist = mock(CertificateBlacklist.class);
@@ -61,7 +65,8 @@ public class CertificateBlacklistTest {
     when(mockedSharedPreferences.edit()).thenReturn(mockedEditor);
 
     this.certificateBlacklist = new CertificateBlacklist(mockedContext, "anAccessToken",
-      "AnUserAgent", client);
+      "AnUserAgent");
+    this.blacklistClient = new BlacklistClient("AnUserAgent", client, mockedCallback);
   }
 
   @After
@@ -76,7 +81,7 @@ public class CertificateBlacklistTest {
 
   @Test
   public void checkRequestContainsUserAgentHeader() throws Exception {
-    certificateBlacklist.requestBlacklist(obtainBaseEndpointUrl());
+    blacklistClient.requestBlacklist(obtainBaseEndpointUrl());
 
     assertRequestContainsHeader("User-Agent", "AnUserAgent");
   }
