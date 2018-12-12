@@ -100,7 +100,11 @@ public class TelemetryUtils {
 
   static String obtainApplicationState(Context context) {
     ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-    List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
+    List<ActivityManager.RunningAppProcessInfo> appProcesses = null;
+
+    if (activityManager != null) {
+      appProcesses = activityManager.getRunningAppProcesses();
+    }
     if (appProcesses == null) {
       return NO_STATE;
     }
