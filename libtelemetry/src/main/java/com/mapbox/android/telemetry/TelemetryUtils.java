@@ -143,7 +143,11 @@ public class TelemetryUtils {
 
   static String obtainCellularNetworkType(Context context) {
     TelephonyManager telephonyManager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
-    return NETWORKS.get(telephonyManager.getNetworkType());
+    if (telephonyManager != null) {
+      return NETWORKS.get(telephonyManager.getNetworkType());
+    }
+
+    return NETWORKS.get(TelephonyManager.NETWORK_TYPE_UNKNOWN);
   }
 
   static String obtainCurrentDate() {

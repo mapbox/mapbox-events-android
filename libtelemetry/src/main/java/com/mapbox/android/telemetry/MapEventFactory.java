@@ -116,7 +116,11 @@ public class MapEventFactory {
 
   private String obtainCellularCarrier(Context context) {
     TelephonyManager manager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-    String carrierName = manager.getNetworkOperatorName();
+    String carrierName = null;
+
+    if (manager != null) {
+      carrierName = manager.getNetworkOperatorName();
+    }
 
     if (TextUtils.isEmpty(carrierName)) {
       return NO_CARRIER;
