@@ -41,7 +41,6 @@ class CertificateBlacklist implements Callback {
   private final String accessToken;
   private  final BlacklistClient blacklistClient;
   private List<String> revokedKeys;
-  private boolean fileOpen = false;
 
   CertificateBlacklist(Context context, String accessToken, String userAgent) {
     this.context = context;
@@ -63,9 +62,7 @@ class CertificateBlacklist implements Callback {
 
       if (file.exists()) {
         try {
-          if (!fileOpen) {
-            revokedKeys = obtainBlacklistContents(file);
-          }
+          revokedKeys = obtainBlacklistContents(file);
         } catch (IOException exception) {
           Log.e(LOG_TAG, exception.getMessage());
         }
@@ -86,9 +83,18 @@ class CertificateBlacklist implements Callback {
   }
 
   private void saveBlackList(ResponseBody responseBody) throws IOException {
-    fileOpen = true;
+    if (responseBody == null) {
+      return;
+    }
+
     Gson gson = new GsonBuilder().create();
-    JsonObject responseJson = gson.fromJson(responseBody.string(), JsonObject.class);
+    JsonObject responseJson = new JsonObject();
+
+    try {
+      responseJson = gson.fromJson(responseBody.string(), JsonObject.class);
+    } catch (JsonSyntaxException exception) {
+      Log.e(LOG_TAG, exception.getMessage());
+    }
 
     responseJson = addSHAtoKeys(responseJson);
     FileOutputStream outputStream = null;
@@ -98,18 +104,15 @@ class CertificateBlacklist implements Callback {
       outputStream.write(responseJson.toString().getBytes());
     } catch (IOException exception) {
       Log.e(LOG_TAG, exception.getMessage());
-      fileOpen = false;
     } finally {
       try {
-        outputStream.close();
+        if (outputStream != null) {
+          outputStream.close();
+        }
       } catch (IOException exception) {
         Log.e(LOG_TAG, exception.getMessage());
-        fileOpen = false;
       }
     }
-
-    fileOpen = false;
-    saveTimestamp();
   }
 
   @Override
@@ -145,7 +148,6 @@ class CertificateBlacklist implements Callback {
   }
 
   private List<String> obtainBlacklistContents(File file) throws IOException {
-    fileOpen = true;
     InputStream inputStream = new FileInputStream(file);
     BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
     List<String> blacklist = new ArrayList<>();
@@ -162,10 +164,8 @@ class CertificateBlacklist implements Callback {
 
     } catch (JsonIOException | JsonSyntaxException exception) {
       Log.e(LOG_TAG, exception.getMessage());
-      fileOpen = false;
     }
 
-    fileOpen = false;
     return blacklist;
   }
 
