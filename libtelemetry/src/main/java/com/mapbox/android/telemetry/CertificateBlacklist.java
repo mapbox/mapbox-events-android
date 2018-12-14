@@ -7,7 +7,6 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
@@ -50,7 +49,12 @@ class CertificateBlacklist implements Callback {
   }
 
   boolean isBlacklisted(String hash) {
-    return revokedKeys.contains(hash);
+    for (String revokedKey : revokedKeys) {
+      if (hash.contains(revokedKey)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private void retrieveBlackList() {
@@ -96,7 +100,9 @@ class CertificateBlacklist implements Callback {
       Log.e(LOG_TAG, exception.getMessage());
     }
 
-    responseJson = addSHAtoKeys(responseJson);
+    JsonArray jsonArray = responseJson.getAsJsonArray("RevokedCertKeys");
+    Type listType = new TypeToken<List<String>>(){}.getType();
+    revokedKeys = gson.fromJson(jsonArray.toString(),listType);
     FileOutputStream outputStream = null;
 
     try {
@@ -127,24 +133,6 @@ class CertificateBlacklist implements Callback {
       saveBlackList(response.body());
     }
     saveTimestamp();
-  }
-
-  private JsonObject addSHAtoKeys(JsonObject jsonObject) {
-    Gson gson = new Gson();
-
-    JsonArray jsonArray = jsonObject.getAsJsonArray("RevokedCertKeys");
-    JsonArray shaKeys = new JsonArray();
-
-    for (JsonElement key : jsonArrayNullCheck(jsonArray)) {
-      shaKeys.add(SHA256 + key.getAsString());
-    }
-
-    Type listType = new TypeToken<List<String>>(){}.getType();
-    revokedKeys = gson.fromJson(shaKeys.toString(),listType);
-
-    jsonObject.add("RevokedCertKeys", shaKeys);
-
-    return jsonObject;
   }
 
   private List<String> obtainBlacklistContents(File file) throws IOException {

@@ -51,9 +51,12 @@ class CertificatePinnerFactory {
 
     String key = retrievePinKey(pins);
     List<String> hashList = pins.get(key);
-    hashList = removeBlaklistedHashes(certificateBlacklist, hashList);
 
-    pins.put(key, hashList);
+    if (hashList != null) {
+      hashList = removeBlaklistedHashes(certificateBlacklist, hashList);
+      pins.put(key, hashList);
+    }
+
     return pins;
   }
 
