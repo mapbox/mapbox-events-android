@@ -32,7 +32,6 @@ import okhttp3.ResponseBody;
 class CertificateBlacklist implements Callback {
   private static final String LOG_TAG = "MapboxBlacklist";
   private static final String BLACKLIST_FILE = "MapboxBlacklist";
-  private static final String SHA256 = "sha256/";
   private static final long DAY_IN_MILLIS = 86400000;
   private static final String REQUEST_FAIL = "Request failed to download blacklist";
   static final String MAPBOX_SHARED_PREFERENCE_KEY_BLACKLIST_TIMESTAMP = "mapboxBlacklistTimestamp";
@@ -163,13 +162,5 @@ class CertificateBlacklist implements Callback {
 
     editor.putLong(MAPBOX_SHARED_PREFERENCE_KEY_BLACKLIST_TIMESTAMP, System.currentTimeMillis());
     editor.apply();
-  }
-
-  private JsonArray jsonArrayNullCheck(JsonArray jsonArray) {
-    if (jsonArray.isJsonNull()) {
-      return new JsonArray();
-    }
-
-    return jsonArray;
   }
 }
