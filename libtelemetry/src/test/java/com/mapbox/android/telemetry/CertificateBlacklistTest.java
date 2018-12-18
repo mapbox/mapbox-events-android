@@ -2,6 +2,9 @@ package com.mapbox.android.telemetry;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
 
 import org.junit.After;
 import org.junit.Before;
@@ -30,6 +33,8 @@ import static com.mapbox.android.telemetry.TelemetryUtils.MAPBOX_SHARED_PREFEREN
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -75,7 +80,7 @@ public class CertificateBlacklistTest {
   }
 
   @Test
-  public void checkDaySinceLastUpdate() throws Exception {
+  public void checkDaySinceLastUpdate() {
     assertTrue(certificateBlacklist.daySinceLastUpdate());
   }
 
@@ -104,6 +109,15 @@ public class CertificateBlacklistTest {
     certificateBlacklist.onResponse(mockedCall, mockedResponse);
 
     assertTrue(certificateBlacklist.isBlacklisted(oneItemList.get(0)));
+  }
+
+  @Test
+  public void checkRequestUrlGeneration() throws Exception {
+    Context mockedContext = getConfigContext();
+    String accessToken = "accessToken";
+    HttpUrl httpUrl = getHttpUrl(accessToken);
+
+    assertEquals(httpUrl, blacklistClient.generateRequestUrl(mockedContext, accessToken));
   }
 
   private TelemetryClientSettings provideDefaultTelemetryClientSettings() {
@@ -144,5 +158,32 @@ public class CertificateBlacklistTest {
       request = server.takeRequest();
     }
     return request;
+  }
+
+  private HttpUrl getHttpUrl(String accessToken) {
+    return new HttpUrl.Builder().scheme("https")
+      .host("api.mapbox.com")
+      .addPathSegment("events-config")
+      .addQueryParameter("access_token", accessToken)
+      .build();
+  }
+
+  private Context getConfigContext() throws PackageManager.NameNotFoundException {
+    String anyAppInfoHostname = "any.app.info.hostname";
+    String anyAppInfoAccessToken = "anyAppInfoAccessToken";
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    Bundle mockedBundle = mock(Bundle.class);
+    when(mockedBundle.getString(eq("com.mapbox.TestEventsServer"))
+    ).thenReturn(anyAppInfoHostname);
+    when(mockedBundle.getString(eq("com.mapbox.TestEventsAccessToken"))
+    ).thenReturn(anyAppInfoAccessToken);
+    ApplicationInfo mockedApplicationInfo = mock(ApplicationInfo.class);
+    mockedApplicationInfo.metaData = mockedBundle;
+    String packageName = "com.foo.test";
+    when(mockedContext.getPackageManager().getApplicationInfo(packageName, PackageManager.GET_META_DATA))
+      .thenReturn(mockedApplicationInfo);
+    when(mockedContext.getPackageName()).thenReturn(packageName);
+
+    return mockedContext;
   }
 }
