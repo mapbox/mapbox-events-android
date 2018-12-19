@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
 public class CertificateBlacklistTest {
   private MockWebServer server;
   private CertificateBlacklist certificateBlacklist;
-  private BlacklistClient blacklistClient;
+  private ConfiguationClient configuationClient;
 
   @Before
   public void setUp() throws Exception {
@@ -71,7 +71,7 @@ public class CertificateBlacklistTest {
 
     this.certificateBlacklist = new CertificateBlacklist(mockedContext, "anAccessToken",
       "AnUserAgent");
-    this.blacklistClient = new BlacklistClient("AnUserAgent", client, mockedCallback);
+    this.configuationClient = new ConfiguationClient("AnUserAgent", client, mockedCallback);
   }
 
   @After
@@ -86,7 +86,7 @@ public class CertificateBlacklistTest {
 
   @Test
   public void checkRequestContainsUserAgentHeader() throws Exception {
-    blacklistClient.requestBlacklist(obtainBaseEndpointUrl());
+    configuationClient.requestBlacklist(obtainBaseEndpointUrl());
 
     assertRequestContainsHeader("User-Agent", "AnUserAgent");
   }

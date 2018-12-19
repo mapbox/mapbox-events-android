@@ -26,6 +26,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
@@ -52,14 +53,15 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private CopyOnWriteArraySet<TelemetryListener> telemetryListeners = null;
   private final CertificateBlacklist certificateBlacklist;
   private CopyOnWriteArraySet<AttachmentListener> attachmentListeners = null;
+  private final ConfiguationClient configuationClient;
   static Context applicationContext = null;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
     initializeQueue();
-    this.certificateBlacklist = new CertificateBlacklist(context, accessToken,
-      TelemetryUtils.createFullUserAgent(userAgent, applicationContext));
-    checkBlacklistLastUpdateTime();
+    this.configuationClient = new ConfiguationClient(context, TelemetryUtils.createFullUserAgent(userAgent,
+            context), accessToken, new OkHttpClient());
+    this.certificateBlacklist = new CertificateBlacklist(context, configuationClient);
     checkRequiredParameters(accessToken, userAgent);
     AlarmReceiver alarmReceiver = obtainAlarmReceiver();
     this.schedulerFlusher = new SchedulerFlusherFactory(applicationContext, alarmReceiver).supply();
@@ -91,8 +93,9 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     this.isServiceBound = isServiceBound;
     initializeTelemetryListeners();
     initializeAttachmentListeners();
-    this.certificateBlacklist = new CertificateBlacklist(context, accessToken,
-      TelemetryUtils.createFullUserAgent(userAgent, applicationContext));
+    this.configuationClient = new ConfiguationClient(context, TelemetryUtils.createFullUserAgent(userAgent,
+            context), accessToken, new OkHttpClient());
+    this.certificateBlacklist = new CertificateBlacklist(context, configuationClient);
   }
 
   @Override
@@ -554,13 +557,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     }
 
     return false;
-  }
-
-  @VisibleForTesting
-  void checkBlacklistLastUpdateTime() {
-    if (certificateBlacklist.daySinceLastUpdate()) {
-      certificateBlacklist.requestBlacklist();
-    }
   }
 
   private void sendAttachment(Event event) {
