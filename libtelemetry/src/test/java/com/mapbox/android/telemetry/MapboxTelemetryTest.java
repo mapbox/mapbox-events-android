@@ -19,7 +19,6 @@ import java.util.List;
 
 import okhttp3.Callback;
 
-import static com.mapbox.android.telemetry.CertificateBlacklist.MAPBOX_SHARED_PREFERENCE_KEY_BLACKLIST_TIMESTAMP;
 import static com.mapbox.android.telemetry.TelemetryUtils.MAPBOX_SHARED_PREFERENCES;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -614,8 +613,8 @@ public class MapboxTelemetryTest {
     return mapboxTelemetry;
   }
 
-  private MapboxTelemetry obtainMapboxTelemetryWith(TelemetryClient telemetryClient) {
-    Context mockedContext = mock(Context.class);
+  private MapboxTelemetry obtainMapboxTelemetryWith(TelemetryClient telemetryClient) throws IOException {
+    Context mockedContext = obtainBlacklistContext();
     File mockedFile = mock(File.class);
     when(mockedContext.getFilesDir()).thenReturn(mockedFile);
     MapboxTelemetry.applicationContext = mockedContext;
@@ -757,8 +756,9 @@ public class MapboxTelemetryTest {
     return mapboxTelemetry;
   }
 
-  private MapboxTelemetry obtainMapboxTelemetryWith(boolean isServiceBound, TelemetryService telemetryService) {
-    Context mockedContext = mock(Context.class);
+  private MapboxTelemetry obtainMapboxTelemetryWith(boolean isServiceBound, TelemetryService telemetryService)
+    throws IOException {
+    Context mockedContext = obtainBlacklistContext();
     File mockedFile = mock(File.class);
     when(mockedContext.getFilesDir()).thenReturn(mockedFile);
     MapboxTelemetry.applicationContext = mockedContext;
@@ -780,8 +780,8 @@ public class MapboxTelemetryTest {
     return theMapboxTelemetry;
   }
 
-  private MapboxTelemetry obtainMapboxTelemetryForForeground() {
-    Context mockedContext = mock(Context.class);
+  private MapboxTelemetry obtainMapboxTelemetryForForeground() throws IOException {
+    Context mockedContext = obtainBlacklistContext();
     File mockedFile = mock(File.class);
     when(mockedContext.getFilesDir()).thenReturn(mockedFile);
     ActivityManager mockedActivityManager = mock(ActivityManager.class, RETURNS_DEEP_STUBS);
@@ -834,7 +834,7 @@ public class MapboxTelemetryTest {
     SharedPreferences mockedSharedPreferences = mock(SharedPreferences.class);
     when(mockedContext.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE))
       .thenReturn(mockedSharedPreferences);
-    when(mockedSharedPreferences.getLong(MAPBOX_SHARED_PREFERENCE_KEY_BLACKLIST_TIMESTAMP,0))
+    when(mockedSharedPreferences.getLong("mapboxConfigSyncTimestamp",0))
       .thenReturn(Long.valueOf(0));
 
     return mockedContext;
