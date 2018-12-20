@@ -9,6 +9,7 @@ import java.util.Set;
 import okhttp3.CertificatePinner;
 
 class CertificatePinnerFactory {
+  private static final String SHA256_PIN_FORMAT = "sha256/%s";
 
   private static final Map<Environment, Map<String, List<String>>> CERTIFICATES_PINS = new HashMap<Environment,
     Map<String, List<String>>>() {
@@ -26,11 +27,9 @@ class CertificatePinnerFactory {
    */
   CertificatePinner provideCertificatePinnerFor(Environment environment, CertificateBlacklist certificateBlacklist) {
     CertificatePinner.Builder certificatePinnerBuilder = new CertificatePinner.Builder();
-
     Map<String, List<String>> certificatesPins = provideCertificatesPinsFor(environment);
     certificatesPins = removeBlacklistedPins(certificatesPins, certificateBlacklist);
     addCertificatesPins(certificatesPins, certificatePinnerBuilder);
-
     return certificatePinnerBuilder.build();
   }
 
@@ -41,40 +40,33 @@ class CertificatePinnerFactory {
   private void addCertificatesPins(Map<String, List<String>> pins, CertificatePinner.Builder builder) {
     for (Map.Entry<String, List<String>> entry : pins.entrySet()) {
       for (String pin : entry.getValue()) {
-        builder.add(entry.getKey(), pin);
+        builder.add(entry.getKey(), String.format(SHA256_PIN_FORMAT, pin));
       }
     }
   }
 
   private Map<String, List<String>> removeBlacklistedPins(Map<String, List<String>> pins,
                                                           CertificateBlacklist certificateBlacklist) {
-    List<String> blackList = certificateBlacklist.retrieveBlackList();
-
-    if (blackList.isEmpty()) {
-      return pins;
-    }
-
     String key = retrievePinKey(pins);
     List<String> hashList = pins.get(key);
-    hashList = removeBlaklistedHashes(blackList, hashList);
-
-    pins.put(key, hashList);
+    if (hashList != null) {
+      hashList = removeBlacklistedHashes(certificateBlacklist, hashList);
+      pins.put(key, hashList);
+    }
     return pins;
   }
 
   private String retrievePinKey(Map<String, List<String>> pins) {
     Set<String> pinsKey = pins.keySet();
-
     return pinsKey.iterator().next();
   }
 
-  private List<String> removeBlaklistedHashes(List blackList, List<String> hashList) {
+  private List<String> removeBlacklistedHashes(CertificateBlacklist certificateBlacklist, List<String> hashList) {
     for (String hash : hashList) {
-      if (blackList.contains(hash)) {
+      if (certificateBlacklist.isBlacklisted(hash)) {
         hashList.remove(hash);
       }
     }
-
     return hashList;
   }
 }

@@ -2,6 +2,7 @@ package com.mapbox.android.telemetry;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
@@ -10,6 +11,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.ArgumentCaptor;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,6 +19,7 @@ import java.util.List;
 
 import okhttp3.Callback;
 
+import static com.mapbox.android.telemetry.TelemetryUtils.MAPBOX_SHARED_PREFERENCES;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -491,16 +494,6 @@ public class MapboxTelemetryTest {
   }
 
   @Test
-  public void checkCertificateBlacklistUpdateCalled() throws Exception {
-    Context mockedContext = obtainBlacklistContext();
-    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext);
-
-    theMapboxTelemetry.checkBlacklistLastUpdateTime();
-
-    verify(mockedContext, times(1)).getFilesDir();
-  }
-
-  @Test
   public void checksIsAppInBackgroundOptLocationIn() throws Exception {
     MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryForForeground();
 
@@ -620,8 +613,10 @@ public class MapboxTelemetryTest {
     return mapboxTelemetry;
   }
 
-  private MapboxTelemetry obtainMapboxTelemetryWith(TelemetryClient telemetryClient) {
-    Context mockedContext = mock(Context.class);
+  private MapboxTelemetry obtainMapboxTelemetryWith(TelemetryClient telemetryClient) throws IOException {
+    Context mockedContext = obtainBlacklistContext();
+    File mockedFile = mock(File.class);
+    when(mockedContext.getFilesDir()).thenReturn(mockedFile);
     MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
@@ -761,8 +756,11 @@ public class MapboxTelemetryTest {
     return mapboxTelemetry;
   }
 
-  private MapboxTelemetry obtainMapboxTelemetryWith(boolean isServiceBound, TelemetryService telemetryService) {
-    Context mockedContext = mock(Context.class);
+  private MapboxTelemetry obtainMapboxTelemetryWith(boolean isServiceBound, TelemetryService telemetryService)
+    throws IOException {
+    Context mockedContext = obtainBlacklistContext();
+    File mockedFile = mock(File.class);
+    when(mockedContext.getFilesDir()).thenReturn(mockedFile);
     MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
@@ -782,8 +780,10 @@ public class MapboxTelemetryTest {
     return theMapboxTelemetry;
   }
 
-  private MapboxTelemetry obtainMapboxTelemetryForForeground() {
-    Context mockedContext = mock(Context.class);
+  private MapboxTelemetry obtainMapboxTelemetryForForeground() throws IOException {
+    Context mockedContext = obtainBlacklistContext();
+    File mockedFile = mock(File.class);
+    when(mockedContext.getFilesDir()).thenReturn(mockedFile);
     ActivityManager mockedActivityManager = mock(ActivityManager.class, RETURNS_DEEP_STUBS);
     when(mockedContext.getSystemService(Context.ACTIVITY_SERVICE)).thenReturn(mockedActivityManager);
     ActivityManager.RunningTaskInfo mockedRunningTaskInfo = mock(ActivityManager.RunningTaskInfo.class);
@@ -830,7 +830,13 @@ public class MapboxTelemetryTest {
 
   private Context obtainBlacklistContext() throws IOException {
     Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
-    when(mockedContext.getFilesDir()).thenReturn(temporaryFolder.newFolder());
+
+    SharedPreferences mockedSharedPreferences = mock(SharedPreferences.class);
+    when(mockedContext.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE))
+      .thenReturn(mockedSharedPreferences);
+    when(mockedSharedPreferences.getLong("mapboxConfigSyncTimestamp",0))
+      .thenReturn(Long.valueOf(0));
+
     return mockedContext;
   }
 }
