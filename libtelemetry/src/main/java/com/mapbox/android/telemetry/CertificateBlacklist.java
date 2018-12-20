@@ -19,8 +19,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 class CertificateBlacklist implements ConfigurationChangeHandler {
   private static final String LOG_TAG = "MapboxBlacklist";
@@ -45,7 +45,7 @@ class CertificateBlacklist implements ConfigurationChangeHandler {
   }
 
   private void retrieveBlackList(File directory) {
-    revokedKeys = new ArrayList<>();
+    revokedKeys = new CopyOnWriteArrayList<>();
     if (directory.isDirectory()) {
       File file = new File(directory, BLACKLIST_FILE);
       if (file.exists()) {
@@ -92,7 +92,7 @@ class CertificateBlacklist implements ConfigurationChangeHandler {
   private List<String> obtainBlacklistContents(File file) throws IOException {
     InputStream inputStream = new FileInputStream(file);
     BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-    List<String> blacklist = new ArrayList<>();
+    List<String> blacklist = new CopyOnWriteArrayList<>();
     Gson gson = new Gson();
 
     try {
