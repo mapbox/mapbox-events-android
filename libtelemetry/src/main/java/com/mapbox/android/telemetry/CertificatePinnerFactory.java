@@ -50,7 +50,7 @@ class CertificatePinnerFactory {
     String key = retrievePinKey(pins);
     List<String> hashList = pins.get(key);
     if (hashList != null) {
-      hashList = removeBlaklistedHashes(certificateBlacklist, hashList);
+      hashList = removeBlacklistedHashes(certificateBlacklist, hashList);
       pins.put(key, hashList);
     }
     return pins;
@@ -61,7 +61,7 @@ class CertificatePinnerFactory {
     return pinsKey.iterator().next();
   }
 
-  private List<String> removeBlaklistedHashes(CertificateBlacklist certificateBlacklist, List<String> hashList) {
+  private List<String> removeBlacklistedHashes(CertificateBlacklist certificateBlacklist, List<String> hashList) {
     for (String hash : hashList) {
       if (certificateBlacklist.isBlacklisted(hash)) {
         hashList.remove(hash);
