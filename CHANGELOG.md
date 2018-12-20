@@ -19,6 +19,9 @@ Mapbox welcomes participation and contributions from everyone.
 - Update dependencies and cleanup gradle scripts - [#237](https://github.com/mapbox/mapbox-events-android/pull/237)
 - Telemetry SDK background location updates + batch locations - [#236](https://github.com/mapbox/mapbox-events-android/pull/236)
 
+### v3.5.7
+- Refactor Certificate Blacklist - [#311](https://github.com/mapbox/mapbox-events-android/pull/311)
+
 ### v3.5.6
 - Add UserAgent header to Config Request - [#297](https://github.com/mapbox/mapbox-events-android/pull/297)
 - Add lifecycle methods to track lifecycle of parent activity - [#254](https://github.com/mapbox/mapbox-events-android/pull/254)
