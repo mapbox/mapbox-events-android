@@ -4,6 +4,10 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v4.1.1
+- Fix binary size checker archive name - [#304](https://github.com/mapbox/mapbox-events-android/pull/304)
+- Remove jacoco from release builds - [#303](https://github.com/mapbox/mapbox-events-android/pull/303)
+
 ### v4.1.0
 - Publish metrics to AWS on master and release only - [#293](https://github.com/mapbox/mapbox-events-android/pull/293)
 - Push mobile metrics to loading dock - [#288](https://github.com/mapbox/mapbox-events-android/pull/288)
