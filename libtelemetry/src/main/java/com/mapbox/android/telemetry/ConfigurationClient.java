@@ -20,8 +20,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
-class ConfiguationClient implements Callback {
-  private static final String LOG_TAG = "ConfiguationClient";
+class ConfigurationClient implements Callback {
+  private static final String LOG_TAG = "ConfigurationClient";
   private static final String USER_AGENT_REQUEST_HEADER = "User-Agent";
   private static final String HTTPS_SCHEME = "https";
   private static final String EVENT_CONFIG_SEGMENT = "events-config";
@@ -44,7 +44,7 @@ class ConfiguationClient implements Callback {
   private final OkHttpClient client;
   private final List<ConfigurationChangeHandler> handlers;
 
-  ConfiguationClient(Context context, String userAgent, String accessToken, OkHttpClient client) {
+  ConfigurationClient(Context context, String userAgent, String accessToken, OkHttpClient client) {
     this.context = context;
     this.userAgent = userAgent;
     this.accessToken = accessToken;

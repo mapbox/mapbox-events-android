@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 
 public class ConfigurationClientTest {
   private MockWebServer server;
-  private ConfiguationClient configuationClient;
+  private ConfigurationClient configurationClient;
 
   @Before
   public void setUp() throws Exception {
@@ -56,7 +56,7 @@ public class ConfigurationClientTest {
       .thenReturn(Long.valueOf(0));
     when(mockedSharedPreferences.edit()).thenReturn(mockedEditor);
 
-    this.configuationClient = new ConfiguationClient(mockedContext, TelemetryUtils.createFullUserAgent("AnUserAgent",
+    this.configurationClient = new ConfigurationClient(mockedContext, TelemetryUtils.createFullUserAgent("AnUserAgent",
       mockedContext), "anAccessToken", client);
   }
 
@@ -67,7 +67,7 @@ public class ConfigurationClientTest {
 
   @Test
   public void checkDaySinceLastUpdate() {
-    assertTrue(configuationClient.shouldUpdate());
+    assertTrue(configurationClient.shouldUpdate());
   }
 
   private TelemetryClientSettings provideDefaultTelemetryClientSettings() {

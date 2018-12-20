@@ -53,15 +53,15 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private CopyOnWriteArraySet<TelemetryListener> telemetryListeners = null;
   private final CertificateBlacklist certificateBlacklist;
   private CopyOnWriteArraySet<AttachmentListener> attachmentListeners = null;
-  private final ConfiguationClient configuationClient;
+  private final ConfigurationClient configurationClient;
   static Context applicationContext = null;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
     initializeQueue();
-    this.configuationClient = new ConfiguationClient(context, TelemetryUtils.createFullUserAgent(userAgent,
+    this.configurationClient = new ConfigurationClient(context, TelemetryUtils.createFullUserAgent(userAgent,
             context), accessToken, new OkHttpClient());
-    this.certificateBlacklist = new CertificateBlacklist(context, configuationClient);
+    this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
     checkRequiredParameters(accessToken, userAgent);
     AlarmReceiver alarmReceiver = obtainAlarmReceiver();
     this.schedulerFlusher = new SchedulerFlusherFactory(applicationContext, alarmReceiver).supply();
@@ -93,9 +93,9 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     this.isServiceBound = isServiceBound;
     initializeTelemetryListeners();
     initializeAttachmentListeners();
-    this.configuationClient = new ConfiguationClient(context, TelemetryUtils.createFullUserAgent(userAgent,
+    this.configurationClient = new ConfigurationClient(context, TelemetryUtils.createFullUserAgent(userAgent,
             context), accessToken, new OkHttpClient());
-    this.certificateBlacklist = new CertificateBlacklist(context, configuationClient);
+    this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
   }
 
   @Override

@@ -28,13 +28,13 @@ class CertificateBlacklist implements ConfigurationChangeHandler {
   private final Context context;
   private List<String> revokedKeys;
 
-  CertificateBlacklist(Context context, ConfiguationClient configuationClient) {
+  CertificateBlacklist(Context context, ConfigurationClient configurationClient) {
     this.context = context;
-    configuationClient.addHandler(this);
+    configurationClient.addHandler(this);
 
     // Check if it's time to update
-    if (configuationClient.shouldUpdate()) {
-      configuationClient.update();
+    if (configurationClient.shouldUpdate()) {
+      configurationClient.update();
     } else {
       retrieveBlackList(context.getFilesDir());
     }
