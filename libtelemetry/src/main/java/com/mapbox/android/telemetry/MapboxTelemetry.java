@@ -52,14 +52,15 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private CopyOnWriteArraySet<TelemetryListener> telemetryListeners = null;
   private final CertificateBlacklist certificateBlacklist;
   private CopyOnWriteArraySet<AttachmentListener> attachmentListeners = null;
+  private final ConfigurationClient configurationClient;
   static Context applicationContext = null;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
     initializeQueue();
-    this.certificateBlacklist = new CertificateBlacklist(context, accessToken,
-      TelemetryUtils.createFullUserAgent(userAgent, applicationContext), new OkHttpClient());
-    checkBlacklistLastUpdateTime();
+    this.configurationClient = new ConfigurationClient(context, TelemetryUtils.createFullUserAgent(userAgent,
+            context), accessToken, new OkHttpClient());
+    this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
     checkRequiredParameters(accessToken, userAgent);
     this.httpCallback = this;
     AlarmReceiver alarmReceiver = obtainAlarmReceiver();
@@ -89,8 +90,9 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     this.isServiceBound = isServiceBound;
     initializeTelemetryListeners();
     initializeAttachmentListeners();
-    this.certificateBlacklist = new CertificateBlacklist(context, accessToken,
-      TelemetryUtils.createFullUserAgent(userAgent, applicationContext), new OkHttpClient());
+    this.configurationClient = new ConfigurationClient(context, TelemetryUtils.createFullUserAgent(userAgent,
+            context), accessToken, new OkHttpClient());
+    this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
   }
 
   @Override
@@ -573,13 +575,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     }
 
     return false;
-  }
-
-  @VisibleForTesting
-  void checkBlacklistLastUpdateTime() {
-    if (certificateBlacklist.daySinceLastUpdate()) {
-      certificateBlacklist.requestBlacklist(certificateBlacklist.generateRequestUrl());
-    }
   }
 
   private void sendAttachment(Event event) {

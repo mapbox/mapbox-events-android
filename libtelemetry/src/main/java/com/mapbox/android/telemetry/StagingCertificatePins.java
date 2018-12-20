@@ -12,9 +12,9 @@ class StagingCertificatePins {
     {
       put("api-events-staging.tilestream.net", new ArrayList<String>() {
         {
-          add("sha256/3euxrJOrEZI15R4104UsiAkDqe007EPyZ6eTL/XxdAY=");
-          add("sha256/5kJvNEMw0KjrCAu7eXY5HZdvyCS13BbA0VJG1RSP91w=");
-          add("sha256/r/mIkG3eEpVdm+u/ko/cwxzOMo1bk4TyHIlByibiA5E=");
+          add("3euxrJOrEZI15R4104UsiAkDqe007EPyZ6eTL/XxdAY=");
+          add("5kJvNEMw0KjrCAu7eXY5HZdvyCS13BbA0VJG1RSP91w=");
+          add("r/mIkG3eEpVdm+u/ko/cwxzOMo1bk4TyHIlByibiA5E=");
         }
       });
     }
