@@ -71,7 +71,7 @@ class ChinaCertificatePins {
           add("KB5X/PyAAiRc7W/NjUyd6xbDdibuOTWBJB2MqHHF/Ao=");
           add("hRQ7yTW/P5l76uNNP3MXNgshlmcbDNHMtBxCbUtGAWE=");
           add("AoclhkrtKF+qHKKq0wUS4oXLwlJtWlywtiLndnNzS2U=");
-          add("ikvGB5KkNlwesHRqjYvkZGlxP6OLMbaCkpflTM4DNM=");
+          add("5ikvGB5KkNlwesHRqjYvkZGlxP6OLMbaCkpflTM4DNM=");
           add("qK2GksTrZ7LXDBkNWH6FnuNGxgxPpwNSK+NgknU7H1U=");
           add("K3qyQniCBiGmfutYDE7ryDY2YoTORgp4DOgK1laOqfo=");
           add("B7quINbFSUen02LQ9kwtYXnsJtixTpKafzXFkcRb7RU=");
