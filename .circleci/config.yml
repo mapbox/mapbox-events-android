@@ -83,7 +83,7 @@ jobs:
     environment:
       BUILDTYPE: Release
       IS_LOCAL_DEVELOPMENT: false
-      OK_TO_RELEASE_CORE: false
+      OK_TO_RELEASE_CORE: true
       OK_TO_RELEASE_TELEM: true
     steps:
       - checkout
@@ -103,7 +103,7 @@ jobs:
       - deploy:
           name: Publish to Maven Central
           command: |
-            if [ "${CIRCLE_BRANCH}" == "4.2.0-release" ]; then
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
               if [ "$OK_TO_RELEASE_CORE" == true ]; then
                 make publish-core ;
               fi
