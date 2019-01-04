@@ -337,10 +337,15 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     }
   }
 
-  private void sendEventsIfPossible(List<Event> events) {
-    if (isNetworkConnected()) {
-      sendEvents(events);
-    }
+  private void sendEventsIfPossible(final List<Event> events) {
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        if (isNetworkConnected()) {
+          sendEvents(events);
+        }
+      }
+    }).start();
   }
 
   private boolean isNetworkConnected() {
