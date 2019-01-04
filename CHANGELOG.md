@@ -4,6 +4,9 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v4.2.0
+- Enable event creation outside of telem sdk - [#318](https://github.com/mapbox/mapbox-events-android/pull/318)
+
 ### v4.1.1
 - Fix binary size checker archive name - [#304](https://github.com/mapbox/mapbox-events-android/pull/304)
 - Remove jacoco from release builds - [#303](https://github.com/mapbox/mapbox-events-android/pull/303)
