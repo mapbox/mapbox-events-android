@@ -36,6 +36,7 @@ dependencies {
     implementation dependenciesList.okhttp3
     implementation dependenciesList.gson
     implementation dependenciesList.archLifecycleExtensions
+    implementation dependenciesList.archWorkManager
 
     annotationProcessor dependenciesList.archLifecycleCompiler
 
