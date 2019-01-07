@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -55,6 +57,9 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private CopyOnWriteArraySet<AttachmentListener> attachmentListeners = null;
   private final ConfigurationClient configurationClient;
   static Context applicationContext = null;
+
+  //test
+  private WorkManager workManager;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
@@ -130,6 +135,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   public boolean enable() {
     if (TelemetryEnabler.isEventsEnabled(applicationContext)) {
       startTelemetry();
+      setupWorkManager();
       return true;
     }
 
@@ -604,5 +610,10 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   private boolean isLollipopOrHigher() {
     return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
+  }
+
+  private void setupWorkManager() {
+    workManager = WorkManager.getInstance();
+    workManager.enqueue(OneTimeWorkRequest.from(WorkTest.class));
   }
 }

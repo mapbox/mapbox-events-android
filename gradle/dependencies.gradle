@@ -19,7 +19,7 @@ ext {
             espressoVersion     : '3.0.1',
             archLifecycleVersion: "1.1.0",
             assertJ             : "3.11.1",
-            archWorkManager     : "1.0.0-beta01"
+            workVersion         : "1.0.0-beta01"
     ]
 
     pluginVersion = [
@@ -35,7 +35,7 @@ ext {
             //architecture components
             archLifecycleExtensions: "android.arch.lifecycle:extensions:${version.archLifecycleVersion}",
             archLifecycleCompiler  : "android.arch.lifecycle:compiler:${version.archLifecycleVersion}",
-            archWorkManager        : "android.arch.work:work-runtime:${version.archWorkManager}",
+            archWorkManager        : "android.arch.work:work-runtime:${version.workVersion}",
 
             // okhttp
             okhttp3                : "com.squareup.okhttp3:okhttp:${version.okhttp3}",
