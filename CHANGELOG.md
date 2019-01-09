@@ -26,6 +26,9 @@ Mapbox welcomes participation and contributions from everyone.
 - Update dependencies and cleanup gradle scripts - [#237](https://github.com/mapbox/mapbox-events-android/pull/237)
 - Telemetry SDK background location updates + batch locations - [#236](https://github.com/mapbox/mapbox-events-android/pull/236)
 
+### v3.5.8
+- Enable event creation outside of telem sdk - [#318](https://github.com/mapbox/mapbox-events-android/pull/318)
+
 ### v3.5.7
 - Refactor Certificate Blacklist - [#311](https://github.com/mapbox/mapbox-events-android/pull/311)
 
