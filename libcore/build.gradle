@@ -1,5 +1,9 @@
 apply plugin: 'com.android.library'
 
+// Re-apply runtime required subproject gradle scripts and classpaths,
+// so that Maps SDK doesn't rely on them being served from the top level build.gradle
+apply from: "../gradle/dependencies.gradle"
+
 version = VERSION_NAME
 
 android {
@@ -36,8 +40,3 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 }
-
-apply from: 'javadoc.gradle'
-apply from: "${rootDir}/gradle/mvn-push-android.gradle"
-apply from: "${rootDir}/gradle/checkstyle.gradle"
-apply from: "${rootDir}/gradle/jacoco.gradle"
