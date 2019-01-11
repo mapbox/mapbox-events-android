@@ -29,6 +29,28 @@ subprojects {
     }
 }
 
+def TESTABLE_MODULES = ["libcore", "libtelemetry", "liblocation"]
+def RELEASE_MODULES = ["libcore", "libtelemetry"]
+
+subprojects { subproject ->
+
+    if (TESTABLE_MODULES.contains(subproject.name)) {
+        apply from: "${rootDir}/gradle/checkstyle.gradle"
+        apply from: "${rootDir}/gradle/jacoco.gradle"
+    }
+
+    if (RELEASE_MODULES.contains(subproject.name)) {
+        subproject.afterEvaluate {
+            subproject.apply from: "javadoc.gradle"
+        }
+        subproject.apply from: "${rootDir}/gradle/mvn-push-android.gradle"
+    }
+
+    if (subproject.name == "libtelemetry") {
+        subproject.apply from: "${rootDir}/gradle/download-schema.gradle"
+    }
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
