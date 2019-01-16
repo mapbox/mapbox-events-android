@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
     setContentView(R.layout.activity_main);
 
     String accessTokenTelemetry = obtainAccessToken();
-    String userAgentTelemetry = "MapboxEventsAndroid/4.1.0";
+    String userAgentTelemetry = "MapboxEventsAndroid/job-v-intent";
     mapboxTelemetry = new MapboxTelemetry(this, accessTokenTelemetry, userAgentTelemetry);
 
     checkPermissions();

@@ -1,6 +1,8 @@
 package com.mapbox.android.telemetry;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
+import android.app.PendingIntent;
 import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.LifecycleObserver;
 import android.arch.lifecycle.OnLifecycleEvent;
@@ -9,13 +11,26 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.mapbox.android.core.location.LocationEngine;
+import com.mapbox.android.core.location.LocationEngineProvider;
+import com.mapbox.android.core.location.LocationEngineRequest;
 import com.mapbox.android.core.permissions.PermissionsManager;
 
 import java.io.IOException;
@@ -60,7 +75,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     initializeContext(context);
     initializeQueue();
     this.configurationClient = new ConfigurationClient(context, TelemetryUtils.createFullUserAgent(userAgent,
-            context), accessToken, new OkHttpClient());
+      context), accessToken, new OkHttpClient());
     this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
     checkRequiredParameters(accessToken, userAgent);
     AlarmReceiver alarmReceiver = obtainAlarmReceiver();
@@ -94,7 +109,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     initializeTelemetryListeners();
     initializeAttachmentListeners();
     this.configurationClient = new ConfigurationClient(context, TelemetryUtils.createFullUserAgent(userAgent,
-            context), accessToken, new OkHttpClient());
+      context), accessToken, new OkHttpClient());
     this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
   }
 
@@ -130,6 +145,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   public boolean enable() {
     if (TelemetryEnabler.isEventsEnabled(applicationContext)) {
       startTelemetry();
+      startBackgroundLocation();
       return true;
     }
 
@@ -483,6 +499,42 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     return false;
   }
 
+  @SuppressLint("MissingPermission")
+  private void startBackgroundLocation() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+      final LocationManager locationManager = (LocationManager) applicationContext
+        .getSystemService(Context.LOCATION_SERVICE);
+
+      LocationListener locationListener = new LocationListener() {
+        @SuppressLint("NewApi")
+        @Override
+        public void onLocationChanged(Location location) {
+          locationManager.removeUpdates(this);
+
+          LocationJobService.schedule(applicationContext, userAgent, accessToken, location);
+          startIntentLocationService();
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+      };
+
+      locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0.0f, locationListener);
+    }
+  }
+
   private boolean checkLocationPermission() {
     if (PermissionsManager.areLocationPermissionsGranted(applicationContext)) {
       return true;
@@ -604,5 +656,54 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   private boolean isLollipopOrHigher() {
     return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
+  }
+
+  //test
+  @SuppressLint("MissingPermission")
+  private void startIntentLocationService() {
+    LocationEngineRequest locationEngineRequest = new LocationEngineRequest.Builder(1000L)
+      .setPriority(LocationEngineRequest.PRIORITY_NO_POWER)
+      .setMaxWaitTime(1000L * 5).build();
+
+    LocationIntentService pendingIntent = new LocationIntentService();
+
+    FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(applicationContext);
+    fusedLocationProviderClient.requestLocationUpdates(toGMSLocationRequest(locationEngineRequest), pendingIntent.getPendingIntent())
+      .addOnSuccessListener(new OnSuccessListener<Void>() {
+        @Override
+        public void onSuccess(Void aVoid) {
+          Log.e("test", "Location updates are enabled");
+        }
+      })
+      .addOnFailureListener(new OnFailureListener() {
+        @Override
+        public void onFailure(@NonNull Exception e) {
+          Log.e("test","Enabling location updates failed");
+        }
+      });
+  }
+
+  private static LocationRequest toGMSLocationRequest(LocationEngineRequest request) {
+    LocationRequest locationRequest = new LocationRequest();
+    locationRequest.setInterval(request.getInterval());
+    locationRequest.setFastestInterval(request.getFastestInterval());
+    locationRequest.setSmallestDisplacement(request.getDisplacemnt());
+    locationRequest.setMaxWaitTime(request.getMaxWaitTime());
+    locationRequest.setPriority(toGMSLocationPriority(request.getPriority()));
+    return locationRequest;
+  }
+
+  private static int toGMSLocationPriority(int enginePriority) {
+    switch (enginePriority) {
+      case LocationEngineRequest.PRIORITY_HIGH_ACCURACY:
+        return LocationRequest.PRIORITY_HIGH_ACCURACY;
+      case LocationEngineRequest.PRIORITY_BALANCED_POWER_ACCURACY:
+        return LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY;
+      case LocationEngineRequest.PRIORITY_LOW_POWER:
+        return LocationRequest.PRIORITY_LOW_POWER;
+      case LocationEngineRequest.PRIORITY_NO_POWER:
+      default:
+        return LocationRequest.PRIORITY_NO_POWER;
+    }
   }
 }

@@ -32,6 +32,8 @@ android {
 }
 
 dependencies {
+    compileOnly dependenciesList.gmsLocation
+
     implementation project(':libcore')
     implementation dependenciesList.okhttp3
     implementation dependenciesList.gson
