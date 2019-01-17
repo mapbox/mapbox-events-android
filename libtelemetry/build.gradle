@@ -32,6 +32,19 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
     }
+
+    publishNonDefault true
+    flavorDimensions "version"
+    productFlavors {
+        full {
+            dimension "version"
+        }
+
+        lite {
+            dimension "version"
+            versionNameSuffix "-lite"
+        }
+    }
 }
 
 dependencies {

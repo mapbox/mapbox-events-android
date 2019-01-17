@@ -13,11 +13,21 @@ android {
     }
 
     buildTypes {
-        debug {
-            minifyEnabled false
-        }
         release {
             minifyEnabled true
+        }
+    }
+
+    publishNonDefault true
+    flavorDimensions "version"
+    productFlavors {
+        full {
+            dimension "version"
+        }
+
+        lite {
+            dimension "version"
+            versionNameSuffix "-lite"
         }
     }
 }
@@ -40,8 +50,8 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
-    implementation project(":libtelemetry")
     implementation project(":libcore")
+    implementation project(":libtelemetry")
 }
 
 apply from: "${rootDir}/gradle/developer-config.gradle"
