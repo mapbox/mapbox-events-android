@@ -18,7 +18,6 @@ android {
         }
     }
 
-    publishNonDefault true
     flavorDimensions "version"
     productFlavors {
         full {

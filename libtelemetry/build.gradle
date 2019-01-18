@@ -33,7 +33,6 @@ android {
         targetCompatibility JavaVersion.VERSION_1_7
     }
 
-    publishNonDefault true
     flavorDimensions "version"
     productFlavors {
         full {
