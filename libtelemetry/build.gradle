@@ -48,13 +48,13 @@ android {
 }
 
 dependencies {
-    implementation project(':libcore')
     implementation dependenciesList.okhttp3
     implementation dependenciesList.gson
     implementation dependenciesList.supportAnnotation
-    implementation dependenciesList.archLifecycleExtensions
 
-    annotationProcessor dependenciesList.archLifecycleCompiler
+    fullImplementation project(':libcore')
+    fullImplementation dependenciesList.archLifecycleExtensions
+    fullAnnotationProcessor dependenciesList.archLifecycleCompiler
 
     testImplementation dependenciesList.junit
     testImplementation dependenciesList.mockito

@@ -1,8 +1,5 @@
 package com.mapbox.android.telemetry;
 
-
-import android.support.annotation.Nullable;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -144,7 +141,7 @@ class TelemetryClientSettings {
   }
 
   private OkHttpClient configureHttpClient(CertificateBlacklist certificateBlacklist,
-                                           @Nullable Interceptor interceptor) {
+                                           Interceptor interceptor) {
     CertificatePinnerFactory factory = new CertificatePinnerFactory();
     OkHttpClient.Builder builder = client.newBuilder()
       .retryOnConnectionFailure(true)
