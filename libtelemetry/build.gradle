@@ -38,6 +38,7 @@ dependencies {
     implementation project(':libcore')
     implementation dependenciesList.okhttp3
     implementation dependenciesList.gson
+    implementation dependenciesList.supportAnnotation
     implementation dependenciesList.archLifecycleExtensions
 
     annotationProcessor dependenciesList.archLifecycleCompiler
@@ -48,7 +49,6 @@ dependencies {
     testImplementation dependenciesList.commonsIO
 
     androidTestImplementation dependenciesList.mockitoAndroid
-    androidTestImplementation dependenciesList.supportAnnotation
     androidTestImplementation dependenciesList.testRunner
     androidTestImplementation dependenciesList.testRules
     androidTestImplementation dependenciesList.gmsLocation
