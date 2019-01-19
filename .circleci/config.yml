@@ -134,7 +134,7 @@ jobs:
       - run:
           name: Check & Publish Binary Size
           command: |
-            binary_path="libtelemetry/build/outputs/aar/libtelemetry-release.aar"
+            binary_path="libtelemetry/build/outputs/aar/libtelemetry-full-release.aar"
             label="Telemetry-AAR"
             archive_name="mapbox-events-android"
             if [[ $CIRCLE_BRANCH == master ]] || [[ $CIRCLE_BRANCH == release-* ]]; then
