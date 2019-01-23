@@ -142,13 +142,13 @@ public class ConfigurationClientTest {
   }
 
   private Response getValidResponse() throws IOException {
-    Request mRequest = mock(Request.class);
+    Request request = mock(Request.class);
 
     Response.Builder builder = new Response.Builder();
     ResponseBody responseBody = mock(ResponseBody.class);
     when(responseBody.string()).thenReturn("test");
 
-    return builder.request(mRequest)
+    return builder.request(request)
       .body(responseBody)
       .protocol(Protocol.HTTP_1_1)
       .code(200)
