@@ -11,6 +11,7 @@ import java.io.IOException;
 
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -46,7 +47,7 @@ public class ConfigurationClientInstrumentationTest {
     assertFalse(configurationClient.shouldUpdate());
   }
 
-  private void setTimeStamp(Long milliseconds) {
+  private void setTimeStamp(long milliseconds) {
     SharedPreferences sharedPreferences =
       TelemetryUtils.obtainSharedPreferences(InstrumentationRegistry.getTargetContext());
     SharedPreferences.Editor editor = sharedPreferences.edit();

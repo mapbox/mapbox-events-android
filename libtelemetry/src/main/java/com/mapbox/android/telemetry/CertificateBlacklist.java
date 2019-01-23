@@ -103,7 +103,7 @@ class CertificateBlacklist implements ConfigurationChangeHandler {
       JsonObject responseJson = gson.fromJson(data, JsonObject.class);
       JsonElement jsonElement = responseJson.get("RevokedCertKeys");
 
-      jsonArray = isJsonArray(jsonElement) ? gson.fromJson(jsonElement, JsonArray.class) : null;
+      jsonArray = jsonElement.isJsonArray() ? gson.fromJson(jsonElement, JsonArray.class) : null;
     } catch (JsonSyntaxException exception) {
       Log.e(LOG_TAG, exception.getMessage());
       return false;
@@ -135,9 +135,5 @@ class CertificateBlacklist implements ConfigurationChangeHandler {
     if (saveBlackList(data)) {
       retrieveBlackList(context.getFilesDir(), true);
     }
-  }
-
-  private static boolean isJsonArray(JsonElement element) {
-    return element instanceof JsonArray;
   }
 }

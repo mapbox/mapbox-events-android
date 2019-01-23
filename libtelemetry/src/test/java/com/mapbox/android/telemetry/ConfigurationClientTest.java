@@ -101,6 +101,16 @@ public class ConfigurationClientTest {
     verify(mockedHandler, times(0)).onUpdate("test");
   }
 
+  @Test
+  public void nullHandler() throws Exception {
+    ConfigurationChangeHandler nullHandler = null;
+    configurationClient.addHandler(nullHandler);
+    Call mockedCall = mock(Call.class);
+    Response response = getValidResponse();
+
+    configurationClient.onResponse(mockedCall, response);
+  }
+
   private TelemetryClientSettings provideDefaultTelemetryClientSettings() {
     HttpUrl localUrl = obtainBaseEndpointUrl();
     SslClient sslClient = SslClient.localhost();
