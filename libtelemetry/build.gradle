@@ -39,7 +39,13 @@ dependencies {
     implementation dependenciesList.okhttp3
     implementation dependenciesList.gson
     implementation dependenciesList.supportAnnotation
-    implementation dependenciesList.archLifecycleExtensions
+    implementation (dependenciesList.archLifecycleExtensions) {
+        exclude group: 'android.arch.lifecycle', module: 'runtime'
+        exclude group: 'android.arch.lifecycle', module: 'livedata'
+        exclude group: 'android.arch.lifecycle', module: 'viewmodel'
+        exclude group: 'android.arch.core', module: 'common'
+        exclude group: 'android.arch.core', module: 'runtime'
+    }
 
     annotationProcessor dependenciesList.archLifecycleCompiler
 
