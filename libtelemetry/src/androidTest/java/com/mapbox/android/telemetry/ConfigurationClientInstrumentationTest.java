@@ -4,6 +4,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.test.InstrumentationRegistry;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -47,6 +53,21 @@ public class ConfigurationClientInstrumentationTest {
     assertFalse(configurationClient.shouldUpdate());
   }
 
+  @Test
+  public void updateRequestTest() {
+    setTimeStamp(System.currentTimeMillis() - DAY_IN_MILLIS);
+
+    ConfigurationChangeHandler configurationChangeHandler = new ConfigurationChangeHandler() {
+      @Override
+      public void onUpdate(String data) {
+        assertTrue(isValidContent(data));
+      }
+    };
+
+    configurationClient.addHandler(configurationChangeHandler);
+    configurationClient.update();
+  }
+
   private void setTimeStamp(long milliseconds) {
     SharedPreferences sharedPreferences =
       TelemetryUtils.obtainSharedPreferences(InstrumentationRegistry.getTargetContext());
@@ -55,4 +76,15 @@ public class ConfigurationClientInstrumentationTest {
     editor.apply();
   }
 
+  private static boolean isValidContent(String data) {
+    Gson gson = new GsonBuilder().create();
+    try {
+      JsonObject responseJson = gson.fromJson(data, JsonObject.class);
+      JsonElement jsonElement = responseJson.get("RevokedCertKeys");
+
+      return jsonElement.isJsonArray();
+    } catch (JsonSyntaxException exception) {
+      return false;
+    }
+  }
 }
