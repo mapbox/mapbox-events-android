@@ -43,7 +43,6 @@ dependencies {
         exclude group: 'android.arch.lifecycle', module: 'livedata'
         exclude group: 'android.arch.lifecycle', module: 'viewmodel'
         exclude group: 'android.arch.core', module: 'runtime'
-        exclude group: 'com.android.support', module: 'support-annotations'
     }
 
     annotationProcessor dependenciesList.archLifecycleCompiler
