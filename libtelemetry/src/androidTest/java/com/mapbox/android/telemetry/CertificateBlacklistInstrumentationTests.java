@@ -14,6 +14,7 @@ import java.util.List;
 
 import okhttp3.OkHttpClient;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
@@ -31,7 +32,22 @@ public class CertificateBlacklistInstrumentationTests {
   }
 
   @Test
-  public void checkBlacklistSaved() throws Exception {
+  public void checkBlacklistMalformed() {
+    List<String> oneItemList = new ArrayList<>();
+    oneItemList.add("test12345");
+    String preContent = "{\"RevokedCertKeys\" : [\"\"]}";
+    String fileContent = "{\"RevokedCertKeys\" : \"test12345\"}";
+
+    certificateBlacklist.onUpdate(preContent);
+    assertFalse(certificateBlacklist.isBlacklisted(oneItemList.get(0)));
+
+    certificateBlacklist.onUpdate(fileContent);
+
+    assertFalse(certificateBlacklist.isBlacklisted(oneItemList.get(0)));
+  }
+
+  @Test
+  public void checkBlacklistSaved() {
     List<String> oneItemList = new ArrayList<>();
     oneItemList.add("test12345");
     String fileContent = "{\"RevokedCertKeys\" : [\"test12345\"]}";
