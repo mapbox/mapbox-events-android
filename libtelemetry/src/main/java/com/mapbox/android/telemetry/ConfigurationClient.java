@@ -90,7 +90,9 @@ class ConfigurationClient implements Callback {
     }
 
     for (final ConfigurationChangeHandler handler: handlers) {
-      handlerNullCheck(handler).onUpdate(body.string());
+      if (handler != null) {
+        handler.onUpdate(body.string());
+      }
     }
   }
 
@@ -126,18 +128,5 @@ class ConfigurationClient implements Callback {
     }
 
     return COM_CONFIG_ENDPOINT;
-  }
-
-  private ConfigurationChangeHandler handlerNullCheck(ConfigurationChangeHandler changeHandler) {
-    if (changeHandler == null) {
-      return new ConfigurationChangeHandler() {
-        @Override
-        public void onUpdate(String data) {
-
-        }
-      };
-    }
-
-    return changeHandler;
   }
 }
