@@ -71,7 +71,7 @@ jobs:
       - run:
           name: Post code coverage report to Codecov.io
           command: |
-            ./gradlew testDebugUnitTestCoverage
+            ./gradlew testFullDebugUnitTestCoverage
             pip install --user codecov && /root/.local/bin/codecov
       - store_artifacts:
           path: app/build/reports
