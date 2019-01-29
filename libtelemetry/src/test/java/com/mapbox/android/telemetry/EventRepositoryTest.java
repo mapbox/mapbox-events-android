@@ -13,19 +13,77 @@ import com.mapbox.android.telemetry.datarepo.EventRepository;
 import org.junit.Test;
 
 import java.util.List;
-
-import okhttp3.Callback;
+import java.util.concurrent.CountDownLatch;
 
 import static com.mapbox.android.telemetry.TelemetryEnabler.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE;
 import static com.mapbox.android.telemetry.TelemetryUtils.MAPBOX_SHARED_PREFERENCES;
 import static com.mapbox.android.telemetry.TelemetryUtils.MAPBOX_SHARED_PREFERENCE_KEY_VENDOR_ID;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class EventRepositoryTest {
+
+  @Test
+  public void checkMultiThread() throws InterruptedException {
+    final EventRepository repository = EventRepository.getInstance();
+    final int num = 100;
+    final int threadNum = 5;
+    final CountDownLatch countDownLatch = new CountDownLatch(threadNum);
+    class PutThread extends Thread {
+      @Override
+      public void run() {
+        for (int i = 0; i < num; i++) {
+          MapClickEvent clickEvent = new MapClickEvent(new MapState(0, 0, 0));
+          repository.put(clickEvent);
+        }
+        countDownLatch.countDown();
+      }
+    }
+
+    for (int i = 0; i < threadNum; i++) {
+      new PutThread().start();
+    }
+
+    countDownLatch.await();
+    repository.getAll(new DataSource.DataSourceCallback() {
+      @Override
+      public void onDataAvailable(@NonNull List<Event> data) {
+        assertNotNull(data);
+        assertEquals(num * threadNum, data.size());
+        assertTrue(data.get(0) instanceof MapClickEvent);
+        assertTrue(data.get(data.size() - 1) instanceof MapClickEvent);
+
+      }
+    });
+
+    MapClickEvent clickEvent = new MapClickEvent(new MapState(0, 0, 0));
+    repository.put(clickEvent);
+    repository.getAll(new DataSource.DataSourceCallback() {
+      @Override
+      public void onDataAvailable(@NonNull List<Event> data) {
+        assertNotNull(data);
+        assertEquals(1, data.size());
+        assertTrue(data.get(0) instanceof MapClickEvent);
+      }
+    });
+  }
+
+  @Test
+  public void checkEmptyRepo() {
+    EventRepository repository = EventRepository.getInstance();
+
+    repository.getAll(new DataSource.DataSourceCallback() {
+      @Override
+      public void onDataAvailable(@NonNull List<Event> data) {
+        assertNotNull(data);
+        assertEquals(0, data.size());
+      }
+    });
+  }
 
   @Test
   public void checkPutEvents() {
@@ -124,6 +182,7 @@ public class EventRepositoryTest {
     EventRepository repository = EventRepository.getInstance();
     NavigationEventFactory factory = new NavigationEventFactory();
     NavigationState state = mock(NavigationState.class);
+    when(state.getNavigationRerouteData()).thenReturn(mock(NavigationRerouteData.class));
     repository.put(factory.createNavigationEvent(Event.Type.NAV_ARRIVE, state));
     repository.put(factory.createNavigationEvent(Event.Type.NAV_CANCEL, state));
     repository.put(factory.createNavigationEvent(Event.Type.NAV_DEPART, state));
@@ -234,18 +293,5 @@ public class EventRepositoryTest {
     AlarmManager mockedAlarmManager = mock(AlarmManager.class, RETURNS_DEEP_STUBS);
     when(mockedContext.getSystemService(Context.ALARM_SERVICE)).thenReturn(mockedAlarmManager);
     MapboxTelemetry.applicationContext = mockedContext;
-    String aValidAccessToken = "validAccessToken";
-    String aValidUserAgent = "MapboxTelemetryAndroid/";
-    EventsQueue mockedEventsQueue = mock(EventsQueue.class);
-    TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
-    Callback mockedHttpCallback = mock(Callback.class);
-    SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
-    Clock mockedClock = mock(Clock.class);
-    boolean indifferentServiceBound = true;
-    TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false);
-    TelemetryLocationEnabler telemetryLocationEnabler = new TelemetryLocationEnabler(false);
-    new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
-      mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      indifferentServiceBound, telemetryEnabler, telemetryLocationEnabler);
   }
 }
