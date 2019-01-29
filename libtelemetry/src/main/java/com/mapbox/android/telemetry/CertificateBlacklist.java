@@ -6,6 +6,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
@@ -100,7 +101,9 @@ class CertificateBlacklist implements ConfigurationChangeHandler {
     JsonArray jsonArray;
     try {
       JsonObject responseJson = gson.fromJson(data, JsonObject.class);
-      jsonArray = responseJson.getAsJsonArray("RevokedCertKeys");
+      JsonElement jsonElement = responseJson.get("RevokedCertKeys");
+
+      jsonArray = jsonElement.isJsonArray() ? gson.fromJson(jsonElement, JsonArray.class) : null;
     } catch (JsonSyntaxException exception) {
       Log.e(LOG_TAG, exception.getMessage());
       return false;

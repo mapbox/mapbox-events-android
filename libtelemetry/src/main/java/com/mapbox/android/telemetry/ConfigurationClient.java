@@ -90,7 +90,9 @@ class ConfigurationClient implements Callback {
     }
 
     for (final ConfigurationChangeHandler handler: handlers) {
-      handler.onUpdate(body.string());
+      if (handler != null) {
+        handler.onUpdate(body.string());
+      }
     }
   }
 
