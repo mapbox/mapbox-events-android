@@ -12,12 +12,18 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
 
+import okhttp3.Call;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
+import okhttp3.Protocol;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.internal.tls.SslClient;
 
@@ -26,6 +32,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class ConfigurationClientTest {
@@ -70,6 +78,39 @@ public class ConfigurationClientTest {
     assertTrue(configurationClient.shouldUpdate());
   }
 
+  @Test
+  public void successResponse() throws IOException {
+    ConfigurationChangeHandler mockedHandler = mock(ConfigurationChangeHandler.class);
+    configurationClient.addHandler(mockedHandler);
+    Call mockedCall = mock(Call.class);
+    Response response = getValidResponse();
+
+    configurationClient.onResponse(mockedCall, response);
+
+    verify(mockedHandler, times(1)).onUpdate("test");
+  }
+
+  @Test
+  public void nullResponse() throws IOException {
+    ConfigurationChangeHandler mockedHandler = mock(ConfigurationChangeHandler.class);
+    configurationClient.addHandler(mockedHandler);
+    Call mockedCall = mock(Call.class);
+
+    configurationClient.onResponse(mockedCall, null);
+
+    verify(mockedHandler, times(0)).onUpdate("test");
+  }
+
+  @Test
+  public void nullHandler() throws Exception {
+    ConfigurationChangeHandler nullHandler = null;
+    configurationClient.addHandler(nullHandler);
+    Call mockedCall = mock(Call.class);
+    Response response = getValidResponse();
+
+    configurationClient.onResponse(mockedCall, response);
+  }
+
   private TelemetryClientSettings provideDefaultTelemetryClientSettings() {
     HttpUrl localUrl = obtainBaseEndpointUrl();
     SslClient sslClient = SslClient.localhost();
@@ -108,5 +149,20 @@ public class ConfigurationClientTest {
     when(mockedContext.getPackageName()).thenReturn(packageName);
 
     return mockedContext;
+  }
+
+  private Response getValidResponse() throws IOException {
+    Request request = mock(Request.class);
+
+    Response.Builder builder = new Response.Builder();
+    ResponseBody responseBody = mock(ResponseBody.class);
+    when(responseBody.string()).thenReturn("test");
+
+    return builder.request(request)
+      .body(responseBody)
+      .protocol(Protocol.HTTP_1_1)
+      .code(200)
+      .message("success")
+      .build();
   }
 }

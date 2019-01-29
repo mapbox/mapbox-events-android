@@ -52,7 +52,11 @@ dependencies {
     implementation dependenciesList.supportAnnotation
 
     fullImplementation project(':libcore')
-    fullImplementation dependenciesList.archLifecycleExtensions
+    fullImplementation (dependenciesList.archLifecycleExtensions) {
+        exclude group: 'android.arch.lifecycle', module: 'livedata'
+        exclude group: 'android.arch.lifecycle', module: 'viewmodel'
+        exclude group: 'android.arch.core', module: 'runtime'
+    }
     fullAnnotationProcessor dependenciesList.archLifecycleCompiler
 
     testImplementation dependenciesList.junit
