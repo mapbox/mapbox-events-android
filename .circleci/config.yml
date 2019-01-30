@@ -93,6 +93,7 @@ jobs:
       IS_LOCAL_DEVELOPMENT: false
       OK_TO_RELEASE_CORE: true
       OK_TO_RELEASE_TELEM: true
+      OK_TO_RELEASE_LITE: false
     steps:
       - checkout
       - run:
@@ -117,6 +118,9 @@ jobs:
               fi
               if [ "$OK_TO_RELEASE_TELEM" == true ]; then
                 make publish-telem ;
+              fi
+              if [ "$OK_TO_RELEASE_LITE" == true ]; then
+                make publish-lite ;
               fi
             fi
       - store_artifacts:
