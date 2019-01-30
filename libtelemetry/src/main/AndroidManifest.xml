@@ -8,11 +8,10 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <application>
         <service android:name="com.mapbox.android.telemetry.TelemetryService"/>
+        <provider
+            android:name="com.mapbox.android.telemetry.provider.MapboxTelemetryInitProvider"
+            android:authorities="${applicationId}.mapboxtelemetryinitprovider"
+            android:exported="false"
+            android:initOrder="100"/>
     </application>
-    <!--TODO Remove comment after analyzing the impact on the performance when adding SchedulerFlusherJobService-->
-    <!--<application>-->
-    <!--<service-->
-    <!--android:name="com.mapbox.android.telemetry.SchedulerFlusherJobService"-->
-    <!--android:permission="android.permission.BIND_JOB_SERVICE"/>-->
-    <!--</application>-->
 </manifest>
