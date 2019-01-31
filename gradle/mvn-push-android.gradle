@@ -50,11 +50,22 @@ def getRepositoryPassword() {
     return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
 }
 
+def isLiteRelease() {
+    if (System.getenv('IS_LITE_RELEASE') != null) {
+        return System.getenv('IS_LITE_RELEASE').toBoolean()
+    }
+    return false
+}
+
 afterEvaluate { project ->
     uploadArchives {
         repositories {
             mavenDeployer {
                 beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+                if (isLiteRelease()) {
+                    VERSION_NAME = VERSION_NAME + "-lite"
+                }
 
                 pom.groupId = GROUP
                 pom.artifactId = POM_ARTIFACT_ID
@@ -122,10 +133,29 @@ afterEvaluate { project ->
         from android.sourceSets.main.java.sourceFiles
     }
 
-    artifacts {
-        archives androidSourcesJar
-        archives androidJavadocsJar
+    if (project.toString() == "project ':libtelemetry'") {
+        artifacts {
+            if (new File('libtelemetry/build/outputs/aar').exists()) {
+                def testNum = 0
+                new File('libtelemetry/build/outputs/aar').eachFile() { file ->
+                    if (file.toString().contains("lite") && isLiteRelease()) {
+                        archives file: file, classifier: testNum
+                        testNum++
+                    } else if (file.toString().contains("full")) {
+                        archives file: file
+                    }
+                }
+            }
+            archives androidJavadocsJar
+        }
+    } else {
+        artifacts {
+            archives androidSourcesJar
+            archives androidJavadocsJar
+        }
     }
+
+
 }
 
 // See: https://github.com/chrisbanes/gradle-mvn-push/issues/43#issuecomment-84140513
