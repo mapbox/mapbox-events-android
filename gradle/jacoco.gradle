@@ -3,35 +3,46 @@ apply plugin: 'jacoco'
 project.afterEvaluate {
     // Grab all build types and product flavors
     def buildTypes = android.buildTypes.collect { type -> type.name }
+    def productFlavors = android.productFlavors.collect { flavor -> flavor.name }
 
-    buildTypes.each { buildTypeName ->
-        def sourceName, sourcePath
-        sourceName = sourcePath = "${buildTypeName}"
-        def testTaskName = "test${sourceName.capitalize()}UnitTest"
-        def coverageTaskName = "${testTaskName}Coverage"
+    // When no product flavors defined, use empty
+    if (!productFlavors) productFlavors.add('')
 
-        // Create coverage task of form 'testFlavorTypeUnitTestCoverage' depending on 'testFlavorTypeUnitTest'
-        task "${coverageTaskName}"(type: JacocoReport, dependsOn: "$testTaskName") {
-            group = 'Reporting'
-            description = "Generate Jacoco coverage reports for the ${sourceName.capitalize()} build."
+    productFlavors.each { productFlavorName ->
+        buildTypes.each { buildTypeName ->
+            def sourceName, sourcePath
 
-            classDirectories = fileTree(
-                    dir: "${project.buildDir}/intermediates/javac/${sourcePath}",
-                    excludes: ['**/R.class',
-                               '**/R$*.class',
-                               '**/BuildConfig.*',
-                               '**/Manifest*.*'])
+            sourceName = sourcePath = productFlavorName ?
+                    "${productFlavorName}${buildTypeName.capitalize()}" : "${buildTypeName}"
 
-            sourceDirectories = files(["src/main/java",
-                                       "src/$buildTypeName/java"])
+            def testTaskName = "test${sourceName.capitalize()}UnitTest"
+            def coverageTaskName = "${testTaskName}Coverage"
 
-            executionData = files("${project.buildDir}/jacoco/${testTaskName}.exec")
+            // Create coverage task of form 'testFlavorTypeUnitTestCoverage' depending on 'testFlavorTypeUnitTest'
+            task "${coverageTaskName}"(type: JacocoReport, dependsOn: "$testTaskName") {
+                group = 'Reporting'
+                description = "Generate Jacoco coverage reports for the ${sourceName.capitalize()} build."
 
-            reports {
-                xml.enabled = true
-                html.enabled = true
+                classDirectories = fileTree(
+                        dir: "${project.buildDir}/intermediates/javac/${sourcePath}",
+                        excludes: ['**/R.class',
+                                   '**/R$*.class',
+                                   '**/BuildConfig.*',
+                                   '**/Manifest*.*',
+                                   '**/*$Lambda$*.*'])
+
+                sourceDirectories = files(["src/main/java",
+                                           "src/$productFlavorName/java",
+                                           "src/$buildTypeName/java"])
+
+                executionData = files("${project.buildDir}/jacoco/${testTaskName}.exec")
+
+                reports {
+                    xml.enabled = true
+                    html.enabled = true
+                }
             }
+            build.dependsOn "${coverageTaskName}"
         }
-        build.dependsOn "${coverageTaskName}"
     }
 }

@@ -3,8 +3,6 @@ package com.mapbox.android.telemetry;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-
 
 class TelemetryReceiver extends BroadcastReceiver {
   private static final String BACKGROUND_RECEIVED_INTENT_KEY = "background_received";
@@ -14,7 +12,7 @@ class TelemetryReceiver extends BroadcastReceiver {
   static final String TELEMETRY_RECEIVER_INTENT = "com.mapbox.telemetry_receiver";
   private final TelemetryCallback callback;
 
-  TelemetryReceiver(@NonNull TelemetryCallback callback) {
+  TelemetryReceiver(TelemetryCallback callback) {
     this.callback = callback;
   }
 
