@@ -69,7 +69,12 @@ afterEvaluate { project ->
                 beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
                 if (isLiteRelease()) {
-                    VERSION_NAME = VERSION_NAME + "-LITE"
+                    if (isReleaseBuild()) {
+                        VERSION_NAME = VERSION_NAME + "-LITE"
+                    } else {
+                        def versionNameArray = VERSION_NAME.split('-')
+                        VERSION_NAME = versionNameArray[0] + "-LITE-" + versionNameArray[1]
+                    }
                 }
 
                 pom.groupId = GROUP

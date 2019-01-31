@@ -19,7 +19,7 @@ publish-core:
 
 publish-telem:
 	export IS_LOCAL_DEVELOPMENT=false; ./gradlew :libtelemetry:uploadArchives
-	export IS_LOCAL_DEVELOPMENT=false; export IS_LITE_RELEASE=true;   ./gradlew :libtelemetry:uploadArchives
+	export IS_LOCAL_DEVELOPMENT=false; export IS_LITE_RELEASE=true; ./gradlew :libtelemetry:uploadArchives
 
 publish-local:
 	# This publishes to ~/.m2/repository/com/mapbox/mapboxsdk
