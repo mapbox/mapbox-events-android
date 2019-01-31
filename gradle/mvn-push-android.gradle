@@ -16,6 +16,7 @@
 
 apply plugin: 'maven'
 apply plugin: 'signing'
+def core = project(':libcore')
 
 def isReleaseBuild() {
     return VERSION_NAME.contains("SNAPSHOT") == false
@@ -57,6 +58,10 @@ def isLiteRelease() {
     return false
 }
 
+def isTelem() {
+    return project.toString() == "project ':libtelemetry'"
+}
+
 afterEvaluate { project ->
     uploadArchives {
         repositories {
@@ -64,7 +69,7 @@ afterEvaluate { project ->
                 beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
                 if (isLiteRelease()) {
-                    VERSION_NAME = VERSION_NAME + "-lite"
+                    VERSION_NAME = VERSION_NAME + "-LITE"
                 }
 
                 pom.groupId = GROUP
@@ -108,6 +113,60 @@ afterEvaluate { project ->
                             name POM_DEVELOPER_NAME
                         }
                     }
+
+                    if (POM_DESCRIPTION == "Mapbox Android Telemetry Library") {
+                        String okhttpString = dependenciesList.okhttp3
+                        def okhttp = okhttpString.split(':')
+
+                        String gsonString = dependenciesList.gson
+                        def gson = gsonString.split(':')
+
+                        String annotationString = dependenciesList.supportAnnotation
+                        def supportAnnotation = annotationString.split(':')
+
+                        def dependenciesArray = [okhttp, gson, supportAnnotation]
+                        def exclusionsArray = []
+
+                        if (!VERSION_NAME.contains('LITE')) {
+                            String coreString = "com.mapbox.mapboxsdk:mapbox-android-core:" + core.version
+                            def coreArray = coreString.split(':')
+                            dependenciesArray.add(coreArray)
+
+                            String lifecycleString = dependenciesList.archLifecycleExtensions
+                            def lifecycleArray = lifecycleString.split(':')
+                            dependenciesArray.add(lifecycleArray)
+
+                            def viewModel = ["viewmodel", "android.arch.lifecycle"]
+                            def runtime = ["runtime", "android.arch.core"]
+                            def liveData = ["livedata", "android.arch.lifecycle"]
+                            exclusionsArray.add(viewModel)
+                            exclusionsArray.add(runtime)
+                            exclusionsArray.add(liveData)
+                        }
+
+                        dependencies {
+                            for (String[] thisDependency: dependenciesArray ) {
+                                dependency {
+                                    groupId thisDependency[0]
+                                    artifactId thisDependency[1]
+                                    version thisDependency[2]
+                                    scope "compile"
+
+                                    if (thisDependency[1] == "extensions") {
+                                        exclusions {
+                                            for (String[] thisExclusion: exclusionsArray) {
+                                                exclusion {
+                                                    artifactId thisDependency[1]
+                                                    groupId thisDependency[0]
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -133,26 +192,23 @@ afterEvaluate { project ->
         from android.sourceSets.main.java.sourceFiles
     }
 
-    if (project.toString() == "project ':libtelemetry'") {
-        artifacts {
+
+    artifacts {
+        if (isTelem()) {
             if (new File('libtelemetry/build/outputs/aar').exists()) {
                 def testNum = 0
                 new File('libtelemetry/build/outputs/aar').eachFile() { file ->
                     if (file.toString().contains("lite") && isLiteRelease()) {
-                        archives file: file, classifier: testNum
+                        archives file: file, classifier:testNum
                         testNum++
                     } else if (file.toString().contains("full")) {
                         archives file: file
                     }
                 }
             }
-            archives androidJavadocsJar
         }
-    } else {
-        artifacts {
-            archives androidSourcesJar
-            archives androidJavadocsJar
-        }
+        archives androidSourcesJar
+        archives androidJavadocsJar
     }
 
 
