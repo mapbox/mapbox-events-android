@@ -16,7 +16,6 @@
 
 apply plugin: 'maven'
 apply plugin: 'signing'
-def core = project(':libcore')
 
 def isReleaseBuild() {
     return VERSION_NAME.contains("SNAPSHOT") == false
@@ -92,6 +91,17 @@ afterEvaluate { project ->
                     }
                 }
 
+                def configurations = project.configurations
+                def dependenciesList = configurations.getByName('implementation').dependencies
+
+                if (!VERSION_NAME.contains('LITE')) {
+                    for (Configuration[] config : configurations) {
+                        if (config.toString() == "[configuration ':libtelemetry:fullImplementation']") {
+                            dependenciesList = dependenciesList + config.dependencies[0]
+                        }
+                    }
+                }
+
                 pom.project {
                     name POM_NAME
                     packaging POM_PACKAGING
@@ -120,54 +130,24 @@ afterEvaluate { project ->
                     }
 
                     if (POM_DESCRIPTION == "Mapbox Android Telemetry Library") {
-                        String okhttpString = dependenciesList.okhttp3
-                        def okhttp = okhttpString.split(':')
-
-                        String gsonString = dependenciesList.gson
-                        def gson = gsonString.split(':')
-
-                        String annotationString = dependenciesList.supportAnnotation
-                        def supportAnnotation = annotationString.split(':')
-
-                        def dependenciesArray = [okhttp, gson, supportAnnotation]
-                        def exclusionsArray = []
-
-                        if (!VERSION_NAME.contains('LITE')) {
-                            String coreString = "com.mapbox.mapboxsdk:mapbox-android-core:" + core.version
-                            def coreArray = coreString.split(':')
-                            dependenciesArray.add(coreArray)
-
-                            String lifecycleString = dependenciesList.archLifecycleExtensions
-                            def lifecycleArray = lifecycleString.split(':')
-                            dependenciesArray.add(lifecycleArray)
-
-                            def viewModel = ["viewmodel", "android.arch.lifecycle"]
-                            def runtime = ["runtime", "android.arch.core"]
-                            def liveData = ["livedata", "android.arch.lifecycle"]
-                            exclusionsArray.add(viewModel)
-                            exclusionsArray.add(runtime)
-                            exclusionsArray.add(liveData)
-                        }
-
                         dependencies {
-                            for (String[] thisDependency: dependenciesArray ) {
+                            for (Object thisDependency : dependenciesList) {
                                 dependency {
-                                    groupId thisDependency[0]
-                                    artifactId thisDependency[1]
-                                    version thisDependency[2]
+                                    groupId thisDependency.group
+                                    artifactId thisDependency.name
+                                    version thisDependency.version
                                     scope "compile"
 
-                                    if (thisDependency[1] == "extensions") {
+                                    if (thisDependency.excludeRules.size() > 0) {
                                         exclusions {
-                                            for (String[] thisExclusion: exclusionsArray) {
+                                            for (Object thisExclusion: thisDependency.excludeRules) {
                                                 exclusion {
-                                                    artifactId thisDependency[1]
-                                                    groupId thisDependency[0]
+                                                    artifactId thisExclusion.module
+                                                    groupId thisExclusion.group
                                                 }
                                             }
                                         }
                                     }
-
                                 }
                             }
                         }
@@ -215,8 +195,6 @@ afterEvaluate { project ->
         archives androidSourcesJar
         archives androidJavadocsJar
     }
-
-
 }
 
 // See: https://github.com/chrisbanes/gradle-mvn-push/issues/43#issuecomment-84140513
