@@ -32,20 +32,32 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
     }
+
+    flavorDimensions "version"
+    productFlavors {
+        full {
+            dimension "version"
+        }
+
+        lite {
+            dimension "version"
+            versionNameSuffix "-lite"
+        }
+    }
 }
 
 dependencies {
-    implementation project(':libcore')
     implementation dependenciesList.okhttp3
     implementation dependenciesList.gson
     implementation dependenciesList.supportAnnotation
-    implementation (dependenciesList.archLifecycleExtensions) {
+
+    fullImplementation project(':libcore')
+    fullImplementation (dependenciesList.archLifecycleExtensions) {
         exclude group: 'android.arch.lifecycle', module: 'livedata'
         exclude group: 'android.arch.lifecycle', module: 'viewmodel'
         exclude group: 'android.arch.core', module: 'runtime'
     }
-
-    annotationProcessor dependenciesList.archLifecycleCompiler
+    fullAnnotationProcessor dependenciesList.archLifecycleCompiler
 
     testImplementation dependenciesList.junit
     testImplementation dependenciesList.mockito
