@@ -68,12 +68,7 @@ afterEvaluate { project ->
                 beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
                 if (isLiteRelease()) {
-                    if (isReleaseBuild()) {
-                        VERSION_NAME = VERSION_NAME + "-LITE"
-                    } else {
-                        def versionNameArray = VERSION_NAME.split('-')
-                        VERSION_NAME = versionNameArray[0] + "-LITE-" + versionNameArray[1]
-                    }
+                    POM_ARTIFACT_ID = POM_ARTIFACT_ID + "-lite"
                 }
 
                 pom.groupId = GROUP
@@ -88,17 +83,6 @@ afterEvaluate { project ->
                     }
                     snapshotRepository(url: getSnapshotRepositoryUrl()) {
                         authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
-                    }
-                }
-
-                def configurations = project.configurations
-                def dependenciesList = configurations.getByName('implementation').dependencies
-
-                if (!VERSION_NAME.contains('LITE')) {
-                    for (Configuration[] config : configurations) {
-                        if (config.toString() == "[configuration ':libtelemetry:fullImplementation']") {
-                            dependenciesList = dependenciesList + config.dependencies[0]
-                        }
                     }
                 }
 
@@ -129,21 +113,34 @@ afterEvaluate { project ->
                         }
                     }
 
-                    if (POM_DESCRIPTION == "Mapbox Android Telemetry Library") {
+                    if (isTelem()) {
+                        def allDependencies = configurations.implementation.allDependencies
+                        if (!isLiteRelease()) {
+                            allDependencies += configurations.fullImplementation.allDependencies
+                        }
+
                         dependencies {
-                            for (Object thisDependency : dependenciesList) {
+                            for (def dep: allDependencies) {
+                                if (dep == null) {
+                                    continue
+                                }
+
                                 dependency {
-                                    groupId thisDependency.group
-                                    artifactId thisDependency.name
-                                    version thisDependency.version
+                                    groupId dep.group
+                                    artifactId dep.name
+                                    version dep.version
                                     scope "compile"
 
-                                    if (thisDependency.excludeRules.size() > 0) {
+                                    if (!dep.excludeRules.isEmpty()) {
                                         exclusions {
-                                            for (Object thisExclusion: thisDependency.excludeRules) {
+                                            for (def exc: dep.excludeRules) {
+                                                if (exc == null) {
+                                                    return
+                                                }
+
                                                 exclusion {
-                                                    artifactId thisExclusion.module
-                                                    groupId thisExclusion.group
+                                                    artifactId exc.module
+                                                    groupId exc.group
                                                 }
                                             }
                                         }
@@ -177,20 +174,12 @@ afterEvaluate { project ->
         from android.sourceSets.main.java.sourceFiles
     }
 
-
     artifacts {
+        // Hacking with telem artifacts due to bug in gradle uploadArchives task
         if (isTelem()) {
-            if (new File('libtelemetry/build/outputs/aar').exists()) {
-                def testNum = 0
-                new File('libtelemetry/build/outputs/aar').eachFile() { file ->
-                    if (file.toString().contains("lite") && isLiteRelease()) {
-                        archives file: file, classifier:testNum
-                        testNum++
-                    } else if (file.toString().contains("full")) {
-                        archives file: file
-                    }
-                }
-            }
+            def artifactsDir = "${project.buildDir}/outputs/aar/"
+            archives file: new File(isLiteRelease() ? "${artifactsDir}/libtelemetry-lite-release.aar" :
+                    "${artifactsDir}/libtelemetry-full-release.aar")
         }
         archives androidSourcesJar
         archives androidJavadocsJar
