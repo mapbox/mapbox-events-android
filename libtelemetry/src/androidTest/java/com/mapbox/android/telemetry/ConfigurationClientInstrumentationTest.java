@@ -2,25 +2,34 @@ package com.mapbox.android.telemetry;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.support.test.InstrumentationRegistry;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
 import java.io.IOException;
 
 import okhttp3.Call;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
+import okhttp3.Protocol;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class ConfigurationClientInstrumentationTest {
   private ConfigurationClient configurationClient;
@@ -31,6 +40,44 @@ public class ConfigurationClientInstrumentationTest {
     Context context = InstrumentationRegistry.getTargetContext();
     this.configurationClient = new ConfigurationClient(context,
       TelemetryUtils.createFullUserAgent("AnUserAgent", context), "anAccessToken", new OkHttpClient());
+  }
+
+  @Test
+  public void checkComEndpoint() {
+    Context context = InstrumentationRegistry.getTargetContext();
+    OkHttpClient httpClient = mock(OkHttpClient.class);
+    when(httpClient.newCall(any(Request.class))).thenReturn(mock(Call.class));
+    this.configurationClient = new ConfigurationClient(context,
+      TelemetryUtils.createFullUserAgent("AnUserAgent", context), "anAccessToken", httpClient);
+    configurationClient.update();
+    ArgumentCaptor<Request> argument = ArgumentCaptor.forClass(Request.class);
+    verify(httpClient).newCall(argument.capture());
+    assertEquals("api.mapbox.com", argument.getValue().url().host());
+  }
+
+  @Test
+  public void checkCnEndpoint() throws PackageManager.NameNotFoundException {
+    Context context = mock(Context.class);
+    PackageManager packageManager = mock(PackageManager.class);
+    ApplicationInfo applicationInfo = mock(ApplicationInfo.class);
+    Bundle bundle = new Bundle();
+    bundle.putBoolean("com.mapbox.CnEventsServer", true);
+    applicationInfo.metaData = bundle;
+
+    when(context.getPackageName()).thenReturn("package");
+    when(packageManager.getApplicationInfo(anyString(), eq(PackageManager.GET_META_DATA))).thenReturn(applicationInfo);
+    when(context.getPackageManager()).thenReturn(packageManager);
+
+    OkHttpClient httpClient = mock(OkHttpClient.class);
+    when(httpClient.newCall((Request) any())).thenReturn(mock(Call.class));
+    this.configurationClient = new ConfigurationClient(context,
+      TelemetryUtils.createFullUserAgent("AnUserAgent", InstrumentationRegistry.getTargetContext()),
+      "anAccessToken", httpClient);
+
+    configurationClient.update();
+    ArgumentCaptor<Request> argument = ArgumentCaptor.forClass(Request.class);
+    verify(httpClient).newCall(argument.capture());
+    assertEquals("api.mapbox.cn", argument.getValue().url().host());
   }
 
   @Test
@@ -54,18 +101,22 @@ public class ConfigurationClientInstrumentationTest {
   }
 
   @Test
-  public void updateRequestTest() {
+  public void updateRequestTest() throws IOException {
     setTimeStamp(System.currentTimeMillis() - DAY_IN_MILLIS);
 
     ConfigurationChangeHandler configurationChangeHandler = new ConfigurationChangeHandler() {
       @Override
       public void onUpdate(String data) {
-        assertTrue(isValidContent(data));
+        assertEquals("test1", data);
       }
     };
 
     configurationClient.addHandler(configurationChangeHandler);
-    configurationClient.update();
+    ResponseBody mockResponseBody = body("test1");
+
+    configurationClient.onResponse(mock(Call.class), newResponse(mockResponseBody));
+    assertFalse(configurationClient.shouldUpdate());
+
   }
 
   private void setTimeStamp(long milliseconds) {
@@ -76,15 +127,24 @@ public class ConfigurationClientInstrumentationTest {
     editor.apply();
   }
 
-  private static boolean isValidContent(String data) {
-    Gson gson = new GsonBuilder().create();
-    try {
-      JsonObject responseJson = gson.fromJson(data, JsonObject.class);
-      JsonElement jsonElement = responseJson.get("RevokedCertKeys");
+  private Response newResponse(ResponseBody responseBody) {
+    return new Response.Builder()
+      .request(new Request.Builder()
+        .url("https://example.com/")
+        .build())
+      .protocol(Protocol.HTTP_1_1)
+      .code(200)
+      .message("OK")
+      .body(responseBody)
+      .build();
+  }
 
-      return jsonElement.isJsonArray();
-    } catch (JsonSyntaxException exception) {
-      return false;
-    }
+  static ResponseBody body(String hex) {
+    return body(hex, null);
+  }
+
+  static ResponseBody body(String hex, String charset) {
+    MediaType mediaType = charset == null ? null : MediaType.parse("any/thing; charset=" + charset);
+    return ResponseBody.create(mediaType, hex);
   }
 }
