@@ -21,7 +21,7 @@ def isReleaseBuild() {
     return VERSION_NAME.contains("SNAPSHOT") == false
 }
 
-def isLocalBuild() {
+def static isLocalBuild() {
     if (System.getenv('IS_LOCAL_DEVELOPMENT') != null) {
         return System.getenv('IS_LOCAL_DEVELOPMENT').toBoolean()
     }
@@ -50,7 +50,7 @@ def getRepositoryPassword() {
     return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
 }
 
-def isLiteRelease() {
+def static isLiteRelease() {
     if (System.getenv('IS_LITE_RELEASE') != null) {
         return System.getenv('IS_LITE_RELEASE').toBoolean()
     }
@@ -113,6 +113,7 @@ afterEvaluate { project ->
                         }
                     }
 
+                    // Hacking with telem pom due to bug in gradle uploadArchives task
                     if (isTelem()) {
                         def allDependencies = configurations.implementation.allDependencies
                         if (!isLiteRelease()) {
@@ -160,7 +161,17 @@ afterEvaluate { project ->
     }
 
     task androidJavadocs(type: Javadoc) {
-        source = android.sourceSets.main.java.srcDirs
+        def sources = android.sourceSets.main.collect {
+            it.javaDirectories
+        }
+        if (isTelem()) {
+            sources += isLiteRelease() ? android.sourceSets.lite.collect {
+                it.javaDirectories
+            } : android.sourceSets.full.collect {
+                it.javaDirectories
+            }
+        }
+        source = sources
         classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
     }
 
@@ -171,7 +182,18 @@ afterEvaluate { project ->
 
     task androidSourcesJar(type: Jar) {
         classifier = 'sources'
-        from android.sourceSets.main.java.sourceFiles
+        def sources = android.sourceSets.main.collect {
+            it.javaDirectories
+        }
+
+        if (isTelem()) {
+            sources += isLiteRelease() ? android.sourceSets.lite.collect {
+                it.javaDirectories
+            } : android.sourceSets.full.collect {
+                it.javaDirectories
+            }
+        }
+        from sources
     }
 
     artifacts {
