@@ -117,6 +117,7 @@ jobs:
               fi
               if [ "$OK_TO_RELEASE_TELEM" == true ]; then
                 make publish-telem ;
+                make publish-telem-lite ;
               fi
             fi
       - store_artifacts:
