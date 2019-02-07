@@ -4,8 +4,7 @@ android.libraryVariants.all { variant ->
         description = "Generates javadoc for build $name"
         failOnError = false
         destinationDir = new File(destinationDir, variant.baseName)
-        source = files(variant.javaCompile.source)
-        classpath = files(variant.javaCompile.classpath) + files(android.bootClasspath)
+        source = variant.sourceSets.collect { it.java.sourceFiles }.inject { m, i -> m + i }
         options.windowTitle("Mapbox Android Telemetry SDK $VERSION_NAME Reference")
         options.docTitle("Mapbox Android Telemetry SDK $VERSION_NAME")
         options.header("Mapbox Android Telemetry SDK $VERSION_NAME Reference")
