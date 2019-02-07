@@ -136,7 +136,7 @@ afterEvaluate { project ->
                                         exclusions {
                                             for (def exc: dep.excludeRules) {
                                                 if (exc == null) {
-                                                    return
+                                                    continue
                                                 }
 
                                                 exclusion {
