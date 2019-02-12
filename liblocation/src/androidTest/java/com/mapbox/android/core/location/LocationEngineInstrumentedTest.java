@@ -20,12 +20,13 @@ import static junit.framework.Assert.assertTrue;
 public class LocationEngineInstrumentedTest {
   private static final long INTERVAL = 1000L;
 
-  private static LocationEngine[] foregroundLocationEngines = { getAndroidEngine(),
-    getGoogleEngine(), getMapboxEngine()};
+  private static LocationEngine[] foregroundLocationEngines = {
+    getGoogleEngine(),
+    getMapboxEngine()};
 
   @Rule
   public GrantPermissionRule permissionRule =
-          GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION);
+    GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION);
 
   @Test
   public void getLastLocation() throws Exception {
@@ -48,7 +49,7 @@ public class LocationEngineInstrumentedTest {
       final AtomicReference<LocationEngineResult> resultRef = new AtomicReference<>();
       LocationEngineCallback<LocationEngineResult> callback = getCallback(resultRef, latch);
 
-      engine.requestLocationUpdates(getRequest(INTERVAL), callback, null);
+      engine.requestLocationUpdates(getRequest(INTERVAL, LocationEngineRequest.PRIORITY_LOW_POWER), callback, null);
       assertTrue(latch.await(5, SECONDS));
 
       LocationEngineResult result = resultRef.get();
@@ -76,13 +77,13 @@ public class LocationEngineInstrumentedTest {
     return new LocationEngineProxy<>(implementation);
   }
 
-  private static LocationEngineRequest getRequest(long interval) {
-    return new LocationEngineRequest.Builder(interval).build();
+  private static LocationEngineRequest getRequest(long interval, int priority) {
+    return new LocationEngineRequest.Builder(interval).setPriority(priority).build();
   }
 
   private static LocationEngineCallback<LocationEngineResult> getCallback(
-          final AtomicReference<LocationEngineResult> resultRef,
-          final CountDownLatch latch) {
+    final AtomicReference<LocationEngineResult> resultRef,
+    final CountDownLatch latch) {
     return new LocationEngineCallback<LocationEngineResult>() {
       @Override
       public void onSuccess(LocationEngineResult result) {
