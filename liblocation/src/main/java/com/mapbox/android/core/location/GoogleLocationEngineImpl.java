@@ -5,15 +5,14 @@ import android.content.Context;
 import android.location.Location;
 import android.os.Looper;
 import android.support.annotation.NonNull;
-
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationRequest;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
@@ -46,7 +45,8 @@ class GoogleLocationEngineImpl implements LocationEngineImpl<LocationCallback> {
     throws SecurityException {
     GoogleLastLocationEngineCallbackTransport transport =
       new GoogleLastLocationEngineCallbackTransport(callback);
-    fusedLocationProviderClient.getLastLocation().addOnSuccessListener(transport).addOnFailureListener(transport);
+    fusedLocationProviderClient.getLastLocation().addOnSuccessListener(transport);
+    fusedLocationProviderClient.getLastLocation().addOnFailureListener(transport);
   }
 
   @Override
