@@ -50,8 +50,8 @@ dependencies {
     implementation dependenciesList.okhttp3
     implementation dependenciesList.gson
     implementation dependenciesList.supportAnnotation
+    implementation project(':libcore')
 
-    fullImplementation project(':libcore')
     fullImplementation (dependenciesList.archLifecycleExtensions) {
         exclude group: 'android.arch.lifecycle', module: 'livedata'
         exclude group: 'android.arch.lifecycle', module: 'viewmodel'
