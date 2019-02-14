@@ -1,6 +1,7 @@
 package com.mapbox.android.telemetry;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -97,6 +98,9 @@ class CertificateBlacklist implements ConfigurationChangeHandler {
   }
 
   private static boolean isValidContent(String data) {
+    if (TextUtils.isEmpty(data)) {
+      return false;
+    }
     Gson gson = new GsonBuilder().create();
     JsonArray jsonArray;
     try {
@@ -121,12 +125,14 @@ class CertificateBlacklist implements ConfigurationChangeHandler {
       JsonObject jsonObject = gson.fromJson(reader, JsonObject.class);
       if (jsonObject != null) {
         JsonArray jsonArray = jsonObject.getAsJsonArray("RevokedCertKeys");
-        Type listType = new TypeToken<List<String>>(){}.getType();
-        blacklist = gson.fromJson(jsonArray.toString(),listType);
+        Type listType = new TypeToken<List<String>>() {
+        }.getType();
+        blacklist = gson.fromJson(jsonArray.toString(), listType);
       }
     } catch (JsonIOException | JsonSyntaxException exception) {
       Log.e(LOG_TAG, exception.getMessage());
     }
+    reader.close();
     return blacklist != null ? blacklist : Collections.<String>emptyList();
   }
 
