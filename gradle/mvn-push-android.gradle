@@ -128,7 +128,8 @@ afterEvaluate { project ->
 
                                 dependency {
                                     groupId dep.group
-                                    artifactId dep.name
+                                    // Since name is readonly property we can't override it
+                                    artifactId (dep.name == 'libcore' ? 'mapbox-android-core' : dep.name)
                                     version dep.version
                                     scope "compile"
 
