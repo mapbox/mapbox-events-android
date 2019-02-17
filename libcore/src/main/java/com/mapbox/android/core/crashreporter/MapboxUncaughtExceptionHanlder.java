@@ -52,12 +52,12 @@ public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionH
    * <p>
    * Crash data will land in context.getFilesDir()/${mapboxPackage}/
    *
-   * @param context        application context.
-   * @param mapboxPackage  mapbox package name exceptions to handle.
+   * @param context       application context.
+   * @param mapboxPackage mapbox package name exceptions to handle.
    *
-   * <p>
-   * Note: Package name used to filter exceptions: i.e. `com.mapbox.android.telemetry` will catch all
-   *       telemetry exceptions in the context of a single app process.
+   *                      <p>
+   *                      Note: Package name used to filter exceptions: i.e. `com.mapbox.android.telemetry`
+   *                      will catch all telemetry exceptions in the context of a single app process.
    */
   public static void install(@NonNull Context context, @NonNull String mapboxPackage) {
     Context applicationContext;
@@ -116,13 +116,13 @@ public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionH
    * @param depth of exception chain
    */
   @VisibleForTesting
-  void setExceptionChainDepth(@IntRange(from=1, to=256) int depth) {
+  void setExceptionChainDepth(@IntRange(from = 1, to = 256) int depth) {
     this.exceptionChainDepth = depth;
   }
 
   @VisibleForTesting
   boolean isMapboxCrash(List<Throwable> throwables) {
-    for (Throwable cause: throwables) {
+    for (Throwable cause : throwables) {
       final StackTraceElement[] stackTraceElements = cause.getStackTrace();
       for (final StackTraceElement element : stackTraceElements) {
         if (isMapboxStackTraceElement(element)) {

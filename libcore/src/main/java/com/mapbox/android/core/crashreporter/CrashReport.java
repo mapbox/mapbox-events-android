@@ -34,7 +34,7 @@ public class CrashReport {
 
     try {
       this.content.put(key, value);
-    } catch (JSONException e) {
+    } catch (JSONException je) {
       Log.e(TAG, "Failed json encode value: " + String.valueOf(value));
     }
   }

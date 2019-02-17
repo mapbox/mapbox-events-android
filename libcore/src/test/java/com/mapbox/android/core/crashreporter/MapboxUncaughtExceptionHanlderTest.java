@@ -46,9 +46,9 @@ public class MapboxUncaughtExceptionHanlderTest {
     exceptionHanlder = null;
   }
 
- @Test(expected = IllegalArgumentException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void invalidPackageName() {
-      new MapboxUncaughtExceptionHanlder(context, sharedPreferences, "", defaultExceptionHanlder);
+    new MapboxUncaughtExceptionHanlder(context, sharedPreferences, "", defaultExceptionHanlder);
   }
 
   @Test(expected = IllegalArgumentException.class)
