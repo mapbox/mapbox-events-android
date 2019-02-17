@@ -28,6 +28,10 @@ android {
         warningsAsErrors true
         abortOnError true
     }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
 }
 
 dependencies {

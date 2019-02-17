@@ -8,10 +8,5 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <application>
         <service android:name="com.mapbox.android.telemetry.TelemetryService"/>
-        <provider
-            android:name="com.mapbox.android.telemetry.provider.MapboxTelemetryInitProvider"
-            android:authorities="${applicationId}.mapboxtelemetryinitprovider"
-            android:exported="false"
-            android:initOrder="100"/>
     </application>
 </manifest>
