@@ -11,17 +11,20 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
 
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 import static org.mockito.ArgumentMatchers.any;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MapboxUncaughtExceptionHanlderTest {
   private static final String TELEM_MAPBOX_PACKAGE = "com.mapbox.android.telemetry";
+  private static final String TELEM_MAPBOX_VERSION = "4.0.0";
 
   @Mock
   private Thread.UncaughtExceptionHandler defaultExceptionHanlder;
@@ -37,23 +40,14 @@ public class MapboxUncaughtExceptionHanlderTest {
   @Before
   public void setUp() {
     exceptionHanlder =
-      new MapboxUncaughtExceptionHanlder(context, sharedPreferences, TELEM_MAPBOX_PACKAGE, defaultExceptionHanlder);
+      new MapboxUncaughtExceptionHanlder(context, sharedPreferences, TELEM_MAPBOX_PACKAGE, TELEM_MAPBOX_VERSION,
+        defaultExceptionHanlder);
   }
 
   @After
   public void tearDown() {
     reset(context);
     exceptionHanlder = null;
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void invalidPackageName() {
-    new MapboxUncaughtExceptionHanlder(context, sharedPreferences, "", defaultExceptionHanlder);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void nullPackageName() {
-    new MapboxUncaughtExceptionHanlder(context, sharedPreferences, null, defaultExceptionHanlder);
   }
 
   @Test
@@ -66,7 +60,8 @@ public class MapboxUncaughtExceptionHanlderTest {
   @Test
   public void testNullDefaultExceptionHanlder() {
     exceptionHanlder =
-      new MapboxUncaughtExceptionHanlder(context, sharedPreferences, TELEM_MAPBOX_PACKAGE, null);
+      new MapboxUncaughtExceptionHanlder(context, sharedPreferences, TELEM_MAPBOX_PACKAGE, TELEM_MAPBOX_VERSION,
+        null);
     try {
       exceptionHanlder.uncaughtException(Thread.currentThread(), new Throwable());
     } catch (Throwable throwable) {
@@ -88,20 +83,16 @@ public class MapboxUncaughtExceptionHanlderTest {
   public void testHighLevelException() {
     exceptionHanlder.setExceptionChainDepth(2);
     Throwable throwable = createThrowable("HighLevelThrowable", "A", "B");
-
     List<Throwable> causalChain = exceptionHanlder.getCausalChain(throwable);
-    assertFalse(exceptionHanlder.isMapboxCrash(causalChain));
+    assertThat(exceptionHanlder.isMapboxCrash(causalChain)).isFalse();
   }
 
   @Test
   public void testMidLevelException() {
     exceptionHanlder.setExceptionChainDepth(2);
-    Throwable throwable = createThrowable("HighLevelThrowable", "A", "B");
-    throwable.initCause(createThrowable("MidLevelThrowable",
-      TELEM_MAPBOX_PACKAGE + ".A", "B", "C", "D"));
-
+    Throwable throwable = createMapboxThrowable();
     List<Throwable> causalChain = exceptionHanlder.getCausalChain(throwable);
-    assertTrue(exceptionHanlder.isMapboxCrash(causalChain));
+    assertThat(exceptionHanlder.isMapboxCrash(causalChain)).isTrue();
   }
 
   @Test
@@ -112,25 +103,61 @@ public class MapboxUncaughtExceptionHanlderTest {
     midLevelThrowable.initCause(createThrowable("LowLevelThrowable",
       TELEM_MAPBOX_PACKAGE + ".A", "F", "G"));
     highLevelThrowable.initCause(midLevelThrowable);
-
     List<Throwable> causalChain = exceptionHanlder.getCausalChain(highLevelThrowable);
-    assertTrue(exceptionHanlder.isMapboxCrash(causalChain));
+    assertThat(exceptionHanlder.isMapboxCrash(causalChain)).isTrue();
   }
 
   @Test
-  public void uncaughtException() {
-    /// Handle exception
-
-    /// Test file is written
+  public void exceptionHandlerDisabled() {
+    // Disable via shared pref
+    exceptionHanlder.onSharedPreferenceChanged(
+      getMockedSharedPrefs(MapboxUncaughtExceptionHanlder.MAPBOX_PREF_ENABLE_CRASH_REPORTER, false),
+      MapboxUncaughtExceptionHanlder.MAPBOX_PREF_ENABLE_CRASH_REPORTER);
+    exceptionHanlder.uncaughtException(Thread.currentThread(), new Throwable());
+    verify(context, never()).getFilesDir();
   }
 
   @Test
-  public void testFileContent() {
+  public void exceptionHandlerEnabledNotMapboxCrash() {
+    exceptionHanlder.uncaughtException(Thread.currentThread(),
+      createThrowable("HighLevelThrowable", "A", "B"));
+    verify(context, never()).getFilesDir();
+  }
 
+  @Test
+  public void exceptionHandlerEnabledMapboxCrash() {
+    exceptionHanlder.setExceptionChainDepth(2);
+    exceptionHanlder.uncaughtException(Thread.currentThread(), createMapboxThrowable());
+    verify(context, times(2)).getFilesDir();
+  }
+
+  @Test
+  public void onSharedPreferenceChangedWithInvalidKey() {
+    boolean isEnabled = exceptionHanlder.isEnabled();
+    exceptionHanlder.onSharedPreferenceChanged(getMockedSharedPrefs("FooKey", false), "FooKey");
+    assertThat(exceptionHanlder.isEnabled()).isEqualTo(isEnabled);
   }
 
   @Test
   public void onSharedPreferenceChanged() {
+    boolean isEnabled = exceptionHanlder.isEnabled();
+    exceptionHanlder.onSharedPreferenceChanged(
+      getMockedSharedPrefs(MapboxUncaughtExceptionHanlder.MAPBOX_PREF_ENABLE_CRASH_REPORTER, false),
+      MapboxUncaughtExceptionHanlder.MAPBOX_PREF_ENABLE_CRASH_REPORTER);
+    assertThat(exceptionHanlder.isEnabled()).isNotEqualTo(isEnabled);
+  }
+
+  private static Throwable createMapboxThrowable() {
+    Throwable throwable = createThrowable("HighLevelThrowable", "A", "B");
+    throwable.initCause(createThrowable("MidLevelThrowable",
+      TELEM_MAPBOX_PACKAGE + ".A", "B", "C", "D"));
+    return throwable;
+  }
+
+  private static SharedPreferences getMockedSharedPrefs(String key, boolean value) {
+    SharedPreferences sharedPreferences = mock(SharedPreferences.class);
+    when(sharedPreferences.getBoolean(key, false)).thenReturn(value);
+    return sharedPreferences;
   }
 
   private static Throwable createThrowable(String message, String... stackTraceElements) {

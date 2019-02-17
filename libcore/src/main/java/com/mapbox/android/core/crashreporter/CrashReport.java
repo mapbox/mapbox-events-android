@@ -2,6 +2,7 @@ package com.mapbox.android.core.crashreporter;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,10 +20,10 @@ public class CrashReport {
     this.content = new JSONObject();
     put("event", CRASH_EVENT);
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US);
-    put("created", dateFormat.format(created));
+    put("created", dateFormat.format(created.getTimeInMillis()));
   }
 
-  CrashReport(String json) throws JSONException {
+  CrashReport(@NonNull String json) throws JSONException {
     this.content = new JSONObject(json);
   }
 
@@ -49,8 +50,9 @@ public class CrashReport {
     return this.content.toString();
   }
 
+  @VisibleForTesting
   @NonNull
-  private String getString(@NonNull String key) {
+  String getString(@NonNull String key) {
     return this.content.optString(key);
   }
 

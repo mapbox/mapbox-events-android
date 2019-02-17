@@ -6,6 +6,7 @@ import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.mapbox.android.core.FileUtils;
@@ -20,15 +21,16 @@ public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionH
   SharedPreferences.OnSharedPreferenceChangeListener {
   public static final String MAPBOX_PREF_ENABLE_CRASH_REPORTER = "mapbox.crash.enable";
   public static final String MAPBOX_CRASH_REPORTER_PREFERENCES = "MapboxCrashReporterPrefs";
-  public static final int DEFAULT_EXCEPTION_CHAIN_DEPTH = 3;
 
   private static final String TAG = "MbUncaughtExcHandler";
   private static final String CRASH_FILENAME_FORMAT = "%s/%s.crash";
+  private static final int DEFAULT_EXCEPTION_CHAIN_DEPTH = 3;
 
   private final Thread.UncaughtExceptionHandler defaultExceptionHandler;
   private final Context applicationContext;
   private final AtomicBoolean isEnabled = new AtomicBoolean(true);
   private final String mapboxPackage;
+  private final String version;
 
   private int exceptionChainDepth;
 
@@ -36,12 +38,14 @@ public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionH
   MapboxUncaughtExceptionHanlder(@NonNull Context applicationContext,
                                  @NonNull SharedPreferences sharedPreferences,
                                  @NonNull String mapboxPackage,
+                                 @NonNull String version,
                                  Thread.UncaughtExceptionHandler defaultExceptionHandler) {
-    if (mapboxPackage == null || mapboxPackage.isEmpty()) {
-      throw new IllegalArgumentException("Invalid package name: " + mapboxPackage);
+    if (TextUtils.isEmpty(mapboxPackage) || TextUtils.isEmpty(version)) {
+      throw new IllegalArgumentException("Invalid package name: " + mapboxPackage + " or version: " + version);
     }
     this.applicationContext = applicationContext;
     this.mapboxPackage = mapboxPackage;
+    this.version = version;
     this.exceptionChainDepth = DEFAULT_EXCEPTION_CHAIN_DEPTH;
     this.defaultExceptionHandler = defaultExceptionHandler;
     sharedPreferences.registerOnSharedPreferenceChangeListener(this);
@@ -54,12 +58,13 @@ public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionH
    *
    * @param context       application context.
    * @param mapboxPackage mapbox package name exceptions to handle.
+   * @param version       version of mapbox package
    *
    *                      <p>
    *                      Note: Package name used to filter exceptions: i.e. `com.mapbox.android.telemetry`
    *                      will catch all telemetry exceptions in the context of a single app process.
    */
-  public static void install(@NonNull Context context, @NonNull String mapboxPackage) {
+  public static void install(@NonNull Context context, @NonNull String mapboxPackage, @NonNull String version) {
     Context applicationContext;
     if (context.getApplicationContext() == null) {
       // In shared processes content providers getApplicationContext() can return null.
@@ -70,7 +75,7 @@ public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionH
 
     Thread.setDefaultUncaughtExceptionHandler(new MapboxUncaughtExceptionHanlder(applicationContext,
       applicationContext.getSharedPreferences(MAPBOX_CRASH_REPORTER_PREFERENCES, Context.MODE_PRIVATE),
-      mapboxPackage, Thread.getDefaultUncaughtExceptionHandler()));
+      mapboxPackage, version, Thread.getDefaultUncaughtExceptionHandler()));
   }
 
   @Override
@@ -80,11 +85,16 @@ public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionH
     List<Throwable> causalChain;
     if (isEnabled.get() && isMapboxCrash(causalChain = getCausalChain(throwable))) {
       try {
-        CrashReport report = CrashReportBuilder.setup(applicationContext, mapboxPackage)
+        CrashReport report = CrashReportBuilder.setup(applicationContext, mapboxPackage, version)
           .addExceptionThread(thread)
           .addCausalChain(causalChain)
           .build();
 
+        File directory = FileUtils.getFile(applicationContext, mapboxPackage);
+        if (!directory.exists()) {
+          directory.mkdir();
+        }
+        // TODO: we should keep max 10 crashes and delete older
         File file = FileUtils.getFile(applicationContext, getReportFileName(mapboxPackage, report.getDateString()));
         FileUtils.writeToFile(file, report.toJson());
       } catch (Exception ex) {
@@ -102,12 +112,21 @@ public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionH
 
   @Override
   public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+    if (!MAPBOX_PREF_ENABLE_CRASH_REPORTER.equals(key)) {
+      return;
+    }
+
     try {
       isEnabled.set(sharedPreferences.getBoolean(MAPBOX_PREF_ENABLE_CRASH_REPORTER, false));
     } catch (Exception ex) {
       // In case of a ClassCastException
       Log.e(TAG, ex.toString());
     }
+  }
+
+  @VisibleForTesting
+  boolean isEnabled() {
+    return isEnabled.get();
   }
 
   /**
@@ -154,9 +173,10 @@ public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionH
     return level >= exceptionChainDepth;
   }
 
+  @VisibleForTesting
   @NonNull
-  private static String getReportFileName(@NonNull String mapboxPackage,
-                                          @NonNull String timestamp) {
+  static String getReportFileName(@NonNull String mapboxPackage,
+                                  @NonNull String timestamp) {
     return String.format(CRASH_FILENAME_FORMAT, mapboxPackage, timestamp);
   }
 }

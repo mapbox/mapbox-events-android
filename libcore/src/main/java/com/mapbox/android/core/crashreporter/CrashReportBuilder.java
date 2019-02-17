@@ -17,14 +17,16 @@ public final class CrashReportBuilder {
   private static final String STACK_TRACE_ELEMENT_FORMAT = "%s.%s(%s:%d)";
   private final Context applicationContext;
   private final String sdkIdentifier;
+  private final String sdkVersion;
   private final List<Throwable> causalChain = new ArrayList<>(4);
 
   private Thread uncaughtExceptionThread;
   private boolean isSilent;
 
-  private CrashReportBuilder(Context applicationContext, String sdkIdentifier) {
+  private CrashReportBuilder(Context applicationContext, String sdkIdentifier, String sdkVersion) {
     this.applicationContext = applicationContext;
     this.sdkIdentifier = sdkIdentifier;
+    this.sdkVersion = sdkVersion;
   }
 
   public static CrashReport fromJson(String json) throws IllegalArgumentException {
@@ -35,8 +37,8 @@ public final class CrashReportBuilder {
     }
   }
 
-  static CrashReportBuilder setup(Context context, String sdkIdentifier) {
-    return new CrashReportBuilder(context, sdkIdentifier);
+  static CrashReportBuilder setup(Context context, String sdkIdentifier, String sdkVersion) {
+    return new CrashReportBuilder(context, sdkIdentifier, sdkVersion);
   }
 
   CrashReportBuilder isSilent(boolean silent) {
@@ -44,12 +46,12 @@ public final class CrashReportBuilder {
     return this;
   }
 
-  CrashReportBuilder addCausalChain(List<Throwable> causalChain) {
+  CrashReportBuilder addCausalChain(@NonNull List<Throwable> causalChain) {
     this.causalChain.addAll(causalChain);
     return this;
   }
 
-  CrashReportBuilder addExceptionThread(Thread thread) {
+  CrashReportBuilder addExceptionThread(@NonNull Thread thread) {
     this.uncaughtExceptionThread = thread;
     return this;
   }
@@ -57,14 +59,17 @@ public final class CrashReportBuilder {
   CrashReport build() {
     CrashReport report = new CrashReport(new GregorianCalendar());
     report.put("sdkIdentifier", sdkIdentifier);
-    // TODO: add sdkVersion attribute
+    report.put("sdkVersion", sdkVersion);
     report.put("osVersion", String.format(OS_VERSION_FORMAT, Build.VERSION.RELEASE));
+    report.put("model", Build.MODEL);
     report.put("device", Build.DEVICE);
     report.put("isSilent", Boolean.toString(isSilent));
     report.put("stackTraceHash", getStackTraceHash(causalChain));
     report.put("stackTrace", getStackTrace(causalChain));
-    report.put("threadDetails", String.format(THREAD_DETAILS_FORMAT, uncaughtExceptionThread.getId(),
-      uncaughtExceptionThread.getName(), uncaughtExceptionThread.getPriority()));
+    if (uncaughtExceptionThread != null) {
+      report.put("threadDetails", String.format(THREAD_DETAILS_FORMAT, uncaughtExceptionThread.getId(),
+        uncaughtExceptionThread.getName(), uncaughtExceptionThread.getPriority()));
+    }
     report.put("appID", applicationContext.getPackageName());
     return report;
   }
@@ -83,11 +88,12 @@ public final class CrashReportBuilder {
         }
       }
     }
-    return Integer.toHexString(result.toString().hashCode());
+    return result.toString();
   }
 
+  @VisibleForTesting
   @NonNull
-  private static String getStackTraceHash(@NonNull List<Throwable> throwables) {
+  static String getStackTraceHash(@NonNull List<Throwable> throwables) {
     StringBuilder result = new StringBuilder();
     for (Throwable throwable: throwables) {
       StackTraceElement[] stackTraceElements = throwable.getStackTrace();
