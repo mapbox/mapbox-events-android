@@ -15,6 +15,9 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 
+/**
+ * File utility class
+ */
 public final class FileUtils {
   private static final String LOG_TAG = "FileUtils";
   private static final int DEFAULT_BUFFER_SIZE_IN_BYTES = 4096;
@@ -22,11 +25,24 @@ public final class FileUtils {
   private FileUtils() {
   }
 
+  /**
+   * Return file from context.getFilesDir()/fileName
+   *
+   * @param context  application context
+   * @param fileName path to the file
+   * @return instance of the file object.
+   */
   @NonNull
   public static File getFile(@NonNull Context context, @NonNull String fileName) {
     return new File(context.getFilesDir(), fileName);
   }
 
+  /**
+   * Read from file.
+   *
+   * @param file valid reference to the file.
+   * @return content read from the file.
+   */
   @NonNull
   public static String readFromFile(@NonNull File file) throws FileNotFoundException {
     InputStream inputStream = new FileInputStream(file);
@@ -50,6 +66,12 @@ public final class FileUtils {
     return output.toString();
   }
 
+  /**
+   * Write to file.
+   *
+   * @param file    valid reference to the file.
+   * @param content content to write to the file.
+   */
   public static void writeToFile(@NonNull File file, @NonNull String content) throws IOException {
     OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
     try {
@@ -66,6 +88,11 @@ public final class FileUtils {
     }
   }
 
+  /**
+   * Delete file.
+   *
+   * @param file to delete.
+   */
   public static void deleteFile(@NonNull File file) {
     boolean deleted = file.delete();
     if (!deleted) {

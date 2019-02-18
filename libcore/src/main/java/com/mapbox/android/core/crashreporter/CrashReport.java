@@ -11,6 +11,9 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
+/**
+ * Crash report data model
+ */
 public class CrashReport {
   private static final String TAG = "MapboxCrashReport";
   private static final String CRASH_EVENT = "mobile.crash";
@@ -27,6 +30,12 @@ public class CrashReport {
     this.content = new JSONObject(json);
   }
 
+  /**
+   * Add key value pair to report
+   *
+   * @param key   valid non-empty key
+   * @param value valid string value or null
+   */
   public synchronized void put(@NonNull String key, @Nullable String value) {
     if (value == null) {
       putNull(key);
@@ -40,11 +49,21 @@ public class CrashReport {
     }
   }
 
+  /**
+   * Return formatted date string
+   *
+   * @return date string in "yyyy-MM-dd'T'HH:mm:ss.SSSZ" format
+   */
   @NonNull
   public String getDateString() {
     return getString("created");
   }
 
+  /**
+   * Return json formatted crash data
+   *
+   * @return valid json string
+   */
   @NonNull
   public String toJson() {
     return this.content.toString();

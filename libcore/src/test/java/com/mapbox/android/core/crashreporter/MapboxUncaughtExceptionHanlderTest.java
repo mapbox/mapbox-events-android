@@ -9,6 +9,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.io.File;
 import java.util.List;
 
 import static junit.framework.TestCase.fail;
@@ -127,6 +128,7 @@ public class MapboxUncaughtExceptionHanlderTest {
   @Test
   public void exceptionHandlerEnabledMapboxCrash() {
     exceptionHanlder.setExceptionChainDepth(2);
+    when(context.getFilesDir()).thenReturn(new File(""));
     exceptionHanlder.uncaughtException(Thread.currentThread(), createMapboxThrowable());
     verify(context, times(2)).getFilesDir();
   }

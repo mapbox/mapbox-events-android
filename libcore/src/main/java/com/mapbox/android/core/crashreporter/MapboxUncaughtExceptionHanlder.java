@@ -17,6 +17,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Mapbox custom exception handler, which catches unhandled fatal exceptions
+ * caused by Mapbox classes. This is an attempt to capture mapbox exceptions as reliably
+ * as possible with minimal false positives.
+ * <p>
+ * Note: this handler is not capturing full application's stacktrace!
+ */
 public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionHandler,
   SharedPreferences.OnSharedPreferenceChangeListener {
   public static final String MAPBOX_PREF_ENABLE_CRASH_REPORTER = "mapbox.crash.enable";

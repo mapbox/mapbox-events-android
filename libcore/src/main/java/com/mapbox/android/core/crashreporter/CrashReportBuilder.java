@@ -11,6 +11,9 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Crash report builder encapsulates report generation logic.
+ */
 public final class CrashReportBuilder {
   private static final String OS_VERSION_FORMAT = "Android-%s";
   private static final String THREAD_DETAILS_FORMAT = "tid:%s|name:%s|priority:%s";
@@ -29,6 +32,12 @@ public final class CrashReportBuilder {
     this.sdkVersion = sdkVersion;
   }
 
+  /**
+   * Exports json encoded content to CrashReport object
+   *
+   * @param json valid json body.
+   * @return new instance of CrashReport
+   */
   public static CrashReport fromJson(String json) throws IllegalArgumentException {
     try {
       return new CrashReport(json);
@@ -78,9 +87,9 @@ public final class CrashReportBuilder {
   @NonNull
   String getStackTrace(@NonNull List<Throwable> throwables) {
     StringBuilder result = new StringBuilder();
-    for (Throwable throwable: throwables) {
+    for (Throwable throwable : throwables) {
       StackTraceElement[] stackTraceElements = throwable.getStackTrace();
-      for (StackTraceElement element: stackTraceElements) {
+      for (StackTraceElement element : stackTraceElements) {
         if (element.getClassName().startsWith(sdkIdentifier)) {
           result.append(String.format(Locale.US, STACK_TRACE_ELEMENT_FORMAT,
             element.getClassName(), element.getMethodName(),
@@ -95,9 +104,9 @@ public final class CrashReportBuilder {
   @NonNull
   static String getStackTraceHash(@NonNull List<Throwable> throwables) {
     StringBuilder result = new StringBuilder();
-    for (Throwable throwable: throwables) {
+    for (Throwable throwable : throwables) {
       StackTraceElement[] stackTraceElements = throwable.getStackTrace();
-      for (StackTraceElement element: stackTraceElements) {
+      for (StackTraceElement element : stackTraceElements) {
         result.append(element.getClassName());
         result.append(element.getMethodName());
       }
