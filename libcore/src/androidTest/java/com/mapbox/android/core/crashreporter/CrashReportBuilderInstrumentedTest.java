@@ -54,7 +54,7 @@ public class CrashReportBuilderInstrumentedTest {
       .addCausalChain(causalChain)
       .build();
 
-    assertEquals(report.getString("event"), "mobile.crash");
+    assertEquals("mobile.crash", report.getString("event"));
     assertFalse(report.getString("created").isEmpty());
   }
 
