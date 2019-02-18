@@ -2,9 +2,12 @@ checkstyle:
 	./gradlew checkstyle
 
 test:
-	./gradlew :libcore:test
 	./gradlew :libtelemetry:downloadSchema
-	./gradlew :libtelemetry:test
+	./gradlew test
+
+test-coverage:
+	./gradlew testDebugUnitTestCoverage
+	./gradlew testFullDebugUnitTestCoverage
 
 release:
 	./gradlew :libcore:assembleRelease
