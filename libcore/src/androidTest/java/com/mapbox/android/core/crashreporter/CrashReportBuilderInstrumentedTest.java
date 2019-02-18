@@ -43,7 +43,7 @@ public class CrashReportBuilderInstrumentedTest {
   @Test
   public void validBodyfromJson() {
     CrashReport report = CrashReportBuilder.fromJson(validJson);
-    assertEquals(report.toJson(), validJson.trim());
+    assertEquals(validJson.trim(), report.toJson());
   }
 
   @Test
