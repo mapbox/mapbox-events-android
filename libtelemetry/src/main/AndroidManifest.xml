@@ -9,10 +9,4 @@
     <application>
         <service android:name="com.mapbox.android.telemetry.TelemetryService"/>
     </application>
-    <!--TODO Remove comment after analyzing the impact on the performance when adding SchedulerFlusherJobService-->
-    <!--<application>-->
-    <!--<service-->
-    <!--android:name="com.mapbox.android.telemetry.SchedulerFlusherJobService"-->
-    <!--android:permission="android.permission.BIND_JOB_SERVICE"/>-->
-    <!--</application>-->
 </manifest>
