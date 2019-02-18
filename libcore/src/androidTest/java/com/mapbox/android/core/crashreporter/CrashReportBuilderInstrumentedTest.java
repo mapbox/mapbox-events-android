@@ -71,7 +71,7 @@ public class CrashReportBuilderInstrumentedTest {
   public void getStackTrace() {
     List<Throwable> causalChain = exceptionHanlder.getCausalChain(createMapboxThrowable());
     String stackTrace = builder.getStackTrace(causalChain);
-    assertEquals(stackTrace, "com.mapbox.android.telemetry.A.foo(com.mapbox.android.telemetry.A.java:0)\n");
+    assertEquals("com.mapbox.android.telemetry.A.foo(com.mapbox.android.telemetry.A.java:0)\n", stackTrace);
   }
 
   @Test
