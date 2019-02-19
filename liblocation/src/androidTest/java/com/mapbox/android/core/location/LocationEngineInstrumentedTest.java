@@ -21,9 +21,10 @@ public class LocationEngineInstrumentedTest {
   private static final long INTERVAL = 1000L;
 
   private static LocationEngine[] foregroundLocationEngines = {
-    getAndroidEngine(),
     getGoogleEngine(),
-    getMapboxEngine()};
+    getMapboxEngine(),
+    getAndroidEngine(),
+  };
 
   @Rule
   public GrantPermissionRule permissionRule =
