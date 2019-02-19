@@ -21,6 +21,7 @@ public class LocationEngineInstrumentedTest {
   private static final long INTERVAL = 1000L;
 
   private static LocationEngine[] foregroundLocationEngines = {
+    getAndroidEngine(),
     getGoogleEngine(),
     getMapboxEngine()};
 
@@ -35,7 +36,7 @@ public class LocationEngineInstrumentedTest {
       final AtomicReference<LocationEngineResult> resultRef = new AtomicReference<>();
 
       engine.getLastLocation(getCallback(resultRef, latch));
-      assertTrue(latch.await(5, SECONDS));
+      assertTrue(latch.await(1, SECONDS));
 
       LocationEngineResult result = resultRef.get();
       assertNotNull(result.getLastLocation());
