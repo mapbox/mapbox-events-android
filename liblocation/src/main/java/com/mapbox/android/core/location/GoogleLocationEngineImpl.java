@@ -15,6 +15,7 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
 import java.util.Collections;
 import java.util.List;
@@ -45,8 +46,9 @@ class GoogleLocationEngineImpl implements LocationEngineImpl<LocationCallback> {
     throws SecurityException {
     GoogleLastLocationEngineCallbackTransport transport =
       new GoogleLastLocationEngineCallbackTransport(callback);
-    fusedLocationProviderClient.getLastLocation().addOnSuccessListener(transport);
-    fusedLocationProviderClient.getLastLocation().addOnFailureListener(transport);
+    Task<Location> lastLocation = fusedLocationProviderClient.getLastLocation();
+    lastLocation.addOnSuccessListener(transport);
+    lastLocation.addOnFailureListener(transport);
   }
 
   @Override
