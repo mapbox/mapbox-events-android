@@ -16,7 +16,7 @@ import static junit.framework.Assert.assertNotNull;
 
 @RunWith(AndroidJUnit4.class)
 public class LocationEngineInstrumentedTest {
-  private static final long INTERVAL = 100L;
+  private static final long INTERVAL = 1000L;
 
   private static LocationEngine[] foregroundLocationEngines = {
     getGoogleEngine(),
