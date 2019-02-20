@@ -12,13 +12,11 @@ import org.junit.runner.RunWith;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class LocationEngineInstrumentedTest {
-  private static final long INTERVAL = 1000L;
+  private static final long INTERVAL = 100L;
 
   private static LocationEngine[] foregroundLocationEngines = {
     getGoogleEngine(),
@@ -37,7 +35,7 @@ public class LocationEngineInstrumentedTest {
       final AtomicReference<LocationEngineResult> resultRef = new AtomicReference<>();
 
       engine.getLastLocation(getCallback(resultRef, latch));
-      assertTrue(latch.await(1, SECONDS));
+      latch.await();
 
       LocationEngineResult result = resultRef.get();
       assertNotNull(result.getLastLocation());
@@ -45,19 +43,48 @@ public class LocationEngineInstrumentedTest {
   }
 
   @Test
-  public void requestAndRemoveLocationUpdates() throws Exception {
-    for (LocationEngine engine : foregroundLocationEngines) {
-      final CountDownLatch latch = new CountDownLatch(1);
-      final AtomicReference<LocationEngineResult> resultRef = new AtomicReference<>();
-      LocationEngineCallback<LocationEngineResult> callback = getCallback(resultRef, latch);
+  public void requestAndRemoveGoogleLocationUpdates() throws Exception {
+    LocationEngine engine = getGoogleEngine();
+    final CountDownLatch latch = new CountDownLatch(1);
+    final AtomicReference<LocationEngineResult> resultRef = new AtomicReference<>();
+    LocationEngineCallback<LocationEngineResult> callback = getCallback(resultRef, latch);
 
-      engine.requestLocationUpdates(getRequest(INTERVAL, LocationEngineRequest.PRIORITY_LOW_POWER), callback, null);
-      assertTrue(latch.await(5, SECONDS));
+    engine.requestLocationUpdates(getRequest(INTERVAL, LocationEngineRequest.PRIORITY_LOW_POWER), callback, null);
+    latch.await();
 
-      LocationEngineResult result = resultRef.get();
-      assertNotNull(result.getLastLocation());
-      engine.removeLocationUpdates(callback);
-    }
+    LocationEngineResult result = resultRef.get();
+    assertNotNull(result.getLastLocation());
+    engine.removeLocationUpdates(callback);
+  }
+
+  @Test
+  public void requestAndRemoveAndroidLocationUpdates() throws Exception {
+    LocationEngine engine = getAndroidEngine();
+    final CountDownLatch latch = new CountDownLatch(1);
+    final AtomicReference<LocationEngineResult> resultRef = new AtomicReference<>();
+    LocationEngineCallback<LocationEngineResult> callback = getCallback(resultRef, latch);
+
+    engine.requestLocationUpdates(getRequest(INTERVAL, LocationEngineRequest.PRIORITY_LOW_POWER), callback, null);
+    latch.await();
+
+    LocationEngineResult result = resultRef.get();
+    assertNotNull(result.getLastLocation());
+    engine.removeLocationUpdates(callback);
+  }
+
+  @Test
+  public void requestAndRemoveMapboxLocationUpdates() throws Exception {
+    LocationEngine engine = getMapboxEngine();
+    final CountDownLatch latch = new CountDownLatch(1);
+    final AtomicReference<LocationEngineResult> resultRef = new AtomicReference<>();
+    LocationEngineCallback<LocationEngineResult> callback = getCallback(resultRef, latch);
+
+    engine.requestLocationUpdates(getRequest(INTERVAL, LocationEngineRequest.PRIORITY_HIGH_ACCURACY), callback, null);
+    latch.await();
+
+    LocationEngineResult result = resultRef.get();
+    assertNotNull(result.getLastLocation());
+    engine.removeLocationUpdates(callback);
   }
 
   private static LocationEngine getMapboxEngine() {
@@ -95,6 +122,7 @@ public class LocationEngineInstrumentedTest {
 
       @Override
       public void onFailure(Exception exception) {
+        latch.countDown();
         exception.printStackTrace();
       }
     };

@@ -31,8 +31,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-
-public class GoogleLocationEngineImplTest2 {
+public class GoogleLocationEngineImplAdditionalTest {
   private static final long INTERVAL = 1000L;
   private LocationEngineProxy engine;
   private Location location;
@@ -76,7 +75,7 @@ public class GoogleLocationEngineImplTest2 {
         public Object answer(InvocationOnMock invocation) throws Throwable {
           OnSuccessListener listener = (OnSuccessListener) invocation.getArguments()[0];
           listener.onSuccess(location);
-          return null;
+          return mock(Task.class);
         }
       });
     engine.getLastLocation(new LocationEngineCallback<LocationEngineResult>() {
