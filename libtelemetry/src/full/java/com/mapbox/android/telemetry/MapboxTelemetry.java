@@ -122,9 +122,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     if (sendEventIfWhitelisted(event)) {
       return true;
     }
-
-    boolean isPushed = pushToQueue(event);
-    return isPushed;
+    return pushToQueue(event);
   }
 
   public boolean enable() {
@@ -218,7 +216,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   boolean isQueueEmpty() {
-    return queue.queue.size() == 0;
+    return queue.isEmpty();
   }
 
   private void startTelemetryService() {
@@ -239,7 +237,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     boolean areValidParameters = areRequiredParametersValid(accessToken, userAgent);
     if (areValidParameters) {
       initializeTelemetryClient();
-      queue.setTelemetryInitialized(true);
     }
     return areValidParameters;
   }
@@ -269,7 +266,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   private void initializeQueue() {
-    queue = new EventsQueue(new FullQueueFlusher(this));
+    queue = EventsQueue.create(this);
   }
 
   private boolean areRequiredParametersValid(String accessToken, String userAgent) {
@@ -331,8 +328,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   private void flushEnqueuedEvents() {
     List<Event> currentEvents = queue.flush();
-    boolean areThereAnyEvents = currentEvents.size() > 0;
-    if (areThereAnyEvents) {
+    if (!currentEvents.isEmpty()) {
       sendEventsIfPossible(currentEvents);
     }
   }

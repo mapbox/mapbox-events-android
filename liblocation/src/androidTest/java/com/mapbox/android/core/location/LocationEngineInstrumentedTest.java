@@ -1,5 +1,6 @@
 package com.mapbox.android.core.location;
 
+import android.Manifest;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.GrantPermissionRule;
@@ -10,13 +11,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class LocationEngineInstrumentedTest {
   private static final long INTERVAL = 1000L;
+  private static final long TIMEOUT = 60;
 
   private static LocationEngine[] foregroundLocationEngines = {
     getGoogleEngine(),
@@ -27,6 +31,9 @@ public class LocationEngineInstrumentedTest {
   @Rule
   public GrantPermissionRule permissionRule =
     GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION);
+  @Rule
+  public GrantPermissionRule permissionRule2 =
+    GrantPermissionRule.grant(Manifest.permission.ACCESS_COARSE_LOCATION);
 
   @Test
   public void getLastLocation() throws Exception {
@@ -50,7 +57,7 @@ public class LocationEngineInstrumentedTest {
     LocationEngineCallback<LocationEngineResult> callback = getCallback(resultRef, latch);
 
     engine.requestLocationUpdates(getRequest(INTERVAL, LocationEngineRequest.PRIORITY_LOW_POWER), callback, null);
-    latch.await();
+    assertTrue(latch.await(TIMEOUT, TimeUnit.SECONDS));
 
     LocationEngineResult result = resultRef.get();
     assertNotNull(result.getLastLocation());
@@ -65,7 +72,7 @@ public class LocationEngineInstrumentedTest {
     LocationEngineCallback<LocationEngineResult> callback = getCallback(resultRef, latch);
 
     engine.requestLocationUpdates(getRequest(INTERVAL, LocationEngineRequest.PRIORITY_LOW_POWER), callback, null);
-    latch.await();
+    assertTrue(latch.await(TIMEOUT, TimeUnit.SECONDS));
 
     LocationEngineResult result = resultRef.get();
     assertNotNull(result.getLastLocation());
@@ -80,7 +87,7 @@ public class LocationEngineInstrumentedTest {
     LocationEngineCallback<LocationEngineResult> callback = getCallback(resultRef, latch);
 
     engine.requestLocationUpdates(getRequest(INTERVAL, LocationEngineRequest.PRIORITY_HIGH_ACCURACY), callback, null);
-    latch.await();
+    assertTrue(latch.await(TIMEOUT, TimeUnit.SECONDS));
 
     LocationEngineResult result = resultRef.get();
     assertNotNull(result.getLastLocation());

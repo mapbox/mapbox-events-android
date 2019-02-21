@@ -1,45 +1,53 @@
 package com.mapbox.android.telemetry;
 
 
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 class ConcurrentQueue<T> {
+  private static final String TAG = "ConcurrentQueue";
   private final Queue<T> queue;
-  private int count = 0;
 
   ConcurrentQueue() {
     this.queue = new ConcurrentLinkedQueue<>();
   }
 
   boolean add(T event) {
-    boolean isAdded = queue.add(event);
-    count++;
-    return isAdded;
+    try {
+      return queue.add(event);
+    } catch (Exception exc) {
+      Log.e(TAG, exc.toString());
+      return false;
+    }
+  }
+
+  @Nullable
+  T remove() {
+    return queue.remove();
   }
 
   List<T> flush() {
-    List<T> queuedEvents = new ArrayList<>(count);
-    for (int i = 0; i < count; i++) {
-      T event = queue.remove();
-      queuedEvents.add(event);
+    List<T> queuedEvents = new ArrayList<>(queue.size());
+    try {
+      queuedEvents.addAll(queue);
+      queue.clear();
+    } catch (Exception exc) {
+      Log.e(TAG, exc.toString());
     }
-    count = 0;
     return queuedEvents;
   }
 
-  boolean enqueue(T event) {
-    queue.remove();
-    return queue.add(event);
-  }
-
   int size() {
-    return count;
+    return queue.size();
   }
 
-  // For testing only
+  @VisibleForTesting
   Queue<T> obtainQueue() {
     return queue;
   }

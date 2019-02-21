@@ -1,44 +1,78 @@
 package com.mapbox.android.telemetry;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadFactory;
 
 class EventsQueue {
+  @VisibleForTesting
   static final int SIZE_LIMIT = 180;
-  private final FlushQueueCallback callback;
-  final ConcurrentQueue<Event> queue;
-  private boolean isTelemetryInitialized = false;
+  private final FullQueueCallback callback;
+  private final ConcurrentQueue<Event> queue;
+  private final ExecutorService executorService;
 
-  EventsQueue(FlushQueueCallback callback) {
+  @VisibleForTesting
+  EventsQueue(@NonNull ConcurrentQueue<Event> queue,
+              @NonNull FullQueueCallback callback, @NonNull ExecutorService executorService) {
+    this.queue = queue;
     this.callback = callback;
-    this.queue = new ConcurrentQueue<>();
+    this.executorService = executorService;
+  }
+
+  static synchronized EventsQueue create(@NonNull FullQueueCallback callback) {
+    if (callback == null) {
+      throw new IllegalArgumentException("Callback can't be null");
+    }
+    ExecutorService executorService = new ThreadPoolExecutor(0, 1,
+      20, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(),
+      threadFactory("EventsFullQueueDispatcher"));
+    return new EventsQueue(new ConcurrentQueue<Event>(), callback, executorService);
+  }
+
+  boolean isEmpty() {
+    return queue.size() == 0;
+  }
+
+  int size() {
+    return queue.size();
   }
 
   boolean push(Event event) {
-    if (checkMaximumSize()) {
-      if (!isTelemetryInitialized) {
-        return enqueue(event);
+    synchronized (this) {
+      if (queue.size() >= SIZE_LIMIT) {
+        dispatchCallback(queue.flush());
       }
-      callback.onFullQueueFlush(queue, event);
-      return false;
+      return queue.add(event);
     }
-
-    return queue.add(event);
   }
 
   List<Event> flush() {
-    return queue.flush();
+    synchronized (this) {
+      return queue.flush();
+    }
   }
 
-  void setTelemetryInitialized(boolean telemetryInitialized) {
-    isTelemetryInitialized = telemetryInitialized;
+  private void dispatchCallback(final List<Event> events) {
+    executorService.execute(new Runnable() {
+      @Override
+      public void run() {
+        callback.onFullQueue(events);
+      }
+    });
   }
 
-  private boolean enqueue(Event event) {
-    return queue.enqueue(event);
-  }
-
-  private boolean checkMaximumSize() {
-    return queue.size() >= SIZE_LIMIT;
+  private static ThreadFactory threadFactory(final String name) {
+    return new ThreadFactory() {
+      @Override
+      public Thread newThread(Runnable runnable) {
+        return new Thread(runnable, name);
+      }
+    };
   }
 }
