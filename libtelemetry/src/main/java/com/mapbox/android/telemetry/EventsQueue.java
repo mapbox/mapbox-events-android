@@ -1,44 +1,39 @@
 package com.mapbox.android.telemetry;
 
+import android.support.annotation.NonNull;
 
 import java.util.List;
 
 class EventsQueue {
   static final int SIZE_LIMIT = 180;
-  private final FlushQueueCallback callback;
-  final ConcurrentQueue<Event> queue;
-  private boolean isTelemetryInitialized = false;
+  private final FullQueueCallback callback;
+  private final ConcurrentQueue<Event> queue;
 
-  EventsQueue(FlushQueueCallback callback) {
+  EventsQueue(@NonNull FullQueueCallback callback, @NonNull ConcurrentQueue<Event> queue) {
     this.callback = callback;
-    this.queue = new ConcurrentQueue<>();
+    this.queue = queue;
+  }
+
+  boolean isEmpty() {
+    return queue.size() == 0;
+  }
+
+  int size() {
+    return queue.size();
   }
 
   boolean push(Event event) {
-    if (checkMaximumSize()) {
-      if (!isTelemetryInitialized) {
-        return enqueue(event);
-      }
-      callback.onFullQueueFlush(queue, event);
-      return false;
+    if (queue.size() >= SIZE_LIMIT) {
+      callback.onFullQueue(flush());
     }
-
-    return queue.add(event);
+    synchronized (this) {
+      return queue.add(event);
+    }
   }
 
   List<Event> flush() {
-    return queue.flush();
-  }
-
-  void setTelemetryInitialized(boolean telemetryInitialized) {
-    isTelemetryInitialized = telemetryInitialized;
-  }
-
-  private boolean enqueue(Event event) {
-    return queue.enqueue(event);
-  }
-
-  private boolean checkMaximumSize() {
-    return queue.size() >= SIZE_LIMIT;
+    synchronized (this) {
+      return queue.flush();
+    }
   }
 }

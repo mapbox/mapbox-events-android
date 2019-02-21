@@ -558,7 +558,7 @@ public class MapboxTelemetryTest {
     MapboxTelemetry.applicationContext = obtainNetworkConnectedMockedContext();
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
-    EventsQueue eventsQueue = new EventsQueue(mock(FlushQueueCallback.class));
+    EventsQueue eventsQueue = new EventsQueue(mock(FullQueueCallback.class), new ConcurrentQueue<Event>());
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     TelemetryClient telemetryClient = mock(TelemetryClient.class);
     Callback httpCallback = mock(Callback.class);
