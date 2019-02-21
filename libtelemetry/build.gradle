@@ -51,6 +51,7 @@ dependencies {
     implementation dependenciesList.gson
     implementation dependenciesList.supportAnnotation
     implementation project(':libcore')
+    implementation project(':libupload')
 
     fullImplementation (dependenciesList.archLifecycleExtensions) {
         exclude group: 'android.arch.lifecycle', module: 'livedata'
