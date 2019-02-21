@@ -5,18 +5,20 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.doAnswer;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EventsQueueTest {
@@ -24,13 +26,17 @@ public class EventsQueueTest {
   @Mock
   private FullQueueCallback mockedCallback;
 
+  @Mock
+  private ExecutorService mockedExcecutor;
+
   private ConcurrentQueue<Event> queue;
   private EventsQueue eventsQueueWrapper;
 
   @Before
   public void setUp() {
     queue = new ConcurrentQueue<>();
-    eventsQueueWrapper = new EventsQueue(mockedCallback, queue);
+    setupDirectExecutor(mockedExcecutor);
+    eventsQueueWrapper = new EventsQueue(queue, mockedCallback, mockedExcecutor);
   }
 
   @After
@@ -65,28 +71,6 @@ public class EventsQueueTest {
   }
 
   @Test
-  public void checksMultiThreadOnFullQueueFlushCalled() throws InterruptedException {
-    int n = 5;
-    final CountDownLatch latch = new CountDownLatch(n);
-    class TestThread extends Thread {
-      @Override
-      public void run() {
-        for (int i = 0; i <= EventsQueue.SIZE_LIMIT; i++) {
-          eventsQueueWrapper.push(mock(Event.class));
-        }
-        latch.countDown();
-      }
-    }
-
-    for (int i = 0; i < n; i++) {
-      new TestThread().start();
-    }
-    latch.await();
-    verify(mockedCallback, times(n)).onFullQueue(any(List.class));
-  }
-
-
-  @Test
   public void checksPushingTheEventRightAfterReachingFullCapacity() {
     fillQueue(EventsQueue.SIZE_LIMIT);
     Event event = mock(Event.class);
@@ -100,5 +84,14 @@ public class EventsQueueTest {
     for (int i = 0; i < max; i++) {
       eventsQueueWrapper.push(mock(Event.class));
     }
+  }
+
+  private void setupDirectExecutor(ExecutorService executor) {
+    doAnswer(new Answer<Object>() {
+      public Object answer(InvocationOnMock invocation) {
+        ((Runnable) invocation.getArguments()[0]).run();
+        return null;
+      }
+    }).when(executor).execute(any(Runnable.class));
   }
 }

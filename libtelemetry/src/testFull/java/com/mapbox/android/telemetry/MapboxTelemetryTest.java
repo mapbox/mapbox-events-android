@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 import okhttp3.Callback;
 
@@ -558,7 +559,8 @@ public class MapboxTelemetryTest {
     MapboxTelemetry.applicationContext = obtainNetworkConnectedMockedContext();
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
-    EventsQueue eventsQueue = new EventsQueue(mock(FullQueueCallback.class), new ConcurrentQueue<Event>());
+    EventsQueue eventsQueue = new EventsQueue(new ConcurrentQueue<Event>(),
+      mock(FullQueueCallback.class), mock(ExecutorService.class));
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     TelemetryClient telemetryClient = mock(TelemetryClient.class);
     Callback httpCallback = mock(Callback.class);

@@ -266,7 +266,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   private void initializeQueue() {
-    queue = new EventsQueue(this, new ConcurrentQueue<Event>());
+    queue = EventsQueue.create(this);
   }
 
   private boolean areRequiredParametersValid(String accessToken, String userAgent) {
