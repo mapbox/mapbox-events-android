@@ -11,7 +11,10 @@ import org.mockito.stubbing.Answer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -19,6 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.times;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EventsQueueTest {
@@ -80,10 +84,72 @@ public class EventsQueueTest {
     assertThat(eventsQueueWrapper.isEmpty()).isTrue();
   }
 
+  @Test
+  public void multiThreadedStressTest() throws InterruptedException {
+    int pushingThreads = 10;
+    int flushingThreads = 5;
+    final CountDownLatch latchPushing = new CountDownLatch(pushingThreads);
+    final CountDownLatch latchFlushing = new CountDownLatch(flushingThreads);
+    Random eventCount = new Random();
+    Random sleepFlushTime = new Random();
+
+    int i;
+    for (i = 0; i < pushingThreads; i++) {
+      createPushThread(eventsQueueWrapper, eventCount.nextInt(EventsQueue.SIZE_LIMIT), latchPushing).start();
+    }
+
+    for (i = 0; i < flushingThreads; i++) {
+      createFlushThread(eventsQueueWrapper, sleepFlushTime, latchFlushing).start();
+    }
+
+    assertThat(latchPushing.await(5, TimeUnit.SECONDS)).isTrue();
+    assertThat(latchFlushing.await(10, TimeUnit.SECONDS)).isTrue();
+  }
+
+  @Test
+  public void checksMultiThreadOnFullQueueFlushCalled() throws InterruptedException {
+    int pushingThreads = 10;
+    final CountDownLatch latchPushing = new CountDownLatch(pushingThreads);
+    int i;
+    for (i = 0; i < pushingThreads; i++) {
+      createPushThread(eventsQueueWrapper, EventsQueue.SIZE_LIMIT + 1, latchPushing).start();
+    }
+    assertThat(latchPushing.await(5, TimeUnit.SECONDS)).isTrue();
+    verify(mockedCallback, times(pushingThreads)).onFullQueue(any(List.class));
+  }
+
   private void fillQueue(int max) {
     for (int i = 0; i < max; i++) {
       eventsQueueWrapper.push(mock(Event.class));
     }
+  }
+
+  private static Thread createPushThread(final EventsQueue queue, final int count, final CountDownLatch latch) {
+    return new Thread(new Runnable() {
+      @Override
+      public void run() {
+        for (int i = 0; i < count; i++) {
+          queue.push(mock(Event.class));
+        }
+        latch.countDown();
+      }
+    });
+  }
+
+  private static Thread createFlushThread(final EventsQueue queue, final Random random, final CountDownLatch latch) {
+    return new Thread(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          Thread.sleep((long)(random.nextInt(3)*1000));
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+          return;
+        }
+        queue.flush();
+        latch.countDown();
+      }
+    });
   }
 
   private void setupDirectExecutor(ExecutorService executor) {
