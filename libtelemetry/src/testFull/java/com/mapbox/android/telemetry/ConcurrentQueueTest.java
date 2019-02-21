@@ -27,6 +27,11 @@ public class ConcurrentQueueTest {
   }
 
   @Test
+  public void addNullValue() {
+    assertThat(queue.add(null)).isFalse();
+  }
+
+  @Test
   public void checksAdding() {
     Event mockedEvent = mock(Event.class);
     queue.add(mockedEvent);

@@ -26,6 +26,9 @@ class EventsQueue {
   }
 
   static synchronized EventsQueue create(@NonNull FullQueueCallback callback) {
+    if (callback == null) {
+      throw new IllegalArgumentException("Callback can't be null");
+    }
     ExecutorService executorService = new ThreadPoolExecutor(0, 1,
       20, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(),
       threadFactory("EventsFullQueueDispatcher"));

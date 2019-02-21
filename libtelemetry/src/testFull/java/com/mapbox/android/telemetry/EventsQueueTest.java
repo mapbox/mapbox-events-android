@@ -59,6 +59,13 @@ public class EventsQueueTest {
   }
 
   @Test
+  public void checkSize() {
+    int eventsToPush = 100;
+    fillQueue(eventsToPush);
+    assertThat(eventsQueueWrapper.size()).isEqualTo(eventsToPush);
+  }
+
+  @Test
   public void checksQueueFlushing() {
     fillQueue(EventsQueue.SIZE_LIMIT);
     List<Event> originalQueue = new ArrayList<>(queue.obtainQueue());
@@ -116,6 +123,11 @@ public class EventsQueueTest {
     }
     assertThat(latchPushing.await(5, TimeUnit.SECONDS)).isTrue();
     verify(mockedCallback, times(pushingThreads)).onFullQueue(any(List.class));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testFactory() {
+    EventsQueue.create(null);
   }
 
   private void fillQueue(int max) {
