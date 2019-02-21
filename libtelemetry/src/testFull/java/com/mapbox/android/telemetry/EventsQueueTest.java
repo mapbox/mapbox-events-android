@@ -141,9 +141,9 @@ public class EventsQueueTest {
       @Override
       public void run() {
         try {
-          Thread.sleep((long)(random.nextInt(3)*1000));
-        } catch (InterruptedException e) {
-          e.printStackTrace();
+          Thread.sleep((long) (random.nextInt(3) * 1000));
+        } catch (InterruptedException ex) {
+          ex.printStackTrace();
           return;
         }
         queue.flush();
