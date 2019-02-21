@@ -20,7 +20,7 @@ import static junit.framework.Assert.assertTrue;
 @RunWith(AndroidJUnit4.class)
 public class LocationEngineInstrumentedTest {
   private static final long INTERVAL = 1000L;
-  private static final long Time_OUT = 60 * 3;
+  private static final long TIMEOUT = 60;
 
   private static LocationEngine[] foregroundLocationEngines = {
     getGoogleEngine(),
@@ -57,7 +57,7 @@ public class LocationEngineInstrumentedTest {
     LocationEngineCallback<LocationEngineResult> callback = getCallback(resultRef, latch);
 
     engine.requestLocationUpdates(getRequest(INTERVAL, LocationEngineRequest.PRIORITY_LOW_POWER), callback, null);
-    assertTrue(latch.await(Time_OUT, TimeUnit.SECONDS));
+    assertTrue(latch.await(TIMEOUT, TimeUnit.SECONDS));
 
     LocationEngineResult result = resultRef.get();
     assertNotNull(result.getLastLocation());
@@ -72,7 +72,7 @@ public class LocationEngineInstrumentedTest {
     LocationEngineCallback<LocationEngineResult> callback = getCallback(resultRef, latch);
 
     engine.requestLocationUpdates(getRequest(INTERVAL, LocationEngineRequest.PRIORITY_LOW_POWER), callback, null);
-    assertTrue(latch.await(Time_OUT, TimeUnit.SECONDS));
+    assertTrue(latch.await(TIMEOUT, TimeUnit.SECONDS));
 
     LocationEngineResult result = resultRef.get();
     assertNotNull(result.getLastLocation());
@@ -87,7 +87,7 @@ public class LocationEngineInstrumentedTest {
     LocationEngineCallback<LocationEngineResult> callback = getCallback(resultRef, latch);
 
     engine.requestLocationUpdates(getRequest(INTERVAL, LocationEngineRequest.PRIORITY_HIGH_ACCURACY), callback, null);
-    assertTrue(latch.await(Time_OUT, TimeUnit.SECONDS));
+    assertTrue(latch.await(TIMEOUT, TimeUnit.SECONDS));
 
     LocationEngineResult result = resultRef.get();
     assertNotNull(result.getLastLocation());
