@@ -9,11 +9,13 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -61,6 +63,28 @@ public class EventsQueueTest {
     eventsQueueWrapper.push(mock(Event.class));
     verify(mockedCallback).onFullQueue(any(List.class));
   }
+
+  @Test
+  public void checksMultiThreadOnFullQueueFlushCalled() throws InterruptedException {
+    int n = 5;
+    final CountDownLatch latch = new CountDownLatch(n);
+    class TestThread extends Thread {
+      @Override
+      public void run() {
+        for (int i = 0; i <= EventsQueue.SIZE_LIMIT; i++) {
+          eventsQueueWrapper.push(mock(Event.class));
+        }
+        latch.countDown();
+      }
+    }
+
+    for (int i = 0; i < n; i++) {
+      new TestThread().start();
+    }
+    latch.await();
+    verify(mockedCallback, times(n)).onFullQueue(any(List.class));
+  }
+
 
   @Test
   public void checksPushingTheEventRightAfterReachingFullCapacity() {

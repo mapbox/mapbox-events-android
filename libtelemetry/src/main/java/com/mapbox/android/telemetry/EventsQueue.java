@@ -23,17 +23,15 @@ class EventsQueue {
   }
 
   boolean push(Event event) {
-    if (queue.size() >= SIZE_LIMIT) {
-      callback.onFullQueue(flush());
-    }
     synchronized (this) {
+      if (queue.size() >= SIZE_LIMIT) {
+        callback.onFullQueue(flush());
+      }
       return queue.add(event);
     }
   }
 
   List<Event> flush() {
-    synchronized (this) {
-      return queue.flush();
-    }
+    return queue.flush();
   }
 }
