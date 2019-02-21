@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import com.mapbox.android.telemetry.location.SessionIdentifier;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;

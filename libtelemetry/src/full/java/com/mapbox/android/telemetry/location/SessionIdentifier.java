@@ -1,6 +1,8 @@
-package com.mapbox.android.telemetry;
+package com.mapbox.android.telemetry.location;
 
-class SessionIdentifier {
+import com.mapbox.android.telemetry.TelemetryUtils;
+
+public class SessionIdentifier {
   private static final int HOURS_TO_MILLISECONDS = (60 * 60 * 1000);
   private String sessionId = null;
   private long lastSessionIdUpdate;
@@ -10,7 +12,7 @@ class SessionIdentifier {
   SessionIdentifier() {
   }
 
-  SessionIdentifier(int rotationInterval) {
+  public SessionIdentifier(int rotationInterval) {
     this.rotationInterval = rotationInterval;
   }
 
@@ -20,7 +22,6 @@ class SessionIdentifier {
       sessionId = TelemetryUtils.obtainUniversalUniqueIdentifier();
       lastSessionIdUpdate = System.currentTimeMillis();
     }
-
     return sessionId;
   }
 }

@@ -1,25 +1,26 @@
-package com.mapbox.android.telemetry;
+package com.mapbox.android.telemetry.location;
 
 import android.location.Location;
+import com.mapbox.android.telemetry.LocationEvent;
 
 import java.math.BigDecimal;
 
-class LocationMapper {
+public class LocationMapper {
   private static final int SEVEN_DIGITS_AFTER_DECIMAL = 7;
   private static final double MIN_LONGITUDE = -180;
   private static final double MAX_LONGITUDE = 180;
   private SessionIdentifier sessionIdentifier;
 
-  LocationMapper() {
+  public LocationMapper() {
     sessionIdentifier = new SessionIdentifier();
   }
 
-  LocationEvent from(Location location, String applicationState) {
+  public LocationEvent from(Location location, String applicationState) {
     LocationEvent locationEvent = createLocationEvent(location, applicationState);
     return locationEvent;
   }
 
-  void updateSessionIdentifier(SessionIdentifier sessionIdentifier) {
+  public void updateSessionIdentifier(SessionIdentifier sessionIdentifier) {
     this.sessionIdentifier = sessionIdentifier;
   }
 

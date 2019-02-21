@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
 import android.support.annotation.NonNull;
+import com.mapbox.android.telemetry.location.LocationMapper;
+import com.mapbox.android.telemetry.location.SessionIdentifier;
 
 import java.util.ArrayList;
 import java.util.List;
