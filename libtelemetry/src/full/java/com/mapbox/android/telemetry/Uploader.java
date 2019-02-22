@@ -19,7 +19,7 @@ class Uploader implements MapboxUploader, Callback {
   private Context context;
   private Configuration config;
 
-  public Uploader(MapboxUploadClient<Object, Uploader> mapboxUploadClient, Context context) {
+  Uploader(MapboxUploadClient<Object, Uploader> mapboxUploadClient, Context context) {
     this.mapboxUploadClient = mapboxUploadClient;
     this.context = context;
   }

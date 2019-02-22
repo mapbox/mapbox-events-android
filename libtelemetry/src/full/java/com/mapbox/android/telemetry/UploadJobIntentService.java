@@ -19,7 +19,7 @@ import okhttp3.Response;
 public class UploadJobIntentService extends JobIntentService implements Callback {
   private static final String LOG_TAG = "UploadJobIntentService";
   private static final int JOB_ID = 564321;
-  private MapboxUploader.MapboxUploadClient<List<Event>, UploadJobIntentService> uploadClient;
+  private static MapboxUploader.MapboxUploadClient<List<Event>, UploadJobIntentService> uploadClient;
   private Gson gson = new Gson();
 
   public void schedule(Context context, List<Event> events, MapboxUploader.MapboxUploadClient mapboxUploadClient) {
@@ -27,14 +27,18 @@ public class UploadJobIntentService extends JobIntentService implements Callback
 
     Intent intent = new Intent("UploadJob");
     intent.putExtra("list", gson.toJson(events));
+//    intent.putExtra("client", gson.toJson(mapboxUploadClient));
 
     enqueueWork(context, UploadJobIntentService.class, JOB_ID, intent);
   }
 
   @Override
   protected void onHandleWork(@NonNull Intent intent) {
+    Log.e("test", "onHandleWork");
     List<Event> events = gson.fromJson(intent.getStringExtra("list"), List.class);
+//    uploadClient = gson.fromJson(intent.getStringExtra("client"), MapboxUploader.MapboxUploadClient.class);
 
+    Log.e("test", "events: " + events);
     uploadClient.upload(events,this);
   }
 

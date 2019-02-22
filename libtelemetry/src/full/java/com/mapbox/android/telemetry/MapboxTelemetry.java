@@ -462,9 +462,30 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     if (Event.Type.TURNSTILE.equals(event.obtainType())) {
       List<Event> appUserTurnstile = new ArrayList<>(1);
       appUserTurnstile.add(event);
-      UploadClient uploadClient = new UploadClient(certificateBlacklist, applicationContext, accessToken, userAgent);
+
+      TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder()
+        .environment(Environment.COM)
+        .build();
+
+      UploadClient uploadClient = new UploadClient(certificateBlacklist, applicationContext, accessToken, userAgent,
+        telemetryClientSettings);
       Uploader uploader = new Uploader(uploadClient, applicationContext);
+
+      MapboxUploader.Configuration config = new MapboxUploader.Configuration() {
+        @Override
+        public void setUploadInterval(long interval) {
+
+        }
+
+        @Override
+        public long getUploadInterval() {
+          return 22;
+        }
+      };
+
+      uploader.setConfiguration(config);
       uploader.send(appUserTurnstile);
+
 //      sendEventsIfPossible(appUserTurnstile);
       return true;
     }
