@@ -1,6 +1,7 @@
 package com.mapbox.android.telemetry;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.mapbox.libupload.MapboxUploader;
 
@@ -25,7 +26,8 @@ class Uploader implements MapboxUploader, Callback {
 
   @Override
   public void send(Object data) {
-    if (config.getUploadInterval() > 0) {
+    Log.e("test", "send data: " + data);
+    if (config != null && config.getUploadInterval() > 0) {
       scheduleJob(data);
     } else {
       mapboxUploadClient.upload(data, this);
@@ -39,7 +41,7 @@ class Uploader implements MapboxUploader, Callback {
 
   @Override
   public void addListener(Listener listener) {
-    if(listeners == null) {
+    if (listeners == null) {
       listeners = new ArrayList<>();
     }
 
@@ -60,11 +62,11 @@ class Uploader implements MapboxUploader, Callback {
 
   @Override
   public void onFailure(Call call, IOException e) {
-
+    Log.e("test", "uploader - failure: " + e);
   }
 
   @Override
   public void onResponse(Call call, Response response) throws IOException {
-
+    Log.e("test", "uploader - response: " + response);
   }
 }

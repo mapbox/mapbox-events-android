@@ -17,6 +17,7 @@ import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 
 import com.mapbox.android.core.permissions.PermissionsManager;
+import com.mapbox.libupload.MapboxUploader;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -61,7 +62,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     initializeQueue();
     this.configurationClient = new ConfigurationClient(context, TelemetryUtils.createFullUserAgent(userAgent,
             context), accessToken, new OkHttpClient());
-    this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
+    this.certificateBlacklist = new CertificateBlacklist(context);
     checkRequiredParameters(accessToken, userAgent);
     AlarmReceiver alarmReceiver = obtainAlarmReceiver();
     this.schedulerFlusher = new SchedulerFlusherFactory(applicationContext, alarmReceiver).supply();
@@ -95,7 +96,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     initializeAttachmentListeners();
     this.configurationClient = new ConfigurationClient(context, TelemetryUtils.createFullUserAgent(userAgent,
             context), accessToken, new OkHttpClient());
-    this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
+    this.certificateBlacklist = new CertificateBlacklist(context);
   }
 
   @Override
@@ -461,7 +462,10 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     if (Event.Type.TURNSTILE.equals(event.obtainType())) {
       List<Event> appUserTurnstile = new ArrayList<>(1);
       appUserTurnstile.add(event);
-      sendEventsIfPossible(appUserTurnstile);
+      UploadClient uploadClient = new UploadClient(certificateBlacklist, applicationContext, accessToken, userAgent);
+      Uploader uploader = new Uploader(uploadClient, applicationContext);
+      uploader.send(appUserTurnstile);
+//      sendEventsIfPossible(appUserTurnstile);
       return true;
     }
 

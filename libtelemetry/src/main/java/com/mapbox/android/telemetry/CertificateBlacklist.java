@@ -31,17 +31,17 @@ class CertificateBlacklist implements ConfigurationChangeHandler {
   private final Context context;
   private final List<String> revokedKeys;
 
-  CertificateBlacklist(Context context, ConfigurationClient configurationClient) {
+  CertificateBlacklist(Context context) {
     this.context = context;
     this.revokedKeys = new CopyOnWriteArrayList<>();
-    configurationClient.addHandler(this);
+//    configurationClient.addHandler(this);
 
     // Check if it's time to update
-    if (configurationClient.shouldUpdate()) {
-      configurationClient.update();
-    } else {
+//    if (configurationClient.shouldUpdate()) {
+//      configurationClient.update();
+//    } else {
       retrieveBlackList(context.getFilesDir(), false);
-    }
+//    }
   }
 
   boolean isBlacklisted(String hash) {
@@ -134,6 +134,12 @@ class CertificateBlacklist implements ConfigurationChangeHandler {
     }
     reader.close();
     return blacklist != null ? blacklist : Collections.<String>emptyList();
+  }
+
+  void updateBlacklist(String data) {
+    if (saveBlackList(data)) {
+      retrieveBlackList(context.getFilesDir(), true);
+    }
   }
 
   @Override

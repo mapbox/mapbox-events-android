@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v4.app.JobIntentService;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.mapbox.libupload.MapboxUploader;
@@ -39,11 +40,11 @@ public class UploadJobIntentService extends JobIntentService implements Callback
 
   @Override
   public void onFailure(Call call, IOException e) {
-
+    Log.e("test", "job - failure: " + e);
   }
 
   @Override
   public void onResponse(Call call, Response response) throws IOException {
-
+    Log.e("test", "job - response: " + response);
   }
 }
