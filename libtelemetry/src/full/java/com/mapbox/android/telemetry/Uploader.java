@@ -1,6 +1,10 @@
 package com.mapbox.android.telemetry;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.mapbox.libupload.MapboxUploader;
@@ -26,7 +30,6 @@ class Uploader implements MapboxUploader, Callback {
 
   @Override
   public void send(Object data) {
-    Log.e("test", "send data: " + data);
     if (config != null && config.getUploadInterval() > 0) {
       scheduleJob(data);
     } else {
@@ -54,6 +57,8 @@ class Uploader implements MapboxUploader, Callback {
   }
 
   private void scheduleJob(Object data) {
+    registerJobReceiver();
+
     UploadJobIntentService uploadJobIntentService = new UploadJobIntentService();
     List<Event> events = (List<Event>) data;
 
@@ -61,12 +66,40 @@ class Uploader implements MapboxUploader, Callback {
   }
 
   @Override
-  public void onFailure(Call call, IOException e) {
-    Log.e("test", "uploader - failure: " + e);
+  public void onFailure(Call call, IOException exception) {
+    Log.e("test", "uploader - failure: " + exception);
+
+    if (listeners != null) {
+      for (Listener listener: listeners) {
+        listener.onFailure(exception);
+      }
+    }
   }
 
   @Override
   public void onResponse(Call call, Response response) throws IOException {
     Log.e("test", "uploader - response: " + response);
+
+    if (listeners != null) {
+      for (Listener listener: listeners) {
+        listener.onSuccess(response);
+      }
+    }
+  }
+
+  private void registerJobReceiver() {
+    BroadcastReceiver receiver = new BroadcastReceiver() {
+      @Override
+      public void onReceive(Context context, Intent intent) {
+
+        if (listeners != null) {
+          for (Listener listener: listeners) {
+            listener.onSuccess(intent.getStringExtra("response"));
+          }
+        }
+      }
+    };
+
+    LocalBroadcastManager.getInstance(context).registerReceiver(receiver, new IntentFilter("jobSuccess"));
   }
 }

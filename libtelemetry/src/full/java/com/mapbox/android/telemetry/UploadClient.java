@@ -87,7 +87,7 @@ public class UploadClient implements MapboxUploader.MapboxUploadClient, Callback
       .post(body)
       .build();
 
-    OkHttpClient client = settings.getClient(certificateBlacklist);
+    client = settings.getClient(certificateBlacklist);
     client.newCall(request).enqueue((Callback) callback);
   }
 
@@ -99,9 +99,7 @@ public class UploadClient implements MapboxUploader.MapboxUploadClient, Callback
   }
 
   void configurationRequest() {
-    if (client == null) {
-      client = new OkHttpClient();
-    }
+    client = new OkHttpClient();
 
     HttpUrl requestUrl = generateRequestUrl(context, accessToken);
     Request request = new Request.Builder()

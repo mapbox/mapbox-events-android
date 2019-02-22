@@ -471,19 +471,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
         telemetryClientSettings);
       Uploader uploader = new Uploader(uploadClient, applicationContext);
 
-      MapboxUploader.Configuration config = new MapboxUploader.Configuration() {
-        @Override
-        public void setUploadInterval(long interval) {
-
-        }
-
-        @Override
-        public long getUploadInterval() {
-          return 22;
-        }
-      };
-
-      uploader.setConfiguration(config);
       uploader.send(appUserTurnstile);
 
 //      sendEventsIfPossible(appUserTurnstile);

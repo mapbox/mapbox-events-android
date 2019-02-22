@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v4.app.JobIntentService;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -27,28 +28,25 @@ public class UploadJobIntentService extends JobIntentService implements Callback
 
     Intent intent = new Intent("UploadJob");
     intent.putExtra("list", gson.toJson(events));
-//    intent.putExtra("client", gson.toJson(mapboxUploadClient));
 
     enqueueWork(context, UploadJobIntentService.class, JOB_ID, intent);
   }
 
   @Override
   protected void onHandleWork(@NonNull Intent intent) {
-    Log.e("test", "onHandleWork");
     List<Event> events = gson.fromJson(intent.getStringExtra("list"), List.class);
-//    uploadClient = gson.fromJson(intent.getStringExtra("client"), MapboxUploader.MapboxUploadClient.class);
-
-    Log.e("test", "events: " + events);
     uploadClient.upload(events,this);
   }
 
   @Override
   public void onFailure(Call call, IOException e) {
-    Log.e("test", "job - failure: " + e);
+    Log.e(LOG_TAG, "job - failure: " + e);
   }
 
   @Override
   public void onResponse(Call call, Response response) throws IOException {
-    Log.e("test", "job - response: " + response);
+    Intent intent = new Intent("jobSuccess");
+    intent.putExtra("response", response.code() + " " + response.message());
+    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
   }
 }
