@@ -5,10 +5,6 @@ import android.support.annotation.VisibleForTesting;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
 
 class EventsQueue {
   @VisibleForTesting
@@ -25,13 +21,11 @@ class EventsQueue {
     this.executorService = executorService;
   }
 
-  static synchronized EventsQueue create(@NonNull FullQueueCallback callback) {
-    if (callback == null) {
-      throw new IllegalArgumentException("Callback can't be null");
+  static synchronized EventsQueue create(@NonNull FullQueueCallback callback,
+                                         @NonNull ExecutorService executorService) {
+    if (callback == null || executorService == null) {
+      throw new IllegalArgumentException("Callback or executor can't be null");
     }
-    ExecutorService executorService = new ThreadPoolExecutor(0, 1,
-      20, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(),
-      threadFactory("EventsFullQueueDispatcher"));
     return new EventsQueue(new ConcurrentQueue<Event>(), callback, executorService);
   }
 
@@ -65,14 +59,5 @@ class EventsQueue {
         callback.onFullQueue(events);
       }
     });
-  }
-
-  private static ThreadFactory threadFactory(final String name) {
-    return new ThreadFactory() {
-      @Override
-      public Thread newThread(Runnable runnable) {
-        return new Thread(runnable, name);
-      }
-    };
   }
 }
