@@ -13,6 +13,7 @@ import com.mapbox.libupload.MapboxUploader;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import okhttp3.Call;
@@ -32,10 +33,10 @@ public class UploadClient implements MapboxUploader.MapboxUploadClient, Callback
   private static final String USER_AGENT_REQUEST_HEADER = "User-Agent";
   private static final String COM_CONFIG_ENDPOINT = "api.mapbox.com";
   private static final String CHINA_CONFIG_ENDPOINT = "api.mapbox.cn";
-  private static final String EVENTS_ENDPOINT = "/events/v2";
   private static final String HTTPS_SCHEME = "https";
   private static final String EVENT_CONFIG_SEGMENT = "events-config";
   private static final String ACCESS_TOKEN_QUERY_PARAMETER = "access_token";
+  private static final String EXTRA_DEBUGGING_LOG = "Sending POST to %s (user agent: %s) with payload: %s";
   private static final long DAY_IN_MILLIS = 86400000;
   private CertificateBlacklist certificateBlacklist;
   private OkHttpClient client;
@@ -43,6 +44,7 @@ public class UploadClient implements MapboxUploader.MapboxUploadClient, Callback
   private String accessToken;
   private String userAgent;
   private TelemetryClientSettings settings;
+  private String endpoint;
   private static final Map<Environment, String> ENDPOINTS = new HashMap<Environment, String>() {
     {
       put(Environment.COM, COM_CONFIG_ENDPOINT);
@@ -52,12 +54,13 @@ public class UploadClient implements MapboxUploader.MapboxUploadClient, Callback
   };
 
   UploadClient(CertificateBlacklist certificateBlacklist, Context context, String accessToken, String userAgent,
-               TelemetryClientSettings settings) {
+               TelemetryClientSettings settings, String endpoint) {
     this.certificateBlacklist = certificateBlacklist;
     this.context = context;
     this.accessToken = accessToken;
     this.userAgent = userAgent;
     this.settings = settings;
+    this.endpoint = endpoint;
 
     if (shouldUpdate()) {
       configurationRequest();
@@ -74,12 +77,12 @@ public class UploadClient implements MapboxUploader.MapboxUploadClient, Callback
     RequestBody body = RequestBody.create(JSON, payload);
     HttpUrl baseUrl = settings.getBaseUrl();
 
-    HttpUrl url = baseUrl.newBuilder(EVENTS_ENDPOINT)
+    HttpUrl url = baseUrl.newBuilder(endpoint)
       .addQueryParameter(ACCESS_TOKEN_QUERY_PARAMETER, accessToken).build();
 
-    //    if (isExtraDebuggingNeeded()) {
-    //      logger.debug(LOG_TAG, String.format(Locale.US, EXTRA_DEBUGGING_LOG, url, batch.size(), userAgent, payload));
-    //    }
+    if (isExtraDebuggingNeeded()) {
+      Log.d(LOG_TAG, String.format(Locale.US, EXTRA_DEBUGGING_LOG, url, userAgent, payload));
+    }
 
     Request request = new Request.Builder()
       .url(url)
@@ -107,6 +110,22 @@ public class UploadClient implements MapboxUploader.MapboxUploadClient, Callback
       .header(USER_AGENT_REQUEST_HEADER, userAgent)
       .build();
     client.newCall(request).enqueue(this);
+  }
+
+  void updateAccessToken(String accessToken) {
+    this.accessToken = accessToken;
+  }
+
+  void updateUserAgent(String userAgent) {
+    this.userAgent = userAgent;
+  }
+
+  void updateDebugLoggingEnabled(boolean debugLoggingEnabled) {
+    settings = settings.toBuilder().debugLoggingEnabled(debugLoggingEnabled).build();
+  }
+
+  private boolean isExtraDebuggingNeeded() {
+    return settings.isDebugLoggingEnabled() || settings.getEnvironment().equals(Environment.STAGING);
   }
 
   private static HttpUrl generateRequestUrl(Context context, String accessToken) {

@@ -37,7 +37,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private String accessToken;
   private String userAgent;
   private EventsQueue queue;
-  private TelemetryClient telemetryClient;
   private TelemetryService telemetryService;
   private Callback httpCallback;
   private final SchedulerFlusher schedulerFlusher;
@@ -50,14 +49,14 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private boolean isServiceBound = false;
   private PermissionCheckRunnable permissionCheckRunnable = null;
   private CopyOnWriteArraySet<TelemetryListener> telemetryListeners = null;
-  private final CertificateBlacklist certificateBlacklist;
   private CopyOnWriteArraySet<AttachmentListener> attachmentListeners = null;
   static Context applicationContext = null;
+  private UploadClientFactory uploadClientFactory;
+  private UploadClient uploadClient;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
     initializeQueue();
-    this.certificateBlacklist = new CertificateBlacklist(context);
     checkRequiredParameters(accessToken, userAgent);
     AlarmReceiver alarmReceiver = obtainAlarmReceiver();
     this.schedulerFlusher = new SchedulerFlusherFactory(applicationContext, alarmReceiver).supply();
@@ -73,14 +72,13 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   // For testing only
-  MapboxTelemetry(Context context, String accessToken, String userAgent, EventsQueue queue,
-                  TelemetryClient telemetryClient, Callback httpCallback, SchedulerFlusher schedulerFlusher,
-                  Clock clock, boolean isServiceBound, TelemetryEnabler telemetryEnabler,
-                  TelemetryLocationEnabler telemetryLocationEnabler) {
+  MapboxTelemetry(Context context, String accessToken, String userAgent, EventsQueue queue, UploadClient uploadClient,
+                  Callback httpCallback, SchedulerFlusher schedulerFlusher,Clock clock, boolean isServiceBound,
+                  TelemetryEnabler telemetryEnabler, TelemetryLocationEnabler telemetryLocationEnabler) {
     initializeContext(context);
     this.queue = queue;
     checkRequiredParameters(accessToken, userAgent);
-    this.telemetryClient = telemetryClient;
+    this.uploadClient = uploadClient;
     this.httpCallback = httpCallback;
     this.schedulerFlusher = schedulerFlusher;
     this.clock = clock;
@@ -89,7 +87,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     this.isServiceBound = isServiceBound;
     initializeTelemetryListeners();
     initializeAttachmentListeners();
-    this.certificateBlacklist = new CertificateBlacklist(context);
   }
 
   @Override
@@ -150,19 +147,19 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   public void updateDebugLoggingEnabled(boolean isDebugLoggingEnabled) {
-    if (telemetryClient != null) {
-      telemetryClient.updateDebugLoggingEnabled(isDebugLoggingEnabled);
+    if (uploadClient != null) {
+      uploadClient.updateDebugLoggingEnabled(isDebugLoggingEnabled);
     }
   }
 
   public void updateUserAgent(String userAgent) {
     if (isUserAgentValid(userAgent)) {
-      telemetryClient.updateUserAgent(TelemetryUtils.createFullUserAgent(userAgent, applicationContext));
+      uploadClient.updateUserAgent(TelemetryUtils.createFullUserAgent(userAgent, applicationContext));
     }
   }
 
   public boolean updateAccessToken(String accessToken) {
-    if (isAccessTokenValid(accessToken) && updateTelemetryClient(accessToken)) {
+    if (isAccessTokenValid(accessToken) && updateUploadClient(accessToken)) {
       this.accessToken = accessToken;
       return true;
     }
@@ -232,7 +229,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   boolean checkRequiredParameters(String accessToken, String userAgent) {
     boolean areValidParameters = areRequiredParametersValid(accessToken, userAgent);
     if (areValidParameters) {
-      initializeTelemetryClient();
+      initalizeUploadClient();
       queue.setTelemetryInitialized(true);
     }
     return areValidParameters;
@@ -287,24 +284,36 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     return false;
   }
 
-  private void initializeTelemetryClient() {
-    if (telemetryClient == null) {
-      telemetryClient = createTelemetryClient(accessToken, userAgent);
+  private void initalizeUploadClient() {
+    if (uploadClient == null) {
+      uploadClient = createUploadClient();
     }
   }
 
-  private TelemetryClient createTelemetryClient(String accessToken, String userAgent) {
-    String fullUserAgent = TelemetryUtils.createFullUserAgent(userAgent, applicationContext);
-    TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(accessToken, fullUserAgent,
-      new Logger(), certificateBlacklist);
-    telemetryClient = telemetryClientFactory.obtainTelemetryClient(applicationContext);
+  private UploadClient createUploadClient() {
+    if (uploadClientFactory == null) {
+      createUploadClientFactory();
+    }
 
-    return telemetryClient;
+    return uploadClientFactory.obtainClient(UploadClientFactory.EndpointType.EVENTS);
   }
 
-  private boolean updateTelemetryClient(String accessToken) {
-    if (telemetryClient != null) {
-      telemetryClient.updateAccessToken(accessToken);
+  private UploadClient createAttachmentClient() {
+    if (uploadClientFactory == null) {
+      createUploadClientFactory();
+    }
+
+    return uploadClientFactory.obtainClient(UploadClientFactory.EndpointType.ATTACHMENT);
+  }
+
+  private void createUploadClientFactory() {
+    String fullUserAgent = TelemetryUtils.createFullUserAgent(userAgent, applicationContext);
+    uploadClientFactory = new UploadClientFactory(applicationContext, accessToken, fullUserAgent);
+  }
+
+  private boolean updateUploadClient(String accessToken) {
+    if (uploadClient != null) {
+      uploadClient.updateAccessToken(accessToken);
       return true;
     }
     return false;
@@ -357,7 +366,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   private void sendEvents(List<Event> events) {
     if (checkRequiredParameters(accessToken, userAgent)) {
-      telemetryClient.sendEvents(events, httpCallback);
+      uploadClient.upload(events, httpCallback);
     }
   }
 
@@ -456,14 +465,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
       List<Event> appUserTurnstile = new ArrayList<>(1);
       appUserTurnstile.add(event);
 
-      UploadClientFactory uploadClientFactory = new UploadClientFactory(applicationContext, accessToken, userAgent);
-      UploadClient uploadClient = uploadClientFactory.obtainClient();
-
-      Uploader uploader = new Uploader(uploadClient, applicationContext);
-
-      uploader.send(appUserTurnstile);
-
-      //      sendEventsIfPossible(appUserTurnstile);
+      sendEventsIfPossible(appUserTurnstile);
       return true;
     }
 
@@ -563,7 +565,8 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   private void sendAttachment(Event event) {
     if (checkNetworkAndParameters()) {
-      telemetryClient.sendAttachment(convertEventToAttachment(event), attachmentListeners);
+      uploadClient = createAttachmentClient();
+      uploadClient.upload(convertEventToAttachment(event), null);
     }
   }
 
