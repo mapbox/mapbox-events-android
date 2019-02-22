@@ -17,7 +17,6 @@ import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 
 import com.mapbox.android.core.permissions.PermissionsManager;
-import com.mapbox.libupload.MapboxUploader;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,7 +26,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
@@ -54,14 +52,11 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private CopyOnWriteArraySet<TelemetryListener> telemetryListeners = null;
   private final CertificateBlacklist certificateBlacklist;
   private CopyOnWriteArraySet<AttachmentListener> attachmentListeners = null;
-  private final ConfigurationClient configurationClient;
   static Context applicationContext = null;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
     initializeQueue();
-    this.configurationClient = new ConfigurationClient(context, TelemetryUtils.createFullUserAgent(userAgent,
-            context), accessToken, new OkHttpClient());
     this.certificateBlacklist = new CertificateBlacklist(context);
     checkRequiredParameters(accessToken, userAgent);
     AlarmReceiver alarmReceiver = obtainAlarmReceiver();
@@ -94,8 +89,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     this.isServiceBound = isServiceBound;
     initializeTelemetryListeners();
     initializeAttachmentListeners();
-    this.configurationClient = new ConfigurationClient(context, TelemetryUtils.createFullUserAgent(userAgent,
-            context), accessToken, new OkHttpClient());
     this.certificateBlacklist = new CertificateBlacklist(context);
   }
 
@@ -463,17 +456,14 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
       List<Event> appUserTurnstile = new ArrayList<>(1);
       appUserTurnstile.add(event);
 
-      TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder()
-        .environment(Environment.COM)
-        .build();
+      UploadClientFactory uploadClientFactory = new UploadClientFactory(applicationContext, accessToken, userAgent);
+      UploadClient uploadClient = uploadClientFactory.obtainClient();
 
-      UploadClient uploadClient = new UploadClient(certificateBlacklist, applicationContext, accessToken, userAgent,
-        telemetryClientSettings);
       Uploader uploader = new Uploader(uploadClient, applicationContext);
 
       uploader.send(appUserTurnstile);
 
-//      sendEventsIfPossible(appUserTurnstile);
+      //      sendEventsIfPossible(appUserTurnstile);
       return true;
     }
 

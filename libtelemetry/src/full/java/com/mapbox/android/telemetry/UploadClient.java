@@ -77,9 +77,9 @@ public class UploadClient implements MapboxUploader.MapboxUploadClient, Callback
     HttpUrl url = baseUrl.newBuilder(EVENTS_ENDPOINT)
       .addQueryParameter(ACCESS_TOKEN_QUERY_PARAMETER, accessToken).build();
 
-//    if (isExtraDebuggingNeeded()) {
-//      logger.debug(LOG_TAG, String.format(Locale.US, EXTRA_DEBUGGING_LOG, url, batch.size(), userAgent, payload));
-//    }
+    //    if (isExtraDebuggingNeeded()) {
+    //      logger.debug(LOG_TAG, String.format(Locale.US, EXTRA_DEBUGGING_LOG, url, batch.size(), userAgent, payload));
+    //    }
 
     Request request = new Request.Builder()
       .url(url)

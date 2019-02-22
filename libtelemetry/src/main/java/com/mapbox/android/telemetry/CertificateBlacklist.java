@@ -34,14 +34,8 @@ class CertificateBlacklist implements ConfigurationChangeHandler {
   CertificateBlacklist(Context context) {
     this.context = context;
     this.revokedKeys = new CopyOnWriteArrayList<>();
-//    configurationClient.addHandler(this);
 
-    // Check if it's time to update
-//    if (configurationClient.shouldUpdate()) {
-//      configurationClient.update();
-//    } else {
-      retrieveBlackList(context.getFilesDir(), false);
-//    }
+    retrieveBlackList(context.getFilesDir(), false);
   }
 
   boolean isBlacklisted(String hash) {
