@@ -61,7 +61,7 @@ public class AlarmSchedulerFlusherTest {
 
     theAlarmSchedulerFlusher.unregister();
 
-    verify(mockedAlarmManager, times(1)).cancel(eq(theAlarmSchedulerFlusher.obtainPendingIntent()));
+    verify(mockedAlarmManager, times(0)).cancel(eq(theAlarmSchedulerFlusher.obtainPendingIntent()));
     verify(mockedContext, times(1)).unregisterReceiver(mockedAlarmReceiver);
   }
 
