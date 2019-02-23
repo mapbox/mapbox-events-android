@@ -138,11 +138,9 @@ public class TelemetryClientMapEventsTest extends MockWebServerTest {
     Clock mockedClock = mock(Clock.class);
     TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false);
     TelemetryLocationEnabler telemetryLocationEnabler = new TelemetryLocationEnabler(false);
-    boolean indifferentServiceBound = true;
-    ExecutorService executorService = mock(ExecutorService.class);
-    new MapboxTelemetry(context, aValidAccessToken, aValidUserAgent,
-      mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      indifferentServiceBound, telemetryEnabler, telemetryLocationEnabler, executorService);
+    new MapboxTelemetry(context, aValidAccessToken, aValidUserAgent, mockedEventsQueue, mockedTelemetryClient,
+      mockedHttpCallback, mockedSchedulerFlusher, mockedClock, true,
+      telemetryEnabler, telemetryLocationEnabler,  mock(ExecutorService.class));
   }
 
   private MapState obtainDefaultMapState() {
