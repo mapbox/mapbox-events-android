@@ -9,6 +9,7 @@ import org.junit.Test;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -61,7 +62,7 @@ public class AlarmSchedulerFlusherTest {
 
     theAlarmSchedulerFlusher.unregister();
 
-    verify(mockedAlarmManager, times(0)).cancel(eq(theAlarmSchedulerFlusher.obtainPendingIntent()));
+    verify(mockedAlarmManager, never()).cancel(eq(theAlarmSchedulerFlusher.obtainPendingIntent()));
     verify(mockedContext, times(1)).unregisterReceiver(mockedAlarmReceiver);
   }
 
