@@ -556,7 +556,23 @@ public class MapboxTelemetryTest {
     assertTrue(theMapboxTelemetry.removeAttachmentListener(attachmentListener));
   }
 
+  @Test
+  public void checkFlushIsCalled() {
+    ExecutorService mockedExecutor = mock(ExecutorService.class);
+    setupDirectExecutor(mockedExecutor);
+    MapboxTelemetry mapboxTelemetry = obtainMapboxTelemetryWith(mockedExecutor);
+    mapboxTelemetry.push(mock(Event.class));
+    mapboxTelemetry.disable();
+    verify(mockedExecutor, times(1)).execute(any(Runnable.class));
+  }
+
   private MapboxTelemetry obtainMapboxTelemetry() {
+    ExecutorService mockedExecutor = mock(ExecutorService.class);
+    setupDirectExecutor(mockedExecutor);
+    return obtainMapboxTelemetryWith(mockedExecutor);
+  }
+
+  private MapboxTelemetry obtainMapboxTelemetryWith(ExecutorService mockedExecutor) {
     MapboxTelemetry.applicationContext = obtainNetworkConnectedMockedContext();
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
@@ -571,7 +587,7 @@ public class MapboxTelemetryTest {
     TelemetryLocationEnabler telemetryLocationEnabler = new TelemetryLocationEnabler(false);
     return new MapboxTelemetry(MapboxTelemetry.applicationContext,
       aValidAccessToken, aValidUserAgent, eventsQueue, telemetryClient, httpCallback, mockedSchedulerFlusher,
-      mockedClock, indifferentServiceBound, telemetryEnabler, telemetryLocationEnabler, mock(ExecutorService.class));
+      mockedClock, indifferentServiceBound, telemetryEnabler, telemetryLocationEnabler, mockedExecutor);
   }
 
   private MapboxTelemetry obtainMapboxTelemetryWith(Context context) {
@@ -585,9 +601,11 @@ public class MapboxTelemetryTest {
     Clock mockedClock = mock(Clock.class);
     TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false);
     TelemetryLocationEnabler telemetryLocationEnabler = new TelemetryLocationEnabler(false);
+    ExecutorService mockedExecutor = mock(ExecutorService.class);
+    setupDirectExecutor(mockedExecutor);
     return new MapboxTelemetry(context, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      true, telemetryEnabler, telemetryLocationEnabler, mock(ExecutorService.class));
+      true, telemetryEnabler, telemetryLocationEnabler, mockedExecutor);
   }
 
   private static MapboxTelemetry obtainMapboxTelemetryWith(Context context, boolean isServiceBound,
@@ -641,11 +659,11 @@ public class MapboxTelemetryTest {
     Clock mockedClock = mock(Clock.class);
     TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false);
     TelemetryLocationEnabler telemetryLocationEnabler = new TelemetryLocationEnabler(false);
-    ExecutorService mockedExcecutor = mock(ExecutorService.class);
-    setupDirectExecutor(mockedExcecutor);
+    ExecutorService mockedExecutor = mock(ExecutorService.class);
+    setupDirectExecutor(mockedExecutor);
     return new MapboxTelemetry(context, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, telemetryClient, httpCallback, mockedSchedulerFlusher, mockedClock,
-      true, telemetryEnabler, telemetryLocationEnabler, mockedExcecutor);
+      true, telemetryEnabler, telemetryLocationEnabler, mockedExecutor);
   }
 
   private MapboxTelemetry obtainMapboxTelemetryWith(Context context, EventsQueue eventsQueue,
