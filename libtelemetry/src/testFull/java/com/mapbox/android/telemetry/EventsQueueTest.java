@@ -127,7 +127,7 @@ public class EventsQueueTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testFactory() {
-    EventsQueue.create(null);
+    EventsQueue.create(null, null);
   }
 
   private void fillQueue(int max) {

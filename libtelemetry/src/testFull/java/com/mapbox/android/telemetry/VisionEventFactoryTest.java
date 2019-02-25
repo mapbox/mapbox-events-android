@@ -10,6 +10,8 @@ import org.junit.Test;
 import okhttp3.Callback;
 import okhttp3.MediaType;
 
+import java.util.concurrent.ExecutorService;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -110,11 +112,10 @@ public class VisionEventFactoryTest {
     Callback mockedHttpCallback = mock(Callback.class);
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
-    boolean indifferentServiceBound = true;
     TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false);
     TelemetryLocationEnabler telemetryLocationEnabler = new TelemetryLocationEnabler(false);
     new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      indifferentServiceBound, telemetryEnabler, telemetryLocationEnabler);
+      true, telemetryEnabler, telemetryLocationEnabler, mock(ExecutorService.class));
   }
 }
