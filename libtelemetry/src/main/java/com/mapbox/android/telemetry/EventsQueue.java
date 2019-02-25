@@ -1,44 +1,63 @@
 package com.mapbox.android.telemetry;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 class EventsQueue {
+  @VisibleForTesting
   static final int SIZE_LIMIT = 180;
-  private final FlushQueueCallback callback;
-  final ConcurrentQueue<Event> queue;
-  private boolean isTelemetryInitialized = false;
+  private final FullQueueCallback callback;
+  private final ConcurrentQueue<Event> queue;
+  private final ExecutorService executorService;
 
-  EventsQueue(FlushQueueCallback callback) {
+  @VisibleForTesting
+  EventsQueue(@NonNull ConcurrentQueue<Event> queue,
+              @NonNull FullQueueCallback callback, @NonNull ExecutorService executorService) {
+    this.queue = queue;
     this.callback = callback;
-    this.queue = new ConcurrentQueue<>();
+    this.executorService = executorService;
+  }
+
+  static synchronized EventsQueue create(@NonNull FullQueueCallback callback,
+                                         @NonNull ExecutorService executorService) {
+    if (callback == null || executorService == null) {
+      throw new IllegalArgumentException("Callback or executor can't be null");
+    }
+    return new EventsQueue(new ConcurrentQueue<Event>(), callback, executorService);
+  }
+
+  boolean isEmpty() {
+    return queue.size() == 0;
+  }
+
+  int size() {
+    return queue.size();
   }
 
   boolean push(Event event) {
-    if (checkMaximumSize()) {
-      if (!isTelemetryInitialized) {
-        return enqueue(event);
+    synchronized (this) {
+      if (queue.size() >= SIZE_LIMIT) {
+        dispatchCallback(queue.flush());
       }
-      callback.onFullQueueFlush(queue, event);
-      return false;
+      return queue.add(event);
     }
-
-    return queue.add(event);
   }
 
   List<Event> flush() {
-    return queue.flush();
+    synchronized (this) {
+      return queue.flush();
+    }
   }
 
-  void setTelemetryInitialized(boolean telemetryInitialized) {
-    isTelemetryInitialized = telemetryInitialized;
-  }
-
-  private boolean enqueue(Event event) {
-    return queue.enqueue(event);
-  }
-
-  private boolean checkMaximumSize() {
-    return queue.size() >= SIZE_LIMIT;
+  private void dispatchCallback(final List<Event> events) {
+    executorService.execute(new Runnable() {
+      @Override
+      public void run() {
+        callback.onFullQueue(events);
+      }
+    });
   }
 }

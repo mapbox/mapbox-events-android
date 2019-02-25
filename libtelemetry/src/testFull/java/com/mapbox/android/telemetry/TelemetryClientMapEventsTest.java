@@ -13,6 +13,7 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 import okhttp3.Callback;
 
@@ -135,12 +136,11 @@ public class TelemetryClientMapEventsTest extends MockWebServerTest {
     Callback mockedHttpCallback = mock(Callback.class);
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
-    boolean indifferentServiceBound = true;
     TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false);
     TelemetryLocationEnabler telemetryLocationEnabler = new TelemetryLocationEnabler(false);
-    new MapboxTelemetry(context, aValidAccessToken, aValidUserAgent,
-      mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      indifferentServiceBound, telemetryEnabler, telemetryLocationEnabler);
+    new MapboxTelemetry(context, aValidAccessToken, aValidUserAgent, mockedEventsQueue, mockedTelemetryClient,
+      mockedHttpCallback, mockedSchedulerFlusher, mockedClock, true,
+      telemetryEnabler, telemetryLocationEnabler,  mock(ExecutorService.class));
   }
 
   private MapState obtainDefaultMapState() {

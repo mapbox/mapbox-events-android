@@ -1,63 +1,59 @@
 package com.mapbox.android.telemetry;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ConcurrentQueueTest {
+  private ConcurrentQueue<Event> queue;
 
-  @Test
-  public void checksAdding() throws Exception {
-    ConcurrentQueue<Event> theQueue = new ConcurrentQueue<>();
-    Event mockedEvent = mock(Event.class);
+  @Before
+  public void setUp() {
+    queue = new ConcurrentQueue<>();
+  }
 
-    theQueue.add(mockedEvent);
-
-    assertTrue(theQueue.obtainQueue().contains(mockedEvent));
-    assertEquals(1, theQueue.size());
+  @After
+  public void tearDown() {
+    queue = null;
   }
 
   @Test
-  public void checksFlushing() throws Exception {
-    ConcurrentQueue<Event> theQueue = new ConcurrentQueue<>();
+  public void addNullValue() {
+    assertThat(queue.add(null)).isFalse();
+  }
+
+  @Test
+  public void checksAdding() {
+    Event mockedEvent = mock(Event.class);
+    queue.add(mockedEvent);
+    assertThat(queue.obtainQueue().contains(mockedEvent)).isTrue();
+    assertThat(queue.size()).isEqualTo(1);
+  }
+
+  @Test
+  public void checksFlushing() {
     Event mockedEvent = mock(Event.class);
     List<Event> expectedEventsFlushed = new ArrayList<>(1);
     expectedEventsFlushed.add(mockedEvent);
-    theQueue.add(mockedEvent);
-
-    List<Event> eventsFlushed = theQueue.flush();
-
-    assertEquals(expectedEventsFlushed, eventsFlushed);
-    assertEquals(0, theQueue.size());
+    queue.add(mockedEvent);
+    List<Event> eventsFlushed = queue.flush();
+    assertThat(expectedEventsFlushed).containsAll(eventsFlushed);
+    assertThat(queue.size()).isEqualTo(0);
   }
 
   @Test
-  public void checksEmptyFlushing() throws Exception {
-    ConcurrentQueue<Event> theQueue = new ConcurrentQueue<>();
-
-    List<Event> eventsFlushed = theQueue.flush();
-
-    assertEquals(0, eventsFlushed.size());
-    assertEquals(0, theQueue.size());
-  }
-
-  @Test
-  public void checksEnqueuing() throws Exception {
-    ConcurrentQueue<Event> theQueue = new ConcurrentQueue<>();
-    Event firstEvent = mock(Event.class);
-    theQueue.add(firstEvent);
-    Event secondEvent = mock(Event.class);
-
-    theQueue.enqueue(secondEvent);
-
-    assertFalse(theQueue.obtainQueue().contains(firstEvent));
-    assertTrue(theQueue.obtainQueue().contains(secondEvent));
-    assertEquals(1, theQueue.size());
+  public void checksEmptyFlushing() {
+    List<Event> eventsFlushed = queue.flush();
+    assertThat(eventsFlushed.isEmpty()).isTrue();
+    assertThat(queue.size()).isEqualTo(0);
   }
 }

@@ -23,6 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.SynchronousQueue;
 
 import com.mapbox.android.telemetry.location.SessionIdentifier;
 import okhttp3.Call;
@@ -38,7 +43,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private static final int NO_FLAGS = 0;
   private String accessToken;
   private String userAgent;
-  private EventsQueue queue;
+  private final EventsQueue queue;
   private TelemetryClient telemetryClient;
   private TelemetryService telemetryService;
   private Callback httpCallback;
@@ -55,11 +60,11 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private final CertificateBlacklist certificateBlacklist;
   private CopyOnWriteArraySet<AttachmentListener> attachmentListeners = null;
   private final ConfigurationClient configurationClient;
+  private final ExecutorService executorService;
   static Context applicationContext = null;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
-    initializeQueue();
     this.configurationClient = new ConfigurationClient(context, TelemetryUtils.createFullUserAgent(userAgent,
             context), accessToken, new OkHttpClient());
     this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
@@ -75,14 +80,18 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
     // Initializing callback after listeners object is instantiated
     this.httpCallback = getHttpCallback(telemetryListeners);
+    this.executorService = ExecutorServiceFactory.create("MapboxTelemetryExecutor", 3,
+      20);
+    this.queue = EventsQueue.create(this, executorService);
   }
 
   // For testing only
   MapboxTelemetry(Context context, String accessToken, String userAgent, EventsQueue queue,
                   TelemetryClient telemetryClient, Callback httpCallback, SchedulerFlusher schedulerFlusher,
                   Clock clock, boolean isServiceBound, TelemetryEnabler telemetryEnabler,
-                  TelemetryLocationEnabler telemetryLocationEnabler) {
+                  TelemetryLocationEnabler telemetryLocationEnabler, ExecutorService executorService) {
     initializeContext(context);
+    this.executorService = executorService;
     this.queue = queue;
     checkRequiredParameters(accessToken, userAgent);
     this.telemetryClient = telemetryClient;
@@ -99,7 +108,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
   }
 
-  @Override
+  @Override // Callback is dispatched on background thread
   public void onFullQueue(List<Event> fullQueue) {
     TelemetryEnabler.State telemetryState = telemetryEnabler.obtainTelemetryState();
     if (TelemetryEnabler.State.ENABLED.equals(telemetryState)
@@ -123,9 +132,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     if (sendEventIfWhitelisted(event)) {
       return true;
     }
-
-    boolean isPushed = pushToQueue(event);
-    return isPushed;
+    return pushToQueue(event);
   }
 
   public boolean enable() {
@@ -219,7 +226,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   boolean isQueueEmpty() {
-    return queue.queue.size() == 0;
+    return queue.isEmpty();
   }
 
   private void startTelemetryService() {
@@ -240,7 +247,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     boolean areValidParameters = areRequiredParametersValid(accessToken, userAgent);
     if (areValidParameters) {
       initializeTelemetryClient();
-      queue.setTelemetryInitialized(true);
     }
     return areValidParameters;
   }
@@ -267,10 +273,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
         throw new IllegalArgumentException(NON_NULL_APPLICATION_CONTEXT_REQUIRED);
       }
     }
-  }
-
-  private void initializeQueue() {
-    queue = new EventsQueue(new FullQueueFlusher(this));
   }
 
   private boolean areRequiredParametersValid(String accessToken, String userAgent) {
@@ -330,15 +332,20 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     });
   }
 
-  private void flushEnqueuedEvents() {
-    List<Event> currentEvents = queue.flush();
-    boolean areThereAnyEvents = currentEvents.size() > 0;
-    if (areThereAnyEvents) {
-      sendEventsIfPossible(currentEvents);
+  private synchronized void flushEnqueuedEvents() {
+    final List<Event> currentEvents = queue.flush();
+    if (currentEvents.isEmpty()) {
+      return;
     }
+    executorService.execute(new Runnable() {
+      @Override
+      public void run() {
+        sendEventsIfPossible(currentEvents);
+      }
+    });
   }
 
-  private void sendEventsIfPossible(List<Event> events) {
+  private synchronized void sendEventsIfPossible(List<Event> events) {
     if (isNetworkConnected()) {
       sendEvents(events);
     }
@@ -460,12 +467,17 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   private boolean sendEventIfWhitelisted(Event event) {
     if (Event.Type.TURNSTILE.equals(event.obtainType())) {
-      List<Event> appUserTurnstile = new ArrayList<>(1);
+      final List<Event> appUserTurnstile = new ArrayList<>(1);
       appUserTurnstile.add(event);
-      sendEventsIfPossible(appUserTurnstile);
+      executorService.execute(new Runnable() {
+        @Override
+        public void run() {
+          sendEventsIfPossible(appUserTurnstile);
+        }
+      });
       return true;
     }
-
+    // Not super concerned about vision, since they most likely doing i/o on bg thread anyways
     if (Event.Type.VIS_ATTACHMENT.equals((event.obtainType()))) {
       sendAttachment(event);
       return true;
@@ -605,5 +617,24 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   private boolean isLollipopOrHigher() {
     return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
+  }
+
+  private static final class ExecutorServiceFactory {
+    private ExecutorServiceFactory() {}
+
+    private static synchronized ExecutorService create(String name, int maxSize, long keepAliveSeconds) {
+      return new ThreadPoolExecutor(0, maxSize,
+        keepAliveSeconds, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(),
+        threadFactory(name));
+    }
+
+    private static ThreadFactory threadFactory(final String name) {
+      return new ThreadFactory() {
+        @Override
+        public Thread newThread(Runnable runnable) {
+          return new Thread(runnable, name);
+        }
+      };
+    }
   }
 }

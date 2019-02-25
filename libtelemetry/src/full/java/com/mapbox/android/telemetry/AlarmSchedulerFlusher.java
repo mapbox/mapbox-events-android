@@ -9,8 +9,8 @@ import android.os.Build;
 import android.os.SystemClock;
 import android.support.annotation.VisibleForTesting;
 
-import static com.mapbox.android.telemetry.SchedulerFlusherFactory.flushingPeriod;
 import static com.mapbox.android.telemetry.SchedulerFlusherFactory.SCHEDULER_FLUSHER_INTENT;
+import static com.mapbox.android.telemetry.SchedulerFlusherFactory.flushingPeriod;
 
 class AlarmSchedulerFlusher implements SchedulerFlusher {
   private final Context context;
@@ -53,7 +53,9 @@ class AlarmSchedulerFlusher implements SchedulerFlusher {
 
   @Override
   public void unregister() {
-    manager.cancel(pendingIntent);
+    if (pendingIntent != null) {
+      manager.cancel(pendingIntent);
+    }
     try {
       context.unregisterReceiver(receiver);
     } catch (IllegalArgumentException exception) {

@@ -10,5 +10,5 @@ gcloud firebase test android run --type instrumentation \
     --device model=hammerhead,version=21,locale=en,orientation=portrait  \
     --device model=athene,version=23,locale=en,orientation=landscape \
     --device model=sailfish,version=26,locale=en,orientation=portrait \
-    --device model=walleye,version=28,locale=en,orientation=landscape \
+    --device model=sailfish,version=28,locale=en,orientation=portrait \
     --timeout 20m
