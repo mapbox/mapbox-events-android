@@ -131,7 +131,7 @@ public class TelemetryClientMapEventsTest extends MockWebServerTest {
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
-    TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
+    UploadClient mockedUploadClient = mock(UploadClient.class);
     Callback mockedHttpCallback = mock(Callback.class);
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
@@ -139,7 +139,7 @@ public class TelemetryClientMapEventsTest extends MockWebServerTest {
     TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false);
     TelemetryLocationEnabler telemetryLocationEnabler = new TelemetryLocationEnabler(false);
     new MapboxTelemetry(context, aValidAccessToken, aValidUserAgent,
-      mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
+      mockedEventsQueue, mockedUploadClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
       indifferentServiceBound, telemetryEnabler, telemetryLocationEnabler);
   }
 
