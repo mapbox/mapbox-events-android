@@ -13,14 +13,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import okhttp3.OkHttpClient;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 @RunWith(AndroidJUnit4.class)
 public class CertificateBlacklistInstrumentationTests {
@@ -31,19 +25,7 @@ public class CertificateBlacklistInstrumentationTests {
     Context context = InstrumentationRegistry.getTargetContext();
     context.deleteFile("MapboxBlacklist");
     setSystemPrefs();
-
-    ConfigurationClient configurationClient = new ConfigurationClient(context,
-      TelemetryUtils.createFullUserAgent("AnUserAgent", context), "anAccessToken", new OkHttpClient());
-    this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
-  }
-
-  @Test
-  public void checkUpdateOnCreate() {
-    ConfigurationClient configurationClient = mock(ConfigurationClient.class);
-    when(configurationClient.shouldUpdate()).thenReturn(true);
-    Context context = InstrumentationRegistry.getTargetContext();
-    this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
-    verify(configurationClient, times(1)).update();
+    this.certificateBlacklist = new CertificateBlacklist(context);
   }
 
   @Test
@@ -94,9 +76,8 @@ public class CertificateBlacklistInstrumentationTests {
     assertTrue(certificateBlacklist.isBlacklisted("test12345"));
 
     Context context = InstrumentationRegistry.getTargetContext();
-    ConfigurationClient configurationClient = new ConfigurationClient(context,
-      TelemetryUtils.createFullUserAgent("AnUserAgent", context), "anAccessToken", new OkHttpClient());
-    this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
+    this.certificateBlacklist = new CertificateBlacklist(context);
+    
     assertTrue(certificateBlacklist.isBlacklisted("test12345"));
   }
 
