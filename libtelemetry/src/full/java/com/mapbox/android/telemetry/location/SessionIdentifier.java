@@ -2,6 +2,11 @@ package com.mapbox.android.telemetry.location;
 
 import com.mapbox.android.telemetry.TelemetryUtils;
 
+/**
+ * Session identifier is managing session id renewal policy.
+ * <p>
+ * Will be deprecated in future releases - avoid creating dependencies of this class.
+ */
 public class SessionIdentifier {
   private static final long HOURS_TO_MILLISECONDS = 60 * 60 * 1000;
   private static final int DEFAULT_ROTATION_HOURS = 24;
@@ -9,14 +14,27 @@ public class SessionIdentifier {
   private String sessionId = null;
   private long lastSessionIdUpdate;
 
+  /**
+   * By default session id renewal interval is 24 hours.
+   */
   public SessionIdentifier() {
     this(DEFAULT_ROTATION_HOURS * HOURS_TO_MILLISECONDS);
   }
 
+  /**
+   * Create instance of session identifier object.
+   *
+   * @param intervalMillis interval in milliseconds.
+   */
   public SessionIdentifier(long intervalMillis) {
     this.rotationInterval = intervalMillis;
   }
 
+  /**
+   * Create instance of session identifier object.
+   *
+   * @param rotationInterval interval in hours.
+   */
   public SessionIdentifier(int rotationInterval) {
     this.rotationInterval = rotationInterval * HOURS_TO_MILLISECONDS;
   }

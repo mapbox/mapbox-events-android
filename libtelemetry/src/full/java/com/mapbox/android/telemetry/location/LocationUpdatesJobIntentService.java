@@ -11,6 +11,11 @@ import com.mapbox.android.telemetry.LocationEvent;
 
 import java.util.List;
 
+/**
+ * This job intent service is responsible for managing location updates
+ * in the background since the updates are reported via broadcast mechanism
+ * and therefore are dispatched on the main thread.
+ */
 public class LocationUpdatesJobIntentService extends JobIntentService {
   private static final int JOB_ID = 102;
   private static final String TAG = "LocJobIntentService";

@@ -11,6 +11,15 @@ import com.mapbox.android.core.location.LocationEngineProvider;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Location collector client is responsible for managing our anonymous
+ * location data collection. There's only one instance of the location collector
+ * that exist in the context of app process. Location collector is lifecycle aware
+ * and uses location engine in a battery efficient way.
+ * <p>
+ * Location collector can be disabled at any point of time or uninstalled completely
+ * in order to release system resources.
+ */
 public class LocationCollectionClient {
   private static final int LOCATION_COLLECTION_STATUS_UPDATED = 0;
   private static final int SESSION_ROTATION_INTERVAL_UPDATED = 1;
@@ -36,8 +45,14 @@ public class LocationCollectionClient {
     };
   }
 
-  public static LocationCollectionClient install(@NonNull Context context,
-                                                 @NonNull SessionIdentifier sessionIdentifier) {
+  /**
+   * Install location collection client
+   *
+   * @param context         non-null reference to context object.
+   * @param defaultInterval default session rotation interval.
+   * @return instance of location collector client
+   */
+  public static LocationCollectionClient install(@NonNull Context context, long defaultInterval) {
     Context applicationContext;
     if (context.getApplicationContext() == null) {
       // In shared processes content providers getApplicationContext() can return null.
@@ -49,13 +64,16 @@ public class LocationCollectionClient {
     synchronized (lock) {
       if (locationCollectionClient == null) {
         locationCollectionClient = new LocationCollectionClient(new LocationEngineControllerImpl(applicationContext,
-          LocationEngineProvider.getBestLocationEngine(applicationContext), sessionIdentifier),
+          LocationEngineProvider.getBestLocationEngine(applicationContext), new SessionIdentifier(defaultInterval)),
           new HandlerThread("LocationSettingsChangeThread"));
       }
     }
     return locationCollectionClient;
   }
 
+  /**
+   * Uninstall current location collection client.
+   */
   public static void uninstall() {
     synchronized (lock) {
       if (locationCollectionClient != null) {
@@ -66,6 +84,12 @@ public class LocationCollectionClient {
     }
   }
 
+  /**
+   * Return a valid single instance of the location client.
+   * This method may throw an exception if called before install is called.
+   *
+   * @return instance of location client
+   */
   @NonNull
   public static LocationCollectionClient getInstance() {
     synchronized (lock) {
@@ -77,6 +101,11 @@ public class LocationCollectionClient {
     }
   }
 
+  /**
+   * Set a session rotation interval in milliseconds.
+   *
+   * @param interval interval in which session id will be renewed.
+   */
   public void setSessionRotationInterval(long interval) {
     Message message = Message.obtain();
     message.what = SESSION_ROTATION_INTERVAL_UPDATED;
@@ -86,10 +115,22 @@ public class LocationCollectionClient {
     settingsChangeHandler.sendMessage(message);
   }
 
+  /**
+   * Returns status of location collection client.
+   *
+   * @return true if collection client is active, false otherwise
+   */
   public boolean isEnabled() {
     return isEnabled.get();
   }
 
+  /**
+   * Change status of the location collection client.
+   * <p>
+   * Note: this method is not going to block your thread.
+   *
+   * @param enabled location collection status.
+   */
   public void setEnabled(boolean enabled) {
     if (isEnabled.compareAndSet(!enabled, enabled)) {
       settingsChangeHandler.sendEmptyMessage(LOCATION_COLLECTION_STATUS_UPDATED);

@@ -5,6 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+/**
+ * Broadcast receiver through which location updates are reported.
+ * This receiver is optimized for the background location updates use case.
+ */
 public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
   private static final String TAG = "LocationUpdateReceiver";
   static final String ACTION_LOCATION_UPDATED =
