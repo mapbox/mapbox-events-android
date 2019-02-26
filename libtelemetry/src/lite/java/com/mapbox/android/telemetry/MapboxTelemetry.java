@@ -17,7 +17,7 @@ public class MapboxTelemetry {
   private static final String NON_NULL_APPLICATION_CONTEXT_REQUIRED = "Non-null application context required.";
   private String accessToken;
   private String userAgent;
-  private TelemetryClient telemetryClient;
+  private UploadClient uploadClient;
   private Callback httpCallback;
   private CopyOnWriteArraySet<TelemetryListener> telemetryListeners = null;
   private final CertificateBlacklist certificateBlacklist;
@@ -26,9 +26,6 @@ public class MapboxTelemetry {
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
-    this.configurationClient = new ConfigurationClient(context, TelemetryUtils.createFullUserAgent(userAgent,
-            context), accessToken, new OkHttpClient());
-    this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
     checkRequiredParameters(accessToken, userAgent);
     initializeTelemetryListeners();
     // Initializing callback after listeners object is instantiated
@@ -122,7 +119,7 @@ public class MapboxTelemetry {
   boolean checkRequiredParameters(String accessToken, String userAgent) {
     boolean areValidParameters = areRequiredParametersValid(accessToken, userAgent);
     if (areValidParameters) {
-      initializeTelemetryClient();
+      initalizeUploadClient();
     }
     return areValidParameters;
   }
@@ -157,23 +154,28 @@ public class MapboxTelemetry {
     return false;
   }
 
-  private void initializeTelemetryClient() {
-    if (telemetryClient == null) {
-      telemetryClient = createTelemetryClient(accessToken, userAgent);
+  private void initalizeUploadClient() {
+    if (uploadClient == null) {
+      uploadClient = createUploadClient();
     }
   }
 
-  private TelemetryClient createTelemetryClient(String accessToken, String userAgent) {
-    String fullUserAgent = TelemetryUtils.createFullUserAgent(userAgent, applicationContext);
-    TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(accessToken, fullUserAgent,
-      new Logger(), certificateBlacklist);
-    telemetryClient = telemetryClientFactory.obtainTelemetryClient(applicationContext);
-    return telemetryClient;
+  private UploadClient createUploadClient() {
+    if (uploadClientFactory == null) {
+      createUploadClientFactory();
+    }
+
+    return uploadClientFactory.obtainClient(UploadClientFactory.EndpointType.EVENTS);
   }
 
-  private boolean updateTelemetryClient(String accessToken) {
-    if (telemetryClient != null) {
-      telemetryClient.updateAccessToken(accessToken);
+  private void createUploadClientFactory() {
+    String fullUserAgent = TelemetryUtils.createFullUserAgent(userAgent, applicationContext);
+    uploadClientFactory = new UploadClientFactory(applicationContext, accessToken, fullUserAgent);
+  }
+
+  private boolean updateUploadClient(String accessToken) {
+    if (uploadClient != null) {
+      uploadClient.updateAccessToken(accessToken);
       return true;
     }
     return false;
