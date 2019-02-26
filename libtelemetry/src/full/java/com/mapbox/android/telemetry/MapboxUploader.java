@@ -1,8 +1,6 @@
 package com.mapbox.android.telemetry;
 
-import android.content.Context;
-
-public interface MapboxUploader <T, E> {
+public interface MapboxUploader<T, E> {
 
   void send(T data);
 
@@ -14,15 +12,17 @@ public interface MapboxUploader <T, E> {
 
   interface Listener<F> {
     void onSuccess(F data);
+
     void onFailure(Exception exception);
   }
 
   interface Configuration {
     void setUploadInterval(long interval);
+
     long getUploadInterval();
   }
 
-  interface MapboxUploadClient <B, D> {
+  interface MapboxUploadClient<B, D> {
     void upload(B data, D callback);
   }
 }
