@@ -9,7 +9,6 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSerializer;
-import com.mapbox.libupload.MapboxUploader;
 
 import java.io.IOException;
 import java.util.HashMap;

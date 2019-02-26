@@ -77,7 +77,7 @@ public class CertificateBlacklistInstrumentationTests {
 
     Context context = InstrumentationRegistry.getTargetContext();
     this.certificateBlacklist = new CertificateBlacklist(context);
-    
+
     assertTrue(certificateBlacklist.isBlacklisted("test12345"));
   }
 

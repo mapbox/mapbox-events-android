@@ -1,16 +1,16 @@
-package com.mapbox.libupload;
+package com.mapbox.android.telemetry;
 
 import android.content.Context;
 
 public interface MapboxUploader <T, E> {
 
-  public void send(T data);
+  void send(T data);
 
-  public void setConfiguration(Configuration configuration);
+  void setConfiguration(Configuration configuration);
 
-  public void addListener(Listener<E> listener);
+  void addListener(Listener<E> listener);
 
-  public void removeListener(Listener<E> listener);
+  void removeListener(Listener<E> listener);
 
   interface Listener<F> {
     void onSuccess(F data);
@@ -23,6 +23,6 @@ public interface MapboxUploader <T, E> {
   }
 
   interface MapboxUploadClient <B, D> {
-    public void upload(B data, D callback);
+    void upload(B data, D callback);
   }
 }

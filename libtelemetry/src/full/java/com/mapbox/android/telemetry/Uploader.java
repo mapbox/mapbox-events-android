@@ -7,8 +7,6 @@ import android.content.IntentFilter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.mapbox.libupload.MapboxUploader;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

@@ -8,7 +8,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.mapbox.libupload.MapboxUploader;
 
 import java.io.IOException;
 import java.util.List;
