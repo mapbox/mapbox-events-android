@@ -5,7 +5,10 @@ package com.mapbox.android.telemetry.location;
  */
 interface LocationEngineController {
   void setSessionIdentifier(SessionIdentifier sessionIdentifier);
+
   void onPause();
+
   void onResume();
+
   void onDestroy();
 }

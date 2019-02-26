@@ -3,14 +3,14 @@ package com.mapbox.android.telemetry.location;
 import com.mapbox.android.telemetry.TelemetryUtils;
 
 public class SessionIdentifier {
-  private static final long HOURS_TO_MILLISECONDS = 60*60*1000;
+  private static final long HOURS_TO_MILLISECONDS = 60 * 60 * 1000;
   private static final int DEFAULT_ROTATION_HOURS = 24;
   private final long rotationInterval;
   private String sessionId = null;
   private long lastSessionIdUpdate;
 
   public SessionIdentifier() {
-    this(DEFAULT_ROTATION_HOURS*HOURS_TO_MILLISECONDS);
+    this(DEFAULT_ROTATION_HOURS * HOURS_TO_MILLISECONDS);
   }
 
   public SessionIdentifier(long intervalMillis) {
@@ -18,7 +18,7 @@ public class SessionIdentifier {
   }
 
   public SessionIdentifier(int rotationInterval) {
-    this.rotationInterval = rotationInterval*HOURS_TO_MILLISECONDS;
+    this.rotationInterval = rotationInterval * HOURS_TO_MILLISECONDS;
   }
 
   String getSessionId() {

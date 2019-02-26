@@ -30,7 +30,7 @@ public class LocationUpdatesJobIntentService extends JobIntentService {
 
       List<Location> locations = result.getLocations();
       String sessionId = intent.getStringExtra("session_id");
-      for (Location location: locations) {
+      for (Location location : locations) {
         if (isThereAnyNaN(location) || isThereAnyInfinite(location)) {
           continue;
         }

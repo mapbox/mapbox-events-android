@@ -31,7 +31,7 @@ public class LocationCollectionClient {
     this.settingsChangeHandler = new Handler(handlerThread.getLooper()) {
       @Override
       public void handleMessage(Message msg) {
-        _handleMessage(msg);
+        handleSettingsChangeMessage(msg);
       }
     };
   }
@@ -86,7 +86,7 @@ public class LocationCollectionClient {
     }
   }
 
-  private void _handleMessage(Message msg) {
+  private void handleSettingsChangeMessage(Message msg) {
     switch (msg.what) {
       case LOCATION_COLLECTION_STATUS_UPDATED:
         if (isEnabled()) {
