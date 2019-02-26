@@ -51,7 +51,6 @@ dependencies {
 
     implementation project(":libcore")
     implementation project(":libtelemetry")
-    implementation project(":libupload")
 }
 
 apply from: "${rootDir}/gradle/developer-config.gradle"
