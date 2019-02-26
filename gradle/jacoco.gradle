@@ -34,8 +34,13 @@ project.afterEvaluate {
                 sourceDirectories = files(["src/main/java",
                                            "src/$productFlavorName/java",
                                            "src/$buildTypeName/java"])
+                println("${project.buildDir}")
 
                 executionData = files("${project.buildDir}/jacoco/${testTaskName}.exec")
+                if(project.buildDir.toString().indexOf("libcore") != -1) {
+                    println("is lib core, use coverage.ec")
+                    executionData = files(["${project.buildDir}/jacoco/${testTaskName}.exec", "build/coverage.ec"])
+                }
 
                 reports {
                     xml.enabled = true
