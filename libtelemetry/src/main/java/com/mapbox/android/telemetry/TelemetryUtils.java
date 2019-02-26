@@ -142,7 +142,7 @@ public class TelemetryUtils {
     return NETWORKS.get(telephonyManager.getNetworkType());
   }
 
-  public static String obtainCurrentDate() {
+  static String obtainCurrentDate() {
     return dateFormat.format(new Date());
   }
 
@@ -183,7 +183,7 @@ public class TelemetryUtils {
     return mapboxVendorId;
   }
 
-  public static SharedPreferences obtainSharedPreferences(Context context) {
+  static SharedPreferences obtainSharedPreferences(Context context) {
     return context.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
   }
 
