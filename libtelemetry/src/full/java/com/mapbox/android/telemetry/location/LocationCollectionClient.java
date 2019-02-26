@@ -56,6 +56,16 @@ public class LocationCollectionClient {
     return locationCollectionClient;
   }
 
+  public static void uninstall() {
+    synchronized (lock) {
+      if (locationCollectionClient != null) {
+        locationCollectionClient.locationEngineController.onDestroy();
+        locationCollectionClient.settingsChangeHandlerThread.quit();
+        locationCollectionClient = null;
+      }
+    }
+  }
+
   @NonNull
   public static LocationCollectionClient getInstance() {
     synchronized (lock) {
