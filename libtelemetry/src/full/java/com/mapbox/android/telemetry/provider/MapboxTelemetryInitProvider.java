@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.mapbox.android.telemetry.location.LocationCollectionClient;
+import com.mapbox.android.telemetry.location.SessionIdentifier;
 
 public class MapboxTelemetryInitProvider extends ContentProvider {
   private static final String EMPTY_APPLICATION_ID_PROVIDER_AUTHORITY =
@@ -18,7 +19,7 @@ public class MapboxTelemetryInitProvider extends ContentProvider {
   @Override
   public boolean onCreate() {
     // Context is guaranteed to be available at onCreate
-    LocationCollectionClient.install(getContext());
+    LocationCollectionClient.install(getContext(), new SessionIdentifier());
     return false;
   }
 

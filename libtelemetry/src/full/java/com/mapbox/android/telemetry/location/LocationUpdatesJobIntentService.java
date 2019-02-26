@@ -21,21 +21,24 @@ public class LocationUpdatesJobIntentService extends JobIntentService {
 
   @Override
   protected void onHandleWork(@NonNull Intent intent) {
-    LocationEngineResult result = LocationEngineResult.extractResult(intent);
-    if (result != null) {
-      LocationMapper locationMapper = new LocationMapper();
+    try {
+      LocationEngineResult result = LocationEngineResult.extractResult(intent);
+      if (result == null) {
+        Log.w(TAG, "LocationEngineResult == null");
+        return;
+      }
+
       List<Location> locations = result.getLocations();
+      String sessionId = intent.getStringExtra("session_id");
       for (Location location: locations) {
         if (isThereAnyNaN(location) || isThereAnyInfinite(location)) {
           continue;
         }
-        // Do we use application state at all?
-        LocationEvent locationEvent = locationMapper.from(location, "");
-
-
+        LocationEvent locationEvent = LocationMapper.create(location, sessionId);
+        // TODO: push event to repository
       }
-    } else {
-      Log.w(TAG, "LocationEngineResult == null");
+    } catch (Throwable throwable) {
+      // TODO: log silent crash
     }
   }
 

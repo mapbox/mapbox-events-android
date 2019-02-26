@@ -12,14 +12,18 @@ public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
 
   @Override
   public void onReceive(Context context, Intent intent) {
-    if (intent == null) {
-      Log.w(TAG, "intent == null");
-      return;
-    }
+    try {
+      if (intent == null) {
+        Log.w(TAG, "intent == null");
+        return;
+      }
 
-    final String action = intent.getAction();
-    if (ACTION_LOCATION_UPDATED.equals(action)) {
-      LocationUpdatesJobIntentService.enqueueWork(context, intent);
+      final String action = intent.getAction();
+      if (ACTION_LOCATION_UPDATED.equals(action)) {
+        LocationUpdatesJobIntentService.enqueueWork(context, intent);
+      }
+    } catch (Throwable throwable) {
+      // TODO: log silent crash
     }
   }
 }
