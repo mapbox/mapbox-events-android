@@ -48,6 +48,10 @@ class LocationEngineControllerImpl implements LocationEngineController {
     removeLocationUpdates();
   }
 
+  long getSessionRotationInterval() {
+    return sessionIdentifier.getInterval();
+  }
+
   private void requestLocationUpdates() {
     if (!checkPermissions()) {
       Log.w(TAG, "Location permissions are not granted");

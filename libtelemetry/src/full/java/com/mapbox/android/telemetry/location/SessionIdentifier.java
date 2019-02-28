@@ -39,6 +39,15 @@ public class SessionIdentifier {
     this.rotationInterval = rotationInterval * HOURS_TO_MILLISECONDS;
   }
 
+  /**
+   * Return rotation interval in milliseconds
+   *
+   * @return interval in milliseconds
+   */
+  public long getInterval() {
+    return rotationInterval;
+  }
+
   String getSessionId() {
     long timeDiff = System.currentTimeMillis() - lastSessionIdUpdate;
     if (timeDiff >= rotationInterval || sessionId == null) {

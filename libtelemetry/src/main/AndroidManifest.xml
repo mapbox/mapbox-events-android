@@ -8,9 +8,5 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <application>
         <service android:name="com.mapbox.android.telemetry.TelemetryService"/>
-        <service
-                android:name=".location.LocationUpdatesJobIntentService"
-                android:exported="true"
-                android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
 </manifest>

@@ -1,10 +1,11 @@
 package com.mapbox.android.telemetry.location;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+import android.os.Bundle;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import com.mapbox.android.core.location.LocationEngineProvider;
@@ -26,10 +27,12 @@ public class LocationCollectionClient {
   private static final Object lock = new Object();
   private static LocationCollectionClient locationCollectionClient;
 
+  @VisibleForTesting
+  final LocationEngineController locationEngineController;
+
   private final AtomicBoolean isEnabled = new AtomicBoolean(false);
-  private final LocationEngineController locationEngineController;
   private final HandlerThread settingsChangeHandlerThread;
-  private final Handler settingsChangeHandler;
+  private Handler settingsChangeHandler;
 
   @VisibleForTesting
   LocationCollectionClient(LocationEngineController collectionController,
@@ -73,15 +76,19 @@ public class LocationCollectionClient {
 
   /**
    * Uninstall current location collection client.
+   * @return true if uninstall was successful
    */
-  public static void uninstall() {
+  public static boolean uninstall() {
+    boolean uninstalled = false;
     synchronized (lock) {
       if (locationCollectionClient != null) {
         locationCollectionClient.locationEngineController.onDestroy();
         locationCollectionClient.settingsChangeHandlerThread.quit();
         locationCollectionClient = null;
+        uninstalled = true;
       }
     }
+    return uninstalled;
   }
 
   /**
@@ -137,7 +144,22 @@ public class LocationCollectionClient {
     }
   }
 
-  private void handleSettingsChangeMessage(Message msg) {
+  @VisibleForTesting
+  Looper getSettingsLooper() {
+    return settingsChangeHandlerThread.getLooper();
+  }
+
+  /**
+   * Should only be used for testing!
+   * @param mockHandler reference to mock handler
+   */
+  @VisibleForTesting
+  void setMockHandler(Handler mockHandler) {
+    this.settingsChangeHandler = mockHandler;
+  }
+
+  @VisibleForTesting
+  void handleSettingsChangeMessage(Message msg) {
     switch (msg.what) {
       case LOCATION_COLLECTION_STATUS_UPDATED:
         if (isEnabled()) {
