@@ -34,12 +34,12 @@ public class MapboxTelemetry {
 
   // For testing only
   MapboxTelemetry(Context context, String accessToken, String userAgent, EventsQueue queue,
-                  TelemetryClient telemetryClient, Callback httpCallback, SchedulerFlusher schedulerFlusher,
+                  UploadClient uploadClient, Callback httpCallback, SchedulerFlusher schedulerFlusher,
                   Clock clock, boolean isServiceBound, TelemetryEnabler telemetryEnabler,
                   TelemetryLocationEnabler telemetryLocationEnabler) {
     initializeContext(context);
     checkRequiredParameters(accessToken, userAgent);
-    this.telemetryClient = telemetryClient;
+    this.uploadClient = uploadClient;
     this.httpCallback = httpCallback;
     initializeTelemetryListeners();
     this.configurationClient = new ConfigurationClient(context, TelemetryUtils.createFullUserAgent(userAgent,
@@ -78,19 +78,19 @@ public class MapboxTelemetry {
   }
 
   public void updateDebugLoggingEnabled(boolean isDebugLoggingEnabled) {
-    if (telemetryClient != null) {
-      telemetryClient.updateDebugLoggingEnabled(isDebugLoggingEnabled);
+    if (uploadClient != null) {
+      uploadClient.updateDebugLoggingEnabled(isDebugLoggingEnabled);
     }
   }
 
   public void updateUserAgent(String userAgent) {
     if (isUserAgentValid(userAgent)) {
-      telemetryClient.updateUserAgent(TelemetryUtils.createFullUserAgent(userAgent, applicationContext));
+      uploadClient.updateUserAgent(TelemetryUtils.createFullUserAgent(userAgent, applicationContext));
     }
   }
 
   public boolean updateAccessToken(String accessToken) {
-    if (isAccessTokenValid(accessToken) && updateTelemetryClient(accessToken)) {
+    if (isAccessTokenValid(accessToken) && updateUploadClient(accessToken)) {
       this.accessToken = accessToken;
       return true;
     }
@@ -183,7 +183,7 @@ public class MapboxTelemetry {
 
   private void sendEvents(List<Event> events) {
     if (checkRequiredParameters(accessToken, userAgent)) {
-      telemetryClient.sendEvents(events, httpCallback);
+      uploadClient.upload(events, httpCallback);
     }
   }
 
