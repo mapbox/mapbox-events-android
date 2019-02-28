@@ -39,7 +39,7 @@ project.afterEvaluate {
                 executionData = files("${project.buildDir}/jacoco/${testTaskName}.exec")
                 if(project.buildDir.toString().indexOf("libcore") != -1) {
                     println("is lib core, use coverage.ec")
-                    executionData = files(["${project.buildDir}/jacoco/${testTaskName}.exec", "build/coverage.ec"])
+                    executionData = files( "build/coverage.ec")
                 }
 
                 reports {
