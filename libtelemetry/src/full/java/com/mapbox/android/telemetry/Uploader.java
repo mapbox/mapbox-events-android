@@ -54,15 +54,6 @@ class Uploader implements MapboxUploader, Callback {
     listeners.remove(listener);
   }
 
-  private void scheduleJob(Object data) {
-    registerJobReceiver();
-
-    UploadJobIntentService uploadJobIntentService = new UploadJobIntentService();
-    List<Event> events = (List<Event>) data;
-
-    uploadJobIntentService.schedule(context, events, mapboxUploadClient);
-  }
-
   @Override
   public void onFailure(Call call, IOException exception) {
     Log.e("test", "uploader - failure: " + exception);
@@ -83,6 +74,23 @@ class Uploader implements MapboxUploader, Callback {
         listener.onSuccess(response);
       }
     }
+  }
+
+  MapboxUploadClient getMapboxUploadClient() {
+    return mapboxUploadClient;
+  }
+
+  void updateClient(MapboxUploadClient uploadClient) {
+    this.mapboxUploadClient = uploadClient;
+  }
+
+  private void scheduleJob(Object data) {
+    registerJobReceiver();
+
+    UploadJobIntentService uploadJobIntentService = new UploadJobIntentService();
+    List<Event> events = (List<Event>) data;
+
+    uploadJobIntentService.schedule(context, events, mapboxUploadClient);
   }
 
   private void registerJobReceiver() {

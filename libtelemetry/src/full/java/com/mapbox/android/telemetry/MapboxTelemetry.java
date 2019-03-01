@@ -52,7 +52,8 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   private CopyOnWriteArraySet<AttachmentListener> attachmentListeners = null;
   static Context applicationContext = null;
   private UploadClientFactory uploadClientFactory;
-  private UploadClient uploadClient;
+  private Uploader eventUploader;
+  private Uploader attachmentUploader;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
@@ -72,13 +73,13 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   // For testing only
-  MapboxTelemetry(Context context, String accessToken, String userAgent, EventsQueue queue, UploadClient uploadClient,
+  MapboxTelemetry(Context context, String accessToken, String userAgent, EventsQueue queue, Uploader uploader,
                   Callback httpCallback, SchedulerFlusher schedulerFlusher,Clock clock, boolean isServiceBound,
                   TelemetryEnabler telemetryEnabler, TelemetryLocationEnabler telemetryLocationEnabler) {
     initializeContext(context);
     this.queue = queue;
     checkRequiredParameters(accessToken, userAgent);
-    this.uploadClient = uploadClient;
+    this.eventUploader = uploader;
     this.httpCallback = httpCallback;
     this.schedulerFlusher = schedulerFlusher;
     this.clock = clock;
@@ -147,14 +148,18 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   public void updateDebugLoggingEnabled(boolean isDebugLoggingEnabled) {
+    UploadClient uploadClient = (UploadClient) eventUploader.getMapboxUploadClient();
     if (uploadClient != null) {
       uploadClient.updateDebugLoggingEnabled(isDebugLoggingEnabled);
+      eventUploader.updateClient(uploadClient);
     }
   }
 
   public void updateUserAgent(String userAgent) {
     if (isUserAgentValid(userAgent)) {
+      UploadClient uploadClient = (UploadClient) eventUploader.getMapboxUploadClient();
       uploadClient.updateUserAgent(TelemetryUtils.createFullUserAgent(userAgent, applicationContext));
+      eventUploader.updateClient(uploadClient);
     }
   }
 
@@ -229,7 +234,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   boolean checkRequiredParameters(String accessToken, String userAgent) {
     boolean areValidParameters = areRequiredParametersValid(accessToken, userAgent);
     if (areValidParameters) {
-      initalizeUploadClient();
+      initializeUploader();
       queue.setTelemetryInitialized(true);
     }
     return areValidParameters;
@@ -284,9 +289,9 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     return false;
   }
 
-  private void initalizeUploadClient() {
-    if (uploadClient == null) {
-      uploadClient = createUploadClient();
+  private void initializeUploader() {
+    if (eventUploader == null) {
+      eventUploader = new Uploader(createUploadClient(), applicationContext);
     }
   }
 
@@ -312,8 +317,10 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   private boolean updateUploadClient(String accessToken) {
-    if (uploadClient != null) {
+    if (eventUploader != null) {
+      UploadClient uploadClient = (UploadClient) eventUploader.getMapboxUploadClient();
       uploadClient.updateAccessToken(accessToken);
+      eventUploader.updateClient(uploadClient);
       return true;
     }
     return false;
@@ -366,7 +373,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   private void sendEvents(List<Event> events) {
     if (checkRequiredParameters(accessToken, userAgent)) {
-      uploadClient.upload(events, httpCallback);
+      eventUploader.send(events);
     }
   }
 
@@ -565,8 +572,15 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
 
   private void sendAttachment(Event event) {
     if (checkNetworkAndParameters()) {
-      uploadClient = createAttachmentClient();
-      uploadClient.upload(convertEventToAttachment(event), null);
+      initializeAttachmentUploader();
+
+      attachmentUploader.send(convertEventToAttachment(event));
+    }
+  }
+
+  private void initializeAttachmentUploader() {
+    if (attachmentUploader == null) {
+      attachmentUploader = new Uploader(createAttachmentClient(), applicationContext);
     }
   }
 

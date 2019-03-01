@@ -166,7 +166,7 @@ public class MapEventFactoryTest {
     String aValidAccessToken = "validAccessToken";
     String aValidUserAgent = "MapboxTelemetryAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
-    UploadClient mockedUploadClient = mock(UploadClient.class);
+    Uploader mockedUploader = mock(Uploader.class);
     Callback mockedHttpCallback = mock(Callback.class);
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
@@ -174,7 +174,7 @@ public class MapEventFactoryTest {
     TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false);
     TelemetryLocationEnabler telemetryLocationEnabler = new TelemetryLocationEnabler(false);
     new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
-      mockedEventsQueue, mockedUploadClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
+      mockedEventsQueue, mockedUploader, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
       indifferentServiceBound, telemetryEnabler, telemetryLocationEnabler);
   }
 
