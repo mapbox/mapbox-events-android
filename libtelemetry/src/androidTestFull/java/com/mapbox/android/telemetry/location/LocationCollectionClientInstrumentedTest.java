@@ -24,7 +24,7 @@ public class LocationCollectionClientInstrumentedTest {
 
   @After
   public void tearDown() {
-    ref = null;
+    LocationCollectionClient.uninstall();
   }
 
   @Test
@@ -35,7 +35,7 @@ public class LocationCollectionClientInstrumentedTest {
 
   @Test
   public void verifyCollectorUninstalled() {
-    assertTrue(LocationCollectionClient.uninstall());
+    LocationCollectionClient.uninstall();
     assertNotEquals(ref, LocationCollectionClient.install(InstrumentationRegistry.getTargetContext(),
       1000));
   }
