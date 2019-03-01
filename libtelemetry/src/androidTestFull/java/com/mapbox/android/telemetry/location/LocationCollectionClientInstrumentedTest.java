@@ -43,11 +43,13 @@ public class LocationCollectionClientInstrumentedTest {
 
   @Test
   public void callUninstallBeforeInstall() {
+    LocationCollectionClient.uninstall();
     assertFalse(LocationCollectionClient.uninstall());
   }
 
   @Test(expected = IllegalStateException.class)
   public void callGetInstanceBeforeInstall() {
+    LocationCollectionClient.uninstall();
     LocationCollectionClient.getInstance();
   }
 
