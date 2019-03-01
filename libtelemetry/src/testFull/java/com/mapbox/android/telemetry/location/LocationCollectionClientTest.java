@@ -74,6 +74,16 @@ public class LocationCollectionClientTest {
     verify(locationEngineController, times(1)).onDestroy();
   }
 
+  @Test(expected = IllegalStateException.class)
+  public void callGetInstanceBeforeInstall() {
+    LocationCollectionClient.getInstance();
+  }
+
+  @Test
+  public void callUninstallBeforeInstall() {
+    assertThat(LocationCollectionClient.uninstall()).isFalse();
+  }
+
   private Handler getMockEmptyMessageHandler() {
     Handler handler = mock(Handler.class);
     when(handler.sendEmptyMessage(anyInt())).thenAnswer(new Answer() {

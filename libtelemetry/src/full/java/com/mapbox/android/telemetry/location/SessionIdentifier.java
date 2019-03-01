@@ -35,6 +35,7 @@ public class SessionIdentifier {
    *
    * @param rotationInterval interval in hours.
    */
+  @Deprecated
   public SessionIdentifier(int rotationInterval) {
     this.rotationInterval = rotationInterval * HOURS_TO_MILLISECONDS;
   }

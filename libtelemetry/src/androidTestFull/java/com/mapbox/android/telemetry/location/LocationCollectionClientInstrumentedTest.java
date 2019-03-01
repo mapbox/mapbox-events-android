@@ -10,7 +10,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -39,18 +38,6 @@ public class LocationCollectionClientInstrumentedTest {
     assertTrue(LocationCollectionClient.uninstall());
     assertNotEquals(ref, LocationCollectionClient.install(InstrumentationRegistry.getTargetContext(),
       1000));
-  }
-
-  @Test
-  public void callUninstallBeforeInstall() {
-    LocationCollectionClient.uninstall();
-    assertFalse(LocationCollectionClient.uninstall());
-  }
-
-  @Test(expected = IllegalStateException.class)
-  public void callGetInstanceBeforeInstall() {
-    LocationCollectionClient.uninstall();
-    LocationCollectionClient.getInstance();
   }
 
   @Test
