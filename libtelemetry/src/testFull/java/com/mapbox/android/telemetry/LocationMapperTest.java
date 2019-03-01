@@ -2,6 +2,7 @@ package com.mapbox.android.telemetry;
 
 import android.location.Location;
 
+import com.mapbox.android.telemetry.location.LocationMapper;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

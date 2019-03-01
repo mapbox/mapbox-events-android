@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.SynchronousQueue;
 
+import com.mapbox.android.telemetry.location.SessionIdentifier;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
