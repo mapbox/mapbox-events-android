@@ -7,7 +7,7 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
 
-class LocationEvent extends Event implements Parcelable {
+public class LocationEvent extends Event implements Parcelable {
   private static final String LOCATION = "location";
   private static final String SOURCE_MAPBOX = "mapbox";
   private static final String OPERATING_SYSTEM = "Android - " + Build.VERSION.RELEASE;
@@ -33,7 +33,7 @@ class LocationEvent extends Event implements Parcelable {
   @SerializedName("horizontalAccuracy")
   private Float accuracy = null;
 
-  LocationEvent(String sessionId, double latitude, double longitude, String applicationState) {
+  public LocationEvent(String sessionId, double latitude, double longitude, String applicationState) {
     this.event = LOCATION;
     this.created = TelemetryUtils.obtainCurrentDate();
     this.source = SOURCE_MAPBOX;
