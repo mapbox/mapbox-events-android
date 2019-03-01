@@ -30,12 +30,24 @@ class CertificateBlacklist implements ConfigurationChangeHandler {
   private static final String BLACKLIST_FILE = "MapboxBlacklist";
   private final Context context;
   private final List<String> revokedKeys;
+  private ConfigurationClient configurationClient;
 
   CertificateBlacklist(Context context, ConfigurationClient configurationClient) {
     this.context = context;
     this.revokedKeys = new CopyOnWriteArrayList<>();
+    this.configurationClient = configurationClient;
     configurationClient.addHandler(this);
+    new CheckThread().start();
+  }
 
+  class CheckThread extends Thread {
+    @Override
+    public void run() {
+      checkAndRetriveBlackList(context, configurationClient);
+    }
+  }
+
+  private void checkAndRetriveBlackList(Context context, ConfigurationClient configurationClient) {
     // Check if it's time to update
     if (configurationClient.shouldUpdate()) {
       configurationClient.update();

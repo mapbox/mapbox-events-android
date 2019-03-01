@@ -74,6 +74,7 @@ public class TelemetryUtils {
       put(TelephonyManager.NETWORK_TYPE_UNKNOWN, UNKNOWN);
     }
   };
+  private static SharedPreferences sharedPreferences;
 
   public static String toHumanReadableAscii(String s) {
     for (int i = 0, length = s.length(), c; i < length; i += Character.charCount(c)) {
@@ -138,7 +139,7 @@ public class TelemetryUtils {
   }
 
   static String obtainCellularNetworkType(Context context) {
-    TelephonyManager telephonyManager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
+    TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
     return NETWORKS.get(telephonyManager.getNetworkType());
   }
 
@@ -184,7 +185,10 @@ public class TelemetryUtils {
   }
 
   static SharedPreferences obtainSharedPreferences(Context context) {
-    return context.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
+    if (sharedPreferences == null) {
+      sharedPreferences = context.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
+    }
+    return sharedPreferences;
   }
 
   private static String updateVendorId() {
@@ -234,7 +238,7 @@ public class TelemetryUtils {
   static boolean adjustWakeUpMode(Context context) {
     try {
       ApplicationInfo appInformation = context.getPackageManager().getApplicationInfo(context.getPackageName(),
-          PackageManager.GET_META_DATA);
+        PackageManager.GET_META_DATA);
       if (appInformation != null && appInformation.metaData != null) {
         boolean adjustWakeUp = appInformation.metaData.getBoolean(KEY_META_DATA_WAKE_UP, false);
         return adjustWakeUp;

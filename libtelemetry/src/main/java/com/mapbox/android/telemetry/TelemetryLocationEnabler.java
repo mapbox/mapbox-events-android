@@ -37,7 +37,8 @@ class TelemetryLocationEnabler {
 
   LocationState updateTelemetryLocationState(LocationState telemetryLocationState, Context context) {
     if (isFromPreferences) {
-      return updateLocationPreferences(telemetryLocationState, context);
+      new SaveThread(telemetryLocationState, context).start();
+      return telemetryLocationState;
     }
 
     currentTelemetryLocationState = telemetryLocationState;
@@ -58,11 +59,21 @@ class TelemetryLocationEnabler {
       LOCATION_STATES.get(LocationState.DISABLED.name());
   }
 
-  private LocationState updateLocationPreferences(LocationState telemetryLocationState, Context context) {
-    SharedPreferences sharedPreferences = obtainSharedPreferences(context);
-    SharedPreferences.Editor editor = sharedPreferences.edit();
-    editor.putString(MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE, telemetryLocationState.name());
-    editor.apply();
-    return telemetryLocationState;
+  class SaveThread extends Thread {
+    private final Context context;
+    private final LocationState telemetryLocationState;
+
+    SaveThread(LocationState telemetryLocationState, Context context) {
+      this.telemetryLocationState = telemetryLocationState;
+      this.context = context;
+    }
+
+    @Override
+    public void run() {
+      SharedPreferences sharedPreferences = obtainSharedPreferences(context);
+      SharedPreferences.Editor editor = sharedPreferences.edit();
+      editor.putString(MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE, telemetryLocationState.name());
+      editor.apply();
+    }
   }
 }
