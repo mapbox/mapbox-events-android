@@ -52,12 +52,8 @@ dependencies {
     implementation dependenciesList.supportAnnotation
     implementation project(':libcore')
 
-    fullImplementation (dependenciesList.archLifecycleExtensions) {
-        exclude group: 'android.arch.lifecycle', module: 'livedata'
-        exclude group: 'android.arch.lifecycle', module: 'viewmodel'
-        exclude group: 'android.arch.core', module: 'runtime'
-    }
-    fullAnnotationProcessor dependenciesList.archLifecycleCompiler
+    fullImplementation dependenciesList.localBroadcastManager
+    fullImplementation dependenciesList.supportCompat
 
     testImplementation dependenciesList.junit
     testImplementation dependenciesList.mockito

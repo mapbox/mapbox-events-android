@@ -7,6 +7,5 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <application>
-        <service android:name="com.mapbox.android.telemetry.TelemetryService"/>
     </application>
 </manifest>

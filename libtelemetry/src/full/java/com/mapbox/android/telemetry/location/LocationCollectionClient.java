@@ -9,6 +9,7 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import com.mapbox.android.core.location.LocationEngineProvider;
+import com.mapbox.android.telemetry.MapboxTelemetry;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -22,6 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * in order to release system resources.
  */
 public class LocationCollectionClient {
+  public static final String LOCATION_COLLECTOR_USER_AGENT = "mapbox-android-location";
   private static final int LOCATION_COLLECTION_STATUS_UPDATED = 0;
   private static final int SESSION_ROTATION_INTERVAL_UPDATED = 1;
   private static final Object lock = new Object();
@@ -32,13 +34,16 @@ public class LocationCollectionClient {
 
   private final AtomicBoolean isEnabled = new AtomicBoolean(false);
   private final HandlerThread settingsChangeHandlerThread;
+  private final MapboxTelemetry telemetry;
+
   private Handler settingsChangeHandler;
 
   @VisibleForTesting
   LocationCollectionClient(LocationEngineController collectionController,
-                           HandlerThread handlerThread) {
+                           HandlerThread handlerThread, MapboxTelemetry telemetry) {
     this.locationEngineController = collectionController;
     this.settingsChangeHandlerThread = handlerThread;
+    this.telemetry = telemetry;
     this.settingsChangeHandlerThread.start();
     this.settingsChangeHandler = new Handler(handlerThread.getLooper()) {
       @Override
@@ -68,7 +73,9 @@ public class LocationCollectionClient {
       if (locationCollectionClient == null) {
         locationCollectionClient = new LocationCollectionClient(new LocationEngineControllerImpl(applicationContext,
           LocationEngineProvider.getBestLocationEngine(applicationContext), new SessionIdentifier(defaultInterval)),
-          new HandlerThread("LocationSettingsChangeThread"));
+          new HandlerThread("LocationSettingsChangeThread"),
+          // Provide empty token as it is not available yet
+          new MapboxTelemetry(applicationContext, "", LOCATION_COLLECTOR_USER_AGENT));
       }
     }
     return locationCollectionClient;
@@ -142,6 +149,15 @@ public class LocationCollectionClient {
     if (isEnabled.compareAndSet(!enabled, enabled)) {
       settingsChangeHandler.sendEmptyMessage(LOCATION_COLLECTION_STATUS_UPDATED);
     }
+  }
+
+  /**
+   * Access to telemetry temporarily until it becomes singleton.
+   *
+   * @return instance of telemetry
+   */
+  MapboxTelemetry getTelemetry() {
+    return telemetry;
   }
 
   @VisibleForTesting
