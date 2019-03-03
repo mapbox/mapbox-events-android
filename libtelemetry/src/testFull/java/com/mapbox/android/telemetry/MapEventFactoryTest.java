@@ -173,10 +173,9 @@ public class MapEventFactoryTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false);
-    TelemetryLocationEnabler telemetryLocationEnabler = new TelemetryLocationEnabler(false);
     new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent, mockedEventsQueue, mockedTelemetryClient,
-      mockedHttpCallback, mockedSchedulerFlusher, mockedClock, true,
-      telemetryEnabler, telemetryLocationEnabler, mock(ExecutorService.class));
+      mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
+      telemetryEnabler, mock(ExecutorService.class));
   }
 
   private MapState obtainAValidMapState() {

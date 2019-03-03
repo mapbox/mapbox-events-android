@@ -62,22 +62,19 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   // For testing only
   MapboxTelemetry(Context context, String accessToken, String userAgent, EventsQueue queue,
                   TelemetryClient telemetryClient, Callback httpCallback, SchedulerFlusher schedulerFlusher,
-                  Clock clock, boolean isServiceBound, TelemetryEnabler telemetryEnabler,
-                  TelemetryLocationEnabler telemetryLocationEnabler, ExecutorService executorService) {
+                  Clock clock, TelemetryEnabler telemetryEnabler, ExecutorService executorService) {
     initializeContext(context);
-    this.executorService = executorService;
-    this.queue = queue;
-    checkRequiredParameters(accessToken, userAgent);
+    sAccessToken.set(accessToken);
+    this.userAgent = userAgent;
     this.telemetryClient = telemetryClient;
-    this.httpCallback = httpCallback;
     this.schedulerFlusher = schedulerFlusher;
     this.clock = clock;
     this.telemetryEnabler = telemetryEnabler;
     initializeTelemetryListeners();
     initializeAttachmentListeners();
-    this.configurationClient = new ConfigurationClient(context, TelemetryUtils.createFullUserAgent(userAgent,
-            context), accessToken, new OkHttpClient());
-    this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
+    this.httpCallback = httpCallback;
+    this.executorService = executorService;
+    this.queue = queue;
   }
 
   @Override // Callback is dispatched on background thread
@@ -216,8 +213,10 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
       this.configurationClient = new ConfigurationClient(applicationContext,
         TelemetryUtils.createFullUserAgent(userAgent, applicationContext), sAccessToken.get(), new OkHttpClient());
     }
-    this.certificateBlacklist = new CertificateBlacklist(applicationContext, configurationClient);
-    checkRequiredParameters(sAccessToken.get(), userAgent);
+
+    if (certificateBlacklist == null) {
+      this.certificateBlacklist = new CertificateBlacklist(applicationContext, configurationClient);
+    }
 
     if (telemetryClient == null) {
       telemetryClient = createTelemetryClient(sAccessToken.get(), userAgent);
@@ -368,7 +367,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     }
   }
 
-  private synchronized static void enableLocationCollector(boolean enable) {
+  private static synchronized void enableLocationCollector(boolean enable) {
     SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences(applicationContext);
     SharedPreferences.Editor editor = sharedPreferences.edit();
     editor.putBoolean(LOCATION_COLLECTOR_ENABLED, enable);

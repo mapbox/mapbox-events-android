@@ -1,8 +1,10 @@
 package com.mapbox.android.telemetry.location;
 
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+import com.mapbox.android.telemetry.MapboxTelemetry;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,17 +32,26 @@ public class LocationCollectionClientTest {
   @Mock
   private HandlerThread handlerThread;
 
+  @Mock
+  private SharedPreferences sharedPreferences;
+
+  @Mock
+  private MapboxTelemetry mapboxTelemetry;
+
   private LocationCollectionClient collectionClient;
 
   @Before
   public void setUp() {
-    collectionClient = new LocationCollectionClient(locationEngineController, handlerThread);
+    collectionClient = new LocationCollectionClient(locationEngineController,
+      handlerThread, sharedPreferences, mapboxTelemetry);
   }
 
   @After
   public void tearDown() {
     reset(locationEngineController);
     reset(handlerThread);
+    reset(sharedPreferences);
+    reset(mapboxTelemetry);
     collectionClient = null;
   }
 

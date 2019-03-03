@@ -8,10 +8,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 
@@ -37,11 +37,11 @@ public class LocationUpdatesBroadcastReceiverTest {
   }
 
   @Test
-  public void testOnReceive() {
+  public void testOnReceiveActionReturnNull() {
     Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
     Intent mockedIntent = mock(Intent.class);
-    when(mockedIntent.getAction()).thenReturn(LocationUpdatesBroadcastReceiver.ACTION_LOCATION_UPDATED);
+    when(mockedIntent.getAction()).thenReturn(null);
     broadcastReceiver.onReceive(mockedContext, mockedIntent);
-    verify(mockedContext, times(1)).getApplicationContext();
+    verify(mockedIntent, never()).getStringExtra(anyString());
   }
 }
