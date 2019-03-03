@@ -1,6 +1,7 @@
 package com.mapbox.android.telemetry.location;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
@@ -8,10 +9,16 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
+import android.util.Log;
 import com.mapbox.android.core.location.LocationEngineProvider;
 import com.mapbox.android.telemetry.MapboxTelemetry;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static com.mapbox.android.telemetry.MapboxTelemetryConstants.LOCATION_COLLECTOR_ENABLED;
+import static com.mapbox.android.telemetry.MapboxTelemetryConstants.MAPBOX_SHARED_PREFERENCES;
+import static com.mapbox.android.telemetry.MapboxTelemetryConstants.SESSION_ROTATION_INTERVAL_MILLIS;
 
 /**
  * Location collector client is responsible for managing our anonymous
@@ -22,10 +29,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Location collector can be disabled at any point of time or uninstalled completely
  * in order to release system resources.
  */
-public class LocationCollectionClient {
-  public static final String LOCATION_COLLECTOR_USER_AGENT = "mapbox-android-location";
+public class LocationCollectionClient implements SharedPreferences.OnSharedPreferenceChangeListener  {
+  private static final String LOCATION_COLLECTOR_USER_AGENT = "mapbox-android-location";
+  private static final String TAG = "LocationCollectionCli";
   private static final int LOCATION_COLLECTION_STATUS_UPDATED = 0;
   private static final int SESSION_ROTATION_INTERVAL_UPDATED = 1;
+  private static final int DEFAULT_SESSION_ROTATION_INTERVAL_HOURS = 24;
   private static final Object lock = new Object();
   private static LocationCollectionClient locationCollectionClient;
 
@@ -35,12 +44,13 @@ public class LocationCollectionClient {
   private final AtomicBoolean isEnabled = new AtomicBoolean(false);
   private final HandlerThread settingsChangeHandlerThread;
   private final MapboxTelemetry telemetry;
-
   private Handler settingsChangeHandler;
 
   @VisibleForTesting
-  LocationCollectionClient(LocationEngineController collectionController,
-                           HandlerThread handlerThread, MapboxTelemetry telemetry) {
+  LocationCollectionClient(@NonNull LocationEngineController collectionController,
+                           @NonNull HandlerThread handlerThread,
+                           @NonNull SharedPreferences sharedPreferences,
+                           @NonNull MapboxTelemetry telemetry) {
     this.locationEngineController = collectionController;
     this.settingsChangeHandlerThread = handlerThread;
     this.telemetry = telemetry;
@@ -51,6 +61,7 @@ public class LocationCollectionClient {
         handleSettingsChangeMessage(msg);
       }
     };
+    sharedPreferences.registerOnSharedPreferenceChangeListener(this);
   }
 
   /**
@@ -74,6 +85,7 @@ public class LocationCollectionClient {
         locationCollectionClient = new LocationCollectionClient(new LocationEngineControllerImpl(applicationContext,
           LocationEngineProvider.getBestLocationEngine(applicationContext), new SessionIdentifier(defaultInterval)),
           new HandlerThread("LocationSettingsChangeThread"),
+          applicationContext.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE),
           // Provide empty token as it is not available yet
           new MapboxTelemetry(applicationContext, "", LOCATION_COLLECTOR_USER_AGENT));
       }
@@ -105,7 +117,7 @@ public class LocationCollectionClient {
    * @return instance of location client
    */
   @NonNull
-  public static LocationCollectionClient getInstance() {
+  static LocationCollectionClient getInstance() {
     synchronized (lock) {
       if (locationCollectionClient != null) {
         return locationCollectionClient;
@@ -120,7 +132,7 @@ public class LocationCollectionClient {
    *
    * @param interval interval in which session id will be renewed.
    */
-  public void setSessionRotationInterval(long interval) {
+  void setSessionRotationInterval(long interval) {
     Message message = Message.obtain();
     message.what = SESSION_ROTATION_INTERVAL_UPDATED;
     Bundle b = new Bundle();
@@ -134,7 +146,7 @@ public class LocationCollectionClient {
    *
    * @return true if collection client is active, false otherwise
    */
-  public boolean isEnabled() {
+  boolean isEnabled() {
     return isEnabled.get();
   }
 
@@ -145,7 +157,7 @@ public class LocationCollectionClient {
    *
    * @param enabled location collection status.
    */
-  public void setEnabled(boolean enabled) {
+  void setEnabled(boolean enabled) {
     if (isEnabled.compareAndSet(!enabled, enabled)) {
       settingsChangeHandler.sendEmptyMessage(LOCATION_COLLECTION_STATUS_UPDATED);
     }
@@ -191,6 +203,21 @@ public class LocationCollectionClient {
         break;
       default:
         break;
+    }
+  }
+
+  @Override
+  public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+    try {
+      if (LOCATION_COLLECTOR_ENABLED.equals(key)) {
+        setEnabled(sharedPreferences.getBoolean(LOCATION_COLLECTOR_ENABLED, false));
+      } else if (SESSION_ROTATION_INTERVAL_MILLIS.equals(key)) {
+        setSessionRotationInterval(sharedPreferences.getLong(SESSION_ROTATION_INTERVAL_MILLIS,
+          TimeUnit.HOURS.toMillis(DEFAULT_SESSION_ROTATION_INTERVAL_HOURS)));
+      }
+    } catch (Exception ex) {
+      // In case of a ClassCastException
+      Log.e(TAG, ex.toString());
     }
   }
 }

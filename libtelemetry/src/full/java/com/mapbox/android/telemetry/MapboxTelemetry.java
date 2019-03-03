@@ -1,6 +1,7 @@
 package com.mapbox.android.telemetry;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
@@ -16,12 +17,14 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.mapbox.android.telemetry.location.LocationCollectionClient;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+
+import static com.mapbox.android.telemetry.MapboxTelemetryConstants.LOCATION_COLLECTOR_ENABLED;
+import static com.mapbox.android.telemetry.MapboxTelemetryConstants.SESSION_ROTATION_INTERVAL_MILLIS;
 
 public class MapboxTelemetry implements FullQueueCallback, EventCallback, ServiceTaskCallback {
   private static final String NON_NULL_APPLICATION_CONTEXT_REQUIRED = "Non-null application context required.";
@@ -109,7 +112,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
       startTelemetry();
       return true;
     }
-
     return false;
   }
 
@@ -118,14 +120,15 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
       stopTelemetry();
       return true;
     }
-
     return false;
   }
 
   public boolean updateSessionIdRotationInterval(SessionInterval interval) {
-    // TODO: switch to shared preferences to avoid circular dependencies
-    LocationCollectionClient.getInstance()
-      .setSessionRotationInterval(TimeUnit.HOURS.toMillis(interval.obtainInterval()));
+    SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences(applicationContext);
+    SharedPreferences.Editor editor = sharedPreferences.edit();
+    editor.putLong(SESSION_ROTATION_INTERVAL_MILLIS,
+      TimeUnit.HOURS.toMillis(interval.obtainInterval()));
+    editor.apply();
     return true;
   }
 
@@ -335,13 +338,12 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     return false;
   }
 
-  private boolean startTelemetry() {
+  private void startTelemetry() {
     TelemetryEnabler.State telemetryState = telemetryEnabler.obtainTelemetryState();
     if (TelemetryEnabler.State.ENABLED.equals(telemetryState)) {
       startAlarm();
-      return true;
+      enableLocationCollector(true);
     }
-    return false;
   }
 
   private void startAlarm() {
@@ -354,22 +356,24 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     if (clock == null) {
       clock = new Clock();
     }
-
     return clock;
   }
 
-  private boolean stopTelemetry() {
+  private void stopTelemetry() {
     TelemetryEnabler.State telemetryState = telemetryEnabler.obtainTelemetryState();
     if (TelemetryEnabler.State.ENABLED.equals(telemetryState)) {
       flushEnqueuedEvents();
       unregisterTelemetry();
-      // TODO: use shared prefs to avoid circular dependencies
-      LocationCollectionClient.getInstance().setEnabled(false);
-      return true;
+      enableLocationCollector(false);
     }
-    return false;
   }
 
+  private synchronized static void enableLocationCollector(boolean enable) {
+    SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences(applicationContext);
+    SharedPreferences.Editor editor = sharedPreferences.edit();
+    editor.putBoolean(LOCATION_COLLECTOR_ENABLED, enable);
+    editor.apply();
+  }
 
   private void sendAttachment(Event event) {
     if (checkNetworkAndParameters()) {
