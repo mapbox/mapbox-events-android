@@ -30,11 +30,11 @@ import static com.mapbox.android.telemetry.MapboxTelemetryConstants.SESSION_ROTA
  * in order to release system resources.
  */
 public class LocationCollectionClient implements SharedPreferences.OnSharedPreferenceChangeListener  {
+  public static final int DEFAULT_SESSION_ROTATION_INTERVAL_HOURS = 24;
   private static final String LOCATION_COLLECTOR_USER_AGENT = "mapbox-android-location";
   private static final String TAG = "LocationCollectionCli";
   private static final int LOCATION_COLLECTION_STATUS_UPDATED = 0;
   private static final int SESSION_ROTATION_INTERVAL_UPDATED = 1;
-  private static final int DEFAULT_SESSION_ROTATION_INTERVAL_HOURS = 24;
   private static final Object lock = new Object();
   private static LocationCollectionClient locationCollectionClient;
 
