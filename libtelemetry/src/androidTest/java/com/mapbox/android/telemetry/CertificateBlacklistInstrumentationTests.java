@@ -43,6 +43,11 @@ public class CertificateBlacklistInstrumentationTests {
     when(configurationClient.shouldUpdate()).thenReturn(true);
     Context context = InstrumentationRegistry.getTargetContext();
     this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
+    try {
+      Thread.sleep(1000);
+    } catch (InterruptedException error) {
+      error.printStackTrace();
+    }
     verify(configurationClient, times(1)).update();
   }
 
@@ -97,6 +102,11 @@ public class CertificateBlacklistInstrumentationTests {
     ConfigurationClient configurationClient = new ConfigurationClient(context,
       TelemetryUtils.createFullUserAgent("AnUserAgent", context), "anAccessToken", new OkHttpClient());
     this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
+    try {
+      Thread.sleep(1000);
+    } catch (InterruptedException error) {
+      error.printStackTrace();
+    }
     assertTrue(certificateBlacklist.isBlacklisted("test12345"));
   }
 
