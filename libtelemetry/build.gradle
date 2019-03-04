@@ -64,7 +64,4 @@ dependencies {
     androidTestImplementation dependenciesList.mockitoAndroid
     androidTestImplementation dependenciesList.testRunner
     androidTestImplementation dependenciesList.testRules
-    androidTestImplementation (dependenciesList.gmsLocation) {
-        exclude group: 'com.android.support', module: 'support-v4'
-    }
 }
