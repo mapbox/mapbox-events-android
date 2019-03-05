@@ -5,11 +5,9 @@ import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import static com.mapbox.android.core.location.Utils.isBetterLocation;
 
@@ -19,7 +17,8 @@ import static com.mapbox.android.core.location.Utils.isBetterLocation;
  * Note: fusion will not work in background mode.
  */
 class MapboxFusedLocationEngineImpl extends AndroidLocationEngineImpl {
-  private static final String TAG = "MapboxLocationEngine";
+  private static final String
+    TAG = "MapboxLocationEngine";
 
   MapboxFusedLocationEngineImpl(@NonNull Context context) {
     super(context);
@@ -96,38 +95,9 @@ class MapboxFusedLocationEngineImpl extends AndroidLocationEngineImpl {
       && currentProvider.equals(LocationManager.GPS_PROVIDER);
   }
 
-  private static final class MapboxLocationEngineCallbackTransport implements LocationListener {
-    private final LocationEngineCallback<LocationEngineResult> callback;
-    private Location currentBestLocation;
-
+  private static final class MapboxLocationEngineCallbackTransport extends LocationCallbackTransport {
     MapboxLocationEngineCallbackTransport(LocationEngineCallback<LocationEngineResult> callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-      if (isBetterLocation(location, currentBestLocation)) {
-        currentBestLocation = location;
-      }
-
-      if (callback != null) {
-        callback.onSuccess(LocationEngineResult.create(currentBestLocation));
-      }
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-      Log.d(TAG, "onStatusChanged: " + provider);
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-      Log.d(TAG, "onProviderEnabled: " + provider);
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-      Log.d(TAG, "onProviderDisabled: " + provider);
+      super(callback);
     }
   }
 }

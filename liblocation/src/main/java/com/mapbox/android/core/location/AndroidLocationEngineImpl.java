@@ -6,7 +6,6 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -139,30 +138,14 @@ class AndroidLocationEngineImpl implements LocationEngineImpl<LocationListener> 
   }
 
   @VisibleForTesting
-  static final class AndroidLocationEngineCallbackTransport implements LocationListener {
-    private final LocationEngineCallback<LocationEngineResult> callback;
-
+  static final class AndroidLocationEngineCallbackTransport extends LocationCallbackTransport {
     AndroidLocationEngineCallbackTransport(LocationEngineCallback<LocationEngineResult> callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-      callback.onSuccess(LocationEngineResult.create(location));
-    }
-
-    @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {
-      // noop
-    }
-
-    @Override
-    public void onProviderEnabled(String s) {
-      // noop
+      super(callback);
     }
 
     @Override
     public void onProviderDisabled(String s) {
+      super.onProviderDisabled(s);
       callback.onFailure(new Exception("Current provider disabled"));
     }
   }
