@@ -30,10 +30,6 @@ ext {
             // play services
             gmsLocation            : "com.google.android.gms:play-services-location:${version.gmsLocation}",
 
-            //architecture components
-            archLifecycleExtensions: "android.arch.lifecycle:extensions:${version.archLifecycleVersion}",
-            archLifecycleCompiler  : "android.arch.lifecycle:compiler:${version.archLifecycleVersion}",
-
             // okhttp
             okhttp3                : "com.squareup.okhttp3:okhttp:${version.okhttp3}",
             okhttp3Mockwebserver   : "com.squareup.okhttp3:mockwebserver:${version.okhttp3}",
@@ -52,6 +48,8 @@ ext {
             supportRecyclerView    : "com.android.support:recyclerview-v7:${version.supportLibVersion}",
             supportCardView        : "com.android.support:cardview-v7:${version.supportLibVersion}",
             supportConstraintLayout: "com.android.support.constraint:constraint-layout:${version.constraintLayout}",
+            localBroadcastManager  : "com.android.support:localbroadcastmanager:${version.supportLibVersion}",
+            supportCompat          : "com.android.support:support-compat:${version.supportLibVersion}",
 
             // instrumentation test
             testRunner             : "com.android.support.test:runner:${version.testRunnerVersion}",

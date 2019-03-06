@@ -5,8 +5,8 @@ import android.content.SharedPreferences;
 
 import org.junit.Test;
 
+import static com.mapbox.android.telemetry.MapboxTelemetryConstants.MAPBOX_SHARED_PREFERENCES;
 import static com.mapbox.android.telemetry.TelemetryEnabler.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE;
-import static com.mapbox.android.telemetry.TelemetryUtils.MAPBOX_SHARED_PREFERENCES;
 import static com.mapbox.android.telemetry.TelemetryUtils.MAPBOX_SHARED_PREFERENCE_KEY_VENDOR_ID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

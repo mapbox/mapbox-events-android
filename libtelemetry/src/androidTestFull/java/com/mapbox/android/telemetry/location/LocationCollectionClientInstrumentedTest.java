@@ -1,13 +1,9 @@
 package com.mapbox.android.telemetry.location;
 
-import android.os.MessageQueue;
 import android.support.test.InstrumentationRegistry;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -43,23 +39,6 @@ public class LocationCollectionClientInstrumentedTest {
   @Test
   public void callGetInstanceAfterInstall() {
     assertEquals(ref, LocationCollectionClient.getInstance());
-  }
-
-  @Test
-  public void verifyInterval() throws InterruptedException {
-    long interval = 2000;
-    final CountDownLatch latch = new CountDownLatch(1);
-    MessageQueue queue = ref.getSettingsLooper().getQueue();
-    queue.addIdleHandler(new MessageQueue.IdleHandler() {
-      @Override
-      public boolean queueIdle() {
-        latch.countDown();
-        return false;
-      }
-    });
-    ref.setSessionRotationInterval(interval);
-    assertTrue(latch.await(2, TimeUnit.SECONDS));
-    assertEquals(interval, ((LocationEngineControllerImpl)ref.locationEngineController).getSessionRotationInterval());
   }
 
   @Test

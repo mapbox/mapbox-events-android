@@ -7,14 +7,6 @@ import android.app.Activity;
  */
 interface LocationEngineController {
   /**
-   * Allows changing session rotation interval by providing a new
-   * version of session identifier object, which manages this policy.
-   *
-   * @param sessionIdentifier reference to the new session identified object
-   */
-  void setSessionIdentifier(SessionIdentifier sessionIdentifier);
-
-  /**
    * Called when {@link Activity#onPause()} is called.
    */
   void onPause();
