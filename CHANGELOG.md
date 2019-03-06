@@ -166,6 +166,11 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Core
 
+### v1.2.0
+- Fix GoogleLocationEngine intermittent delayed updates - [#350](https://github.com/mapbox/mapbox-events-android/pull/350)
+- Run liblocation test in CI - [#338](https://github.com/mapbox/mapbox-events-android/pull/338)
+- Mapbox unhandled exception handler - [#335](https://github.com/mapbox/mapbox-events-android/pull/335)
+
 ### v1.1.0
 - Refactor listener management infrastructure & background mode support - [#290](https://github.com/mapbox/mapbox-events-android/pull/290)
 - Add @Nullable annotation to getLastLocation method - [#264](https://github.com/mapbox/mapbox-events-android/pull/264)
