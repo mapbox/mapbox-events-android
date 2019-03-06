@@ -5,8 +5,6 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
-import android.os.Bundle;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
@@ -15,6 +13,7 @@ import com.mapbox.android.telemetry.MapboxTelemetry;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.mapbox.android.telemetry.MapboxTelemetryConstants.LOCATION_COLLECTOR_ENABLED;
 import static com.mapbox.android.telemetry.MapboxTelemetryConstants.MAPBOX_SHARED_PREFERENCES;
@@ -29,12 +28,11 @@ import static com.mapbox.android.telemetry.MapboxTelemetryConstants.SESSION_ROTA
  * Location collector can be disabled at any point of time or uninstalled completely
  * in order to release system resources.
  */
-public class LocationCollectionClient implements SharedPreferences.OnSharedPreferenceChangeListener  {
+public class LocationCollectionClient implements SharedPreferences.OnSharedPreferenceChangeListener {
   public static final int DEFAULT_SESSION_ROTATION_INTERVAL_HOURS = 24;
   private static final String LOCATION_COLLECTOR_USER_AGENT = "mapbox-android-location";
   private static final String TAG = "LocationCollectionCli";
   private static final int LOCATION_COLLECTION_STATUS_UPDATED = 0;
-  private static final int SESSION_ROTATION_INTERVAL_UPDATED = 1;
   private static final Object lock = new Object();
   private static LocationCollectionClient locationCollectionClient;
 
@@ -42,6 +40,7 @@ public class LocationCollectionClient implements SharedPreferences.OnSharedPrefe
   final LocationEngineController locationEngineController;
 
   private final AtomicBoolean isEnabled = new AtomicBoolean(false);
+  private final AtomicReference<SessionIdentifier> sessionIdentifier = new AtomicReference<>();
   private final HandlerThread settingsChangeHandlerThread;
   private final MapboxTelemetry telemetry;
   private Handler settingsChangeHandler;
@@ -49,10 +48,12 @@ public class LocationCollectionClient implements SharedPreferences.OnSharedPrefe
   @VisibleForTesting
   LocationCollectionClient(@NonNull LocationEngineController collectionController,
                            @NonNull HandlerThread handlerThread,
+                           @NonNull SessionIdentifier sessionIdentifier,
                            @NonNull SharedPreferences sharedPreferences,
                            @NonNull MapboxTelemetry telemetry) {
     this.locationEngineController = collectionController;
     this.settingsChangeHandlerThread = handlerThread;
+    this.sessionIdentifier.set(sessionIdentifier);
     this.telemetry = telemetry;
     this.settingsChangeHandlerThread.start();
     this.settingsChangeHandler = new Handler(handlerThread.getLooper()) {
@@ -61,7 +62,7 @@ public class LocationCollectionClient implements SharedPreferences.OnSharedPrefe
         handleSettingsChangeMessage(msg);
       }
     };
-    sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+    initializeSharedPreferences(sharedPreferences);
   }
 
   /**
@@ -83,8 +84,9 @@ public class LocationCollectionClient implements SharedPreferences.OnSharedPrefe
     synchronized (lock) {
       if (locationCollectionClient == null) {
         locationCollectionClient = new LocationCollectionClient(new LocationEngineControllerImpl(applicationContext,
-          LocationEngineProvider.getBestLocationEngine(applicationContext), new SessionIdentifier(defaultInterval)),
+          LocationEngineProvider.getBestLocationEngine(applicationContext)),
           new HandlerThread("LocationSettingsChangeThread"),
+          new SessionIdentifier(defaultInterval),
           applicationContext.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE),
           // Provide empty token as it is not available yet
           new MapboxTelemetry(applicationContext, "", LOCATION_COLLECTOR_USER_AGENT));
@@ -95,6 +97,7 @@ public class LocationCollectionClient implements SharedPreferences.OnSharedPrefe
 
   /**
    * Uninstall current location collection client.
+   *
    * @return true if uninstall was successful
    */
   public static boolean uninstall() {
@@ -133,12 +136,25 @@ public class LocationCollectionClient implements SharedPreferences.OnSharedPrefe
    * @param interval interval in which session id will be renewed.
    */
   void setSessionRotationInterval(long interval) {
-    Message message = Message.obtain();
-    message.what = SESSION_ROTATION_INTERVAL_UPDATED;
-    Bundle b = new Bundle();
-    b.putLong("interval", interval);
-    message.setData(b);
-    settingsChangeHandler.sendMessage(message);
+    sessionIdentifier.set(new SessionIdentifier(interval));
+  }
+
+  /**
+   * Return a session rotation interval.
+   *
+   * @return session rotation interval in milliseconds.
+   */
+  long getSessionRotationInterval() {
+    return sessionIdentifier.get().getInterval();
+  }
+
+  /**
+   * Return current session identifier.
+   *
+   * @return unique session identifier.
+   */
+  String getSessionId() {
+    return sessionIdentifier.get().getSessionId();
   }
 
   /**
@@ -172,13 +188,9 @@ public class LocationCollectionClient implements SharedPreferences.OnSharedPrefe
     return telemetry;
   }
 
-  @VisibleForTesting
-  Looper getSettingsLooper() {
-    return settingsChangeHandlerThread.getLooper();
-  }
-
   /**
    * Should only be used for testing!
+   *
    * @param mockHandler reference to mock handler
    */
   @VisibleForTesting
@@ -195,11 +207,6 @@ public class LocationCollectionClient implements SharedPreferences.OnSharedPrefe
         } else {
           locationEngineController.onDestroy();
         }
-        break;
-      case SESSION_ROTATION_INTERVAL_UPDATED:
-        Bundle bundle = msg.getData();
-        long interval = bundle.getLong("interval");
-        locationEngineController.setSessionIdentifier(new SessionIdentifier(interval));
         break;
       default:
         break;
@@ -219,5 +226,16 @@ public class LocationCollectionClient implements SharedPreferences.OnSharedPrefe
       // In case of a ClassCastException
       Log.e(TAG, ex.toString());
     }
+  }
+
+  private void initializeSharedPreferences(SharedPreferences sharedPreferences) {
+    // We ought to reset collector state at startup,
+    // this wouldn't be required in future after we migrate
+    // to automatic lifecycle management.
+    SharedPreferences.Editor editor = sharedPreferences.edit();
+    editor.putBoolean(LOCATION_COLLECTOR_ENABLED, isEnabled.get());
+    editor.putLong(SESSION_ROTATION_INTERVAL_MILLIS, sessionIdentifier.get().getInterval());
+    editor.apply();
+    sharedPreferences.registerOnSharedPreferenceChangeListener(this);
   }
 }

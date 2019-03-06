@@ -38,9 +38,10 @@ public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
         return;
       }
 
-      MapboxTelemetry telemetry = LocationCollectionClient.getInstance().getTelemetry();
+      LocationCollectionClient collectionClient =  LocationCollectionClient.getInstance();
+      MapboxTelemetry telemetry = collectionClient.getTelemetry();
+      String sessionId = collectionClient.getSessionId();
       List<Location> locations = result.getLocations();
-      String sessionId = intent.getStringExtra("session_id");
       for (Location location : locations) {
         if (isThereAnyNaN(location) || isThereAnyInfinite(location)) {
           continue;
