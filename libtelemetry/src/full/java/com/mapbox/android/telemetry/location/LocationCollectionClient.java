@@ -204,8 +204,10 @@ public class LocationCollectionClient implements SharedPreferences.OnSharedPrefe
       case LOCATION_COLLECTION_STATUS_UPDATED:
         if (isEnabled()) {
           locationEngineController.onResume();
+          telemetry.enable();
         } else {
           locationEngineController.onDestroy();
+          telemetry.disable();
         }
         break;
       default:
