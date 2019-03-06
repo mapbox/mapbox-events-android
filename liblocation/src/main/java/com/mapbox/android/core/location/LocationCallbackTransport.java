@@ -4,8 +4,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
@@ -17,33 +15,31 @@ import static com.mapbox.android.core.location.Utils.isBetterLocation;
  */
 public class LocationCallbackTransport implements LocationListener {
   private static final String TAG = "CallbackTransport";
-  private static final int MESSAGE_WHAT = 0;
+  private static final int MESSAGE_UPDATE_LOCATION = 0;
+  private static final int MESSAGE_NOT_CACHE_PERIOD = 1;
   protected final LocationEngineCallback<LocationEngineResult> callback;
   private Location currentBestLocation;
   private long fastestInterval = 0;
   private Location cacheLocation;
   private Handler handler;
-  private HandlerThread handlerThread;
 
   LocationCallbackTransport(LocationEngineCallback<LocationEngineResult> callback) {
     this.callback = callback;
-    handlerThread = new HandlerThread(this.getClass().getName());
-    handlerThread.start();
-    handler = new ThresholdHandler(handlerThread.getLooper());
+    handler = new ThresholdHandler();
   }
 
   class ThresholdHandler extends Handler {
-    ThresholdHandler(Looper looper) {
-      super(looper);
-    }
 
     @Override
     public void handleMessage(Message msg) {
-      Location location = cacheLocation;
-      cacheLocation = null;
-      if (location != null && sendLocation(location)) {
-        //send location success, start to send next one after fastestInterval period
-        this.sendEmptyMessageDelayed(MESSAGE_WHAT, fastestInterval);
+      switch (msg.what) {
+        case MESSAGE_UPDATE_LOCATION:
+          Location location = cacheLocation;
+          cacheLocation = null;
+          sendLocation(location);
+          break;
+        default:
+          break;
       }
     }
   }
@@ -51,28 +47,31 @@ public class LocationCallbackTransport implements LocationListener {
   @Override
   public void onLocationChanged(Location location) {
     if (fastestInterval != 0) {
-      if (!handler.hasMessages(MESSAGE_WHAT)) {
+      if (!handler.hasMessages(MESSAGE_UPDATE_LOCATION)) {
         //haven't send message in the previous fastInterval period, so send it directly.
         sendLocation(location);
-        handler.sendEmptyMessageDelayed(MESSAGE_WHAT, fastestInterval);
       } else {
-        //cacheLocation will always be the latest one.
-        cacheLocation = location;
+        if (!handler.hasMessages(MESSAGE_NOT_CACHE_PERIOD)) {
+          cacheLocation = location;
+        }
       }
     } else {
       sendLocation(location);
     }
   }
 
-  private boolean sendLocation(Location location) {
-    if (callback != null) {
+  private void sendLocation(Location location) {
+    if (location != null && callback != null) {
       if (isBetterLocation(location, currentBestLocation)) {
         currentBestLocation = location;
       }
       callback.onSuccess(LocationEngineResult.create(currentBestLocation));
-      return true;
+      if (fastestInterval != 0) {
+        handler.sendEmptyMessageDelayed(MESSAGE_UPDATE_LOCATION, fastestInterval);
+        //On the previous fastestInterval * 0.85 period, we will not cache location since it might not be precious.
+        handler.sendEmptyMessageDelayed(MESSAGE_NOT_CACHE_PERIOD, (long) (fastestInterval * 0.85));
+      }
     }
-    return false;
   }
 
   @Override
@@ -100,7 +99,6 @@ public class LocationCallbackTransport implements LocationListener {
   }
 
   void onDestroy() {
-    handler.removeMessages(MESSAGE_WHAT);
-    handlerThread.quit();
+    handler.removeMessages(MESSAGE_UPDATE_LOCATION);
   }
 }
