@@ -22,8 +22,9 @@ import java.util.UUID;
 
 import okio.Buffer;
 
+import static com.mapbox.android.telemetry.MapboxTelemetryConstants.MAPBOX_SHARED_PREFERENCES;
+
 public class TelemetryUtils {
-  static final String MAPBOX_SHARED_PREFERENCES = "MapboxSharedPreferences";
   static final String MAPBOX_SHARED_PREFERENCE_KEY_VENDOR_ID = "mapboxVendorId";
   private static final String KEY_META_DATA_WAKE_UP = "com.mapbox.AdjustWakeUp";
   private static final String DATE_AND_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";

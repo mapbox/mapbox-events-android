@@ -27,7 +27,7 @@ import okhttp3.ResponseBody;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.internal.tls.SslClient;
 
-import static com.mapbox.android.telemetry.TelemetryUtils.MAPBOX_SHARED_PREFERENCES;
+import static com.mapbox.android.telemetry.MapboxTelemetryConstants.MAPBOX_SHARED_PREFERENCES;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
