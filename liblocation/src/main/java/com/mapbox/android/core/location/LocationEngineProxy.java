@@ -49,6 +49,12 @@ class LocationEngineProxy<T> implements LocationEngine {
   @Override
   public void removeLocationUpdates(@NonNull LocationEngineCallback<LocationEngineResult> callback) {
     checkNotNull(callback, "callback == null");
+    if (listeners != null) {
+      T listener = listeners.get(callback);
+      if (listener instanceof LocationCallbackTransport) {
+        ((LocationCallbackTransport) listener).onDestroy();
+      }
+    }
     locationEngineImpl.removeLocationUpdates(removeListener(callback));
   }
 

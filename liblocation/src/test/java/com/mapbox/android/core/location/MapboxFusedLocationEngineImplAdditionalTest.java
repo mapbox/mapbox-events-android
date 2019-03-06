@@ -22,7 +22,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -69,55 +68,6 @@ public class MapboxFusedLocationEngineImplAdditionalTest {
       .requestLocationUpdates(anyString(), anyLong(), anyFloat(), any(LocationListener.class), any(Looper.class));
     engines.add(new LocationEngineProxy<>(new MapboxFusedLocationEngineImpl(mockContext)));
     engines.add(new LocationEngineProxy<>(new AndroidLocationEngineImpl(mockContext)));
-  }
-
-  @Test
-  public void checkFastInterval() throws InterruptedException {
-    doAnswer(new Answer<Object>() {
-      @Override
-      public Object answer(InvocationOnMock invocation) {
-        LocationListener listener = (LocationListener) invocation.getArguments()[3];
-        listener.onProviderEnabled(PROVIDER);
-        listener.onStatusChanged(PROVIDER, LocationProvider.AVAILABLE, null);
-        listener.onLocationChanged(location);
-        listener.onLocationChanged(location);
-        listener.onProviderDisabled(PROVIDER);
-        return null;
-      }
-    }).when(mockLocationManager)
-      .requestLocationUpdates(anyString(), anyLong(), anyFloat(), any(LocationListener.class), any(Looper.class));
-
-    final CountDownLatch latch = new CountDownLatch(engines.size() * 2);
-
-    LocationEngineCallback<LocationEngineResult> engineCallback = new LocationEngineCallback<LocationEngineResult>() {
-      @Override
-      public void onSuccess(LocationEngineResult result) {
-        List<Location> list = result.getLocations();
-        assertEquals(1, list.size());
-        assertEquals(1.0, list.get(0).getLatitude(), 0);
-        assertEquals(2.0, list.get(0).getLongitude(), 0);
-        latch.countDown();
-      }
-
-      @Override
-      public void onFailure(@NonNull Exception exception) {
-
-      }
-    };
-
-
-    for (LocationEngineProxy engineProxy : engines) {
-      LocationEngineRequest request = getRequest(INTERVAL, LocationEngineRequest.PRIORITY_LOW_POWER);
-      engineProxy.requestLocationUpdates(request,
-        engineCallback, mock(Looper.class));
-
-      latch.await(1, TimeUnit.SECONDS);
-
-      assertNotNull(engineProxy.removeListener(engineCallback));
-    }
-
-    assertFalse(latch.await(1, TimeUnit.SECONDS));
-
   }
 
   @Test
