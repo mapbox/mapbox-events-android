@@ -16,7 +16,13 @@ public class LocationMapper {
   }
 
   public static LocationEvent create(Location location, String sessionId) {
-    return createLocationEvent(location, "", sessionId);
+    // We don't necessarily want to poke activity manager for every single location
+    // update to fetch app state, cause it's extremely expensive to do so on main thread
+    // and we're not making use of appState internally.
+    // Going forward app state changes will be observed by metrics client and can be
+    // correlated with location events via session id.
+    // Since api-events won't accept empty string, default state to unknown
+    return createLocationEvent(location, "unknown", sessionId);
   }
 
   public LocationEvent from(Location location, String applicationState) {
