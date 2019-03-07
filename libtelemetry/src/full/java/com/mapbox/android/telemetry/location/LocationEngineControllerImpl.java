@@ -18,19 +18,11 @@ class LocationEngineControllerImpl implements LocationEngineController {
 
   private final Context applicationContext;
   private final LocationEngine locationEngine;
-  private SessionIdentifier sessionIdentifier;
 
   LocationEngineControllerImpl(@NonNull Context context,
-                               @NonNull LocationEngine locationEngine,
-                               @NonNull SessionIdentifier sessionIdentifier) {
+                               @NonNull LocationEngine locationEngine) {
     this.applicationContext = context;
     this.locationEngine = locationEngine;
-    this.sessionIdentifier = sessionIdentifier;
-  }
-
-  @Override
-  public void setSessionIdentifier(@NonNull SessionIdentifier sessionIdentifier) {
-    this.sessionIdentifier = sessionIdentifier;
   }
 
   @Override
@@ -46,10 +38,6 @@ class LocationEngineControllerImpl implements LocationEngineController {
   @Override
   public void onDestroy() {
     removeLocationUpdates();
-  }
-
-  long getSessionRotationInterval() {
-    return sessionIdentifier.getInterval();
   }
 
   private void requestLocationUpdates() {
@@ -72,7 +60,6 @@ class LocationEngineControllerImpl implements LocationEngineController {
   private PendingIntent getPendingIntent() {
     Intent intent = new Intent(applicationContext, LocationUpdatesBroadcastReceiver.class);
     intent.setAction(LocationUpdatesBroadcastReceiver.ACTION_LOCATION_UPDATED);
-    intent.putExtra("session_id", sessionIdentifier.getSessionId());
     return PendingIntent.getBroadcast(applicationContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
   }
 

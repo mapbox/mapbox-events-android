@@ -3,6 +3,8 @@ package com.mapbox.android.telemetry;
 
 import android.app.AlarmManager;
 import android.content.Context;
+import android.telephony.TelephonyManager;
+import android.view.WindowManager;
 
 import com.google.gson.GsonBuilder;
 
@@ -107,9 +109,20 @@ public class TelemetryClientMapEventsTest extends MockWebServerTest {
   }
 
   private Event obtainLoadEvent() {
-    MapLoadEvent loadEvent = mock(MapLoadEvent.class);
-    when(loadEvent.obtainType()).thenReturn(Event.Type.MAP_LOAD);
+    Context mockedContext = obtainMockedContext();
+    WindowManager mockedWindowManager = mock(WindowManager.class, RETURNS_DEEP_STUBS);
+    when(mockedContext.getSystemService(Context.WINDOW_SERVICE)).thenReturn(mockedWindowManager);
+    initializeMapboxTelemetry(mockedContext);
+    MapEventFactory mapEventFactory = new MapEventFactory();
+    Event loadEvent = mapEventFactory.createMapLoadEvent(Event.Type.MAP_LOAD);
     return loadEvent;
+  }
+
+  private Context obtainMockedContext() {
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    TelephonyManager mockedTelephonyManager = mock(TelephonyManager.class, RETURNS_DEEP_STUBS);
+    when(mockedContext.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(mockedTelephonyManager);
+    return mockedContext;
   }
 
   private void initializeMapboxTelemetry(Context context) {
@@ -124,10 +137,8 @@ public class TelemetryClientMapEventsTest extends MockWebServerTest {
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false);
-    TelemetryLocationEnabler telemetryLocationEnabler = new TelemetryLocationEnabler(false);
     new MapboxTelemetry(context, aValidAccessToken, aValidUserAgent, mockedEventsQueue, mockedTelemetryClient,
-      mockedHttpCallback, mockedSchedulerFlusher, mockedClock, true,
-      telemetryEnabler, telemetryLocationEnabler, mock(ExecutorService.class));
+      mockedHttpCallback, mockedSchedulerFlusher, mockedClock, telemetryEnabler,  mock(ExecutorService.class));
   }
 
   private MapState obtainDefaultMapState() {
@@ -138,14 +149,20 @@ public class TelemetryClientMapEventsTest extends MockWebServerTest {
   }
 
   private Event obtainClickEvent() {
-    MapClickEvent clickEvent = mock(MapClickEvent.class);
-    when(clickEvent.obtainType()).thenReturn(Event.Type.MAP_CLICK);
+    Context mockedContext = obtainMockedContext();
+    initializeMapboxTelemetry(mockedContext);
+    MapEventFactory mapEventFactory = new MapEventFactory();
+    MapState mapState = obtainDefaultMapState();
+    Event clickEvent = mapEventFactory.createMapGestureEvent(Event.Type.MAP_CLICK, mapState);
     return clickEvent;
   }
 
   private Event obtainDragendEvent() {
-    MapDragendEvent dragendEvent = mock(MapDragendEvent.class);
-    when(dragendEvent.obtainType()).thenReturn(MapDragendEvent.Type.MAP_DRAGEND);
+    Context mockedContext = obtainMockedContext();
+    initializeMapboxTelemetry(mockedContext);
+    MapEventFactory mapEventFactory = new MapEventFactory();
+    MapState mapState = obtainDefaultMapState();
+    Event dragendEvent = mapEventFactory.createMapGestureEvent(Event.Type.MAP_DRAGEND, mapState);
     return dragendEvent;
   }
 

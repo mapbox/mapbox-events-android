@@ -7,6 +7,16 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <application>
-        <service android:name="com.mapbox.android.telemetry.TelemetryService"/>
+        <provider
+            android:name=".provider.MapboxTelemetryInitProvider"
+            android:authorities="${applicationId}.mapboxtelemetryinitprovider"
+            android:exported="false"
+            android:initOrder="100"/>
+        <receiver android:name=".location.LocationUpdatesBroadcastReceiver"
+                  android:exported="true" android:permission="android.permission.ACCESS_FINE_LOCATION">
+            <intent-filter>
+                <action android:name="com.mapbox.android.telemetry.location.locationupdatespendingintent.action.LOCATION_UPDATED" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>
