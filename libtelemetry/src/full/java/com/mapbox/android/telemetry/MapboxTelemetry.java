@@ -165,7 +165,7 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     return attachmentListeners.remove(listener);
   }
 
-  boolean isQueueEmpty() {
+  public boolean isQueueEmpty() {
     return queue.isEmpty();
   }
 
