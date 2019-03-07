@@ -7,6 +7,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import java.lang.ref.WeakReference;
+
 import static com.mapbox.android.core.location.Utils.isBetterLocation;
 
 /**
@@ -21,22 +23,31 @@ public class LocationCallbackTransport implements LocationListener {
   private Location currentBestLocation;
   private long fastestInterval = 0;
   private Location cacheLocation;
-  private Handler handler;
+  private final Handler handler;
 
   LocationCallbackTransport(LocationEngineCallback<LocationEngineResult> callback) {
     this.callback = callback;
-    handler = new ThresholdHandler();
+    handler = new ThresholdHandler(this);
   }
 
-  class ThresholdHandler extends Handler {
+  static class ThresholdHandler extends Handler {
+    private final WeakReference<LocationCallbackTransport> weakReference;
+
+    ThresholdHandler(LocationCallbackTransport callbackTransport) {
+      weakReference = new WeakReference<>(callbackTransport);
+    }
 
     @Override
     public void handleMessage(Message msg) {
+      LocationCallbackTransport callbackTransport = weakReference.get();
+      if (callbackTransport == null) {
+        return;
+      }
       switch (msg.what) {
         case MESSAGE_UPDATE_LOCATION:
-          Location location = cacheLocation;
-          cacheLocation = null;
-          sendLocation(location);
+          Location location = callbackTransport.cacheLocation;
+          callbackTransport.cacheLocation = null;
+          callbackTransport.sendLocation(location);
           break;
         default:
           break;
@@ -46,17 +57,13 @@ public class LocationCallbackTransport implements LocationListener {
 
   @Override
   public void onLocationChanged(Location location) {
-    if (fastestInterval != 0) {
-      if (!handler.hasMessages(MESSAGE_UPDATE_LOCATION)) {
-        //haven't send message in the previous fastInterval period, so send it directly.
-        sendLocation(location);
-      } else {
-        if (!handler.hasMessages(MESSAGE_NOT_CACHE_PERIOD)) {
-          cacheLocation = location;
-        }
-      }
-    } else {
+    if (!handler.hasMessages(MESSAGE_UPDATE_LOCATION)) {
+      //haven't send message in the previous fastInterval period, so send it directly.
       sendLocation(location);
+    } else {
+      if (!handler.hasMessages(MESSAGE_NOT_CACHE_PERIOD)) {
+        cacheLocation = location;
+      }
     }
   }
 
@@ -100,5 +107,6 @@ public class LocationCallbackTransport implements LocationListener {
 
   void onDestroy() {
     handler.removeMessages(MESSAGE_UPDATE_LOCATION);
+    handler.removeMessages(MESSAGE_NOT_CACHE_PERIOD);
   }
 }

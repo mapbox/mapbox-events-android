@@ -2,10 +2,13 @@ package com.mapbox.android.core.location;
 
 import android.Manifest;
 import android.content.Context;
+import android.os.Looper;
+import android.support.annotation.UiThread;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,6 +37,13 @@ public class LocationEngineInstrumentedTest {
   @Rule
   public GrantPermissionRule permissionRule2 =
     GrantPermissionRule.grant(Manifest.permission.ACCESS_COARSE_LOCATION);
+
+  @Before
+  public void setUp() {
+    if (Looper.myLooper() == null) {
+      Looper.prepare();
+    }
+  }
 
   @Test
   public void getLastLocation() throws Exception {
