@@ -121,11 +121,16 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   public boolean updateSessionIdRotationInterval(SessionInterval interval) {
-    SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences(applicationContext);
-    SharedPreferences.Editor editor = sharedPreferences.edit();
-    editor.putLong(SESSION_ROTATION_INTERVAL_MILLIS,
-      TimeUnit.HOURS.toMillis(interval.obtainInterval()));
-    editor.apply();
+    final long intervalHours = interval.obtainInterval();
+    executorService.execute(new Runnable() {
+      @Override
+      public void run() {
+        SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences(applicationContext);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putLong(SESSION_ROTATION_INTERVAL_MILLIS, TimeUnit.HOURS.toMillis(intervalHours));
+        editor.apply();
+      }
+    });
     return true;
   }
 
@@ -363,11 +368,16 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     }
   }
 
-  private static synchronized void enableLocationCollector(boolean enable) {
-    SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences(applicationContext);
-    SharedPreferences.Editor editor = sharedPreferences.edit();
-    editor.putBoolean(LOCATION_COLLECTOR_ENABLED, enable);
-    editor.apply();
+  private synchronized void enableLocationCollector(final boolean enable) {
+    executorService.execute(new Runnable() {
+      @Override
+      public void run() {
+        SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences(applicationContext);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(LOCATION_COLLECTOR_ENABLED, enable);
+        editor.apply();
+      }
+    });
   }
 
   private void sendAttachment(Event event) {
