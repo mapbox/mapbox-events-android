@@ -40,33 +40,7 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
     setContentView(R.layout.activity_main);
     mapboxTelemetry = new MapboxTelemetry(this, obtainAccessToken(), LOG_TAG);
     mapboxTelemetry.updateDebugLoggingEnabled(true);
-    mapboxTelemetry.addTelemetryListener(new TelemetryListener() {
-      @SuppressLint("DefaultLocale")
-      @Override
-      public void onHttpResponse(boolean successful, int code) {
-        final String message = successful ?
-          String.format("Transmission succeed with code: %d", code) :
-          String.format("Transmission failed with code: %d", code);
-        runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
-          }
-        });
-        Log.i(LOG_TAG, message);
-      }
-
-      @Override
-      public void onHttpFailure(final String message) {
-        runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
-          }
-        });
-        Log.e(LOG_TAG, "Failure: " + message);
-      }
-    });
+    mapboxTelemetry.addTelemetryListener(new TelemetryListenerWrapper(this));
     mapboxTelemetry.push(new AppUserTurnstile("fooSdk", "1.0.0"));
     locationEngine = LocationEngineProvider.getBestLocationEngine(getApplicationContext());
     locationEngineRequest = getRequest(DEFAULT_INTERVAL);
@@ -175,6 +149,46 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
     private static String getLocationText(Location location) {
       return location == null ? "Unknown location" :
         location.getProvider() + "(" + location.getLatitude() + ", " + location.getLongitude() + ")";
+    }
+  }
+
+  private static final class TelemetryListenerWrapper implements TelemetryListener {
+    private final WeakReference<MainActivity> weakReference;
+
+    TelemetryListenerWrapper(MainActivity activity) {
+      this.weakReference = new WeakReference<>(activity);
+    }
+
+    @SuppressLint("DefaultLocale")
+    @Override
+    public void onHttpResponse(boolean successful, int code) {
+      final String message = successful ?
+        String.format("Transmission succeed with code: %d", code) :
+        String.format("Transmission failed with code: %d", code);
+      final MainActivity activity = weakReference.get();
+      if (activity != null) {
+        activity.runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
+          }
+        });
+      }
+      Log.i(LOG_TAG, message);
+    }
+
+    @Override
+    public void onHttpFailure(final String message) {
+      final MainActivity activity = weakReference.get();
+      if (activity != null) {
+        activity.runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
+          }
+        });
+      }
+      Log.e(LOG_TAG, "Failure: " + message);
     }
   }
 }
