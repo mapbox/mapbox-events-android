@@ -25,8 +25,7 @@ public class MapboxTelemetryInitProvider extends ContentProvider {
   @Override
   public boolean onCreate() {
     if (!BuildConfig.DEBUG) {
-      MapboxUncaughtExceptionHanlder.install(getContext(), MAPBOX_TELEMETRY_PACKAGE,
-        BuildConfig.MAPBOX_TELEMETRY_VERSION);
+      MapboxUncaughtExceptionHanlder.install(getContext(), MAPBOX_TELEMETRY_PACKAGE, BuildConfig.VERSION_NAME);
     }
     LocationCollectionClient.install(getContext(), TimeUnit.HOURS.toMillis(DEFAULT_SESSION_ROTATION_INTERVAL_HOURS));
     return false;

@@ -16,8 +16,6 @@ android {
         versionName version
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'proguard-consumer.pro'
-
-        buildConfigField "String", "MAPBOX_TELEMETRY_VERSION", versionName
     }
 
     buildTypes {
