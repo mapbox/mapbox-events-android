@@ -162,8 +162,7 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
     @SuppressLint("DefaultLocale")
     @Override
     public void onHttpResponse(boolean successful, int code) {
-      final String message = successful ?
-        String.format("Transmission succeed with code: %d", code) :
+      final String message = successful ? String.format("Transmission succeed with code: %d", code) :
         String.format("Transmission failed with code: %d", code);
       final MainActivity activity = weakReference.get();
       if (activity != null) {
