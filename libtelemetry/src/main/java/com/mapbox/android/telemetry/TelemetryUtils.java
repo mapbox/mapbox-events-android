@@ -139,7 +139,7 @@ public class TelemetryUtils {
   }
 
   static String obtainCellularNetworkType(Context context) {
-    TelephonyManager telephonyManager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
+    TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
     return NETWORKS.get(telephonyManager.getNetworkType());
   }
 
@@ -219,23 +219,10 @@ public class TelemetryUtils {
     return context.registerReceiver(null, filter);
   }
 
-  static boolean isServiceRunning(Class<?> serviceClass, Context context) {
-    ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-    if (manager == null) {
-      return false;
-    }
-    for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-      if (serviceClass.getName().equals(service.service.getClassName())) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   static boolean adjustWakeUpMode(Context context) {
     try {
       ApplicationInfo appInformation = context.getPackageManager().getApplicationInfo(context.getPackageName(),
-          PackageManager.GET_META_DATA);
+        PackageManager.GET_META_DATA);
       if (appInformation != null && appInformation.metaData != null) {
         boolean adjustWakeUp = appInformation.metaData.getBoolean(KEY_META_DATA_WAKE_UP, false);
         return adjustWakeUp;

@@ -17,7 +17,8 @@ ext {
             gson                : '2.8.2',
             espressoVersion     : '3.0.1',
             archLifecycleVersion: "1.1.0",
-            assertJ             : "3.11.1"
+            assertJ             : "3.11.1",
+            leakCanaryVersion   : "1.6.3"
     ]
 
     pluginVersion = [
@@ -62,6 +63,9 @@ ext {
             mockito                : "org.mockito:mockito-core:${version.mockito}",
             mockitoAndroid         : "org.mockito:mockito-android:${version.mockito}",
             assertJ                : "org.assertj:assertj-core:${version.assertJ}",
+
+            leakCanary             : "com.squareup.leakcanary:leakcanary-android:${version.leakCanaryVersion}",
+            leakCanaryNoOp         : "com.squareup.leakcanary:leakcanary-android-no-op:${version.leakCanaryVersion}"
     ]
 
     pluginDependencies = [

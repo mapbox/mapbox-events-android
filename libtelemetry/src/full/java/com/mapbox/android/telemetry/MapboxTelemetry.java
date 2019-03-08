@@ -26,7 +26,7 @@ import okhttp3.ResponseBody;
 import static com.mapbox.android.telemetry.MapboxTelemetryConstants.LOCATION_COLLECTOR_ENABLED;
 import static com.mapbox.android.telemetry.MapboxTelemetryConstants.SESSION_ROTATION_INTERVAL_MILLIS;
 
-public class MapboxTelemetry implements FullQueueCallback, EventCallback, ServiceTaskCallback {
+public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   private static final String NON_NULL_APPLICATION_CONTEXT_REQUIRED = "Non-null application context required.";
   private static AtomicReference<String> sAccessToken = new AtomicReference<>();
   private String userAgent;
@@ -87,11 +87,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   @Override
-  public void onEventReceived(Event event) {
-    pushToQueue(event);
-  }
-
-  @Override
   public void onTaskRemoved() {
     flushEnqueuedEvents();
     unregisterTelemetry();
@@ -101,6 +96,8 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     if (sendEventIfWhitelisted(event)) {
       return true;
     }
+    // FIXME: push to queue accesses shared preferences
+    // TODO: Refactor TelemetryEnabler into async shared prefs change listener
     return pushToQueue(event);
   }
 
@@ -121,11 +118,16 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   public boolean updateSessionIdRotationInterval(SessionInterval interval) {
-    SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences(applicationContext);
-    SharedPreferences.Editor editor = sharedPreferences.edit();
-    editor.putLong(SESSION_ROTATION_INTERVAL_MILLIS,
-      TimeUnit.HOURS.toMillis(interval.obtainInterval()));
-    editor.apply();
+    final long intervalHours = interval.obtainInterval();
+    executorService.execute(new Runnable() {
+      @Override
+      public void run() {
+        SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences(applicationContext);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putLong(SESSION_ROTATION_INTERVAL_MILLIS, TimeUnit.HOURS.toMillis(intervalHours));
+        editor.apply();
+      }
+    });
     return true;
   }
 
@@ -276,14 +278,10 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     try {
       ConnectivityManager connectivityManager = (ConnectivityManager)
         applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-      //noinspection MissingPermission
       NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
       if (activeNetwork == null) {
         return false;
       }
-
-      // TODO We should consider using activeNetwork.isConnectedOrConnecting() instead of activeNetwork.isConnected()
-      // See ConnectivityReceiver#isConnected(Context context)
       return activeNetwork.isConnected();
     } catch (Exception exception) {
       return false;
@@ -367,11 +365,16 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     }
   }
 
-  private static synchronized void enableLocationCollector(boolean enable) {
-    SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences(applicationContext);
-    SharedPreferences.Editor editor = sharedPreferences.edit();
-    editor.putBoolean(LOCATION_COLLECTOR_ENABLED, enable);
-    editor.apply();
+  private synchronized void enableLocationCollector(final boolean enable) {
+    executorService.execute(new Runnable() {
+      @Override
+      public void run() {
+        SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences(applicationContext);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(LOCATION_COLLECTOR_ENABLED, enable);
+        editor.apply();
+      }
+    });
   }
 
   private void sendAttachment(Event event) {

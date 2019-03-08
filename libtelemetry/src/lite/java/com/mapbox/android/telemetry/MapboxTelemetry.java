@@ -26,6 +26,7 @@ public class MapboxTelemetry {
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
+    // FIXME: Propagate certificate blacklist changes from full version
     this.configurationClient = new ConfigurationClient(context, TelemetryUtils.createFullUserAgent(userAgent,
             context), accessToken, new OkHttpClient());
     this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
@@ -38,8 +39,7 @@ public class MapboxTelemetry {
   // For testing only
   MapboxTelemetry(Context context, String accessToken, String userAgent, EventsQueue queue,
                   TelemetryClient telemetryClient, Callback httpCallback, SchedulerFlusher schedulerFlusher,
-                  Clock clock, boolean isServiceBound, TelemetryEnabler telemetryEnabler,
-                  TelemetryLocationEnabler telemetryLocationEnabler) {
+                  Clock clock, boolean isServiceBound, TelemetryEnabler telemetryEnabler) {
     initializeContext(context);
     checkRequiredParameters(accessToken, userAgent);
     this.telemetryClient = telemetryClient;

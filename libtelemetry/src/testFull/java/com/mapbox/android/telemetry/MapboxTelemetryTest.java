@@ -96,28 +96,6 @@ public class MapboxTelemetryTest {
   }
 
   @Test
-  public void checksOnEventReceivedPushCalledWhenTelemetryEnabled() throws Exception {
-    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
-    EventsQueue mockedEventsQueue = mock(EventsQueue.class);
-    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext, mockedEventsQueue,
-      TelemetryEnabler.State.ENABLED);
-    Event mockedEvent = mock(Event.class);
-    theMapboxTelemetry.onEventReceived(mockedEvent);
-    verify(mockedEventsQueue, times(1)).push(eq(mockedEvent));
-  }
-
-  @Test
-  public void checksOnEventReceivedPushNotCalledWhenTelemetryDisabled() throws Exception {
-    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
-    EventsQueue mockedEventsQueue = mock(EventsQueue.class);
-    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext, mockedEventsQueue,
-      TelemetryEnabler.State.DISABLED);
-    Event mockedEvent = mock(Event.class);
-    theMapboxTelemetry.onEventReceived(mockedEvent);
-    verify(mockedEventsQueue, never()).push(eq(mockedEvent));
-  }
-
-  @Test
   public void checksSendEventImmediatelyIfWhitelisted() throws Exception {
     Context mockedContext = obtainNetworkConnectedMockedContext();
     TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
@@ -194,14 +172,10 @@ public class MapboxTelemetryTest {
   public void checksOnFullQueueSendEventsNotCalledWhenNullTelemetryClient() throws Exception {
     Context mockedContext = obtainNetworkConnectedMockedContext();
     MapboxTelemetry.applicationContext = mockedContext;
-    String nullAccessToken = null;
-    String nullUserAgent = null;
     TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
     Callback mockedHttpCallback = mock(Callback.class);
-    TelemetryLocationEnabler telemetryLocationEnabler = new TelemetryLocationEnabler(false);
-    telemetryLocationEnabler.injectTelemetryLocationState(TelemetryLocationEnabler.LocationState.ENABLED);
-    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext, nullAccessToken,
-      nullUserAgent, mockedTelemetryClient, mockedHttpCallback);
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext, null,
+      null, mockedTelemetryClient, mockedHttpCallback);
     List<Event> mockedList = mock(List.class);
     theMapboxTelemetry.onFullQueue(mockedList);
     verify(mockedTelemetryClient, never()).sendEvents(eq(mockedList), eq(mockedHttpCallback));
@@ -214,8 +188,6 @@ public class MapboxTelemetryTest {
     String emptyUserAgent = "";
     TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
     Callback mockedHttpCallback = mock(Callback.class);
-    TelemetryLocationEnabler telemetryLocationEnabler = new TelemetryLocationEnabler(false);
-    telemetryLocationEnabler.injectTelemetryLocationState(TelemetryLocationEnabler.LocationState.ENABLED);
     MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext, emptyValidAccessToken,
       emptyUserAgent, mockedTelemetryClient, mockedHttpCallback);
     List<Event> mockedList = mock(List.class);
@@ -417,7 +389,8 @@ public class MapboxTelemetryTest {
     MapboxTelemetry mapboxTelemetry = obtainMapboxTelemetryWith(mockedExecutor);
     mapboxTelemetry.push(mock(Event.class));
     mapboxTelemetry.disable();
-    verify(mockedExecutor, times(1)).execute(any(Runnable.class));
+    // Expect to flush and disable location
+    verify(mockedExecutor, times(2)).execute(any(Runnable.class));
   }
 
   private MapboxTelemetry obtainMapboxTelemetry() {
