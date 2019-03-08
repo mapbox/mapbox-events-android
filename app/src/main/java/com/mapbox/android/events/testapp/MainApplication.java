@@ -1,7 +1,6 @@
 package com.mapbox.android.events.testapp;
 
 import android.app.Application;
-import android.os.StrictMode;
 import com.squareup.leakcanary.LeakCanary;
 
 public class MainApplication extends Application {
@@ -14,18 +13,5 @@ public class MainApplication extends Application {
       return;
     }
     LeakCanary.install(this);
-    if (BuildConfig.DEBUG) {
-      StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-        .detectDiskReads()
-        .detectDiskWrites()
-        .detectNetwork()
-        .penaltyLog()
-        .build());
-      StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-        .detectLeakedSqlLiteObjects()
-        .penaltyLog()
-        .penaltyDeath()
-        .build());
-    }
   }
 }
