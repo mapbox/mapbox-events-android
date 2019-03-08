@@ -4,6 +4,7 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Handler;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,17 +13,21 @@ public class MainAppInitProvider extends ContentProvider {
   @Override
   public boolean onCreate() {
     if (BuildConfig.DEBUG) {
-      StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-        .detectDiskReads()
-        .detectDiskWrites()
-        .detectNetwork()
-        .penaltyLog()
-        .build());
-      StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-        .detectLeakedSqlLiteObjects()
-        .penaltyLog()
-        .penaltyDeath()
-        .build());
+      new Handler().postAtFrontOfQueue(new Runnable() {
+        @Override
+        public void run() {
+          StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+            .detectAll()
+            .penaltyLog()
+            .penaltyDeath()
+            .build());
+          StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+            .detectAll()
+            .penaltyLog()
+            .penaltyDeath()
+            .build());
+        }
+      });
     }
     return false;
   }
