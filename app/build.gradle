@@ -43,6 +43,9 @@ dependencies {
     implementation dependenciesList.supportConstraintLayout
     implementation dependenciesList.gmsLocation
 
+    debugImplementation dependenciesList.leakCanary
+    releaseImplementation dependenciesList.leakCanaryNoOp
+
     testImplementation dependenciesList.junit
     testImplementation dependenciesList.mockito
     androidTestImplementation(dependenciesList.testEspressoCore, {
