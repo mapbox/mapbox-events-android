@@ -25,29 +25,20 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * This class should be instantiated on a background thread,
+ * due to few i/o operations and access to shared preferences.
+ */
 class CertificateBlacklist implements ConfigurationChangeHandler {
   private static final String LOG_TAG = "MapboxBlacklist";
   private static final String BLACKLIST_FILE = "MapboxBlacklist";
   private final Context context;
   private final List<String> revokedKeys;
-  private ConfigurationClient configurationClient;
 
   CertificateBlacklist(Context context, ConfigurationClient configurationClient) {
     this.context = context;
     this.revokedKeys = new CopyOnWriteArrayList<>();
-    this.configurationClient = configurationClient;
     configurationClient.addHandler(this);
-    new CheckThread().start();
-  }
-
-  class CheckThread extends Thread {
-    @Override
-    public void run() {
-      checkAndRetriveBlackList(context, configurationClient);
-    }
-  }
-
-  private void checkAndRetriveBlackList(Context context, ConfigurationClient configurationClient) {
     // Check if it's time to update
     if (configurationClient.shouldUpdate()) {
       configurationClient.update();
@@ -150,6 +141,7 @@ class CertificateBlacklist implements ConfigurationChangeHandler {
 
   @Override
   public void onUpdate(String data) {
+    // This callback is dispatched on background thread
     if (saveBlackList(data)) {
       retrieveBlackList(context.getFilesDir(), true);
     }

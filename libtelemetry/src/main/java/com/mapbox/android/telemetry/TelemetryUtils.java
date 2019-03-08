@@ -75,7 +75,6 @@ public class TelemetryUtils {
       put(TelephonyManager.NETWORK_TYPE_UNKNOWN, UNKNOWN);
     }
   };
-  private static SharedPreferences sharedPreferences;
 
   public static String toHumanReadableAscii(String s) {
     for (int i = 0, length = s.length(), c; i < length; i += Character.charCount(c)) {
@@ -186,10 +185,7 @@ public class TelemetryUtils {
   }
 
   static SharedPreferences obtainSharedPreferences(Context context) {
-    if (sharedPreferences == null) {
-      sharedPreferences = context.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
-    }
-    return sharedPreferences;
+    return context.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
   }
 
   private static String updateVendorId() {
@@ -221,19 +217,6 @@ public class TelemetryUtils {
   private static Intent registerBatteryUpdates(Context context) {
     IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
     return context.registerReceiver(null, filter);
-  }
-
-  static boolean isServiceRunning(Class<?> serviceClass, Context context) {
-    ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-    if (manager == null) {
-      return false;
-    }
-    for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-      if (serviceClass.getName().equals(service.service.getClassName())) {
-        return true;
-      }
-    }
-    return false;
   }
 
   static boolean adjustWakeUpMode(Context context) {

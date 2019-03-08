@@ -276,14 +276,10 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     try {
       ConnectivityManager connectivityManager = (ConnectivityManager)
         applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-      //noinspection MissingPermission
       NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
       if (activeNetwork == null) {
         return false;
       }
-
-      // TODO We should consider using activeNetwork.isConnectedOrConnecting() instead of activeNetwork.isConnected()
-      // See ConnectivityReceiver#isConnected(Context context)
       return activeNetwork.isConnected();
     } catch (Exception exception) {
       return false;
