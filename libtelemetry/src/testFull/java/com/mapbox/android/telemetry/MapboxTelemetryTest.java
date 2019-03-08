@@ -96,28 +96,6 @@ public class MapboxTelemetryTest {
   }
 
   @Test
-  public void checksOnEventReceivedPushCalledWhenTelemetryEnabled() throws Exception {
-    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
-    EventsQueue mockedEventsQueue = mock(EventsQueue.class);
-    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext, mockedEventsQueue,
-      TelemetryEnabler.State.ENABLED);
-    Event mockedEvent = mock(Event.class);
-    theMapboxTelemetry.onEventReceived(mockedEvent);
-    verify(mockedEventsQueue, times(1)).push(eq(mockedEvent));
-  }
-
-  @Test
-  public void checksOnEventReceivedPushNotCalledWhenTelemetryDisabled() throws Exception {
-    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
-    EventsQueue mockedEventsQueue = mock(EventsQueue.class);
-    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext, mockedEventsQueue,
-      TelemetryEnabler.State.DISABLED);
-    Event mockedEvent = mock(Event.class);
-    theMapboxTelemetry.onEventReceived(mockedEvent);
-    verify(mockedEventsQueue, never()).push(eq(mockedEvent));
-  }
-
-  @Test
   public void checksSendEventImmediatelyIfWhitelisted() throws Exception {
     Context mockedContext = obtainNetworkConnectedMockedContext();
     TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);

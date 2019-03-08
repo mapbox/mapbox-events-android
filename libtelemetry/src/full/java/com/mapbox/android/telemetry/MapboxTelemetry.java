@@ -26,7 +26,7 @@ import okhttp3.ResponseBody;
 import static com.mapbox.android.telemetry.MapboxTelemetryConstants.LOCATION_COLLECTOR_ENABLED;
 import static com.mapbox.android.telemetry.MapboxTelemetryConstants.SESSION_ROTATION_INTERVAL_MILLIS;
 
-public class MapboxTelemetry implements FullQueueCallback, EventCallback, ServiceTaskCallback {
+public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   private static final String NON_NULL_APPLICATION_CONTEXT_REQUIRED = "Non-null application context required.";
   private static AtomicReference<String> sAccessToken = new AtomicReference<>();
   private String userAgent;
@@ -87,11 +87,6 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
   }
 
   @Override
-  public void onEventReceived(Event event) {
-    pushToQueue(event);
-  }
-
-  @Override
   public void onTaskRemoved() {
     flushEnqueuedEvents();
     unregisterTelemetry();
@@ -101,6 +96,8 @@ public class MapboxTelemetry implements FullQueueCallback, EventCallback, Servic
     if (sendEventIfWhitelisted(event)) {
       return true;
     }
+    // FIXME: push to queue accesses shared preferences
+    // TODO: Refactor TelemetryEnabler into async shared prefs change listener
     return pushToQueue(event);
   }
 
