@@ -32,9 +32,6 @@ class LocationEngineProxy<T> implements LocationEngine {
     checkNotNull(request, "request == null");
     checkNotNull(callback, "callback == null");
     T listener = getListener(callback);
-    if (listener instanceof LocationCallbackTransport) {
-      ((LocationCallbackTransport) listener).setFastInterval(request.getFastestInterval());
-    }
     locationEngineImpl.requestLocationUpdates(request, listener,
       looper == null ? Looper.getMainLooper() : looper);
   }
@@ -49,12 +46,6 @@ class LocationEngineProxy<T> implements LocationEngine {
   @Override
   public void removeLocationUpdates(@NonNull LocationEngineCallback<LocationEngineResult> callback) {
     checkNotNull(callback, "callback == null");
-    if (listeners != null) {
-      T listener = listeners.get(callback);
-      if (listener instanceof LocationCallbackTransport) {
-        ((LocationCallbackTransport) listener).onDestroy();
-      }
-    }
     locationEngineImpl.removeLocationUpdates(removeListener(callback));
   }
 

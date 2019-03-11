@@ -2,8 +2,8 @@ package com.mapbox.android.core.location;
 
 import android.Manifest;
 import android.content.Context;
+import android.os.HandlerThread;
 import android.os.Looper;
-import android.support.annotation.UiThread;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -17,6 +17,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 
@@ -86,6 +87,63 @@ public class LocationEngineInstrumentedTest {
 
     LocationEngineResult result = resultRef.get();
     assertNotNull(result.getLastLocation());
+    engine.removeLocationUpdates(callback);
+  }
+
+  @Test
+  public void checkCallLooperNewThread() throws InterruptedException {
+    LocationEngine engine = getAndroidEngine();
+    final CountDownLatch latch = new CountDownLatch(1);
+    final AtomicReference<LocationEngineResult> resultRef = new AtomicReference<>();
+    final HandlerThread thread = new HandlerThread("tes");
+    thread.start();
+    final Looper looper = thread.getLooper();
+    LocationEngineCallback<LocationEngineResult> callback = new LocationEngineCallback<LocationEngineResult>() {
+      @Override
+      public void onSuccess(LocationEngineResult result) {
+        latch.countDown();
+        Looper actual = Looper.myLooper();
+        assertEquals(looper, actual);
+      }
+
+      @Override
+      public void onFailure(Exception exception) {
+        latch.countDown();
+        exception.printStackTrace();
+      }
+    };
+    engine.requestLocationUpdates(getRequest(INTERVAL, LocationEngineRequest.PRIORITY_LOW_POWER),
+      callback, looper);
+
+    assertTrue(latch.await(TIMEOUT, TimeUnit.SECONDS));
+
+    engine.removeLocationUpdates(callback);
+  }
+
+  @Test
+  public void checkCallLooperMainThread() throws InterruptedException {
+    LocationEngine engine = getAndroidEngine();
+    final CountDownLatch latch = new CountDownLatch(1);
+    final AtomicReference<LocationEngineResult> resultRef = new AtomicReference<>();
+    LocationEngineCallback<LocationEngineResult> callback = new LocationEngineCallback<LocationEngineResult>() {
+      @Override
+      public void onSuccess(LocationEngineResult result) {
+        latch.countDown();
+        Looper actual = Looper.myLooper();
+        assertEquals(Looper.getMainLooper(), actual);
+      }
+
+      @Override
+      public void onFailure(Exception exception) {
+        latch.countDown();
+        exception.printStackTrace();
+      }
+    };
+    engine.requestLocationUpdates(getRequest(INTERVAL, LocationEngineRequest.PRIORITY_LOW_POWER),
+      callback, Looper.getMainLooper());
+
+    assertTrue(latch.await(TIMEOUT, TimeUnit.SECONDS));
+
     engine.removeLocationUpdates(callback);
   }
 

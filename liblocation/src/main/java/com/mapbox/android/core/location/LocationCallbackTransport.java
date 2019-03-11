@@ -4,6 +4,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
@@ -23,17 +24,17 @@ public class LocationCallbackTransport implements LocationListener {
   private Location currentBestLocation;
   private long fastestInterval = 0;
   private Location cacheLocation;
-  private final Handler handler;
+  private Handler handler;
 
   LocationCallbackTransport(LocationEngineCallback<LocationEngineResult> callback) {
     this.callback = callback;
-    handler = new ThresholdHandler(this);
   }
 
-  static class ThresholdHandler extends Handler {
+  private static class ThresholdHandler extends Handler {
     private final WeakReference<LocationCallbackTransport> weakReference;
 
-    ThresholdHandler(LocationCallbackTransport callbackTransport) {
+    ThresholdHandler(Looper looper, LocationCallbackTransport callbackTransport) {
+      super(looper);
       weakReference = new WeakReference<>(callbackTransport);
     }
 
@@ -57,6 +58,9 @@ public class LocationCallbackTransport implements LocationListener {
 
   @Override
   public void onLocationChanged(Location location) {
+    if (handler == null) {
+      handler = new ThresholdHandler(Looper.myLooper(), LocationCallbackTransport.this);
+    }
     if (!handler.hasMessages(MESSAGE_UPDATE_LOCATION)) {
       //haven't send message in the previous fastInterval period, so send it directly.
       sendLocation(location);
@@ -106,7 +110,9 @@ public class LocationCallbackTransport implements LocationListener {
   }
 
   void onDestroy() {
-    handler.removeMessages(MESSAGE_UPDATE_LOCATION);
-    handler.removeMessages(MESSAGE_NOT_CACHE_PERIOD);
+    if (handler != null) {
+      handler.removeMessages(MESSAGE_UPDATE_LOCATION);
+      handler.removeMessages(MESSAGE_NOT_CACHE_PERIOD);
+    }
   }
 }

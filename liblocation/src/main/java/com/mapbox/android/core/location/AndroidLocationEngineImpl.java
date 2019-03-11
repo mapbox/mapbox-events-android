@@ -67,6 +67,7 @@ class AndroidLocationEngineImpl implements LocationEngineImpl<LocationListener> 
                                      @Nullable Looper looper) throws SecurityException {
     // Pick best provider only if user has not explicitly chosen passive mode
     currentProvider = getBestProvider(request.getPriority());
+    ((LocationCallbackTransport) listener).setFastInterval(request.getFastestInterval());
     locationManager.requestLocationUpdates(currentProvider, request.getInterval(), request.getDisplacemnt(),
       listener, looper);
   }
@@ -83,6 +84,7 @@ class AndroidLocationEngineImpl implements LocationEngineImpl<LocationListener> 
   @Override
   public void removeLocationUpdates(@NonNull LocationListener listener) {
     if (listener != null) {
+      ((LocationCallbackTransport) listener).onDestroy();
       locationManager.removeUpdates(listener);
     }
   }
