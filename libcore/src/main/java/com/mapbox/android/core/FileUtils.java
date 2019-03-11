@@ -14,6 +14,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.Comparator;
 
 /**
  * File utility class
@@ -97,6 +99,48 @@ public final class FileUtils {
     boolean deleted = file.delete();
     if (!deleted) {
       Log.w(LOG_TAG, "Could not delete file: " + file);
+    }
+  }
+
+  /**
+   * Return list of all files in the directory.
+   *
+   * @param context application context.
+   * @param directory target directory on file system
+   * @return list of files in the directory or empty list if directory is empty.
+   */
+  @NonNull
+  public static File[] listAllFiles(@NonNull Context context, @NonNull String directory) {
+    File[] files = context.getDir(directory, Context.MODE_PRIVATE).listFiles();
+    return files != null ? files : new File[0];
+  }
+
+  /**
+   * Delete first n files sorted by property.
+   *
+   * @param files    list of files to delete.
+   * @param sortedBy sorting comparator.
+   * @param numFiles number of files from list to delete.
+   */
+  public static void deleteFirst(@NonNull File[] files, @NonNull Comparator<File> sortedBy, int numFiles) {
+    Arrays.sort(files, sortedBy);
+    int size = Math.min(files.length, numFiles);
+    for (int i = 0; i < size; i++) {
+      if (!files[i].delete()) {
+        Log.w(LOG_TAG, "Failed to delete file: " + files[i]);
+      }
+    }
+  }
+
+  /**
+   *  Comparator for ordering files from oldest to newest, based of their modified date.
+   */
+  public static final class LastModifiedComparator implements Comparator<File> {
+    @Override
+    public int compare(File o1, File o2) {
+      long o1LastModified = o1.lastModified();
+      long o2LastModified = o2.lastModified();
+      return o1LastModified < o2LastModified ? -1 : (o1LastModified == o2LastModified ? 0 : 1);
     }
   }
 }

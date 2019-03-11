@@ -32,6 +32,7 @@ public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionH
   private static final String TAG = "MbUncaughtExcHandler";
   private static final String CRASH_FILENAME_FORMAT = "%s/%s.crash";
   private static final int DEFAULT_EXCEPTION_CHAIN_DEPTH = 3;
+  private static final int DEFAULT_MAX_REPORTS = 10;
 
   private final Thread.UncaughtExceptionHandler defaultExceptionHandler;
   private final Context applicationContext;
@@ -97,11 +98,8 @@ public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionH
           .addCausalChain(causalChain)
           .build();
 
-        File directory = FileUtils.getFile(applicationContext, mapboxPackage);
-        if (!directory.exists()) {
-          directory.mkdir();
-        }
-        // TODO: we should keep max 10 crashes and delete older
+        ensureDirectoryWritable(applicationContext, mapboxPackage);
+
         File file = FileUtils.getFile(applicationContext, getReportFileName(mapboxPackage, report.getDateString()));
         FileUtils.writeToFile(file, report.toJson());
       } catch (Exception ex) {
@@ -178,6 +176,19 @@ public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionH
 
   private boolean isMidOrLowLevelException(int level) {
     return level >= exceptionChainDepth;
+  }
+
+  private static void ensureDirectoryWritable(@NonNull Context context, @NonNull String dirPath) {
+    File directory = FileUtils.getFile(context, dirPath);
+    if (!directory.exists()) {
+      directory.mkdir();
+    }
+
+    // Cleanup directory if we've reached our max limit
+    if (directory.length() >= DEFAULT_MAX_REPORTS) {
+      FileUtils.deleteFirst(FileUtils.listAllFiles(context, dirPath),
+        new FileUtils.LastModifiedComparator(), DEFAULT_MAX_REPORTS - 1);
+    }
   }
 
   @VisibleForTesting
