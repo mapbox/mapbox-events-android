@@ -17,8 +17,7 @@ import static com.mapbox.android.core.location.Utils.isBetterLocation;
  * Note: fusion will not work in background mode.
  */
 class MapboxFusedLocationEngineImpl extends AndroidLocationEngineImpl {
-  private static final String
-    TAG = "MapboxLocationEngine";
+  private static final String TAG = "MapboxLocationEngine";
 
   MapboxFusedLocationEngineImpl(@NonNull Context context) {
     super(context);

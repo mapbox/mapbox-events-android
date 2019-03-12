@@ -1,21 +1,20 @@
 package com.mapbox.android.events.testapp;
 
 import android.annotation.SuppressLint;
-import android.os.Bundle;
-import android.os.Looper;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.os.Bundle;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineCallback;
+import com.mapbox.android.core.location.LocationEngineResult;
 import com.mapbox.android.core.location.LocationEngineProvider;
 import com.mapbox.android.core.location.LocationEngineRequest;
-import com.mapbox.android.core.location.LocationEngineResult;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.android.telemetry.AppUserTurnstile;
@@ -98,31 +97,6 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
     boolean permissionsGranted = PermissionsManager.areLocationPermissionsGranted(this);
     if (permissionsGranted) {
       mapboxTelemetry.enable();
-      LocationEngine locationEngine = LocationEngineProvider.getBestLocationEngine(this);
-      locationEngine.requestLocationUpdates(
-        new LocationEngineRequest.Builder(750)
-          .setFastestInterval(750)
-          .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
-          .build(),
-        new LocationEngineCallback<LocationEngineResult>() {
-
-          private long last = 0;
-
-          @Override
-          public void onSuccess(LocationEngineResult result) {
-            long current = System.currentTimeMillis();
-            long diff = current - last;
-            last = current;
-            String msg = String.valueOf(diff);
-            Log.d("TEST", msg);
-          }
-
-          @Override
-          public void onFailure(@NonNull Exception exception) {
-          }
-        },
-        Looper.getMainLooper());
-
     } else {
       PermissionsManager permissionsManager = new PermissionsManager(this);
       permissionsManager.requestLocationPermissions(this);

@@ -8,15 +8,13 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
-import java.lang.ref.WeakReference;
-
 import static com.mapbox.android.core.location.Utils.isBetterLocation;
 
 /**
  * A base wrap class for LocationListener, contains the logic of downsample
  * location update frequent.
  */
-public class LocationCallbackTransport implements LocationListener {
+class LocationCallbackTransport implements LocationListener {
   private static final String TAG = "CallbackTransport";
   private static final int MESSAGE_UPDATE_LOCATION = 0;
   private static final int MESSAGE_NOT_CACHE_PERIOD = 1;
@@ -31,16 +29,16 @@ public class LocationCallbackTransport implements LocationListener {
   }
 
   private static class ThresholdHandler extends Handler {
-    private final WeakReference<LocationCallbackTransport> weakReference;
+    private LocationCallbackTransport locationCallbackTransport;
 
     ThresholdHandler(Looper looper, LocationCallbackTransport callbackTransport) {
       super(looper);
-      weakReference = new WeakReference<>(callbackTransport);
+      locationCallbackTransport = callbackTransport;
     }
 
     @Override
     public void handleMessage(Message msg) {
-      LocationCallbackTransport callbackTransport = weakReference.get();
+      LocationCallbackTransport callbackTransport = locationCallbackTransport;
       if (callbackTransport == null) {
         return;
       }
@@ -109,7 +107,7 @@ public class LocationCallbackTransport implements LocationListener {
     this.fastestInterval = fastestInterval;
   }
 
-  void onDestroy() {
+  void cleanUp() {
     if (handler != null) {
       handler.removeMessages(MESSAGE_UPDATE_LOCATION);
       handler.removeMessages(MESSAGE_NOT_CACHE_PERIOD);

@@ -31,8 +31,7 @@ class LocationEngineProxy<T> implements LocationEngine {
                                      @Nullable Looper looper) throws SecurityException {
     checkNotNull(request, "request == null");
     checkNotNull(callback, "callback == null");
-    T listener = getListener(callback);
-    locationEngineImpl.requestLocationUpdates(request, listener,
+    locationEngineImpl.requestLocationUpdates(request,  getListener(callback),
       looper == null ? Looper.getMainLooper() : looper);
   }
 

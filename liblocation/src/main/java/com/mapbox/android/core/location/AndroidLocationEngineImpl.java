@@ -83,10 +83,8 @@ class AndroidLocationEngineImpl implements LocationEngineImpl<LocationListener> 
 
   @Override
   public void removeLocationUpdates(@NonNull LocationListener listener) {
-    if (listener != null) {
-      ((LocationCallbackTransport) listener).onDestroy();
-      locationManager.removeUpdates(listener);
-    }
+    ((LocationCallbackTransport) listener).cleanUp();
+    locationManager.removeUpdates(listener);
   }
 
   @Override
