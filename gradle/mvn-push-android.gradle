@@ -116,9 +116,6 @@ afterEvaluate { project ->
                     // Hacking with telem pom due to bug in gradle uploadArchives task
                     if (isTelem()) {
                         def allDependencies = configurations.implementation.allDependencies
-                        if (!isLiteRelease()) {
-                            allDependencies += configurations.fullImplementation.allDependencies
-                        }
 
                         dependencies {
                             for (def dep: allDependencies) {
