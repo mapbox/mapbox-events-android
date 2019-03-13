@@ -26,4 +26,10 @@ public final class MapboxTelemetryConstants {
    * Intent broadcast when valid token becomes available
    */
   public static final String ACTION_TOKEN_CHANGED = "com.mapbox.android.telemetry.action.TOKEN_CHANGED";
+
+  /**
+   * Mapbox telemetry package name (reserved for crash reporting)
+   */
+  public static final String MAPBOX_TELEMETRY_PACKAGE = "com.mapbox.android.telemetry";
+
 }

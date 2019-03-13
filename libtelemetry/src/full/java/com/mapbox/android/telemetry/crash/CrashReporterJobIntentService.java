@@ -6,6 +6,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.JobIntentService;
 import android.util.Log;
 
+import static com.mapbox.android.telemetry.MapboxTelemetryConstants.MAPBOX_TELEMETRY_PACKAGE;
+
 /**
  * This is a background job that sends crash events to the telemetry endpoint
  * at startup.
@@ -22,20 +24,26 @@ public final class CrashReporterJobIntentService extends JobIntentService {
   @Override
   protected void onHandleWork(@NonNull Intent intent) {
     Log.d(LOG_TAG, "onHandleWork");
-    CrashReporterClient client = CrashReporterClient.create(getApplicationContext());
-    // Check if crash reporter enabled
-    if (!client.isEnabled()) {
-      Log.w(LOG_TAG, "Crash reporter is disabled");
-      return;
-    }
+    try {
+      CrashReporterClient client = CrashReporterClient
+        .create(getApplicationContext())
+        .load(MAPBOX_TELEMETRY_PACKAGE);
 
-    while (client.hasNextEvent()) {
-      CrashEvent event = client.nextEvent();
-      if (client.isDuplicate(event)) {
-        Log.d(LOG_TAG, "Skip duplicate crash in this batch: " + event.getHash());
-        continue;
+      if (!client.isEnabled()) {
+        Log.w(LOG_TAG, "Crash reporter is disabled");
+        return;
       }
-      client.send(event);
+
+      while (client.hasNextEvent()) {
+        CrashEvent event = client.nextEvent();
+        if (client.isDuplicate(event)) {
+          Log.d(LOG_TAG, "Skip duplicate crash in this batch: " + event.getHash());
+          continue;
+        }
+        client.send(event);
+      }
+    } catch (Throwable throwable) {
+      // TODO: log silent crash
     }
   }
 }

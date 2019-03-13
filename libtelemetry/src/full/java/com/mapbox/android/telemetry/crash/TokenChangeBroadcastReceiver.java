@@ -27,9 +27,13 @@ public class TokenChangeBroadcastReceiver extends BroadcastReceiver {
 
   @Override
   public void onReceive(Context context, Intent intent) {
-    // Start background job
-    CrashReporterJobIntentService.enqueueWork(context);
-    // Unregister receiver - we need it once at startup
-    LocalBroadcastManager.getInstance(context).unregisterReceiver(this);
+    try {
+      // Start background job
+      CrashReporterJobIntentService.enqueueWork(context);
+      // Unregister receiver - we need it once at startup
+      LocalBroadcastManager.getInstance(context).unregisterReceiver(this);
+    } catch (Throwable throwable) {
+      // TODO: log silent crash
+    }
   }
 }
