@@ -21,4 +21,9 @@ public final class MapboxTelemetryConstants {
    * Location collector session rotation interval in milliseconds
    */
   public static final String SESSION_ROTATION_INTERVAL_MILLIS = "mapboxSessionRotationInterval";
+
+  /**
+   * Intent broadcast when valid token becomes available
+   */
+  public static final String ACTION_TOKEN_CHANGED = "com.mapbox.android.telemetry.action.TOKEN_CHANGED";
 }

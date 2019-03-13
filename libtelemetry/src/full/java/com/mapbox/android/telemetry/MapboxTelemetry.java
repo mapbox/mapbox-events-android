@@ -1,6 +1,7 @@
 package com.mapbox.android.telemetry;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -17,6 +18,8 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
+import android.support.annotation.NonNull;
+import android.support.v4.content.LocalBroadcastManager;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -28,7 +31,7 @@ import static com.mapbox.android.telemetry.MapboxTelemetryConstants.SESSION_ROTA
 
 public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   private static final String NON_NULL_APPLICATION_CONTEXT_REQUIRED = "Non-null application context required.";
-  private static AtomicReference<String> sAccessToken = new AtomicReference<>();
+  private static AtomicReference<String> sAccessToken = new AtomicReference<>("");
   private String userAgent;
   private final EventsQueue queue;
   private TelemetryClient telemetryClient;
@@ -45,7 +48,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
-    sAccessToken.set(accessToken);
+    setAccessToken(context, accessToken);
     this.userAgent = userAgent;
     AlarmReceiver alarmReceiver = obtainAlarmReceiver();
     this.schedulerFlusher = new SchedulerFlusherFactory(applicationContext, alarmReceiver).supply();
@@ -64,7 +67,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
                   TelemetryClient telemetryClient, Callback httpCallback, SchedulerFlusher schedulerFlusher,
                   Clock clock, TelemetryEnabler telemetryEnabler, ExecutorService executorService) {
     initializeContext(context);
-    sAccessToken.set(accessToken);
+    setAccessToken(context, accessToken);
     this.userAgent = userAgent;
     this.telemetryClient = telemetryClient;
     this.schedulerFlusher = schedulerFlusher;
@@ -375,6 +378,16 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
         editor.apply();
       }
     });
+  }
+
+  private static synchronized void setAccessToken(@NonNull Context context, @NonNull String accessToken) {
+    if (TelemetryUtils.isEmpty(accessToken)) {
+      return;
+    }
+    if (sAccessToken.getAndSet(accessToken).isEmpty()) {
+      LocalBroadcastManager.getInstance(context)
+        .sendBroadcast(new Intent(MapboxTelemetryConstants.ACTION_TOKEN_CHANGED));
+    }
   }
 
   private void sendAttachment(Event event) {
