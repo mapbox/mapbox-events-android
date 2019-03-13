@@ -7,8 +7,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
@@ -317,25 +317,29 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     schedulerFlusher.unregister();
   }
 
-  private boolean sendEventIfWhitelisted(Event event) {
-    if (Event.Type.TURNSTILE.equals(event.obtainType())) {
-      final List<Event> appUserTurnstile = new ArrayList<>(1);
-      appUserTurnstile.add(event);
-      executorService.execute(new Runnable() {
-        @Override
-        public void run() {
-          sendEventsIfPossible(appUserTurnstile);
-        }
-      });
-      return true;
+  private synchronized boolean sendEventIfWhitelisted(Event event) {
+    boolean isEventSent = false;
+    switch(event.obtainType()) {
+      case TURNSTILE:
+      case CRASH:
+        final List<Event> events = Collections.singletonList(event);
+        executorService.execute(new Runnable() {
+          @Override
+          public void run() {
+            sendEventsIfPossible(events);
+          }
+        });
+        isEventSent = true;
+        break;
+      case VIS_ATTACHMENT:
+        // Not super concerned about vision, since they most likely doing i/o on bg thread anyways
+        sendAttachment(event);
+        isEventSent = true;
+        break;
+      default:
+        break;
     }
-    // Not super concerned about vision, since they most likely doing i/o on bg thread anyways
-    if (Event.Type.VIS_ATTACHMENT.equals((event.obtainType()))) {
-      sendAttachment(event);
-      return true;
-    }
-
-    return false;
+    return isEventSent;
   }
 
   private void startTelemetry() {

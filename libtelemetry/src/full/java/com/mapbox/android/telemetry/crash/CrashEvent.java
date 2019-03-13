@@ -2,16 +2,57 @@ package com.mapbox.android.telemetry.crash;
 
 import android.annotation.SuppressLint;
 import android.os.Parcel;
+import android.text.TextUtils;
 import com.mapbox.android.telemetry.Event;
 
+/**
+ * This class is temporary and exists only
+ * to comply with legacy telemetry interface,
+ * we should open up a way to send raw json data to
+ * the telemetry endpoint in the future to avoid,
+ * back and forth json serialization overhead.
+ */
 @SuppressLint("ParcelCreator")
 class CrashEvent extends Event {
+  private final String event;
+  private final String created;
+
+  private String sdkIdentifier;
+  private String sdkVersion;
+  private String osVersion;
+  private String model;
+  private String device;
+  private String isSilent;
+  private String stackTraceHash;
+  private String stackTrace;
+  private String threadDetails;
+  private String appId;
+  private String appVersion;
+
+  CrashEvent(String event, String created) {
+    this.event = event;
+    this.created = created;
+  }
+
+  /**
+   * Unfortunately, we have no choice but
+   * to override deprecated method to dispatch
+   * crash events immediately for delivery to
+   * the telemetry endpoint
+   *
+   * @return crash event type.
+   */
+  @Override
+  protected Type obtainType() {
+    return Type.CRASH;
+  }
+
   String getHash() {
-    return null;
+    return stackTraceHash;
   }
 
   boolean isValid() {
-    return false;
+    return !(TextUtils.isEmpty(event) || TextUtils.isEmpty(created) || TextUtils.isEmpty(stackTraceHash));
   }
 
   @Override

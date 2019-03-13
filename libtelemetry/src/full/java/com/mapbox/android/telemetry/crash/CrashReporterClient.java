@@ -127,7 +127,7 @@ final class CrashReporterClient {
     try {
       SharedPreferences.Editor editor = sharedPreferences.edit();
       editor.putString(MAPBOX_LAST_CRASH_REPORTER, hash);
-      editor.commit();
+      editor.apply();
     } catch (Exception ex) {
       // Catch ClassCastException
     }
@@ -159,7 +159,7 @@ final class CrashReporterClient {
     try {
       return gson.fromJson(json, CrashEvent.class);
     } catch (JsonSyntaxException jse) {
-      return new CrashEvent();
+      return new CrashEvent(null, null);
     }
   }
 }
