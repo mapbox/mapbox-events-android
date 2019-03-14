@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import com.mapbox.android.core.location.LocationEngineProvider;
+import com.mapbox.android.telemetry.BuildConfig;
 import com.mapbox.android.telemetry.MapboxTelemetry;
 
 import java.util.concurrent.TimeUnit;
@@ -89,7 +90,8 @@ public class LocationCollectionClient implements SharedPreferences.OnSharedPrefe
           new SessionIdentifier(defaultInterval),
           applicationContext.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE),
           // Provide empty token as it is not available yet
-          new MapboxTelemetry(applicationContext, "", LOCATION_COLLECTOR_USER_AGENT));
+          new MapboxTelemetry(applicationContext, "",
+            String.format("%s/%s", LOCATION_COLLECTOR_USER_AGENT, BuildConfig.VERSION_NAME)));
       }
     }
     return locationCollectionClient;
