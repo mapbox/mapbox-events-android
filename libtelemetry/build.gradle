@@ -52,8 +52,7 @@ dependencies {
     implementation dependenciesList.supportAnnotation
     implementation project(':libcore')
 
-    fullImplementation dependenciesList.localBroadcastManager
-    fullImplementation dependenciesList.supportCompat
+    fullImplementation dependenciesList.supportCoreUtils
 
     testImplementation dependenciesList.junit
     testImplementation dependenciesList.mockito
