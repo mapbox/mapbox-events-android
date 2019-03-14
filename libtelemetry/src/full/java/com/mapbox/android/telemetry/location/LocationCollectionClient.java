@@ -85,7 +85,7 @@ public class LocationCollectionClient implements SharedPreferences.OnSharedPrefe
     synchronized (lock) {
       if (locationCollectionClient == null) {
         locationCollectionClient = new LocationCollectionClient(new LocationEngineControllerImpl(applicationContext,
-          LocationEngineProvider.getBestLocationEngine(applicationContext)),
+          LocationEngineProvider.getBestLocationEngine(applicationContext), new LocationUpdatesBroadcastReceiver()),
           new HandlerThread("LocationSettingsChangeThread"),
           new SessionIdentifier(defaultInterval),
           applicationContext.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE),
