@@ -14,9 +14,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 
+import android.util.Log;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -27,6 +29,7 @@ import static com.mapbox.android.telemetry.MapboxTelemetryConstants.LOCATION_COL
 import static com.mapbox.android.telemetry.MapboxTelemetryConstants.SESSION_ROTATION_INTERVAL_MILLIS;
 
 public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
+  private static final String LOG_TAG = "MapboxTelemetry";
   private static final String NON_NULL_APPLICATION_CONTEXT_REQUIRED = "Non-null application context required.";
   private static AtomicReference<String> sAccessToken = new AtomicReference<>();
   private String userAgent;
@@ -119,7 +122,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
 
   public boolean updateSessionIdRotationInterval(SessionInterval interval) {
     final long intervalHours = interval.obtainInterval();
-    executorService.execute(new Runnable() {
+    executeRunnable(new Runnable() {
       @Override
       public void run() {
         SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences(applicationContext);
@@ -260,7 +263,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     if (currentEvents.isEmpty()) {
       return;
     }
-    executorService.execute(new Runnable() {
+    executeRunnable(new Runnable() {
       @Override
       public void run() {
         sendEventsIfPossible(currentEvents);
@@ -318,7 +321,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     if (Event.Type.TURNSTILE.equals(event.obtainType())) {
       final List<Event> appUserTurnstile = new ArrayList<>(1);
       appUserTurnstile.add(event);
-      executorService.execute(new Runnable() {
+      executeRunnable(new Runnable() {
         @Override
         public void run() {
           sendEventsIfPossible(appUserTurnstile);
@@ -366,7 +369,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   }
 
   private synchronized void enableLocationCollector(final boolean enable) {
-    executorService.execute(new Runnable() {
+    executeRunnable(new Runnable() {
       @Override
       public void run() {
         SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences(applicationContext);
@@ -375,6 +378,14 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
         editor.apply();
       }
     });
+  }
+
+  private void executeRunnable(final Runnable command) {
+    try {
+      executorService.execute(command);
+    } catch (RejectedExecutionException rex) {
+      Log.e(LOG_TAG, rex.toString());
+    }
   }
 
   private void sendAttachment(Event event) {
@@ -415,11 +426,12 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   }
 
   private static final class ExecutorServiceFactory {
-    private ExecutorServiceFactory() {}
+    private ExecutorServiceFactory() {
+    }
 
     private static synchronized ExecutorService create(String name, int maxSize, long keepAliveSeconds) {
       return new ThreadPoolExecutor(0, maxSize,
-        keepAliveSeconds, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(),
+        keepAliveSeconds, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(),
         threadFactory(name));
     }
 
