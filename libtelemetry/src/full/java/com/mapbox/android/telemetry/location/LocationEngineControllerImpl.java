@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
@@ -18,11 +19,14 @@ class LocationEngineControllerImpl implements LocationEngineController {
 
   private final Context applicationContext;
   private final LocationEngine locationEngine;
+  private final LocationUpdatesBroadcastReceiver locationUpdatesBroadcastReceiver;
 
   LocationEngineControllerImpl(@NonNull Context context,
-                               @NonNull LocationEngine locationEngine) {
+                               @NonNull LocationEngine locationEngine,
+                               @NonNull LocationUpdatesBroadcastReceiver locationUpdatesBroadcastReceiver) {
     this.applicationContext = context;
     this.locationEngine = locationEngine;
+    this.locationUpdatesBroadcastReceiver = locationUpdatesBroadcastReceiver;
   }
 
   @Override
@@ -32,12 +36,31 @@ class LocationEngineControllerImpl implements LocationEngineController {
 
   @Override
   public void onResume() {
+    registerReceiver();
     requestLocationUpdates();
   }
 
   @Override
   public void onDestroy() {
     removeLocationUpdates();
+    unregisterReceiver();
+  }
+
+  private void registerReceiver() {
+    try {
+      applicationContext.registerReceiver(locationUpdatesBroadcastReceiver,
+        new IntentFilter(LocationUpdatesBroadcastReceiver.ACTION_LOCATION_UPDATED));
+    } catch (IllegalArgumentException iae) {
+      Log.e(TAG, iae.toString());
+    }
+  }
+
+  private void unregisterReceiver() {
+    try {
+      applicationContext.unregisterReceiver(locationUpdatesBroadcastReceiver);
+    } catch (IllegalArgumentException iae) {
+      Log.e(TAG, iae.toString());
+    }
   }
 
   private void requestLocationUpdates() {
@@ -58,8 +81,8 @@ class LocationEngineControllerImpl implements LocationEngineController {
   }
 
   private PendingIntent getPendingIntent() {
-    Intent intent = new Intent(applicationContext, LocationUpdatesBroadcastReceiver.class);
-    intent.setAction(LocationUpdatesBroadcastReceiver.ACTION_LOCATION_UPDATED);
+    // Implicit intent is required here to work with registering receiver via context
+    Intent intent = new Intent(LocationUpdatesBroadcastReceiver.ACTION_LOCATION_UPDATED);
     return PendingIntent.getBroadcast(applicationContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
   }
 

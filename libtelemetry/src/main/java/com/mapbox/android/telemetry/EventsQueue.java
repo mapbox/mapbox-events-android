@@ -2,11 +2,14 @@ package com.mapbox.android.telemetry;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
+import android.util.Log;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionException;
 
 class EventsQueue {
+  private static final String LOG_TAG = "EventsQueue";
   @VisibleForTesting
   static final int SIZE_LIMIT = 180;
   private final FullQueueCallback callback;
@@ -53,11 +56,15 @@ class EventsQueue {
   }
 
   private void dispatchCallback(final List<Event> events) {
-    executorService.execute(new Runnable() {
-      @Override
-      public void run() {
-        callback.onFullQueue(events);
-      }
-    });
+    try {
+      executorService.execute(new Runnable() {
+        @Override
+        public void run() {
+          callback.onFullQueue(events);
+        }
+      });
+    } catch (RejectedExecutionException rex) {
+      Log.e(LOG_TAG, rex.toString());
+    }
   }
 }
