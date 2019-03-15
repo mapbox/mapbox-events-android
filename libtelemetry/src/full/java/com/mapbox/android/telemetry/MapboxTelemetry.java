@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
+
 import android.util.Log;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -326,7 +327,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
       case TURNSTILE:
       case CRASH:
         final List<Event> events = Collections.singletonList(event);
-        executorService.execute(new Runnable() {
+        executeRunnable(new Runnable() {
           @Override
           public void run() {
             sendEventsIfPossible(events);
