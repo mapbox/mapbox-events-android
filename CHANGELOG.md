@@ -5,7 +5,6 @@ Mapbox welcomes participation and contributions from everyone.
 ## Mapbox Android Telemetry
 
 ### v4.3.0
-
 - Register location updates receiver via Context - [#366](https://github.com/mapbox/mapbox-events-android/pull/366)
 - Handle executor errors - [#365](https://github.com/mapbox/mapbox-events-android/pull/365)
 - Add version to location collector userAgent - [#364](https://github.com/mapbox/mapbox-events-android/pull/364)
