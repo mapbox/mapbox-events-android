@@ -63,7 +63,9 @@ class GoogleLocationEngineImpl implements LocationEngineImpl<LocationCallback> {
 
   @Override
   public void removeLocationUpdates(@NonNull LocationCallback listener) {
-    fusedLocationProviderClient.removeLocationUpdates(listener);
+    if (listener != null) {
+      fusedLocationProviderClient.removeLocationUpdates(listener);
+    }
   }
 
   @Override
