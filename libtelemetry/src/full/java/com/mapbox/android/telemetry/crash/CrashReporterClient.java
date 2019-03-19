@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.mapbox.android.core.FileUtils;
+import com.mapbox.android.telemetry.CrashEvent;
 import com.mapbox.android.telemetry.MapboxTelemetry;
 import com.mapbox.android.telemetry.TelemetryListener;
 

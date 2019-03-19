@@ -22,7 +22,7 @@ public abstract class Event implements Parcelable {
     Type.NAV_REROUTE, Type.NAV_FEEDBACK, Type.NAV_FASTER_ROUTE);
   static EnumSet<Type> visionEventTypes = EnumSet.of(Type.VIS_GENERAL, Type.VIS_ATTACHMENT, Type.VIS_OBJ_DETECTION);
 
-  protected Type obtainType() {
+  Type obtainType() {
     return Type.NO_OP;
   }
 }

@@ -1,9 +1,8 @@
-package com.mapbox.android.telemetry.crash;
+package com.mapbox.android.telemetry;
 
 import android.annotation.SuppressLint;
 import android.os.Parcel;
 import android.text.TextUtils;
-import com.mapbox.android.telemetry.Event;
 
 /**
  * This class is temporary and exists only
@@ -13,7 +12,7 @@ import com.mapbox.android.telemetry.Event;
  * back and forth json serialization overhead.
  */
 @SuppressLint("ParcelCreator")
-class CrashEvent extends Event {
+public class CrashEvent extends Event {
   private final String event;
   private final String created;
 
@@ -29,7 +28,7 @@ class CrashEvent extends Event {
   private String appId;
   private String appVersion;
 
-  CrashEvent(String event, String created) {
+  public CrashEvent(String event, String created) {
     this.event = event;
     this.created = created;
   }
@@ -43,15 +42,15 @@ class CrashEvent extends Event {
    * @return crash event type.
    */
   @Override
-  protected Type obtainType() {
+  Type obtainType() {
     return Type.CRASH;
   }
 
-  String getHash() {
+  public String getHash() {
     return stackTraceHash;
   }
 
-  boolean isValid() {
+  public boolean isValid() {
     return !(TextUtils.isEmpty(event) || TextUtils.isEmpty(created) || TextUtils.isEmpty(stackTraceHash));
   }
 
