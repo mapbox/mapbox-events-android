@@ -22,8 +22,9 @@ import java.util.UUID;
 
 import okio.Buffer;
 
+import static com.mapbox.android.telemetry.MapboxTelemetryConstants.MAPBOX_SHARED_PREFERENCES;
+
 public class TelemetryUtils {
-  static final String MAPBOX_SHARED_PREFERENCES = "MapboxSharedPreferences";
   static final String MAPBOX_SHARED_PREFERENCE_KEY_VENDOR_ID = "mapboxVendorId";
   private static final String KEY_META_DATA_WAKE_UP = "com.mapbox.AdjustWakeUp";
   private static final String DATE_AND_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
@@ -138,7 +139,7 @@ public class TelemetryUtils {
   }
 
   static String obtainCellularNetworkType(Context context) {
-    TelephonyManager telephonyManager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
+    TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
     return NETWORKS.get(telephonyManager.getNetworkType());
   }
 
@@ -218,23 +219,10 @@ public class TelemetryUtils {
     return context.registerReceiver(null, filter);
   }
 
-  static boolean isServiceRunning(Class<?> serviceClass, Context context) {
-    ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-    if (manager == null) {
-      return false;
-    }
-    for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-      if (serviceClass.getName().equals(service.service.getClassName())) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   static boolean adjustWakeUpMode(Context context) {
     try {
       ApplicationInfo appInformation = context.getPackageManager().getApplicationInfo(context.getPackageName(),
-          PackageManager.GET_META_DATA);
+        PackageManager.GET_META_DATA);
       if (appInformation != null && appInformation.metaData != null) {
         boolean adjustWakeUp = appInformation.metaData.getBoolean(KEY_META_DATA_WAKE_UP, false);
         return adjustWakeUp;

@@ -4,9 +4,14 @@
     package="com.mapbox.android.telemetry">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <application>
-        <service android:name="com.mapbox.android.telemetry.TelemetryService"/>
+        <provider
+            android:name=".provider.MapboxTelemetryInitProvider"
+            android:authorities="${applicationId}.mapboxtelemetryinitprovider"
+            android:exported="false"
+            android:initOrder="100"/>
     </application>
 </manifest>

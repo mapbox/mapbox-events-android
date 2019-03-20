@@ -4,6 +4,31 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v4.3.0
+- Register location updates receiver via Context - [#366](https://github.com/mapbox/mapbox-events-android/pull/366)
+- Handle executor errors - [#365](https://github.com/mapbox/mapbox-events-android/pull/365)
+- Add version to location collector userAgent - [#364](https://github.com/mapbox/mapbox-events-android/pull/364)
+- Mismatched Dependency Issue - [#363](https://github.com/mapbox/mapbox-events-android/pull/363)
+- Resolve strict mode UntaggedSocketViolation issue - [#358](https://github.com/mapbox/mapbox-events-android/pull/358)
+- Add more instrumented test cases - [#355](https://github.com/mapbox/mapbox-events-android/pull/355)
+- Sunset telemetry service - [#351](https://github.com/mapbox/mapbox-events-android/pull/351)
+- Add strict mode - [#347](https://github.com/mapbox/mapbox-events-android/pull/347)
+- Location collector refactor - [#349](https://github.com/mapbox/mapbox-events-android/pull/349)
+- Execute network requests on background thread - [#346](https://github.com/mapbox/mapbox-events-android/pull/346)
+- Add null check for pending Intent - [#345](https://github.com/mapbox/mapbox-events-android/pull/345)
+- Refactor event queuing logic - [#344](https://github.com/mapbox/mapbox-events-android/pull/344)
+- Fix pom artifactId for libcore dependency - [#340](https://github.com/mapbox/mapbox-events-android/pull/340)
+- Include libcore into lite version - [#339](https://github.com/mapbox/mapbox-events-android/pull/339)
+- Fix make command - [#337](https://github.com/mapbox/mapbox-events-android/pull/337)
+- Add more test cases for ConfigurationClient - [#336](https://github.com/mapbox/mapbox-events-android/pull/336)
+- Add more test cases for CertificateBlackList - [#334](https://github.com/mapbox/mapbox-events-android/pull/334)
+- Release Telemetry SDK Lite on Maven - [#333](https://github.com/mapbox/mapbox-events-android/pull/333)
+- Remove Unused Lifecycle Dependencies - [#331](https://github.com/mapbox/mapbox-events-android/pull/331)
+- Telemetry SDK Lite - [#328](https://github.com/mapbox/mapbox-events-android/pull/328)
+- Additional Testing Around Blacklist and ConfigurationClient - [#327](https://github.com/mapbox/mapbox-events-android/pull/327)
+- Update tooling, update ci images - [#326](https://github.com/mapbox/mapbox-events-android/pull/326)
+- Prepare the repository as Maps SDK vendor - [#324](https://github.com/mapbox/mapbox-events-android/pull/324)
+
 ### v4.2.0
 - Enable event creation outside of telem sdk - [#318](https://github.com/mapbox/mapbox-events-android/pull/318)
 
@@ -165,6 +190,11 @@ Mapbox welcomes participation and contributions from everyone.
 - Port Location Code from MAS - [#6](https://github.com/mapbox/mapbox-events-android/pull/6)
 
 ## Mapbox Android Core
+
+### v1.2.0
+- Fix GoogleLocationEngine intermittent delayed updates - [#350](https://github.com/mapbox/mapbox-events-android/pull/350)
+- Run liblocation test in CI - [#338](https://github.com/mapbox/mapbox-events-android/pull/338)
+- Mapbox unhandled exception handler - [#335](https://github.com/mapbox/mapbox-events-android/pull/335)
 
 ### v1.1.0
 - Refactor listener management infrastructure & background mode support - [#290](https://github.com/mapbox/mapbox-events-android/pull/290)
