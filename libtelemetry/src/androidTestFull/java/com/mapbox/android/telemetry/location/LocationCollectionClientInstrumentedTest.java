@@ -28,11 +28,8 @@ public class LocationCollectionClientInstrumentedTest {
 
   @Before
   public void setUp() {
-    LocationCollectionClient.uninstall();
-    LocationCollectionClient newRef = LocationCollectionClient.install(InstrumentationRegistry.getTargetContext(),
+    ref = LocationCollectionClient.install(InstrumentationRegistry.getTargetContext(),
       DEFAULT_INTERVAL);
-    assertNotEquals(ref, newRef);
-    ref = newRef;
   }
 
   @After
@@ -47,7 +44,7 @@ public class LocationCollectionClientInstrumentedTest {
   }
 
   @Test
-  public void verifySharedPreference() throws InterruptedException {
+  public void verifySharedPreferences() throws InterruptedException {
     SharedPreferences sharedPreferences =
       InstrumentationRegistry.getTargetContext().getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
     assertFalse(sharedPreferences.getBoolean(LOCATION_COLLECTOR_ENABLED, true));
