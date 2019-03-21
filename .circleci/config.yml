@@ -62,13 +62,6 @@ jobs:
             test_apk_path="outputs/apk/androidTest/debug/libcore-debug-androidTest.apk"
             ./cloud_test.sh $build_dir $test_apk_path $CIRCLE_BUILD_NUM
       - run:
-          name: Run liblocation instrumentation tests on Firebase
-          no_output_timeout: 20m
-          command: |
-            build_dir="liblocation/build"
-            test_apk_path="outputs/apk/androidTest/debug/liblocation-debug-androidTest.apk"
-            ./cloud_test.sh $build_dir $test_apk_path $CIRCLE_BUILD_NUM
-      - run:
           name: Run libtelemetry instrumentation tests on Firebase
           no_output_timeout: 20m
           command: |
