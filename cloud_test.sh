@@ -16,4 +16,4 @@ gcloud firebase test android run --type instrumentation \
     --timeout 20m
 
 covfile_path="gs://test-lab-r47d1tyt8h0hm-iku3c1i8kjrux/sailfish-28-en-portrait/artifacts/${module_name}_coverage.ec"
-gsutil cp covfile_path "${build_dir_outputs}/code_coverage"
+gsutil cp $covfile_path "${build_dir_outputs}/code_coverage"
