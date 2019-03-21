@@ -45,6 +45,7 @@ public class LocationCollectionClient implements SharedPreferences.OnSharedPrefe
   private final HandlerThread settingsChangeHandlerThread;
   private final MapboxTelemetry telemetry;
   private Handler settingsChangeHandler;
+  private SharedPreferences sharedPreferences;
 
   @VisibleForTesting
   LocationCollectionClient(@NonNull LocationEngineController collectionController,
@@ -108,6 +109,7 @@ public class LocationCollectionClient implements SharedPreferences.OnSharedPrefe
       if (locationCollectionClient != null) {
         locationCollectionClient.locationEngineController.onDestroy();
         locationCollectionClient.settingsChangeHandlerThread.quit();
+        locationCollectionClient.sharedPreferences.unregisterOnSharedPreferenceChangeListener(locationCollectionClient);
         locationCollectionClient = null;
         uninstalled = true;
       }
@@ -236,6 +238,7 @@ public class LocationCollectionClient implements SharedPreferences.OnSharedPrefe
     // We ought to reset collector state at startup,
     // this wouldn't be required in future after we migrate
     // to automatic lifecycle management.
+    this.sharedPreferences = sharedPreferences;
     SharedPreferences.Editor editor = sharedPreferences.edit();
     editor.putBoolean(LOCATION_COLLECTOR_ENABLED, isEnabled.get());
     editor.putLong(SESSION_ROTATION_INTERVAL_MILLIS, sessionIdentifier.get().getInterval());
