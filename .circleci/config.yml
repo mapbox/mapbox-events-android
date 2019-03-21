@@ -59,13 +59,15 @@ jobs:
           no_output_timeout: 20m
           command: |
             test_path="libcore/build/outputs/apk/androidTest/debug/libcore-debug-androidTest.apk"
-            ./cloud_test.sh $test_path
+            module_name="libcore"
+            ./cloud_test.sh $test_path $module_name
       - run:
           name: Run libtelemetry instrumentation tests on Firebase
           no_output_timeout: 20m
           command: |
             test_path="libtelemetry/build/outputs/apk/androidTest/full/debug/libtelemetry-full-debug-androidTest.apk"
-            ./cloud_test.sh $test_path
+            module_name="libtelemetry"
+            ./cloud_test.sh $test_path $module_name
       - run:
           name: Post code coverage report to Codecov.io
           command: |
