@@ -58,23 +58,23 @@ jobs:
           name: Run libcore instrumentation tests on Firebase
           no_output_timeout: 20m
           command: |
-            build_dir_outputs="libcore/build/outputs"
-            test_apk_path="apk/androidTest/debug/libcore-debug-androidTest.apk"
-            ./cloud_test.sh $build_dir_outputs $test_apk_path $CIRCLE_BUILD_NUM
+            build_dir="libcore/build"
+            test_apk_path="outputs/apk/androidTest/debug/libcore-debug-androidTest.apk"
+            ./cloud_test.sh $build_dir $test_apk_path $CIRCLE_BUILD_NUM
       - run:
           name: Run liblocation instrumentation tests on Firebase
           no_output_timeout: 20m
           command: |
-            build_dir_outputs="liblocation/build/outputs"
-            test_apk_path="apk/androidTest/debug/liblocation-debug-androidTest.apk"
-            ./cloud_test.sh $build_dir_outputs $test_apk_path $CIRCLE_BUILD_NUM
+            build_dir="liblocation/build"
+            test_apk_path="outputs/apk/androidTest/debug/liblocation-debug-androidTest.apk"
+            ./cloud_test.sh $build_dir $test_apk_path $CIRCLE_BUILD_NUM
       - run:
           name: Run libtelemetry instrumentation tests on Firebase
           no_output_timeout: 20m
           command: |
-            build_dir_outputs="libtelemetry/build/outputs"
-            test_apk_path="apk/androidTest/full/debug/libtelemetry-full-debug-androidTest.apk"
-            ./cloud_test.sh $build_dir_outputs $test_apk_path $CIRCLE_BUILD_NUM
+            build_dir="libtelemetry/build"
+            test_apk_path="outputs/apk/androidTest/full/debug/libtelemetry-full-debug-androidTest.apk"
+            ./cloud_test.sh $build_dir $test_apk_path $CIRCLE_BUILD_NUM
       - run:
           name: Post code coverage report to Codecov.io
           command: |
