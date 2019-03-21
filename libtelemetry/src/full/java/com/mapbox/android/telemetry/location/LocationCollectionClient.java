@@ -44,6 +44,7 @@ public class LocationCollectionClient implements SharedPreferences.OnSharedPrefe
   private final AtomicReference<SessionIdentifier> sessionIdentifier = new AtomicReference<>();
   private final HandlerThread settingsChangeHandlerThread;
   private final MapboxTelemetry telemetry;
+  private final SharedPreferences sharedPreferences;
   private Handler settingsChangeHandler;
 
   @VisibleForTesting
@@ -63,6 +64,7 @@ public class LocationCollectionClient implements SharedPreferences.OnSharedPrefe
         handleSettingsChangeMessage(msg);
       }
     };
+    this.sharedPreferences = sharedPreferences;
     initializeSharedPreferences(sharedPreferences);
   }
 
@@ -108,6 +110,7 @@ public class LocationCollectionClient implements SharedPreferences.OnSharedPrefe
       if (locationCollectionClient != null) {
         locationCollectionClient.locationEngineController.onDestroy();
         locationCollectionClient.settingsChangeHandlerThread.quit();
+        locationCollectionClient.sharedPreferences.unregisterOnSharedPreferenceChangeListener(locationCollectionClient);
         locationCollectionClient = null;
         uninstalled = true;
       }
