@@ -38,7 +38,8 @@ project.afterEvaluate {
 
                 executionData = fileTree(dir: "${project.buildDir}",
                         includes: ["jacoco/${testTaskName}.exec",
-                                   "outputs/code_coverage/${sourceName}AndroidTest/connected/*.ec"])
+                                   "outputs/code_coverage/${sourceName}AndroidTest/connected/*.ec",
+                                   "outputs/code_coverage/*.ec"])
 
                 reports {
                     xml.enabled = true
