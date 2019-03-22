@@ -1,6 +1,5 @@
 package com.mapbox.android.core.location;
 
-import android.Manifest;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.GrantPermissionRule;
@@ -31,9 +30,6 @@ public class LocationEngineInstrumentedTest {
   @Rule
   public GrantPermissionRule permissionRule =
     GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION);
-  @Rule
-  public GrantPermissionRule permissionRule2 =
-    GrantPermissionRule.grant(Manifest.permission.ACCESS_COARSE_LOCATION);
 
   @Test
   public void getLastLocation() throws Exception {

@@ -22,7 +22,7 @@ public class AlarmMangerInstrumentationTest {
     final CountDownLatch latch = new CountDownLatch(2);
     final AtomicReference<Integer> broadcastTrack = new AtomicReference<>();
 
-    Context context = InstrumentationRegistry.getContext();
+    Context context = InstrumentationRegistry.getTargetContext();
     AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
     AlarmReceiver alarmReceiver = obtainAlarmReceiver(broadcastTrack, latch);
 
@@ -46,7 +46,7 @@ public class AlarmMangerInstrumentationTest {
 
   @Test
   public void checksSupplyAlarmManager() {
-    Context context = InstrumentationRegistry.getContext();
+    Context context = InstrumentationRegistry.getTargetContext();
     AlarmReceiver mockedAlarmReceiver = mock(AlarmReceiver.class);
     SchedulerFlusherFactory schedulerFlusherFactory = new SchedulerFlusherFactory(context, mockedAlarmReceiver);
 
@@ -58,7 +58,7 @@ public class AlarmMangerInstrumentationTest {
 
   @Test
   public void checksScheduleExact() throws Exception {
-    Context mockedContext = InstrumentationRegistry.getContext();
+    Context mockedContext = InstrumentationRegistry.getTargetContext();
     AlarmManager mockedAlarmManager = mock(AlarmManager.class);
     AlarmReceiver mockedAlarmReceiver = mock(AlarmReceiver.class);
     AlarmSchedulerFlusher theAlarmSchedulerFlusher = new AlarmSchedulerFlusher(mockedContext, mockedAlarmManager,
