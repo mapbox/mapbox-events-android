@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
+import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
@@ -15,30 +16,29 @@ import com.mapbox.android.telemetry.TelemetryListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.mapbox.android.core.crashreporter.MapboxUncaughtExceptionHanlder.MAPBOX_CRASH_REPORTER_PREFERENCES;
-import static com.mapbox.android.core.crashreporter.MapboxUncaughtExceptionHanlder.MAPBOX_LAST_CRASH_REPORTER;
 import static com.mapbox.android.core.crashreporter.MapboxUncaughtExceptionHanlder.MAPBOX_PREF_ENABLE_CRASH_REPORTER;
 
 final class CrashReporterClient {
+  private static final String LOG_TAG = "CrashReporterClient";
   private static final String CRASH_REPORTER_CLIENT_USER_AGENT = "mapbox-android-crash";
-  private final Context applicationContext;
   private final SharedPreferences sharedPreferences;
   private final MapboxTelemetry telemetry;
   private final HashSet<String> crashHashSet = new HashSet<>();
+  private final HashMap<CrashEvent, File> eventFileHashMap = new HashMap<>();
   private File[] crashReports;
   private int fileCursor;
 
   @VisibleForTesting
-  CrashReporterClient(@NonNull Context context,
-                      @NonNull SharedPreferences sharedPreferences,
+  CrashReporterClient(@NonNull SharedPreferences sharedPreferences,
                       @NonNull MapboxTelemetry telemetry,
                       File[] crashReports) {
-    this.applicationContext = context;
     this.sharedPreferences = sharedPreferences;
     this.telemetry = telemetry;
     this.crashReports = crashReports;
@@ -48,20 +48,14 @@ final class CrashReporterClient {
   static CrashReporterClient create(@NonNull Context context) {
     SharedPreferences sharedPreferences =
       context.getSharedPreferences(MAPBOX_CRASH_REPORTER_PREFERENCES, Context.MODE_PRIVATE);
-    return new CrashReporterClient(context, sharedPreferences,
+    return new CrashReporterClient(sharedPreferences,
       new MapboxTelemetry(context, "", CRASH_REPORTER_CLIENT_USER_AGENT), new File[0]);
   }
 
-  CrashReporterClient load(@NonNull String rootPath) {
-    crashReports = FileUtils.listAllFiles(applicationContext, rootPath);
+  CrashReporterClient load(@NonNull File rootDir) {
+    fileCursor = 0;
+    crashReports = listAllFiles(rootDir);
     Arrays.sort(crashReports, new FileUtils.LastModifiedComparator());
-    String lastSentHash = getLastSentHash();
-    for (int i = 0; i < crashReports.length; i++) {
-      if (lastSentHash.equals(getFileHash(i))) {
-        fileCursor = i + 1;
-        break;
-      }
-    }
     return this;
   }
 
@@ -84,8 +78,17 @@ final class CrashReporterClient {
 
   @NonNull
   CrashEvent nextEvent() {
+    if (!hasNextEvent()) {
+      throw new IllegalStateException("No more events can be read");
+    }
+
     try {
-      return parseJsonCrashEvent(FileUtils.readFromFile(crashReports[fileCursor]));
+      File file = crashReports[fileCursor];
+      CrashEvent event = parseJsonCrashEvent(FileUtils.readFromFile(file));
+      if (event.isValid()) {
+        eventFileHashMap.put(event, file);
+      }
+      return event;
     } catch (FileNotFoundException fileException) {
       throw new IllegalStateException("File cannot be read: " + fileException.toString());
     } finally {
@@ -97,51 +100,39 @@ final class CrashReporterClient {
     if (!event.isValid()) {
       return false;
     }
-
     AtomicBoolean success = new AtomicBoolean(false);
     CountDownLatch latch = new CountDownLatch(1);
-    setupTelemetryListener(success, latch);
+    return sendSync(event, success, latch);
+  }
+
+  boolean delete(CrashEvent event) {
+    File file = eventFileHashMap.get(event);
+    return file != null && file.delete();
+  }
+
+  @VisibleForTesting
+  boolean sendSync(CrashEvent event, AtomicBoolean status, CountDownLatch latch) {
+    setupTelemetryListener(status, latch);
     telemetry.push(event);
     try {
       latch.await(10, TimeUnit.SECONDS);
     } catch (InterruptedException ie) {
       return false;
     } finally {
-      if (success.get()) {
+      if (status.get()) {
         crashHashSet.add(event.getHash());
-        setLastSentHash(getFileHash(fileCursor - 1));
+      } else {
+        // TODO: implement retry policy
       }
     }
-    return success.get();
-  }
-
-  private String getLastSentHash() {
-    try {
-      return sharedPreferences.getString(MAPBOX_LAST_CRASH_REPORTER, "");
-    } catch (Exception ex) {
-      // Catch ClassCastException
-    }
-    return "";
-  }
-
-  private void setLastSentHash(String hash) {
-    try {
-      SharedPreferences.Editor editor = sharedPreferences.edit();
-      editor.putString(MAPBOX_LAST_CRASH_REPORTER, hash);
-      editor.apply();
-    } catch (Exception ex) {
-      // Catch ClassCastException
-    }
-  }
-
-  private String getFileHash(int index) {
-    return Long.toHexString(crashReports[index].lastModified());
+    return status.get();
   }
 
   private void setupTelemetryListener(final AtomicBoolean success, final CountDownLatch latch) {
     telemetry.addTelemetryListener(new TelemetryListener() {
       @Override
       public void onHttpResponse(boolean successful, int code) {
+        Log.d(LOG_TAG, "Response: " + code);
         success.set(successful);
         latch.countDown();
         telemetry.removeTelemetryListener(this);
@@ -149,6 +140,7 @@ final class CrashReporterClient {
 
       @Override
       public void onHttpFailure(String message) {
+        Log.d(LOG_TAG, "Response: " + message);
         latch.countDown();
         telemetry.removeTelemetryListener(this);
       }
@@ -162,5 +154,13 @@ final class CrashReporterClient {
     } catch (JsonSyntaxException jse) {
       return new CrashEvent(null, null);
     }
+  }
+
+  private static File[] listAllFiles(File directory) {
+    if (directory == null) {
+      return new File[0];
+    }
+    File[] files = directory.listFiles();
+    return files != null ? files : new File[0];
   }
 }

@@ -27,7 +27,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionHandler,
   SharedPreferences.OnSharedPreferenceChangeListener {
   public static final String MAPBOX_PREF_ENABLE_CRASH_REPORTER = "mapbox.crash.enable";
-  public static final String MAPBOX_LAST_CRASH_REPORTER = "mapbox.crash.lasthash";
   public static final String MAPBOX_CRASH_REPORTER_PREFERENCES = "MapboxCrashReporterPrefs";
 
   private static final String TAG = "MbUncaughtExcHandler";
