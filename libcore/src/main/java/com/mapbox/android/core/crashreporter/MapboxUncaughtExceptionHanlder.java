@@ -186,7 +186,7 @@ public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionH
 
     // Cleanup directory if we've reached our max limit
     if (directory.length() >= DEFAULT_MAX_REPORTS) {
-      FileUtils.deleteFirst(FileUtils.listAllFiles(context, dirPath),
+      FileUtils.deleteFirst(FileUtils.listAllFiles(directory),
         new FileUtils.LastModifiedComparator(), DEFAULT_MAX_REPORTS - 1);
     }
   }

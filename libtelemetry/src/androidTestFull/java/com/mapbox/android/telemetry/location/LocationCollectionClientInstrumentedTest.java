@@ -10,9 +10,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
 import static com.mapbox.android.telemetry.MapboxTelemetryConstants.LOCATION_COLLECTOR_ENABLED;
 import static com.mapbox.android.telemetry.MapboxTelemetryConstants.MAPBOX_SHARED_PREFERENCES;
 import static org.junit.Assert.assertEquals;
@@ -47,20 +44,10 @@ public class LocationCollectionClientInstrumentedTest {
     SharedPreferences sharedPreferences =
       InstrumentationRegistry.getTargetContext().getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
     assertFalse(sharedPreferences.getBoolean(LOCATION_COLLECTOR_ENABLED, true));
-    final CountDownLatch latch = new CountDownLatch(1);
-    sharedPreferences.registerOnSharedPreferenceChangeListener(
-      new SharedPreferences.OnSharedPreferenceChangeListener() {
-        @Override
-        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-          if (LOCATION_COLLECTOR_ENABLED.equals(key)) {
-            latch.countDown();
-          }
-        }
-      });
     SharedPreferences.Editor editor = sharedPreferences.edit();
     editor.putBoolean(LOCATION_COLLECTOR_ENABLED, true);
     editor.commit();
-    assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
+    Thread.sleep(1000);
     assertTrue(ref.isEnabled());
   }
 

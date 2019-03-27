@@ -27,13 +27,12 @@ public class FileUtilsInstrumentedTest {
     if (!directory.exists()) {
       directory.mkdir();
     }
-    file = FileUtils.getFile(InstrumentationRegistry.getTargetContext(), filename);
-  }
 
-  @After
-  public void tearDown() {
-    assertTrue(file.delete());
-    assertTrue(directory.delete());
+    for (File file: directory.listFiles()) {
+      file.delete();
+    }
+
+    file = FileUtils.getFile(InstrumentationRegistry.getTargetContext(), filename);
   }
 
   @Test

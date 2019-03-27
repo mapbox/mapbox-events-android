@@ -105,13 +105,15 @@ public final class FileUtils {
   /**
    * Return list of all files in the directory.
    *
-   * @param context application context.
    * @param directory target directory on file system
    * @return list of files in the directory or empty list if directory is empty.
    */
   @NonNull
-  public static File[] listAllFiles(@NonNull Context context, @NonNull String directory) {
-    File[] files = context.getDir(directory, Context.MODE_PRIVATE).listFiles();
+  public static File[] listAllFiles(File directory) {
+    if (directory == null) {
+      return new File[0];
+    }
+    File[] files = directory.listFiles();
     return files != null ? files : new File[0];
   }
 

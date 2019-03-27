@@ -54,7 +54,7 @@ final class CrashReporterClient {
 
   CrashReporterClient loadFrom(@NonNull File rootDir) {
     fileCursor = 0;
-    crashReports = listAllFiles(rootDir);
+    crashReports = FileUtils.listAllFiles(rootDir);
     Arrays.sort(crashReports, new FileUtils.LastModifiedComparator());
     return this;
   }
@@ -154,13 +154,5 @@ final class CrashReporterClient {
     } catch (JsonSyntaxException jse) {
       return new CrashEvent(null, null);
     }
-  }
-
-  private static File[] listAllFiles(File directory) {
-    if (directory == null) {
-      return new File[0];
-    }
-    File[] files = directory.listFiles();
-    return files != null ? files : new File[0];
   }
 }
