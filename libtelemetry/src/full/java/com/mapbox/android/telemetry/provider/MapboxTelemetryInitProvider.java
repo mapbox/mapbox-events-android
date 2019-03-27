@@ -11,20 +11,26 @@ import android.support.annotation.Nullable;
 
 import com.mapbox.android.core.crashreporter.MapboxUncaughtExceptionHanlder;
 import com.mapbox.android.telemetry.BuildConfig;
+import com.mapbox.android.telemetry.crash.TokenChangeBroadcastReceiver;
 import com.mapbox.android.telemetry.location.LocationCollectionClient;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.mapbox.android.telemetry.MapboxTelemetryConstants.MAPBOX_TELEMETRY_PACKAGE;
 import static com.mapbox.android.telemetry.location.LocationCollectionClient.DEFAULT_SESSION_ROTATION_INTERVAL_HOURS;
 
 public class MapboxTelemetryInitProvider extends ContentProvider {
-  private static final String MAPBOX_TELEMETRY_PACKAGE = "com.mapbox.android.telemetry";
   private static final String EMPTY_APPLICATION_ID_PROVIDER_AUTHORITY =
     "com.mapbox.android.telemetry.provider.mapboxtelemetryinitprovider";
 
   @Override
   public boolean onCreate() {
     if (!BuildConfig.DEBUG) {
+      // Register broadcast receiver to get notification
+      // when valid token becomes available
+      TokenChangeBroadcastReceiver.register(getContext());
+
+      // Install crash reporter for telemetry packages only!
       MapboxUncaughtExceptionHanlder.install(getContext(), MAPBOX_TELEMETRY_PACKAGE, BuildConfig.VERSION_NAME);
     }
     LocationCollectionClient.install(getContext(), TimeUnit.HOURS.toMillis(DEFAULT_SESSION_ROTATION_INTERVAL_HOURS));
