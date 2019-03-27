@@ -2,7 +2,6 @@ package com.mapbox.android.core.crashreporter;
 
 import android.support.test.InstrumentationRegistry;
 import com.mapbox.android.core.FileUtils;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
