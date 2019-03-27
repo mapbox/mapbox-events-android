@@ -104,7 +104,7 @@ public class LocationCollectionClient implements SharedPreferences.OnSharedPrefe
    *
    * @return true if uninstall was successful
    */
-  public static boolean uninstall() {
+  static boolean uninstall() {
     boolean uninstalled = false;
     synchronized (lock) {
       if (locationCollectionClient != null) {

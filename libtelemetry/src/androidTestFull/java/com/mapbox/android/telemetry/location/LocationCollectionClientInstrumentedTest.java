@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 
 import static com.mapbox.android.telemetry.MapboxTelemetryConstants.LOCATION_COLLECTOR_ENABLED;
 import static com.mapbox.android.telemetry.MapboxTelemetryConstants.MAPBOX_SHARED_PREFERENCES;
-import static com.mapbox.android.telemetry.MapboxTelemetryConstants.SESSION_ROTATION_INTERVAL_MILLIS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -23,7 +22,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class LocationCollectionClientInstrumentedTest {
-  private static final int DEFAULT_INTERVAL = 1000;
+  private static final long DEFAULT_INTERVAL = 1000L;
   private LocationCollectionClient ref;
 
   @Before
@@ -48,8 +47,6 @@ public class LocationCollectionClientInstrumentedTest {
     SharedPreferences sharedPreferences =
       InstrumentationRegistry.getTargetContext().getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
     assertFalse(sharedPreferences.getBoolean(LOCATION_COLLECTOR_ENABLED, true));
-    assertEquals(DEFAULT_INTERVAL, sharedPreferences.getLong(SESSION_ROTATION_INTERVAL_MILLIS, 0));
-
     final CountDownLatch latch = new CountDownLatch(1);
     sharedPreferences.registerOnSharedPreferenceChangeListener(
       new SharedPreferences.OnSharedPreferenceChangeListener() {
