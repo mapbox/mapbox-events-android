@@ -52,7 +52,7 @@ final class CrashReporterClient {
       new MapboxTelemetry(context, "", CRASH_REPORTER_CLIENT_USER_AGENT), new File[0]);
   }
 
-  CrashReporterClient load(@NonNull File rootDir) {
+  CrashReporterClient loadFrom(@NonNull File rootDir) {
     fileCursor = 0;
     crashReports = listAllFiles(rootDir);
     Arrays.sort(crashReports, new FileUtils.LastModifiedComparator());

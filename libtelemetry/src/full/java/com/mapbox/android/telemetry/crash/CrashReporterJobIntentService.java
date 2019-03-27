@@ -37,7 +37,7 @@ public final class CrashReporterJobIntentService extends JobIntentService {
 
       CrashReporterClient client = CrashReporterClient
         .create(getApplicationContext())
-        .load(rootDirectory);
+        .loadFrom(rootDirectory);
 
       if (!client.isEnabled()) {
         Log.w(LOG_TAG, "Crash reporter is disabled");

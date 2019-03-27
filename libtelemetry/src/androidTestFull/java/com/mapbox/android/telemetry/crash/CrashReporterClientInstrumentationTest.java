@@ -45,19 +45,19 @@ public class CrashReporterClientInstrumentationTest {
 
   @Test
   public void loadInvalidNullPath() {
-    CrashReporterClient client = crashReporterClient.load(null);
+    CrashReporterClient client = crashReporterClient.loadFrom(null);
     assertFalse(client.hasNextEvent());
   }
 
   @Test
   public void loadInvalidPath() {
-    CrashReporterClient client = crashReporterClient.load(new File(""));
+    CrashReporterClient client = crashReporterClient.loadFrom(new File(""));
     assertFalse(client.hasNextEvent());
   }
 
   @Test
   public void verifyEventNotLoadedFromEmptyPath() {
-    CrashReporterClient client = crashReporterClient.load(directory);
+    CrashReporterClient client = crashReporterClient.loadFrom(directory);
     assertFalse(client.hasNextEvent());
   }
 
@@ -67,7 +67,7 @@ public class CrashReporterClientInstrumentationTest {
     File file = FileUtils.getFile(context, String.format(CRASH_FILENAME_FORMAT, TEST_DIR_PATH, crashHash));
     FileUtils.writeToFile(file, String.format(crashEvent, crashHash));
 
-    CrashReporterClient client = crashReporterClient.load(directory);
+    CrashReporterClient client = crashReporterClient.loadFrom(directory);
     assertTrue(client.hasNextEvent());
   }
 
@@ -77,7 +77,7 @@ public class CrashReporterClientInstrumentationTest {
     File file = FileUtils.getFile(context, String.format(CRASH_FILENAME_FORMAT, TEST_DIR_PATH, crashHash));
     FileUtils.writeToFile(file, String.format(crashEvent, crashHash));
 
-    CrashReporterClient client = crashReporterClient.load(directory);
+    CrashReporterClient client = crashReporterClient.loadFrom(directory);
     assertTrue(client.hasNextEvent());
   }
 
@@ -87,10 +87,10 @@ public class CrashReporterClientInstrumentationTest {
     File file = FileUtils.getFile(context, String.format(CRASH_FILENAME_FORMAT, TEST_DIR_PATH, crashHash));
     FileUtils.writeToFile(file, String.format(crashEvent, crashHash));
 
-    CrashReporterClient client = crashReporterClient.load(directory);
+    CrashReporterClient client = crashReporterClient.loadFrom(directory);
     assertTrue(client.hasNextEvent());
 
-    client = crashReporterClient.load(new File(""));
+    client = crashReporterClient.loadFrom(new File(""));
     assertFalse(client.hasNextEvent());
   }
 
@@ -122,7 +122,7 @@ public class CrashReporterClientInstrumentationTest {
     FileUtils.writeToFile(file, String.format(crashEvent, crashHash));
 
     // Need to toggle this flag to simulate telem success
-    crashReporterClient.load(directory);
+    crashReporterClient.loadFrom(directory);
     CrashEvent event = crashReporterClient.nextEvent();
     assertFalse(crashReporterClient.isDuplicate(event));
 
@@ -147,7 +147,7 @@ public class CrashReporterClientInstrumentationTest {
     File fileCrash2 = FileUtils.getFile(context, String.format(CRASH_FILENAME_FORMAT, TEST_DIR_PATH, "crash2"));
     FileUtils.writeToFile(fileCrash2, String.format(crashEvent, UUID.randomUUID().toString()));
 
-    crashReporterClient.load(directory);
+    crashReporterClient.loadFrom(directory);
     crashReporterClient.nextEvent();
     CrashEvent crash2 = crashReporterClient.nextEvent();
     crashReporterClient.delete(crash2);
@@ -158,7 +158,7 @@ public class CrashReporterClientInstrumentationTest {
 
   @Test
   public void deleteInvalidEvent() {
-    crashReporterClient.load(directory);
+    crashReporterClient.loadFrom(directory);
     assertFalse(crashReporterClient.delete(new CrashEvent("mobile.crash", "2019-02-21T21:58:43.000Z")));
   }
 
@@ -166,7 +166,7 @@ public class CrashReporterClientInstrumentationTest {
   public void attemptToDeleteAlreadyDeletedFile() throws IOException {
     File file = FileUtils.getFile(context, String.format(CRASH_FILENAME_FORMAT, TEST_DIR_PATH, "crash"));
     FileUtils.writeToFile(file, String.format(crashEvent, UUID.randomUUID().toString()));
-    crashReporterClient.load(directory);
+    crashReporterClient.loadFrom(directory);
     CrashEvent crashEvent = crashReporterClient.nextEvent();
 
     assertTrue(file.delete());
