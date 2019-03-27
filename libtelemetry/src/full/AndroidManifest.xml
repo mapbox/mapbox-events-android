@@ -15,6 +15,7 @@
             android:authorities="${applicationId}.mapboxtelemetryinitprovider"
             android:exported="false"
             android:initOrder="100"/>
-        <service android:name=".crash.CrashReporterJobIntentService"/>
+        <service android:name=".crash.CrashReporterJobIntentService"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
     </application>
 </manifest>
