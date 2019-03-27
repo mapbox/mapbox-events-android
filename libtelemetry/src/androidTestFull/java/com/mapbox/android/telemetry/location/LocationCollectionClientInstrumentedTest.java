@@ -6,7 +6,6 @@ import android.support.test.InstrumentationRegistry;
 
 import com.mapbox.android.telemetry.MapboxTelemetry;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,13 +27,9 @@ public class LocationCollectionClientInstrumentedTest {
 
   @Before
   public void setUp() {
+    LocationCollectionClient.uninstall();
     ref = LocationCollectionClient.install(InstrumentationRegistry.getTargetContext(),
       DEFAULT_INTERVAL);
-  }
-
-  @After
-  public void tearDown() {
-    LocationCollectionClient.uninstall();
   }
 
   @Test
