@@ -6,6 +6,7 @@ import android.support.test.InstrumentationRegistry;
 
 import com.mapbox.android.telemetry.MapboxTelemetry;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,9 +28,13 @@ public class LocationCollectionClientInstrumentedTest {
 
   @Before
   public void setUp() {
-    LocationCollectionClient.uninstall();
     ref = LocationCollectionClient.install(InstrumentationRegistry.getTargetContext(),
       DEFAULT_INTERVAL);
+  }
+
+  @After
+  public void tearDown() {
+    LocationCollectionClient.uninstall();
   }
 
   @Test
@@ -57,11 +62,9 @@ public class LocationCollectionClientInstrumentedTest {
       });
     SharedPreferences.Editor editor = sharedPreferences.edit();
     editor.putBoolean(LOCATION_COLLECTOR_ENABLED, true);
-    editor.putLong(SESSION_ROTATION_INTERVAL_MILLIS, DEFAULT_INTERVAL * 2);
-    editor.apply();
+    editor.commit();
     assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
     assertTrue(ref.isEnabled());
-    assertEquals(DEFAULT_INTERVAL * 2, ref.getSessionRotationInterval());
   }
 
   @Test
