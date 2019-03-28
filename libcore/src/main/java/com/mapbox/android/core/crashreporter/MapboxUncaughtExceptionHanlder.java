@@ -56,7 +56,7 @@ public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionH
     this.version = version;
     this.exceptionChainDepth = DEFAULT_EXCEPTION_CHAIN_DEPTH;
     this.defaultExceptionHandler = defaultExceptionHandler;
-    sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+    initializeSharedPreferences(sharedPreferences);
   }
 
   /**
@@ -196,5 +196,15 @@ public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionH
   static String getReportFileName(@NonNull String mapboxPackage,
                                   @NonNull String timestamp) {
     return String.format(CRASH_FILENAME_FORMAT, mapboxPackage, timestamp);
+  }
+
+  private void initializeSharedPreferences(SharedPreferences sharedPreferences) {
+    try {
+      isEnabled.set(sharedPreferences.getBoolean(MAPBOX_PREF_ENABLE_CRASH_REPORTER, true));
+    } catch (Exception ex) {
+      // In case of a ClassCastException
+      Log.e(TAG, ex.toString());
+    }
+    sharedPreferences.registerOnSharedPreferenceChangeListener(this);
   }
 }

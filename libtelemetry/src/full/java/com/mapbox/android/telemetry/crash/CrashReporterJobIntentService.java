@@ -56,6 +56,7 @@ public final class CrashReporterJobIntentService extends JobIntentService {
       CrashEvent event = client.nextEvent();
       if (client.isDuplicate(event)) {
         Log.d(LOG_TAG, "Skip duplicate crash in this batch: " + event.getHash());
+        client.delete(event);
         continue;
       }
 
