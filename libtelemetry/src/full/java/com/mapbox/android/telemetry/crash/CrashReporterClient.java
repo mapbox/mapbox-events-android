@@ -71,6 +71,7 @@ final class CrashReporterClient {
       return sharedPreferences.getBoolean(MAPBOX_PREF_ENABLE_CRASH_REPORTER, true);
     } catch (Exception ex) {
       // Catch ClassCastException
+      Log.e(LOG_TAG, ex.toString());
       return false;
     }
   }
@@ -159,6 +160,7 @@ final class CrashReporterClient {
     try {
       return gson.fromJson(json, CrashEvent.class);
     } catch (JsonSyntaxException jse) {
+      Log.e(LOG_TAG, jse.toString());
       return new CrashEvent(null, null);
     }
   }

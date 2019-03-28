@@ -50,6 +50,7 @@ public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
       }
     } catch (Throwable throwable) {
       // TODO: log silent crash
+      Log.e(TAG, throwable.toString());
     }
   }
 

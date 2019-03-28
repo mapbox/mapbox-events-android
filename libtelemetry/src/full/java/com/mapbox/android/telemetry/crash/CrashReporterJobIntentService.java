@@ -42,6 +42,7 @@ public final class CrashReporterJobIntentService extends JobIntentService {
       );
     } catch (Throwable throwable) {
       // TODO: log silent crash
+      Log.e(LOG_TAG, throwable.toString());
     }
   }
 
