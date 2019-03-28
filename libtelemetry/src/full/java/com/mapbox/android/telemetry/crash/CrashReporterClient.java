@@ -34,6 +34,7 @@ final class CrashReporterClient {
   private final HashMap<CrashEvent, File> eventFileHashMap = new HashMap<>();
   private File[] crashReports;
   private int fileCursor;
+  private boolean isDebug;
 
   @VisibleForTesting
   CrashReporterClient(@NonNull SharedPreferences sharedPreferences,
@@ -43,6 +44,7 @@ final class CrashReporterClient {
     this.telemetry = telemetry;
     this.crashReports = crashReports;
     this.fileCursor = 0;
+    this.isDebug = false;
   }
 
   static CrashReporterClient create(@NonNull Context context) {
@@ -59,9 +61,14 @@ final class CrashReporterClient {
     return this;
   }
 
+  CrashReporterClient debug(boolean isDebug) {
+    this.isDebug = isDebug;
+    return this;
+  }
+
   boolean isEnabled() {
     try {
-      return sharedPreferences.getBoolean(MAPBOX_PREF_ENABLE_CRASH_REPORTER, false);
+      return sharedPreferences.getBoolean(MAPBOX_PREF_ENABLE_CRASH_REPORTER, true);
     } catch (Exception ex) {
       // Catch ClassCastException
       return false;
@@ -100,7 +107,7 @@ final class CrashReporterClient {
     if (!event.isValid()) {
       return false;
     }
-    AtomicBoolean success = new AtomicBoolean(false);
+    AtomicBoolean success = new AtomicBoolean(isDebug);
     CountDownLatch latch = new CountDownLatch(1);
     return sendSync(event, success, latch);
   }

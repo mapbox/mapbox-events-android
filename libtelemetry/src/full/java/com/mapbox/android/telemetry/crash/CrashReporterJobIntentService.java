@@ -3,6 +3,7 @@ package com.mapbox.android.telemetry.crash;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.JobIntentService;
 import android.util.Log;
 import com.mapbox.android.core.FileUtils;
@@ -35,30 +36,34 @@ public final class CrashReporterJobIntentService extends JobIntentService {
         return;
       }
 
-      CrashReporterClient client = CrashReporterClient
+      handleCrashReports(CrashReporterClient
         .create(getApplicationContext())
-        .loadFrom(rootDirectory);
-
-      if (!client.isEnabled()) {
-        Log.w(LOG_TAG, "Crash reporter is disabled");
-        return;
-      }
-
-      while (client.hasNextEvent()) {
-        CrashEvent event = client.nextEvent();
-        if (client.isDuplicate(event)) {
-          Log.d(LOG_TAG, "Skip duplicate crash in this batch: " + event.getHash());
-          continue;
-        }
-
-        if (client.send(event)) {
-          client.delete(event);
-        } else {
-          Log.w(LOG_TAG, "Failed to deliver crash event");
-        }
-      }
+        .loadFrom(rootDirectory)
+      );
     } catch (Throwable throwable) {
       // TODO: log silent crash
+    }
+  }
+
+  @VisibleForTesting
+  void handleCrashReports(@NonNull CrashReporterClient client) {
+    if (!client.isEnabled()) {
+      Log.w(LOG_TAG, "Crash reporter is disabled");
+      return;
+    }
+
+    while (client.hasNextEvent()) {
+      CrashEvent event = client.nextEvent();
+      if (client.isDuplicate(event)) {
+        Log.d(LOG_TAG, "Skip duplicate crash in this batch: " + event.getHash());
+        continue;
+      }
+
+      if (client.send(event)) {
+        client.delete(event);
+      } else {
+        Log.w(LOG_TAG, "Failed to deliver crash event");
+      }
     }
   }
 }
