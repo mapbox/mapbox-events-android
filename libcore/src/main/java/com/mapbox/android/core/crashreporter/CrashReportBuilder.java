@@ -79,7 +79,8 @@ public final class CrashReportBuilder {
       report.put("threadDetails", String.format(THREAD_DETAILS_FORMAT, uncaughtExceptionThread.getId(),
         uncaughtExceptionThread.getName(), uncaughtExceptionThread.getPriority()));
     }
-    report.put("appID", applicationContext.getPackageName());
+    report.put("appId", applicationContext.getPackageName());
+    report.put("appVersion", getAppVersion(applicationContext));
     return report;
   }
 
@@ -112,5 +113,15 @@ public final class CrashReportBuilder {
       }
     }
     return Integer.toHexString(result.toString().hashCode());
+  }
+
+  @NonNull
+  private static String getAppVersion(Context context) {
+    try {
+      String packageName = context.getPackageName();
+      return context.getPackageManager().getPackageInfo(packageName, 0).versionName;
+    } catch (Exception exception) {
+      return "unknown";
+    }
   }
 }

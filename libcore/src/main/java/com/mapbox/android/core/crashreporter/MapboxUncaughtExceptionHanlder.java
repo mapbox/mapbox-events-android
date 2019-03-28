@@ -32,6 +32,7 @@ public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionH
   private static final String TAG = "MbUncaughtExcHandler";
   private static final String CRASH_FILENAME_FORMAT = "%s/%s.crash";
   private static final int DEFAULT_EXCEPTION_CHAIN_DEPTH = 3;
+  private static final int DEFAULT_MAX_REPORTS = 10;
 
   private final Thread.UncaughtExceptionHandler defaultExceptionHandler;
   private final Context applicationContext;
@@ -55,7 +56,7 @@ public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionH
     this.version = version;
     this.exceptionChainDepth = DEFAULT_EXCEPTION_CHAIN_DEPTH;
     this.defaultExceptionHandler = defaultExceptionHandler;
-    sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+    initializeSharedPreferences(sharedPreferences);
   }
 
   /**
@@ -97,11 +98,8 @@ public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionH
           .addCausalChain(causalChain)
           .build();
 
-        File directory = FileUtils.getFile(applicationContext, mapboxPackage);
-        if (!directory.exists()) {
-          directory.mkdir();
-        }
-        // TODO: we should keep max 10 crashes and delete older
+        ensureDirectoryWritable(applicationContext, mapboxPackage);
+
         File file = FileUtils.getFile(applicationContext, getReportFileName(mapboxPackage, report.getDateString()));
         FileUtils.writeToFile(file, report.toJson());
       } catch (Exception ex) {
@@ -180,10 +178,33 @@ public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionH
     return level >= exceptionChainDepth;
   }
 
+  private static void ensureDirectoryWritable(@NonNull Context context, @NonNull String dirPath) {
+    File directory = FileUtils.getFile(context, dirPath);
+    if (!directory.exists()) {
+      directory.mkdir();
+    }
+
+    // Cleanup directory if we've reached our max limit
+    if (directory.length() >= DEFAULT_MAX_REPORTS) {
+      FileUtils.deleteFirst(FileUtils.listAllFiles(directory),
+        new FileUtils.LastModifiedComparator(), DEFAULT_MAX_REPORTS - 1);
+    }
+  }
+
   @VisibleForTesting
   @NonNull
   static String getReportFileName(@NonNull String mapboxPackage,
                                   @NonNull String timestamp) {
     return String.format(CRASH_FILENAME_FORMAT, mapboxPackage, timestamp);
+  }
+
+  private void initializeSharedPreferences(SharedPreferences sharedPreferences) {
+    try {
+      isEnabled.set(sharedPreferences.getBoolean(MAPBOX_PREF_ENABLE_CRASH_REPORTER, true));
+    } catch (Exception ex) {
+      // In case of a ClassCastException
+      Log.e(TAG, ex.toString());
+    }
+    sharedPreferences.registerOnSharedPreferenceChangeListener(this);
   }
 }

@@ -1,13 +1,14 @@
 package com.mapbox.android.telemetry;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
@@ -17,6 +18,9 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
+
+import android.support.annotation.NonNull;
+import android.support.v4.content.LocalBroadcastManager;
 
 import android.util.Log;
 import okhttp3.Call;
@@ -31,7 +35,7 @@ import static com.mapbox.android.telemetry.MapboxTelemetryConstants.SESSION_ROTA
 public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   private static final String LOG_TAG = "MapboxTelemetry";
   private static final String NON_NULL_APPLICATION_CONTEXT_REQUIRED = "Non-null application context required.";
-  private static AtomicReference<String> sAccessToken = new AtomicReference<>();
+  private static AtomicReference<String> sAccessToken = new AtomicReference<>("");
   private String userAgent;
   private final EventsQueue queue;
   private TelemetryClient telemetryClient;
@@ -48,7 +52,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
-    sAccessToken.set(accessToken);
+    setAccessToken(context, accessToken);
     this.userAgent = userAgent;
     AlarmReceiver alarmReceiver = obtainAlarmReceiver();
     this.schedulerFlusher = new SchedulerFlusherFactory(applicationContext, alarmReceiver).supply();
@@ -67,7 +71,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
                   TelemetryClient telemetryClient, Callback httpCallback, SchedulerFlusher schedulerFlusher,
                   Clock clock, TelemetryEnabler telemetryEnabler, ExecutorService executorService) {
     initializeContext(context);
-    sAccessToken.set(accessToken);
+    setAccessToken(context, accessToken);
     this.userAgent = userAgent;
     this.telemetryClient = telemetryClient;
     this.schedulerFlusher = schedulerFlusher;
@@ -317,25 +321,29 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     schedulerFlusher.unregister();
   }
 
-  private boolean sendEventIfWhitelisted(Event event) {
-    if (Event.Type.TURNSTILE.equals(event.obtainType())) {
-      final List<Event> appUserTurnstile = new ArrayList<>(1);
-      appUserTurnstile.add(event);
-      executeRunnable(new Runnable() {
-        @Override
-        public void run() {
-          sendEventsIfPossible(appUserTurnstile);
-        }
-      });
-      return true;
+  private synchronized boolean sendEventIfWhitelisted(Event event) {
+    boolean isEventSent = false;
+    switch (event.obtainType()) {
+      case TURNSTILE:
+      case CRASH:
+        final List<Event> events = Collections.singletonList(event);
+        executeRunnable(new Runnable() {
+          @Override
+          public void run() {
+            sendEventsIfPossible(events);
+          }
+        });
+        isEventSent = true;
+        break;
+      case VIS_ATTACHMENT:
+        // Not super concerned about vision, since they most likely doing i/o on bg thread anyways
+        sendAttachment(event);
+        isEventSent = true;
+        break;
+      default:
+        break;
     }
-    // Not super concerned about vision, since they most likely doing i/o on bg thread anyways
-    if (Event.Type.VIS_ATTACHMENT.equals((event.obtainType()))) {
-      sendAttachment(event);
-      return true;
-    }
-
-    return false;
+    return isEventSent;
   }
 
   private void startTelemetry() {
@@ -378,6 +386,16 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
         editor.apply();
       }
     });
+  }
+
+  private static synchronized void setAccessToken(@NonNull Context context, @NonNull String accessToken) {
+    if (TelemetryUtils.isEmpty(accessToken)) {
+      return;
+    }
+    if (sAccessToken.getAndSet(accessToken).isEmpty()) {
+      LocalBroadcastManager.getInstance(context)
+        .sendBroadcast(new Intent(MapboxTelemetryConstants.ACTION_TOKEN_CHANGED));
+    }
   }
 
   private void executeRunnable(final Runnable command) {

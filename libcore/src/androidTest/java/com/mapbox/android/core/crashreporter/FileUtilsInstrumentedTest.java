@@ -2,7 +2,6 @@ package com.mapbox.android.core.crashreporter;
 
 import android.support.test.InstrumentationRegistry;
 import com.mapbox.android.core.FileUtils;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,13 +26,12 @@ public class FileUtilsInstrumentedTest {
     if (!directory.exists()) {
       directory.mkdir();
     }
-    file = FileUtils.getFile(InstrumentationRegistry.getTargetContext(), filename);
-  }
 
-  @After
-  public void tearDown() {
-    assertTrue(file.delete());
-    assertTrue(directory.delete());
+    for (File file: directory.listFiles()) {
+      file.delete();
+    }
+
+    file = FileUtils.getFile(InstrumentationRegistry.getTargetContext(), filename);
   }
 
   @Test

@@ -116,7 +116,9 @@ public class MapboxTelemetryTest {
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
     MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext, mockedEventsQueue,
       TelemetryEnabler.State.ENABLED);
+    // Mock event that will end up in the queue
     Event mockedEvent = mock(Event.class);
+    when(mockedEvent.obtainType()).thenReturn(Event.Type.LOCATION);
     theMapboxTelemetry.push(mockedEvent);
     verify(mockedEventsQueue, times(1)).push(eq(mockedEvent));
   }
@@ -128,6 +130,7 @@ public class MapboxTelemetryTest {
     MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext, mockedEventsQueue,
       TelemetryEnabler.State.DISABLED);
     Event mockedEvent = mock(Event.class);
+    when(mockedEvent.obtainType()).thenReturn(Event.Type.LOCATION);
     theMapboxTelemetry.push(mockedEvent);
     verify(mockedEventsQueue, never()).push(eq(mockedEvent));
   }
@@ -387,7 +390,9 @@ public class MapboxTelemetryTest {
     ExecutorService mockedExecutor = mock(ExecutorService.class);
     setupDirectExecutor(mockedExecutor);
     MapboxTelemetry mapboxTelemetry = obtainMapboxTelemetryWith(mockedExecutor);
-    mapboxTelemetry.push(mock(Event.class));
+    Event mockedEvent = mock(Event.class);
+    when(mockedEvent.obtainType()).thenReturn(Event.Type.LOCATION);
+    mapboxTelemetry.push(mockedEvent);
     mapboxTelemetry.disable();
     // Expect to flush and disable location
     verify(mockedExecutor, times(2)).execute(any(Runnable.class));
@@ -459,9 +464,11 @@ public class MapboxTelemetryTest {
     Clock mockedClock = mock(Clock.class);
     TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false);
     telemetryEnabler.updatePreferences(state);
+    ExecutorService mockedExecutor = mock(ExecutorService.class);
+    setupDirectExecutor(mockedExecutor);
     return new MapboxTelemetry(context, aValidAccessToken, aValidUserAgent,
       eventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      telemetryEnabler, mock(ExecutorService.class));
+      telemetryEnabler, mockedExecutor);
   }
 
   private MapboxTelemetry obtainMapboxTelemetryWith(Context context, EventsQueue eventsQueue) {
