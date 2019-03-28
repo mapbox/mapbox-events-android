@@ -12,6 +12,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.File;
 import java.util.List;
 
+import static com.mapbox.android.core.crashreporter.MapboxUncaughtExceptionHanlder.MAPBOX_PREF_ENABLE_CRASH_REPORTER;
 import static junit.framework.TestCase.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,8 +34,7 @@ public class MapboxUncaughtExceptionHanlderTest {
   @Mock
   private Context context;
 
-  @Mock
-  private SharedPreferences sharedPreferences;
+  private SharedPreferences sharedPreferences = getMockedSharedPrefs(MAPBOX_PREF_ENABLE_CRASH_REPORTER, true);
 
   private MapboxUncaughtExceptionHanlder exceptionHanlder;
 
@@ -112,8 +112,8 @@ public class MapboxUncaughtExceptionHanlderTest {
   public void exceptionHandlerDisabled() {
     // Disable via shared pref
     exceptionHanlder.onSharedPreferenceChanged(
-      getMockedSharedPrefs(MapboxUncaughtExceptionHanlder.MAPBOX_PREF_ENABLE_CRASH_REPORTER, false),
-      MapboxUncaughtExceptionHanlder.MAPBOX_PREF_ENABLE_CRASH_REPORTER);
+      getMockedSharedPrefs(MAPBOX_PREF_ENABLE_CRASH_REPORTER, false),
+      MAPBOX_PREF_ENABLE_CRASH_REPORTER);
     exceptionHanlder.uncaughtException(Thread.currentThread(), new Throwable());
     verify(context, never()).getFilesDir();
   }
@@ -145,8 +145,8 @@ public class MapboxUncaughtExceptionHanlderTest {
   public void onSharedPreferenceChanged() {
     boolean isEnabled = exceptionHanlder.isEnabled();
     exceptionHanlder.onSharedPreferenceChanged(
-      getMockedSharedPrefs(MapboxUncaughtExceptionHanlder.MAPBOX_PREF_ENABLE_CRASH_REPORTER, false),
-      MapboxUncaughtExceptionHanlder.MAPBOX_PREF_ENABLE_CRASH_REPORTER);
+      getMockedSharedPrefs(MAPBOX_PREF_ENABLE_CRASH_REPORTER, false),
+      MAPBOX_PREF_ENABLE_CRASH_REPORTER);
     assertThat(exceptionHanlder.isEnabled()).isNotEqualTo(isEnabled);
   }
 
@@ -159,7 +159,7 @@ public class MapboxUncaughtExceptionHanlderTest {
 
   private static SharedPreferences getMockedSharedPrefs(String key, boolean value) {
     SharedPreferences sharedPreferences = mock(SharedPreferences.class);
-    when(sharedPreferences.getBoolean(key, false)).thenReturn(value);
+    when(sharedPreferences.getBoolean(key, true)).thenReturn(value);
     return sharedPreferences;
   }
 
