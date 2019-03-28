@@ -121,7 +121,7 @@ public final class CrashReportBuilder {
       String packageName = context.getPackageName();
       return context.getPackageManager().getPackageInfo(packageName, 0).versionName;
     } catch (Exception exception) {
-      return "";
+      return "unknown";
     }
   }
 }
