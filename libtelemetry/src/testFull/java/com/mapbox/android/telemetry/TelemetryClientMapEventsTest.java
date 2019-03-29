@@ -113,8 +113,7 @@ public class TelemetryClientMapEventsTest extends MockWebServerTest {
     WindowManager mockedWindowManager = mock(WindowManager.class, RETURNS_DEEP_STUBS);
     when(mockedContext.getSystemService(Context.WINDOW_SERVICE)).thenReturn(mockedWindowManager);
     initializeMapboxTelemetry(mockedContext);
-    MapEventFactory mapEventFactory = new MapEventFactory();
-    Event loadEvent = mapEventFactory.createMapLoadEvent(Event.Type.MAP_LOAD);
+    Event loadEvent = mock(MapLoadEvent.class);
     return loadEvent;
   }
 
@@ -138,7 +137,7 @@ public class TelemetryClientMapEventsTest extends MockWebServerTest {
     Clock mockedClock = mock(Clock.class);
     TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false);
     new MapboxTelemetry(context, aValidAccessToken, aValidUserAgent, mockedEventsQueue, mockedTelemetryClient,
-      mockedHttpCallback, mockedSchedulerFlusher, mockedClock, telemetryEnabler,  mock(ExecutorService.class));
+      mockedHttpCallback, mockedSchedulerFlusher, mockedClock, telemetryEnabler, mock(ExecutorService.class));
   }
 
   private MapState obtainDefaultMapState() {
@@ -151,18 +150,16 @@ public class TelemetryClientMapEventsTest extends MockWebServerTest {
   private Event obtainClickEvent() {
     Context mockedContext = obtainMockedContext();
     initializeMapboxTelemetry(mockedContext);
-    MapEventFactory mapEventFactory = new MapEventFactory();
     MapState mapState = obtainDefaultMapState();
-    Event clickEvent = mapEventFactory.createMapGestureEvent(Event.Type.MAP_CLICK, mapState);
+    Event clickEvent = mock(MapClickEvent.class);
     return clickEvent;
   }
 
   private Event obtainDragendEvent() {
     Context mockedContext = obtainMockedContext();
     initializeMapboxTelemetry(mockedContext);
-    MapEventFactory mapEventFactory = new MapEventFactory();
     MapState mapState = obtainDefaultMapState();
-    Event dragendEvent = mapEventFactory.createMapGestureEvent(Event.Type.MAP_DRAGEND, mapState);
+    Event dragendEvent = mock(MapDragendEvent.class);
     return dragendEvent;
   }
 
