@@ -61,7 +61,12 @@ public class LocationCollectionClient implements SharedPreferences.OnSharedPrefe
     this.settingsChangeHandler = new Handler(handlerThread.getLooper()) {
       @Override
       public void handleMessage(Message msg) {
-        handleSettingsChangeMessage(msg);
+        try {
+          handleSettingsChangeMessage(msg);
+        } catch (Throwable throwable) {
+          // TODO: log silent crash
+          Log.e(TAG, throwable.toString());
+        }
       }
     };
     this.sharedPreferences = sharedPreferences;
