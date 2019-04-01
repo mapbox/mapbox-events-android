@@ -178,16 +178,17 @@ public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionH
     return level >= exceptionChainDepth;
   }
 
-  private static void ensureDirectoryWritable(@NonNull Context context, @NonNull String dirPath) {
+  @VisibleForTesting
+  static void ensureDirectoryWritable(@NonNull Context context, @NonNull String dirPath) {
     File directory = FileUtils.getFile(context, dirPath);
     if (!directory.exists()) {
       directory.mkdir();
     }
 
     // Cleanup directory if we've reached our max limit
-    if (directory.length() >= DEFAULT_MAX_REPORTS) {
-      FileUtils.deleteFirst(FileUtils.listAllFiles(directory),
-        new FileUtils.LastModifiedComparator(), DEFAULT_MAX_REPORTS - 1);
+    File [] allFiles = FileUtils.listAllFiles(directory);
+    if (allFiles.length >= DEFAULT_MAX_REPORTS) {
+      FileUtils.deleteFirst(allFiles, new FileUtils.LastModifiedComparator(), DEFAULT_MAX_REPORTS - 1);
     }
   }
 
