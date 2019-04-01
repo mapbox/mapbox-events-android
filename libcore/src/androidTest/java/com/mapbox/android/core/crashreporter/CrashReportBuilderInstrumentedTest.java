@@ -78,7 +78,7 @@ public class CrashReportBuilderInstrumentedTest {
   public void checkStackTraceHash() {
     List<Throwable> causalChain = exceptionHanlder.getCausalChain(createMapboxThrowable());
     String hash = CrashReportBuilder.getStackTraceHash(causalChain);
-    assertEquals("67850f0c", hash);
+    assertEquals("34cbd8fe", hash);
   }
 
   @Test
