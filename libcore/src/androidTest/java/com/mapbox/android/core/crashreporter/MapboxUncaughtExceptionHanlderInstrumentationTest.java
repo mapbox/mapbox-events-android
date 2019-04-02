@@ -51,18 +51,35 @@ public class MapboxUncaughtExceptionHanlderInstrumentationTest {
 
   @Test
   public void testReportCap() throws IOException {
-    for (int i = 0; i < 10; i++) {
-      File file = FileUtils.getFile(context,
-        String.format(CRASH_FILENAME_FORMAT, TELEM_MAPBOX_PACKAGE, String.format("crash%d", i)));
-      FileUtils.writeToFile(file, String.format(crashEvent, UUID.randomUUID().toString()));
-    }
-
+    writeToDisk(10);
     exceptionHanlder.setExceptionChainDepth(1);
     exceptionHanlder.uncaughtException(Thread.currentThread(), createMapboxThrowable());
 
     File[] files = directory.listFiles();
     assertNotNull(files);
     assertEquals(2, files.length);
+  }
+
+  @Test
+  public void ensureDirectoryWritableHasNoEffect() throws IOException {
+    writeToDisk(3);
+    MapboxUncaughtExceptionHanlder.ensureDirectoryWritable(context, TELEM_MAPBOX_PACKAGE);
+    assertEquals(3, directory.listFiles().length);
+  }
+
+  @Test
+  public void ensureDirectoryWritableCleansUp() throws IOException {
+    writeToDisk(10);
+    MapboxUncaughtExceptionHanlder.ensureDirectoryWritable(context, TELEM_MAPBOX_PACKAGE);
+    assertEquals(1, directory.listFiles().length);
+  }
+
+  private void writeToDisk(int numFiles) throws IOException {
+    for (int i = 0; i < numFiles; i++) {
+      File file = FileUtils.getFile(context,
+        String.format(CRASH_FILENAME_FORMAT, TELEM_MAPBOX_PACKAGE, String.format("crash%d", i)));
+      FileUtils.writeToFile(file, String.format(crashEvent, UUID.randomUUID().toString()));
+    }
   }
 
   private static Throwable createMapboxThrowable() {
