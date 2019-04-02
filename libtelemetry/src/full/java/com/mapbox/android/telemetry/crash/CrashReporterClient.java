@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.mapbox.android.core.FileUtils;
+import com.mapbox.android.telemetry.BuildConfig;
 import com.mapbox.android.telemetry.CrashEvent;
 import com.mapbox.android.telemetry.MapboxTelemetry;
 import com.mapbox.android.telemetry.TelemetryListener;
@@ -51,7 +52,8 @@ final class CrashReporterClient {
     SharedPreferences sharedPreferences =
       context.getSharedPreferences(MAPBOX_CRASH_REPORTER_PREFERENCES, Context.MODE_PRIVATE);
     return new CrashReporterClient(sharedPreferences,
-      new MapboxTelemetry(context, "", CRASH_REPORTER_CLIENT_USER_AGENT), new File[0]);
+      new MapboxTelemetry(context, "",
+        String.format("%s/%s", CRASH_REPORTER_CLIENT_USER_AGENT, BuildConfig.VERSION_NAME)), new File[0]);
   }
 
   CrashReporterClient loadFrom(@NonNull File rootDir) {

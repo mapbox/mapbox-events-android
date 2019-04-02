@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import android.util.Log;
 import com.mapbox.android.core.crashreporter.MapboxUncaughtExceptionHanlder;
 import com.mapbox.android.telemetry.BuildConfig;
 import com.mapbox.android.telemetry.crash.TokenChangeBroadcastReceiver;
@@ -20,20 +21,26 @@ import static com.mapbox.android.telemetry.MapboxTelemetryConstants.MAPBOX_TELEM
 import static com.mapbox.android.telemetry.location.LocationCollectionClient.DEFAULT_SESSION_ROTATION_INTERVAL_HOURS;
 
 public class MapboxTelemetryInitProvider extends ContentProvider {
+  private static final String TAG = "MbxTelemInitProvider";
   private static final String EMPTY_APPLICATION_ID_PROVIDER_AUTHORITY =
     "com.mapbox.android.telemetry.provider.mapboxtelemetryinitprovider";
 
   @Override
   public boolean onCreate() {
-    if (!BuildConfig.DEBUG) {
-      // Register broadcast receiver to get notification
-      // when valid token becomes available
-      TokenChangeBroadcastReceiver.register(getContext());
+    try {
+      if (!BuildConfig.DEBUG) {
+        // Register broadcast receiver to get notification
+        // when valid token becomes available
+        TokenChangeBroadcastReceiver.register(getContext());
 
-      // Install crash reporter for telemetry packages only!
-      MapboxUncaughtExceptionHanlder.install(getContext(), MAPBOX_TELEMETRY_PACKAGE, BuildConfig.VERSION_NAME);
+        // Install crash reporter for telemetry packages only!
+        MapboxUncaughtExceptionHanlder.install(getContext(), MAPBOX_TELEMETRY_PACKAGE, BuildConfig.VERSION_NAME);
+      }
+      LocationCollectionClient.install(getContext(), TimeUnit.HOURS.toMillis(DEFAULT_SESSION_ROTATION_INTERVAL_HOURS));
+    } catch (Throwable throwable) {
+      // TODO: log silent crash
+      Log.e(TAG, throwable.toString());
     }
-    LocationCollectionClient.install(getContext(), TimeUnit.HOURS.toMillis(DEFAULT_SESSION_ROTATION_INTERVAL_HOURS));
     return false;
   }
 

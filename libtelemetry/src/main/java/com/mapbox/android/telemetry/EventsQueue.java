@@ -60,7 +60,12 @@ class EventsQueue {
       executorService.execute(new Runnable() {
         @Override
         public void run() {
-          callback.onFullQueue(events);
+          try {
+            callback.onFullQueue(events);
+          } catch (Throwable throwable) {
+            // TODO: log silent crash
+            Log.e(LOG_TAG, throwable.toString());
+          }
         }
       });
     } catch (RejectedExecutionException rex) {
