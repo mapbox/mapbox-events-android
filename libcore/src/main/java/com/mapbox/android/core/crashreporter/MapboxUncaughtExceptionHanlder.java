@@ -31,7 +31,7 @@ public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionH
 
   private static final String TAG = "MbUncaughtExcHandler";
   private static final String CRASH_FILENAME_FORMAT = "%s/%s.crash";
-  private static final int DEFAULT_EXCEPTION_CHAIN_DEPTH = 3;
+  private static final int DEFAULT_EXCEPTION_CHAIN_DEPTH = 2;
   private static final int DEFAULT_MAX_REPORTS = 10;
 
   private final Thread.UncaughtExceptionHandler defaultExceptionHandler;

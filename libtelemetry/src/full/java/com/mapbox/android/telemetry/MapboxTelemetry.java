@@ -129,10 +129,15 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     executeRunnable(new Runnable() {
       @Override
       public void run() {
-        SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences(applicationContext);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putLong(SESSION_ROTATION_INTERVAL_MILLIS, TimeUnit.HOURS.toMillis(intervalHours));
-        editor.apply();
+        try {
+          SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences(applicationContext);
+          SharedPreferences.Editor editor = sharedPreferences.edit();
+          editor.putLong(SESSION_ROTATION_INTERVAL_MILLIS, TimeUnit.HOURS.toMillis(intervalHours));
+          editor.apply();
+        } catch (Throwable throwable) {
+          // TODO: log silent crash
+          Log.e(LOG_TAG, throwable.toString());
+        }
       }
     });
     return true;
@@ -270,7 +275,12 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     executeRunnable(new Runnable() {
       @Override
       public void run() {
-        sendEventsIfPossible(currentEvents);
+        try {
+          sendEventsIfPossible(currentEvents);
+        } catch (Throwable throwable) {
+          // TODO: log silent crash
+          Log.e(LOG_TAG, throwable.toString());
+        }
       }
     });
   }
@@ -330,7 +340,12 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
         executeRunnable(new Runnable() {
           @Override
           public void run() {
-            sendEventsIfPossible(events);
+            try {
+              sendEventsIfPossible(events);
+            } catch (Throwable throwable) {
+              // TODO: log silent crash
+              Log.e(LOG_TAG, throwable.toString());
+            }
           }
         });
         isEventSent = true;
@@ -380,10 +395,15 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     executeRunnable(new Runnable() {
       @Override
       public void run() {
-        SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences(applicationContext);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean(LOCATION_COLLECTOR_ENABLED, enable);
-        editor.apply();
+        try {
+          SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences(applicationContext);
+          SharedPreferences.Editor editor = sharedPreferences.edit();
+          editor.putBoolean(LOCATION_COLLECTOR_ENABLED, enable);
+          editor.apply();
+        } catch (Throwable throwable) {
+          // TODO: log silent crash
+          Log.e(LOG_TAG, throwable.toString());
+        }
       }
     });
   }
