@@ -116,7 +116,7 @@ public class TelemetryUtils {
     return BACKGROUND;
   }
 
-  static int obtainBatteryLevel(Context context) {
+  public static int obtainBatteryLevel(Context context) {
     Intent batteryStatus = registerBatteryUpdates(context);
     if (batteryStatus == null) {
       return UNAVAILABLE_BATTERY_LEVEL;
@@ -126,7 +126,7 @@ public class TelemetryUtils {
     return Math.round((level / (float) scale) * PERCENT_SCALE);
   }
 
-  static boolean isPluggedIn(Context context) {
+  public static boolean isPluggedIn(Context context) {
     Intent batteryStatus = registerBatteryUpdates(context);
     if (batteryStatus == null) {
       return false;
@@ -138,12 +138,12 @@ public class TelemetryUtils {
     return pluggedIntoUSB || pluggedIntoAC;
   }
 
-  static String obtainCellularNetworkType(Context context) {
+  public static String obtainCellularNetworkType(Context context) {
     TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
     return NETWORKS.get(telephonyManager.getNetworkType());
   }
 
-  static String obtainCurrentDate() {
+  public static String obtainCurrentDate() {
     return dateFormat.format(new Date());
   }
 
@@ -171,7 +171,7 @@ public class TelemetryUtils {
   /**
    * Do not call this method outside of activity!!!
    */
-  static String retrieveVendorId() {
+  public static String retrieveVendorId() {
     if (MapboxTelemetry.applicationContext == null) {
       return updateVendorId();
     }
