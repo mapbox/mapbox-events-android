@@ -26,9 +26,10 @@ public class TelemetryClientAppUserTurnstileEventTest extends MockWebServerTest 
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvents(theAppUserTurnstile, mockedCallback);
+    telemetryClient.sendEvents(theAppUserTurnstile, mockedCallback, true);
 
-    String expectedRequestBody = obtainExpectedRequestBody(new GsonBuilder(), theAppUserTurnstile.get(0));
+    String expectedRequestBody = obtainExpectedRequestBody(new GsonBuilder(),
+      true, theAppUserTurnstile.get(0));
     assertRequestBodyEquals(expectedRequestBody);
   }
 }

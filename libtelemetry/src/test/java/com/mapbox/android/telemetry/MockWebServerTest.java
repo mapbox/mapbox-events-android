@@ -145,9 +145,9 @@ class MockWebServerTest {
     return obtainEvents(theEvent);
   }
 
-  String obtainExpectedRequestBody(GsonBuilder gsonBuilder, Event... theEvents) {
+  String obtainExpectedRequestBody(GsonBuilder gsonBuilder, boolean serializeNulls, Event... theEvents) {
     List<Event> events = Arrays.asList(theEvents);
-    Gson gson = gsonBuilder.create();
+    Gson gson = serializeNulls ? gsonBuilder.serializeNulls().create() : gsonBuilder.create();
     String requestBody = gson.toJson(events);
 
     return requestBody;

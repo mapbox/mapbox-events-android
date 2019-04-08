@@ -181,7 +181,7 @@ public class MapboxTelemetry {
 
   private void sendEvents(List<Event> events) {
     if (checkRequiredParameters(accessToken, userAgent)) {
-      telemetryClient.sendEvents(events, httpCallback);
+      telemetryClient.sendEvents(events, httpCallback, true);
     }
   }
 

@@ -7,6 +7,7 @@ import com.google.gson.JsonSerializer;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -55,10 +56,8 @@ class TelemetryClient {
     this.userAgent = userAgent;
   }
 
-  void sendEvents(List<Event> events, Callback callback) {
-    ArrayList<Event> batch = new ArrayList<>();
-    batch.addAll(events);
-    sendBatch(batch, callback);
+  void sendEvents(List<Event> events, Callback callback, boolean serializeNulls) {
+    sendBatch(Collections.unmodifiableList(events), callback, serializeNulls);
   }
 
   void sendAttachment(Attachment attachment, final CopyOnWriteArraySet<AttachmentListener> attachmentListeners) {
@@ -133,9 +132,9 @@ class TelemetryClient {
     return setting;
   }
 
-  private void sendBatch(List<Event> batch, Callback callback) {
+  private void sendBatch(List<Event> batch, Callback callback, boolean serializeNulls) {
     GsonBuilder gsonBuilder = configureGsonBuilder();
-    Gson gson = gsonBuilder.serializeNulls().create();
+    Gson gson = serializeNulls ? gsonBuilder.serializeNulls().create() : gsonBuilder.create();
     String payload = gson.toJson(batch);
     RequestBody body = RequestBody.create(JSON, payload);
     HttpUrl baseUrl = setting.getBaseUrl();

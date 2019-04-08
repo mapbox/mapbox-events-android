@@ -46,7 +46,7 @@ public class TelemetryClientTest extends MockWebServerTest {
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvents(mockedEvent, mockedCallback);
+    telemetryClient.sendEvents(mockedEvent, mockedCallback, false);
 
     assertRequestContainsHeader("Content-Type", "application/json; charset=utf-8");
   }
@@ -60,7 +60,7 @@ public class TelemetryClientTest extends MockWebServerTest {
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvents(mockedEvent, mockedCallback);
+    telemetryClient.sendEvents(mockedEvent, mockedCallback, false);
 
     assertRequestContainsHeader("Content-Encoding", "gzip");
   }
@@ -74,7 +74,7 @@ public class TelemetryClientTest extends MockWebServerTest {
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvents(mockedEvent, mockedCallback);
+    telemetryClient.sendEvents(mockedEvent, mockedCallback, false);
 
     assertRequestContainsParameter("access_token", "theAccessToken");
   }
@@ -88,7 +88,7 @@ public class TelemetryClientTest extends MockWebServerTest {
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvents(mockedEvent, mockedCallback);
+    telemetryClient.sendEvents(mockedEvent, mockedCallback, false);
 
     assertRequestContainsHeader("User-Agent", "theUserAgent");
   }
@@ -102,7 +102,7 @@ public class TelemetryClientTest extends MockWebServerTest {
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvents(mockedEvent, mockedCallback);
+    telemetryClient.sendEvents(mockedEvent, mockedCallback, false);
 
     assertPostRequestSentTo("/events/v2");
   }
@@ -116,7 +116,7 @@ public class TelemetryClientTest extends MockWebServerTest {
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvents(theEvent, mockedCallback);
+    telemetryClient.sendEvents(theEvent, mockedCallback, false);
 
     ArrayList<Event> events = new ArrayList<>(1);
     events.add(theEvent.get(0));
@@ -132,7 +132,7 @@ public class TelemetryClientTest extends MockWebServerTest {
     Callback mockedCallback = mock(Callback.class);
     enqueueMockNoResponse(204);
 
-    telemetryClient.sendEvents(theEvent, mockedCallback);
+    telemetryClient.sendEvents(theEvent, mockedCallback, false);
 
     assertResponseBodyEquals(null);
   }
@@ -149,7 +149,7 @@ public class TelemetryClientTest extends MockWebServerTest {
     Callback aCallback = provideACallback(latch, bodyRef, failureRef);
     enqueueMockResponse(401, "unauthorizedRequestResponse.json");
 
-    telemetryClient.sendEvents(theEvent, aCallback);
+    telemetryClient.sendEvents(theEvent, aCallback, false);
 
     latch.await();
     assertTelemetryResponseEquals(bodyRef.get(), "Unauthorized request, usually because of "
@@ -169,7 +169,7 @@ public class TelemetryClientTest extends MockWebServerTest {
     Callback aCallback = provideACallback(latch, bodyRef, failureRef);
     enqueueMockResponse(422, "invalidMessageBodyResponse.json");
 
-    telemetryClient.sendEvents(theEvent, aCallback);
+    telemetryClient.sendEvents(theEvent, aCallback, false);
 
     latch.await();
     assertTelemetryResponseEquals(bodyRef.get(), "Invalid message body, check the types and required properties of "
@@ -207,7 +207,7 @@ public class TelemetryClientTest extends MockWebServerTest {
     Callback aCallback = provideACallback(latch, bodyRef, failureRef);
     enqueueMockNoResponse(504);
 
-    telemetryClient.sendEvents(theEvent, aCallback);
+    telemetryClient.sendEvents(theEvent, aCallback, false);
 
     latch.await();
     assertTrue(failureRef.get());
@@ -226,7 +226,7 @@ public class TelemetryClientTest extends MockWebServerTest {
       mockedLogger, mock(CertificateBlacklist.class));
     telemetryClient.updateDebugLoggingEnabled(true);
 
-    telemetryClient.sendEvents(mockedEvent, mockedCallback);
+    telemetryClient.sendEvents(mockedEvent, mockedCallback, false);
 
     verify(mockedLogger, times(1))
       .debug(eq("TelemetryClient"), contains(" with 1 event(s) (user agent: anyUserAgent) with payload:"));
