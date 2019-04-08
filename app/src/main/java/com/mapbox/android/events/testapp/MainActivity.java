@@ -2,26 +2,25 @@ package com.mapbox.android.events.testapp;
 
 import android.annotation.SuppressLint;
 import android.location.Location;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineCallback;
-import com.mapbox.android.core.location.LocationEngineResult;
 import com.mapbox.android.core.location.LocationEngineProvider;
 import com.mapbox.android.core.location.LocationEngineRequest;
+import com.mapbox.android.core.location.LocationEngineResult;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.android.telemetry.AppUserTurnstile;
+import com.mapbox.android.telemetry.LocationEvent;
 import com.mapbox.android.telemetry.MapboxTelemetry;
 import com.mapbox.android.telemetry.TelemetryListener;
-import com.mapbox.android.telemetry.MapEventFactory;
-import com.mapbox.android.telemetry.Event;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -56,12 +55,14 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
     });
 
     Button fillQueue = findViewById(R.id.fill_queue);
+
     fillQueue.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        MapEventFactory factory = new MapEventFactory();
         for (int i = 0; i < 180; i++) {
-          mapboxTelemetry.push(factory.createMapLoadEvent(Event.Type.MAP_LOAD));
+          mapboxTelemetry.push(
+            new LocationEvent("testSessionId", 0.0, 0.0, "testAppState"))
+          ;
         }
       }
     });

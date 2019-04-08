@@ -79,55 +79,6 @@ public class SchemaTest {
   }
 
   @Test
-  public void checkMapClickEventSize() throws Exception {
-    JsonObject schema = grabSchema(MAP_CLICK);
-    List<Field> fields = grabClassFields(MapClickEvent.class);
-
-    assertEquals(schema.size(), fields.size());
-  }
-
-  @Test
-  public void checkMapClickEventFields() throws Exception {
-    JsonObject schema = grabSchema(MAP_CLICK);
-    List<Field> fields = grabClassFields(MapClickEvent.class);
-
-    schemaContainsFields(schema, fields);
-  }
-
-  @Test
-  public void checkMapDragEndEventSize() throws Exception {
-    JsonObject schema = grabSchema(MAP_DRAG);
-    List<Field> fields = grabClassFields(MapDragendEvent.class);
-
-    assertEquals(schema.size(), fields.size());
-  }
-
-  @Test
-  public void checkMapDragEndEventFields() throws Exception {
-    JsonObject schema = grabSchema(MAP_DRAG);
-    List<Field> fields = grabClassFields(MapDragendEvent.class);
-
-    schemaContainsFields(schema, fields);
-  }
-
-  @Test
-  public void checkMapLoadEventSize() throws Exception {
-    JsonObject schema = grabSchema(MAP_LOAD);
-    List<Field> fields = grabClassFields(MapLoadEvent.class);
-
-    //FIXME: this assertion is invalid: we should introduce a concept of mandatory/optional field to schema validation
-    //assertEquals(schema.size(), fields.size());
-  }
-
-  @Test
-  public void checkMapLoadEventFields() throws Exception {
-    JsonObject schema = grabSchema(MAP_LOAD);
-    List<Field> fields = grabClassFields(MapLoadEvent.class);
-
-    schemaContainsFields(schema, fields);
-  }
-
-  @Test
   public void checkNavigationArriveEventSize() throws Exception {
     JsonObject schema = grabSchema(NAVIGATION_ARRIVE);
     List<Field> fields = grabClassFields(NavigationArriveEvent.class);
