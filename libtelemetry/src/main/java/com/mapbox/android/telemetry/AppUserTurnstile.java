@@ -5,6 +5,8 @@ import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import com.google.gson.annotations.SerializedName;
 
 import static com.mapbox.android.telemetry.TelemetryEnabler.TELEMETRY_STATES;
@@ -15,24 +17,17 @@ public class AppUserTurnstile extends Event implements Parcelable {
   private static final String APPLICATION_CONTEXT_CANT_BE_NULL = "Create a MapboxTelemetry instance before calling "
     + "this method.";
 
-  @SerializedName("event")
   private final String event;
-  @SerializedName("created")
   private final String created;
-  @SerializedName("userId")
   private final String userId;
   @SerializedName("enabled.telemetry")
   private final boolean enabledTelemetry;
-  @SerializedName("device")
   private final String device;
-  @SerializedName("sdkIdentifier")
   private final String sdkIdentifier;
-  @SerializedName("sdkVersion")
   private final String sdkVersion;
-  @SerializedName("model")
-  private String model = null;
-  @SerializedName("operatingSystem")
-  private String operatingSystem = null;
+  private final String model;
+  private final String operatingSystem;
+  private String skuId;
 
   public AppUserTurnstile(String sdkIdentifier, String sdkVersion) {
     checkApplicationContext();
@@ -62,6 +57,12 @@ public class AppUserTurnstile extends Event implements Parcelable {
     this.operatingSystem = OPERATING_SYSTEM;
   }
 
+  public void setSkuId(@NonNull String skuId) {
+    if (!TextUtils.isEmpty(skuId)) {
+      this.skuId = skuId;
+    }
+  }
+
   @Override
   Type obtainType() {
     return Type.TURNSTILE;
@@ -77,6 +78,7 @@ public class AppUserTurnstile extends Event implements Parcelable {
     sdkVersion = in.readString();
     model = in.readString();
     operatingSystem = in.readString();
+    skuId = in.readString();
   }
 
   @Override
@@ -95,6 +97,7 @@ public class AppUserTurnstile extends Event implements Parcelable {
     dest.writeString(sdkVersion);
     dest.writeString(model);
     dest.writeString(operatingSystem);
+    dest.writeString(skuId);
   }
 
   @SuppressWarnings("unused")

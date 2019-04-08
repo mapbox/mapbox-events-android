@@ -135,7 +135,7 @@ class TelemetryClient {
 
   private void sendBatch(List<Event> batch, Callback callback) {
     GsonBuilder gsonBuilder = configureGsonBuilder();
-    Gson gson = gsonBuilder.create();
+    Gson gson = gsonBuilder.serializeNulls().create();
     String payload = gson.toJson(batch);
     RequestBody body = RequestBody.create(JSON, payload);
     HttpUrl baseUrl = setting.getBaseUrl();
