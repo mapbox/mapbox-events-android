@@ -1,7 +1,6 @@
 package com.mapbox.android.telemetry;
 
 import android.annotation.SuppressLint;
-import android.os.Parcel;
 import android.text.TextUtils;
 
 /**
@@ -54,13 +53,4 @@ public class CrashEvent extends Event {
     return !(TextUtils.isEmpty(event) || TextUtils.isEmpty(created) || TextUtils.isEmpty(stackTraceHash));
   }
 
-  @Override
-  public int describeContents() {
-    return 0;
-  }
-
-  @Override
-  public void writeToParcel(Parcel dest, int flags) {
-    // no-op
-  }
 }

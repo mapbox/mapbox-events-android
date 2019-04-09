@@ -1,11 +1,9 @@
 package com.mapbox.android.telemetry;
 
 
-import android.os.Parcelable;
-
 import java.util.EnumSet;
 
-public abstract class Event implements Parcelable {
+public abstract class Event {
 
   @Deprecated
   public enum Type {
