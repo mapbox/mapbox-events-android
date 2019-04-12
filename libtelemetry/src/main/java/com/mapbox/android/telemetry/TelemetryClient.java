@@ -1,8 +1,6 @@
 package com.mapbox.android.telemetry;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSerializer;
 
 import java.io.File;
 import java.io.IOException;
@@ -68,7 +66,7 @@ class TelemetryClient {
     MultipartBody.Builder requestBodyBuilder = new MultipartBody.Builder(BOUNDARY)
       .setType(MultipartBody.FORM);
 
-    for (FileAttachment fileAttachment: visionAttachments) {
+    for (FileAttachment fileAttachment : visionAttachments) {
       FileData fileData = fileAttachment.getFileData();
       AttachmentMetadata attachmentMetadata = fileAttachment.getAttachmentMetadata();
       metadataList.add(attachmentMetadata);
@@ -160,30 +158,13 @@ class TelemetryClient {
     return setting.isDebugLoggingEnabled() || setting.getEnvironment().equals(Environment.STAGING);
   }
 
-  private GsonBuilder configureGsonBuilder() {
-    GsonBuilder gsonBuilder = new GsonBuilder();
-    JsonSerializer<NavigationArriveEvent> arriveSerializer = new ArriveEventSerializer();
-    gsonBuilder.registerTypeAdapter(NavigationArriveEvent.class, arriveSerializer);
-    JsonSerializer<NavigationDepartEvent> departSerializer = new DepartEventSerializer();
-    gsonBuilder.registerTypeAdapter(NavigationDepartEvent.class, departSerializer);
-    JsonSerializer<NavigationCancelEvent> cancelSerializer = new CancelEventSerializer();
-    gsonBuilder.registerTypeAdapter(NavigationCancelEvent.class, cancelSerializer);
-    JsonSerializer<NavigationFeedbackEvent> feedbackSerializer = new FeedbackEventSerializer();
-    gsonBuilder.registerTypeAdapter(NavigationFeedbackEvent.class, feedbackSerializer);
-    JsonSerializer<NavigationRerouteEvent> rerouteSerializer = new RerouteEventSerializer();
-    gsonBuilder.registerTypeAdapter(NavigationRerouteEvent.class, rerouteSerializer);
-    JsonSerializer<NavigationFasterRouteEvent> fasterRouteSerializer = new FasterRouteEventSerializer();
-    gsonBuilder.registerTypeAdapter(NavigationFasterRouteEvent.class, fasterRouteSerializer);
-    return gsonBuilder;
-  }
-
   private RequestBody reverseMultiForm(MultipartBody.Builder builder) {
     MultipartBody multipartBody = builder.build();
 
     builder = new MultipartBody.Builder(BOUNDARY)
       .setType(MultipartBody.FORM);
 
-    for (int i = multipartBody.size() - 1; i > -1 ; i--) {
+    for (int i = multipartBody.size() - 1; i > -1; i--) {
       builder.addPart(multipartBody.part(i));
     }
 
