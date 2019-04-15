@@ -89,7 +89,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     TelemetryEnabler.State telemetryState = telemetryEnabler.obtainTelemetryState();
     if (TelemetryEnabler.State.ENABLED.equals(telemetryState)
       && !TelemetryUtils.adjustWakeUpMode(applicationContext)) {
-      sendEventsIfPossible(fullQueue);
+      sendEvents(fullQueue, false);
     }
   }
 
@@ -276,19 +276,13 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
       @Override
       public void run() {
         try {
-          sendEventsIfPossible(currentEvents);
+          sendEvents(currentEvents, false);
         } catch (Throwable throwable) {
           // TODO: log silent crash
           Log.e(LOG_TAG, throwable.toString());
         }
       }
     });
-  }
-
-  private synchronized void sendEventsIfPossible(List<Event> events) {
-    if (isNetworkConnected()) {
-      sendEvents(events);
-    }
   }
 
   private boolean isNetworkConnected() {
@@ -305,9 +299,9 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     }
   }
 
-  private void sendEvents(List<Event> events) {
-    if (checkRequiredParameters(sAccessToken.get(), userAgent)) {
-      telemetryClient.sendEvents(events, httpCallback);
+  private synchronized void sendEvents(List<Event> events, boolean serializeNulls) {
+    if (isNetworkConnected() && checkRequiredParameters(sAccessToken.get(), userAgent)) {
+      telemetryClient.sendEvents(events, httpCallback, serializeNulls);
     }
   }
 
@@ -341,7 +335,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
           @Override
           public void run() {
             try {
-              sendEventsIfPossible(events);
+              sendEvents(events, true);
             } catch (Throwable throwable) {
               // TODO: log silent crash
               Log.e(LOG_TAG, throwable.toString());

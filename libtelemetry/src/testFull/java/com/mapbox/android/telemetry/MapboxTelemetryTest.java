@@ -26,6 +26,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
@@ -66,7 +67,8 @@ public class MapboxTelemetryTest {
     List<Event> mockedList = mock(List.class);
     theMapboxTelemetry.enable();
     theMapboxTelemetry.onFullQueue(mockedList);
-    verify(mockedTelemetryClient, times(1)).sendEvents(eq(mockedList), eq(mockedHttpCallback));
+    verify(mockedTelemetryClient, times(1))
+      .sendEvents(eq(mockedList), eq(mockedHttpCallback), anyBoolean());
   }
 
   @Test
@@ -79,7 +81,7 @@ public class MapboxTelemetryTest {
     List<Event> mockedList = mock(List.class);
     theMapboxTelemetry.enable();
     theMapboxTelemetry.onFullQueue(mockedList);
-    verify(mockedTelemetryClient, never()).sendEvents(eq(mockedList), eq(mockedHttpCallback));
+    verify(mockedTelemetryClient, never()).sendEvents(eq(mockedList), eq(mockedHttpCallback), anyBoolean());
   }
 
   @Test
@@ -92,7 +94,7 @@ public class MapboxTelemetryTest {
     List<Event> mockedList = mock(List.class);
     theMapboxTelemetry.enable();
     theMapboxTelemetry.onFullQueue(mockedList);
-    verify(mockedTelemetryClient, never()).sendEvents(eq(mockedList), eq(mockedHttpCallback));
+    verify(mockedTelemetryClient, never()).sendEvents(eq(mockedList), eq(mockedHttpCallback), anyBoolean());
   }
 
   @Test
@@ -106,7 +108,8 @@ public class MapboxTelemetryTest {
     ArgumentCaptor<List<Event>> eventsCaptor = ArgumentCaptor.forClass((Class) List.class);
     theMapboxTelemetry.enable();
     theMapboxTelemetry.push(whitelistedEvent);
-    verify(mockedTelemetryClient, times(1)).sendEvents(eventsCaptor.capture(), eq(mockedHttpCallback));
+    verify(mockedTelemetryClient, times(1))
+      .sendEvents(eventsCaptor.capture(), eq(mockedHttpCallback), anyBoolean());
     assertEquals(eventsCaptor.getValue().get(0), whitelistedEvent);
   }
 
@@ -181,7 +184,7 @@ public class MapboxTelemetryTest {
       null, mockedTelemetryClient, mockedHttpCallback);
     List<Event> mockedList = mock(List.class);
     theMapboxTelemetry.onFullQueue(mockedList);
-    verify(mockedTelemetryClient, never()).sendEvents(eq(mockedList), eq(mockedHttpCallback));
+    verify(mockedTelemetryClient, never()).sendEvents(eq(mockedList), eq(mockedHttpCallback), anyBoolean());
   }
 
   @Test
@@ -195,7 +198,7 @@ public class MapboxTelemetryTest {
       emptyUserAgent, mockedTelemetryClient, mockedHttpCallback);
     List<Event> mockedList = mock(List.class);
     theMapboxTelemetry.onFullQueue(mockedList);
-    verify(mockedTelemetryClient, never()).sendEvents(eq(mockedList), eq(mockedHttpCallback));
+    verify(mockedTelemetryClient, never()).sendEvents(eq(mockedList), eq(mockedHttpCallback), anyBoolean());
   }
 
   @Test

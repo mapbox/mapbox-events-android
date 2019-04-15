@@ -33,9 +33,10 @@ public class TelemetryClientLocationEventTest extends MockWebServerTest {
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvents(theLocationEvent, mockedCallback);
+    telemetryClient.sendEvents(theLocationEvent, mockedCallback, false);
 
-    String expectedRequestBody = obtainExpectedRequestBody(new GsonBuilder(), theLocationEvent.get(0));
+    String expectedRequestBody = obtainExpectedRequestBody(new GsonBuilder(),
+      false, theLocationEvent.get(0));
     assertRequestBodyEquals(expectedRequestBody);
   }
 }

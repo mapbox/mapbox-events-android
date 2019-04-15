@@ -116,9 +116,10 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvents(theAppUserTurnstile, mockedCallback);
+    telemetryClient.sendEvents(theAppUserTurnstile, mockedCallback, true);
 
-    String expectedRequestBody = obtainExpectedRequestBody(new GsonBuilder(), theAppUserTurnstile.get(0));
+    String expectedRequestBody = obtainExpectedRequestBody(new GsonBuilder(),
+      true, theAppUserTurnstile.get(0));
     assertRequestBodyEquals(expectedRequestBody);
   }
 
@@ -132,10 +133,10 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvents(theArriveEvent, mockedCallback);
+    telemetryClient.sendEvents(theArriveEvent, mockedCallback, false);
 
     GsonBuilder gsonBuilder = configureTypeAdapter(arrive, new GsonBuilder());
-    String expectedRequestBody = obtainExpectedRequestBody(gsonBuilder, theArriveEvent.get(0));
+    String expectedRequestBody = obtainExpectedRequestBody(gsonBuilder, false, theArriveEvent.get(0));
     assertRequestBodyEquals(expectedRequestBody);
   }
 
@@ -149,10 +150,10 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvents(theDepartEvent, mockedCallback);
+    telemetryClient.sendEvents(theDepartEvent, mockedCallback, false);
 
     GsonBuilder gsonBuilder = configureTypeAdapter(depart, new GsonBuilder());
-    String expectedRequestBody = obtainExpectedRequestBody(gsonBuilder, theDepartEvent.get(0));
+    String expectedRequestBody = obtainExpectedRequestBody(gsonBuilder, false, theDepartEvent.get(0));
     assertRequestBodyEquals(expectedRequestBody);
   }
 
@@ -166,10 +167,10 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvents(theCancelEvent, mockedCallback);
+    telemetryClient.sendEvents(theCancelEvent, mockedCallback, false);
 
     GsonBuilder gsonBuilder = configureTypeAdapter(cancel, new GsonBuilder());
-    String expectedRequestBody = obtainExpectedRequestBody(gsonBuilder, theCancelEvent.get(0));
+    String expectedRequestBody = obtainExpectedRequestBody(gsonBuilder, false, theCancelEvent.get(0));
     assertRequestBodyEquals(expectedRequestBody);
   }
 
@@ -183,10 +184,10 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvents(theFeedbackEvent, mockedCallback);
+    telemetryClient.sendEvents(theFeedbackEvent, mockedCallback, false);
 
     GsonBuilder gsonBuilder = configureTypeAdapter(feedback, new GsonBuilder());
-    String expectedRequestBody = obtainExpectedRequestBody(gsonBuilder, theFeedbackEvent.get(0));
+    String expectedRequestBody = obtainExpectedRequestBody(gsonBuilder, false, theFeedbackEvent.get(0));
     assertRequestBodyEquals(expectedRequestBody);
   }
 
@@ -200,10 +201,10 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvents(theRerouteEvent, mockedCallback);
+    telemetryClient.sendEvents(theRerouteEvent, mockedCallback, false);
 
     GsonBuilder gsonBuilder = configureTypeAdapter(reroute, new GsonBuilder());
-    String expectedRequestBody = obtainExpectedRequestBody(gsonBuilder, theRerouteEvent.get(0));
+    String expectedRequestBody = obtainExpectedRequestBody(gsonBuilder, false, theRerouteEvent.get(0));
     assertRequestBodyEquals(expectedRequestBody);
   }
 
@@ -217,10 +218,10 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
 
-    telemetryClient.sendEvents(theFasterRouteEvent, mockedCallback);
+    telemetryClient.sendEvents(theFasterRouteEvent, mockedCallback, false);
 
     GsonBuilder gsonBuilder = configureTypeAdapter(fasterRoute, new GsonBuilder());
-    String expectedRequestBody = obtainExpectedRequestBody(gsonBuilder, theFasterRouteEvent.get(0));
+    String expectedRequestBody = obtainExpectedRequestBody(gsonBuilder, false, theFasterRouteEvent.get(0));
     assertRequestBodyEquals(expectedRequestBody);
   }
 
@@ -236,11 +237,11 @@ public class TelemetryClientNavigationEventsTest extends MockWebServerTest {
     enqueueMockResponse();
     List<Event> events = obtainEvents(rerouteEvent, fasterRouteEvent);
 
-    telemetryClient.sendEvents(events, mockedCallback);
+    telemetryClient.sendEvents(events, mockedCallback, false);
 
     GsonBuilder gsonBuilder = configureTypeAdapter(reroute, new GsonBuilder());
     gsonBuilder = configureTypeAdapter(fasterRoute, gsonBuilder);
-    String expectedRequestBody = obtainExpectedRequestBody(gsonBuilder, events.get(0), events.get(1));
+    String expectedRequestBody = obtainExpectedRequestBody(gsonBuilder, false, events.get(0), events.get(1));
     assertRequestBodyEquals(expectedRequestBody);
   }
 
