@@ -6,7 +6,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
+import android.support.annotation.Nullable;
 import com.google.gson.annotations.SerializedName;
 
 import static com.mapbox.android.telemetry.TelemetryEnabler.TELEMETRY_STATES;
@@ -30,17 +30,7 @@ public class AppUserTurnstile extends Event implements Parcelable {
   private String skuId;
 
   public AppUserTurnstile(String sdkIdentifier, String sdkVersion) {
-    checkApplicationContext();
-    this.event = APP_USER_TURNSTILE;
-    this.created = TelemetryUtils.obtainCurrentDate();
-    this.userId = TelemetryUtils.retrieveVendorId();
-    TelemetryEnabler telemetryEnabler = new TelemetryEnabler(true);
-    this.enabledTelemetry = TELEMETRY_STATES.get(telemetryEnabler.obtainTelemetryState());
-    this.device = Build.DEVICE;
-    this.sdkIdentifier = sdkIdentifier;
-    this.sdkVersion = sdkVersion;
-    this.model = Build.MODEL;
-    this.operatingSystem = OPERATING_SYSTEM;
+    this(sdkIdentifier, sdkVersion, true);
   }
 
   AppUserTurnstile(String sdkIdentifier, String sdkVersion, boolean isFromPreferences) {
@@ -57,10 +47,16 @@ public class AppUserTurnstile extends Event implements Parcelable {
     this.operatingSystem = OPERATING_SYSTEM;
   }
 
+  @Nullable
+  public String getSkuId() {
+    return skuId;
+  }
+
   public void setSkuId(@NonNull String skuId) {
-    if (!TextUtils.isEmpty(skuId)) {
-      this.skuId = skuId;
+    if (skuId == null || skuId.length() == 0) {
+      return;
     }
+    this.skuId = skuId;
   }
 
   @Override
