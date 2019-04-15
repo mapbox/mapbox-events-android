@@ -5,7 +5,10 @@ workflows:
   default:
     jobs:
       - build
-      - release
+      - release:
+          filters:
+            tags:
+              only: /-*/
 
 jobs:
   build:
@@ -82,17 +85,12 @@ jobs:
 
 # ------------------------------------------------------------------------------
   release:
-    branch:
-      only:
-      - master
     docker:
       - image: mbgl/android-ndk-r19:8e91a7ebab
     working_directory: ~/code
     environment:
       BUILDTYPE: Release
       IS_LOCAL_DEVELOPMENT: false
-      OK_TO_RELEASE_CORE: true
-      OK_TO_RELEASE_TELEM: true
     steps:
       - checkout
       - run:
@@ -106,18 +104,28 @@ jobs:
             signing.password=$SIGNING_PASSWORD
             signing.secretKeyRingFile=../secring.gpg" >> gradle.properties
       - run:
+          name: Update version name
+          command: |
+            if [[ $CIRCLE_TAG == telem-* ]]; then
+              sed -i -e "s/^VERSION_NAME=.*/VERSION_NAME=${CIRCLE_TAG:6}/" libtelemetry/gradle.properties
+            fi
+            if [[ $CIRCLE_TAG == core-* ]]; then
+              sed -i -e "s/^VERSION_NAME=.*/VERSION_NAME=${CIRCLE_TAG:5}/" libcore/gradle.properties
+            fi
+      - run:
           name: Build libraries
           command: make release
       - deploy:
           name: Publish to Maven Central
           command: |
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              if [ "$OK_TO_RELEASE_CORE" == true ]; then
+            if [[ $CIRCLE_BRANCH == master ]]; then
+              if [[ $CIRCLE_TAG == telem-* ]]; then
+                  make publish-telem ;
+              elif [[ $CIRCLE_TAG == core-* ]]; then
                 make publish-core ;
-              fi
-              if [ "$OK_TO_RELEASE_TELEM" == true ]; then
+              else
                 make publish-telem ;
-                make publish-telem-lite ;
+                make publish-core ;
               fi
             fi
       - store_artifacts:
@@ -136,10 +144,8 @@ jobs:
           name: Check & Publish Binary Size
           command: |
             binary_path="libtelemetry/build/outputs/aar/libtelemetry-full-release.aar"
-            label="Telemetry-AAR"
-            archive_name="mapbox-events-android"
             if [[ $CIRCLE_BRANCH == master ]] || [[ $CIRCLE_BRANCH == release-* ]]; then
-              ./scripts/capture_binary_size_for_aws.sh $binary_path $archive_name
+              ./scripts/capture_binary_size_for_aws.sh $binary_path "mapbox-events-android"
             else
-              ./scripts/check_binary_size.sh $binary_path $label
+              ./scripts/check_binary_size.sh $binary_path "Telemetry-AAR"
             fi
