@@ -4,6 +4,18 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v4.4.0
+- Trigger release job on CI with git tags - [#385](https://github.com/mapbox/mapbox-events-android/pull/385)
+- Add SkuId to the turnstile event - [#380](https://github.com/mapbox/mapbox-events-android/pull/380)
+- Improved telemetry library error handling - [#378](https://github.com/mapbox/mapbox-events-android/pull/378)
+- Fix crash file counting bug - [#377](https://github.com/mapbox/mapbox-events-android/pull/377)
+- Remove maps event classes - [#373](https://github.com/mapbox/mapbox-events-android/pull/373)
+- Call uninstall in setup method of LocationCollectionClientInstrumentedTest - [#372](https://github.com/mapbox/mapbox-events-android/pull/372)
+- Fix flaky LocationCollectionClientInstrumentedTest - [#371](https://github.com/mapbox/mapbox-events-android/pull/371)
+- Restore accidentally deleted test - [#370](https://github.com/mapbox/mapbox-events-android/pull/370)
+- Fix unstable test cases in LocationCollectionClientInstrumentedTest - [#369](https://github.com/mapbox/mapbox-events-android/pull/369)
+- Crash reporter telemetry integration - [#361](https://github.com/mapbox/mapbox-events-android/pull/361)
+
 ### v4.3.0
 - Register location updates receiver via Context - [#366](https://github.com/mapbox/mapbox-events-android/pull/366)
 - Handle executor errors - [#365](https://github.com/mapbox/mapbox-events-android/pull/365)
