@@ -119,14 +119,14 @@ jobs:
           name: Publish to Maven Central
           command: |
             if [[ $CIRCLE_BRANCH == master ]]; then
-              if [[ $CIRCLE_TAG == telem-* ]]; then
-                  make publish-telem ;
-              elif [[ $CIRCLE_TAG == core-* ]]; then
-                make publish-core ;
-              else
-                make publish-telem ;
-                make publish-core ;
-              fi
+              make publish-core ;
+              make publish-telem ;
+            elif [[ $CIRCLE_TAG == telem-* ]]; then
+              make publish-telem ;
+            elif [[ $CIRCLE_TAG == core-* ]]; then
+              make publish-core ;
+            else
+              echo "Skip, not a release branch"
             fi
       - store_artifacts:
           path: app/build/reports
