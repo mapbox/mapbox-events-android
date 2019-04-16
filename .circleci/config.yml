@@ -8,7 +8,7 @@ workflows:
       - release:
           filters:
             tags:
-              only: /-*/
+              only: /(telem|core)-.*/
 
 jobs:
   build:
