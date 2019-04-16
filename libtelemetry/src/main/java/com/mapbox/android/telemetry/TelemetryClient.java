@@ -1,6 +1,7 @@
 package com.mapbox.android.telemetry;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.File;
 import java.io.IOException;
@@ -131,7 +132,7 @@ class TelemetryClient {
   }
 
   private void sendBatch(List<Event> batch, Callback callback, boolean serializeNulls) {
-    Gson gson = new Gson();
+    Gson gson = serializeNulls ? new GsonBuilder().serializeNulls().create() : new Gson();
     String payload = gson.toJson(batch);
     RequestBody body = RequestBody.create(JSON, payload);
     HttpUrl baseUrl = setting.getBaseUrl();

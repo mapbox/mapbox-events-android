@@ -203,7 +203,6 @@ public class SchemaTest {
         schema.remove("locationEnabled");
         //temporary need to work out a solution to include this data
         schema.remove("platform");
-        schema.remove("skuId");
 
         return schema;
       }

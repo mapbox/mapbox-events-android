@@ -99,7 +99,7 @@ public class TelemetryUtils {
     return universalUniqueIdentifier;
   }
 
-  static String obtainApplicationState(Context context) {
+  public static String obtainApplicationState(Context context) {
     ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
     List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
     if (appProcesses == null) {
@@ -147,7 +147,7 @@ public class TelemetryUtils {
     return dateFormat.format(new Date());
   }
 
-  static String generateCreateDateFormatted(Date date) {
+  public static String generateCreateDateFormatted(Date date) {
     return dateFormat.format(date);
   }
 
