@@ -15,6 +15,7 @@ Mapbox welcomes participation and contributions from everyone.
 - Restore accidentally deleted test - [#370](https://github.com/mapbox/mapbox-events-android/pull/370)
 - Fix unstable test cases in LocationCollectionClientInstrumentedTest - [#369](https://github.com/mapbox/mapbox-events-android/pull/369)
 - Crash reporter telemetry integration - [#361](https://github.com/mapbox/mapbox-events-android/pull/361)
+- Aggregate instrumentation and unit test coverage [#343](https://github.com/mapbox/mapbox-events-android/pull/343)
 
 ### v4.3.0
 - Register location updates receiver via Context - [#366](https://github.com/mapbox/mapbox-events-android/pull/366)
