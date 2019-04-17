@@ -204,6 +204,11 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Core
 
+### v1.3.0
+- Crash reporter telemetry integration - [#361](https://github.com/mapbox/mapbox-events-android/pull/361)
+- Fix crash file counting bug - [#377](https://github.com/mapbox/mapbox-events-android/pull/377)
+- Change default exception chain depth - [#378](https://github.com/mapbox/mapbox-events-android/pull/378)
+
 ### v1.2.0
 - Fix GoogleLocationEngine intermittent delayed updates - [#350](https://github.com/mapbox/mapbox-events-android/pull/350)
 - Run liblocation test in CI - [#338](https://github.com/mapbox/mapbox-events-android/pull/338)
