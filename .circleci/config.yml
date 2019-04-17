@@ -108,6 +108,7 @@ jobs:
           command: |
             if [[ $CIRCLE_TAG == telem-* ]]; then
               sed -i -e "s/^VERSION_NAME=.*/VERSION_NAME=${CIRCLE_TAG:6}/" libtelemetry/gradle.properties
+              sed -i -e "s/^VERSION_NAME=.*/VERSION_NAME=[1.0.0,)/" libcore/gradle.properties
             fi
             if [[ $CIRCLE_TAG == core-* ]]; then
               sed -i -e "s/^VERSION_NAME=.*/VERSION_NAME=${CIRCLE_TAG:5}/" libcore/gradle.properties
