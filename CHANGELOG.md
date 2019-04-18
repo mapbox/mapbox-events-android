@@ -4,6 +4,9 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v4.4.1
+- Publish telemetry release with specific version of released libcore - [#390](https://github.com/mapbox/mapbox-events-android/pull/390)
+
 ### v4.4.0
 - Trigger release job on CI with git tags - [#385](https://github.com/mapbox/mapbox-events-android/pull/385)
 - Add SkuId to the turnstile event - [#380](https://github.com/mapbox/mapbox-events-android/pull/380)
@@ -203,6 +206,11 @@ Mapbox welcomes participation and contributions from everyone.
 - Port Location Code from MAS - [#6](https://github.com/mapbox/mapbox-events-android/pull/6)
 
 ## Mapbox Android Core
+
+### v1.3.0
+- Crash reporter telemetry integration - [#361](https://github.com/mapbox/mapbox-events-android/pull/361)
+- Fix crash file counting bug - [#377](https://github.com/mapbox/mapbox-events-android/pull/377)
+- Change default exception chain depth - [#378](https://github.com/mapbox/mapbox-events-android/pull/378)
 
 ### v1.2.0
 - Fix GoogleLocationEngine intermittent delayed updates - [#350](https://github.com/mapbox/mapbox-events-android/pull/350)
