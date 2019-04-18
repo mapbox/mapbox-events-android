@@ -4,6 +4,9 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v4.4.1
+- Publish telemetry release with specific version of released libcore - [#390](https://github.com/mapbox/mapbox-events-android/pull/390)
+
 ### v4.4.0
 - Trigger release job on CI with git tags - [#385](https://github.com/mapbox/mapbox-events-android/pull/385)
 - Add SkuId to the turnstile event - [#380](https://github.com/mapbox/mapbox-events-android/pull/380)
