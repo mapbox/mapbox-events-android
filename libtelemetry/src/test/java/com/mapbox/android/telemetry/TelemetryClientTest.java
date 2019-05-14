@@ -186,7 +186,7 @@ public class TelemetryClientTest extends MockWebServerTest {
       .build();
     HttpUrl localUrl = obtainBaseEndpointUrl();
     SslClient sslClient = SslClient.localhost();
-    TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder()
+    TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder(mockedContext)
       .client(localOkHttpClientWithShortTimeout)
       .baseUrl(localUrl)
       .sslSocketFactory(sslClient.socketFactory)
