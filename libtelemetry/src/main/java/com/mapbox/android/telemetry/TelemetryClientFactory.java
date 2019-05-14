@@ -57,7 +57,7 @@ class TelemetryClientFactory {
 
   private TelemetryClient buildClientFrom(ServerInformation serverInformation, Context context) {
     Environment environment = serverInformation.getEnvironment();
-    switch(environment) {
+    switch (environment) {
       case STAGING:
         return buildTelemetryClientCustom(serverInformation, certificateBlacklist, context);
       default:
