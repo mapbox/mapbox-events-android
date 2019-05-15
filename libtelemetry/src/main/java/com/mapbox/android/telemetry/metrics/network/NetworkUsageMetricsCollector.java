@@ -11,8 +11,6 @@ public class NetworkUsageMetricsCollector {
   private final TelemetryMetrics metrics;
 
   public NetworkUsageMetricsCollector(Context context, TelemetryMetrics metrics) {
-    Context applicationContext = context.getApplicationContext();
-    context = applicationContext != null ? applicationContext : context;
     this.connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     this.metrics = metrics;
   }
