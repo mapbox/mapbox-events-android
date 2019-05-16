@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,7 +28,8 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import okhttp3.mockwebserver.SocketPolicy;
-import okhttp3.mockwebserver.internal.tls.SslClient;
+import okhttp3.tls.HandshakeCertificates;
+import okhttp3.tls.HeldCertificate;
 import okio.Buffer;
 import okio.GzipSource;
 
@@ -38,11 +40,23 @@ class MockWebServerTest {
   private static final String FILE_ENCODING = "UTF-8";
   private MockWebServer server;
   private MockResponse mockResponse;
-
+  private HandshakeCertificates serverCertificates;
+  private HeldCertificate localhostCertificate;
+  HandshakeCertificates clientCertificates;
   @Before
   public void setUp() throws Exception {
     this.server = new MockWebServer();
-    this.server.useHttps(SslClient.localhost().socketFactory, false);
+    String localhost = InetAddress.getByName("localhost").getCanonicalHostName();
+    localhostCertificate = new HeldCertificate.Builder()
+      .addSubjectAlternativeName(localhost)
+      .build();
+    serverCertificates = new HandshakeCertificates.Builder()
+      .heldCertificate(localhostCertificate)
+      .build();
+    clientCertificates = new HandshakeCertificates.Builder()
+      .addTrustedCertificate(localhostCertificate.certificate())
+      .build();
+    this.server.useHttps(serverCertificates.sslSocketFactory(), false);
     this.server.start();
   }
 
@@ -175,12 +189,11 @@ class MockWebServerTest {
 
   TelemetryClientSettings provideDefaultTelemetryClientSettings() {
     HttpUrl localUrl = obtainBaseEndpointUrl();
-    SslClient sslClient = SslClient.localhost();
 
     return new TelemetryClientSettings.Builder()
       .baseUrl(localUrl)
-      .sslSocketFactory(sslClient.socketFactory)
-      .x509TrustManager(sslClient.trustManager)
+      .sslSocketFactory(clientCertificates.sslSocketFactory())
+      .x509TrustManager(clientCertificates.trustManager())
       .hostnameVerifier(new HostnameVerifier() {
         @Override
         public boolean verify(String hostname, SSLSession session) {

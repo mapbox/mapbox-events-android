@@ -57,6 +57,7 @@ dependencies {
     testImplementation dependenciesList.junit
     testImplementation dependenciesList.mockito
     testImplementation dependenciesList.okhttp3Mockwebserver
+    testImplementation dependenciesList.okhttpTls
     testImplementation dependenciesList.commonsIO
     testImplementation dependenciesList.assertJ
 
