@@ -43,6 +43,7 @@ class MockWebServerTest {
   private HandshakeCertificates serverCertificates;
   private HeldCertificate localhostCertificate;
   HandshakeCertificates clientCertificates;
+
   @Before
   public void setUp() throws Exception {
     this.server = new MockWebServer();
