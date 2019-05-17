@@ -27,7 +27,7 @@ class AlarmSchedulerFlusher implements SchedulerFlusher {
   @Override
   public void register() {
     Intent alarmIntent = receiver.supplyIntent();
-    pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent, 0);
+    pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
     IntentFilter filter = new IntentFilter(SCHEDULER_FLUSHER_INTENT);
     context.registerReceiver(receiver, filter);
   }
