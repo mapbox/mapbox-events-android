@@ -13,6 +13,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
@@ -25,7 +26,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.internal.tls.SslClient;
+import okhttp3.tls.HandshakeCertificates;
+import okhttp3.tls.HeldCertificate;
 
 import static com.mapbox.android.telemetry.MapboxTelemetryConstants.MAPBOX_SHARED_PREFERENCES;
 import static org.junit.Assert.assertTrue;
@@ -39,11 +41,24 @@ import static org.mockito.Mockito.when;
 public class ConfigurationClientTest {
   private MockWebServer server;
   private ConfigurationClient configurationClient;
+  private HandshakeCertificates serverCertificates;
+  private HeldCertificate localhostCertificate;
+  private HandshakeCertificates clientCertificates;
 
   @Before
   public void setUp() throws Exception {
     this.server = new MockWebServer();
-    server.useHttps(SslClient.localhost().socketFactory, false);
+    String localhost = InetAddress.getByName("localhost").getCanonicalHostName();
+    localhostCertificate = new HeldCertificate.Builder()
+      .addSubjectAlternativeName(localhost)
+      .build();
+    serverCertificates = new HandshakeCertificates.Builder()
+      .heldCertificate(localhostCertificate)
+      .build();
+    clientCertificates = new HandshakeCertificates.Builder()
+      .addTrustedCertificate(localhostCertificate.certificate())
+      .build();
+    server.useHttps(serverCertificates.sslSocketFactory(), false);
     server.start();
 
     TelemetryClientSettings settings = provideDefaultTelemetryClientSettings();
@@ -60,7 +75,7 @@ public class ConfigurationClientTest {
     SharedPreferences.Editor mockedEditor = mock(SharedPreferences.Editor.class);
     when(mockedContext.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE))
       .thenReturn(mockedSharedPreferences);
-    when(mockedSharedPreferences.getLong("mapboxConfigSyncTimestamp",0))
+    when(mockedSharedPreferences.getLong("mapboxConfigSyncTimestamp", 0))
       .thenReturn(Long.valueOf(0));
     when(mockedSharedPreferences.edit()).thenReturn(mockedEditor);
 
@@ -113,12 +128,11 @@ public class ConfigurationClientTest {
 
   private TelemetryClientSettings provideDefaultTelemetryClientSettings() {
     HttpUrl localUrl = obtainBaseEndpointUrl();
-    SslClient sslClient = SslClient.localhost();
 
     return new TelemetryClientSettings.Builder()
       .baseUrl(localUrl)
-      .sslSocketFactory(sslClient.socketFactory)
-      .x509TrustManager(sslClient.trustManager)
+      .sslSocketFactory(clientCertificates.sslSocketFactory())
+      .x509TrustManager(clientCertificates.trustManager())
       .hostnameVerifier(new HostnameVerifier() {
         @Override
         public boolean verify(String hostname, SSLSession session) {
