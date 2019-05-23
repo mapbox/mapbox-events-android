@@ -1,7 +1,7 @@
 ---
 name: 🐞 Bug report
 about: Mobile Telemetry Bug Report
-title: "\U0001F41E [Platform] Bug Summary"
+title: "\U0001F41E Bug Summary"
 labels: "bug"
 assignees:
 
