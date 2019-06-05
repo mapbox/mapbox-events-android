@@ -55,7 +55,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.mapbox.mapboxsdk:mapbox-android-core:0.3.0'
+    compile 'com.mapbox.mapboxsdk:mapbox-android-core:0.3.0-SNAPSHOT'
 }
 ```
 
