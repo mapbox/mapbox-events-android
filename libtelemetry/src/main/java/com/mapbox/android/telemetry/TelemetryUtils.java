@@ -9,6 +9,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.BatteryManager;
+import android.support.annotation.Nullable;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
@@ -20,8 +21,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
+import android.util.Log;
 import okio.Buffer;
 
+import static android.content.ContentValues.TAG;
 import static com.mapbox.android.telemetry.MapboxTelemetryConstants.MAPBOX_SHARED_PREFERENCES;
 
 public class TelemetryUtils {
@@ -121,8 +124,12 @@ public class TelemetryUtils {
     if (batteryStatus == null) {
       return UNAVAILABLE_BATTERY_LEVEL;
     }
+
     int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, DEFAULT_BATTERY_LEVEL);
     int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, DEFAULT_BATTERY_LEVEL);
+    if (level < 0 || scale <= 0) {
+      return UNAVAILABLE_BATTERY_LEVEL;
+    }
     return Math.round((level / (float) scale) * PERCENT_SCALE);
   }
 
@@ -214,9 +221,21 @@ public class TelemetryUtils {
     }
   }
 
+  /**
+   * This method can return null on devices without
+   * any battery (like a TV) or because of buggy firmware.
+   * @param context application context
+   * @return intent
+   */
+  @Nullable
   private static Intent registerBatteryUpdates(Context context) {
-    IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-    return context.registerReceiver(null, filter);
+    try {
+      return context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+    } catch (Exception exc) {
+      // There is a weird intermittent bug that causes SecurityException in android versions <= 4.2
+      Log.e(TAG,  String.format("%s: Failed receiver registration for ACTION_BATTERY_CHANGED", exc.toString()));
+      return null;
+    }
   }
 
   static boolean adjustWakeUpMode(Context context) {
