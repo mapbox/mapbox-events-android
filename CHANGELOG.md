@@ -4,6 +4,9 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v4.5.1
+- Revert okhttp to version 3.12.0 [#413](https://github.com/mapbox/mapbox-events-android/pull/413)
+
 ### v4.5.0
 - Fix crash due to buggy firmware [#407](https://github.com/mapbox/mapbox-events-android/pull/407)
 - Bump okhttp and gson versions [#398](https://github.com/mapbox/mapbox-events-android/pull/398)
