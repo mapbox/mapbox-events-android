@@ -25,7 +25,6 @@ import okhttp3.Callback;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
-import okhttp3.mockwebserver.internal.tls.SslClient;
 
 import static android.net.ConnectivityManager.TYPE_WIFI;
 import static org.junit.Assert.assertEquals;
@@ -190,12 +189,11 @@ public class TelemetryClientTest extends MockWebServerTest {
       .readTimeout(100, TimeUnit.MILLISECONDS)
       .build();
     HttpUrl localUrl = obtainBaseEndpointUrl();
-    SslClient sslClient = SslClient.localhost();
-    TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder(mockedContext)
+    TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder()
       .client(localOkHttpClientWithShortTimeout)
       .baseUrl(localUrl)
-      .sslSocketFactory(sslClient.socketFactory)
-      .x509TrustManager(sslClient.trustManager)
+      .sslSocketFactory(clientCertificates.sslSocketFactory())
+      .x509TrustManager(clientCertificates.trustManager())
       .hostnameVerifier(new HostnameVerifier() {
         @Override
         public boolean verify(String hostname, SSLSession session) {

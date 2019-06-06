@@ -4,6 +4,12 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v4.5.0
+- Fix crash due to buggy firmware [#407](https://github.com/mapbox/mapbox-events-android/pull/407)
+- Bump okhttp and gson versions [#398](https://github.com/mapbox/mapbox-events-android/pull/398)
+- Reuse intent for alarms [#400](https://github.com/mapbox/mapbox-events-android/pull/400)
+- Remove navigation event classes from telemetry library [#383](https://github.com/mapbox/mapbox-events-android/pull/383)
+
 ### v4.4.1
 - Publish telemetry release with specific version of released libcore - [#390](https://github.com/mapbox/mapbox-events-android/pull/390)
 
