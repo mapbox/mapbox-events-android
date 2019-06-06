@@ -10,6 +10,7 @@ gcloud firebase test android run --type instrumentation \
     --app app/build/outputs/apk/full/debug/app-full-debug.apk \
     --test "${build_dir}/${test_apk_path}" \
     --results-dir="$results_dir" \
+    --device model=m0,version=18,locale=en,orientation=portrait  \
     --device model=hammerhead,version=21,locale=en,orientation=portrait  \
     --device model=hammerhead,version=23,locale=en,orientation=landscape \
     --device model=sailfish,version=26,locale=en,orientation=portrait \
