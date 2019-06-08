@@ -1,8 +1,11 @@
-package com.mapbox.android.telemetry.metrics;
+package com.mapbox.android.core.metrics;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-class MetricsImpl implements Metrics {
+/**
+ * Default implementation of the metric.
+ */
+public class MetricsImpl implements Metrics {
   private final long start;
   private final long end;
   private final AtomicLong value;

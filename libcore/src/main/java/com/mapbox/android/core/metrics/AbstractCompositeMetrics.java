@@ -1,4 +1,4 @@
-package com.mapbox.android.telemetry.metrics;
+package com.mapbox.android.core.metrics;
 
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
@@ -9,16 +9,40 @@ import java.util.Deque;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Tracks stats over rolling time window of the max length.
+ * Optimized for write heavy metrics.
+ */
 public abstract class AbstractCompositeMetrics {
   private final Map<String, Deque<Metrics>> metricsMap = new ConcurrentHashMap<>();
   private final long maxLength;
 
+  /**
+   * Create instance of the composite metric.
+   *
+   * @param maxLength max time window in milliseconds.
+   */
   public AbstractCompositeMetrics(long maxLength) {
     this.maxLength = maxLength;
   }
 
+  /**
+   * Called by child class when new metrics is needed.
+   * Concrete implementation of the metric is delegated to child class.
+   *
+   * @param start of the time span.
+   * @param end of the time span.
+   * @return reference to the new metric object.
+   */
   protected abstract Metrics nextMetrics(long start, long end);
 
+  /**
+   * Adds value to the metric and occasionally creates new metric
+   * if the delta is out of the exiting metric span.
+   *
+   * @param name name of the metric.
+   * @param delta value to increment.
+   */
   public void add(String name, long delta) {
     long now = SystemClock.uptimeMillis();
     Deque<Metrics> metrics = getOrCreateMetrics(name.trim());
@@ -34,7 +58,7 @@ public abstract class AbstractCompositeMetrics {
   }
 
   @Nullable
-  public Metrics getMetrics(@NonNull String name) {
+  Metrics getMetrics(@NonNull String name) {
     Deque<Metrics> metrics = metricsMap.get(name.trim());
     return metrics != null && !metrics.isEmpty() ? metrics.pop() : null;
   }

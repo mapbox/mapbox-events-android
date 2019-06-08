@@ -1,5 +1,9 @@
 package com.mapbox.android.telemetry.metrics;
 
+import com.mapbox.android.core.metrics.AbstractCompositeMetrics;
+import com.mapbox.android.core.metrics.Metrics;
+import com.mapbox.android.core.metrics.MetricsImpl;
+
 import static android.net.ConnectivityManager.TYPE_WIFI;
 
 public class TelemetryMetrics extends AbstractCompositeMetrics {
