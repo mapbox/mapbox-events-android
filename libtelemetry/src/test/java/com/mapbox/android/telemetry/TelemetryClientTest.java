@@ -189,7 +189,7 @@ public class TelemetryClientTest extends MockWebServerTest {
       .readTimeout(100, TimeUnit.MILLISECONDS)
       .build();
     HttpUrl localUrl = obtainBaseEndpointUrl();
-    TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder()
+    TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder(mockedContext)
       .client(localOkHttpClientWithShortTimeout)
       .baseUrl(localUrl)
       .sslSocketFactory(clientCertificates.sslSocketFactory())

@@ -3,17 +3,11 @@ package com.mapbox.android.telemetry;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.X509TrustManager;
 
 import android.content.Context;
-import com.mapbox.android.telemetry.metrics.TelemetryMetrics;
-import com.mapbox.android.telemetry.metrics.network.NetworkErrorInterceptor;
-import com.mapbox.android.telemetry.metrics.network.NetworkUsageInterceptor;
-import com.mapbox.android.telemetry.metrics.network.NetworkUsageMetricsCollector;
 import okhttp3.ConnectionSpec;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
@@ -56,13 +50,12 @@ class TelemetryClientSettings {
   }
 
   OkHttpClient getClient(CertificateBlacklist certificateBlacklist, int eventCount) {
-    // FIXME: access global reference
-    TelemetryMetrics metrics = new TelemetryMetrics(TimeUnit.HOURS.toMillis(24));
     // Order in which interceptors are added matter!
     Interceptor[] interceptors = {
-      new GzipRequestInterceptor(),
-      new NetworkUsageInterceptor(new NetworkUsageMetricsCollector(context, metrics)),
-      new NetworkErrorInterceptor(metrics, eventCount) };
+      new GzipRequestInterceptor() };
+    // TODO: add network interceptors in the following order
+    // new NetworkUsageInterceptor(new NetworkUsageMetricsCollector(context, metrics)),
+    // new NetworkErrorInterceptor(metrics, eventCount) };
     return configureHttpClient(certificateBlacklist, interceptors);
   }
 
