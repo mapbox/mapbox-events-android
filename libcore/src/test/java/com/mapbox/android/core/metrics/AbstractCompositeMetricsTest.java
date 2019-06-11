@@ -36,6 +36,14 @@ public class AbstractCompositeMetricsTest {
   }
 
   @Test
+  public void addRemoveMetric() {
+    metrics.add("test", 100L);
+    metrics.getMetrics("test");
+    metrics.add("test", 10L);
+    assertThat(metrics.getMetrics("test").getValue()).isEqualTo(10L);
+  }
+
+  @Test
   public void getEmptyMetric() {
     assertThat(metrics.getMetrics("test")).isNull();
   }

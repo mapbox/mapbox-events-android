@@ -70,9 +70,12 @@ public abstract class AbstractCompositeMetrics {
     Deque<Metrics> metrics;
     if ((metrics = metricsMap.get(name)) == null) {
       metrics = new ArrayDeque<>();
+      metricsMap.put(name, metrics);
+    }
+
+    if (metrics.isEmpty()) {
       long now = SystemClock.uptimeMillis();
       metrics.add(nextMetrics(now, now + maxLength));
-      metricsMap.put(name, metrics);
     }
     return metrics;
   }
