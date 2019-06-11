@@ -45,10 +45,10 @@ public abstract class AbstractCompositeMetrics {
    */
   public void add(String name, long delta) {
     long now = SystemClock.uptimeMillis();
-    Deque<Metrics> metrics = getOrCreateMetrics(name.trim());
 
     Metrics last;
     synchronized (this) {
+      Deque<Metrics> metrics = getOrCreateMetrics(name.trim());
       if (now >= metrics.getLast().getEnd()) {
         metrics.add(nextMetrics(now, now + maxLength));
       }
@@ -60,11 +60,13 @@ public abstract class AbstractCompositeMetrics {
   @Nullable
   Metrics getMetrics(@NonNull String name) {
     Deque<Metrics> metrics = metricsMap.get(name.trim());
-    return metrics != null && !metrics.isEmpty() ? metrics.pop() : null;
+    synchronized (this) {
+      return metrics != null && !metrics.isEmpty() ? metrics.pop() : null;
+    }
   }
 
   @NonNull
-  private synchronized Deque<Metrics> getOrCreateMetrics(@NonNull String name) {
+  private Deque<Metrics> getOrCreateMetrics(@NonNull String name) {
     Deque<Metrics> metrics;
     if ((metrics = metricsMap.get(name)) == null) {
       metrics = new ArrayDeque<>();
