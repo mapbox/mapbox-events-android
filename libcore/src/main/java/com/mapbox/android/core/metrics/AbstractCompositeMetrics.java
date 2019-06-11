@@ -58,7 +58,7 @@ public abstract class AbstractCompositeMetrics {
   }
 
   @Nullable
-  Metrics getMetrics(@NonNull String name) {
+  public Metrics getMetrics(@NonNull String name) {
     Deque<Metrics> metrics = metricsMap.get(name.trim());
     synchronized (this) {
       return metrics != null && !metrics.isEmpty() ? metrics.pop() : null;
