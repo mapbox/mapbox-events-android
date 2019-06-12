@@ -2,6 +2,8 @@ package com.mapbox.android.telemetry;
 
 import android.content.Context;
 
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import com.google.gson.Gson;
 
 import org.junit.Test;
@@ -24,23 +26,26 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
 
+import static android.net.ConnectivityManager.TYPE_WIFI;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class TelemetryClientTest extends MockWebServerTest {
 
   @Test
   public void sendsContentTypeHeader() throws Exception {
-    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
-    MapboxTelemetry.applicationContext = mockedContext;
-    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
+    MapboxTelemetry.applicationContext =  getMockedContext();
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent",
+      MapboxTelemetry.applicationContext);
     List<Event> mockedEvent = obtainAnEvent();
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
@@ -52,9 +57,9 @@ public class TelemetryClientTest extends MockWebServerTest {
 
   @Test
   public void sendsContentEncodingHeader() throws Exception {
-    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
-    MapboxTelemetry.applicationContext = mockedContext;
-    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
+    MapboxTelemetry.applicationContext =  getMockedContext();
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent",
+      MapboxTelemetry.applicationContext);
     List<Event> mockedEvent = obtainAnEvent();
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
@@ -66,9 +71,9 @@ public class TelemetryClientTest extends MockWebServerTest {
 
   @Test
   public void sendsPostEventRequestWithTheCorrectAccessTokenParameter() throws Exception {
-    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
-    MapboxTelemetry.applicationContext = mockedContext;
-    TelemetryClient telemetryClient = obtainATelemetryClient("theAccessToken", "anyUserAgent");
+    MapboxTelemetry.applicationContext =  getMockedContext();
+    TelemetryClient telemetryClient = obtainATelemetryClient("theAccessToken", "anyUserAgent",
+      MapboxTelemetry.applicationContext);
     List<Event> mockedEvent = obtainAnEvent();
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
@@ -80,9 +85,9 @@ public class TelemetryClientTest extends MockWebServerTest {
 
   @Test
   public void sendsUserAgentHeader() throws Exception {
-    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
-    MapboxTelemetry.applicationContext = mockedContext;
-    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "theUserAgent");
+    MapboxTelemetry.applicationContext = getMockedContext();
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "theUserAgent",
+      MapboxTelemetry.applicationContext);
     List<Event> mockedEvent = obtainAnEvent();
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
@@ -94,9 +99,9 @@ public class TelemetryClientTest extends MockWebServerTest {
 
   @Test
   public void sendsPostEventRequestToTheCorrectEndpoint() throws Exception {
-    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
-    MapboxTelemetry.applicationContext = mockedContext;
-    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
+    MapboxTelemetry.applicationContext =  getMockedContext();
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent",
+      MapboxTelemetry.applicationContext);
     List<Event> mockedEvent = obtainAnEvent();
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
@@ -108,9 +113,9 @@ public class TelemetryClientTest extends MockWebServerTest {
 
   @Test
   public void sendsTheCorrectBodyPostingAnEvent() throws Exception {
-    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
-    MapboxTelemetry.applicationContext = mockedContext;
-    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
+    MapboxTelemetry.applicationContext =  getMockedContext();
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent",
+      MapboxTelemetry.applicationContext);
     List<Event> theEvent = obtainAnEvent();
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
@@ -124,9 +129,9 @@ public class TelemetryClientTest extends MockWebServerTest {
 
   @Test
   public void receivesNoBodyPostingAnEventSuccessfully() throws Exception {
-    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
-    MapboxTelemetry.applicationContext = mockedContext;
-    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
+    MapboxTelemetry.applicationContext =  getMockedContext();
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent",
+      MapboxTelemetry.applicationContext);
     List<Event> theEvent = obtainAnEvent();
     Callback mockedCallback = mock(Callback.class);
     enqueueMockNoResponse(204);
@@ -138,9 +143,9 @@ public class TelemetryClientTest extends MockWebServerTest {
 
   @Test
   public void parsesUnauthorizedRequestResponseProperlyPostingAnEvent() throws Exception {
-    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
-    MapboxTelemetry.applicationContext = mockedContext;
-    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
+    MapboxTelemetry.applicationContext =  getMockedContext();
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent",
+      MapboxTelemetry.applicationContext);
     List<Event> theEvent = obtainAnEvent();
     final CountDownLatch latch = new CountDownLatch(1);
     final AtomicReference<String> bodyRef = new AtomicReference<>();
@@ -158,9 +163,9 @@ public class TelemetryClientTest extends MockWebServerTest {
 
   @Test
   public void parsesInvalidMessageBodyResponseProperlyPostingAnEvent() throws Exception {
-    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
-    MapboxTelemetry.applicationContext = mockedContext;
-    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
+    MapboxTelemetry.applicationContext = getMockedContext();;
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent",
+      MapboxTelemetry.applicationContext);
     List<Event> theEvent = obtainAnEvent();
     final CountDownLatch latch = new CountDownLatch(1);
     final AtomicReference<String> bodyRef = new AtomicReference<>();
@@ -178,13 +183,13 @@ public class TelemetryClientTest extends MockWebServerTest {
 
   @Test
   public void checksRequestTimeoutFailure() throws Exception {
-    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    Context mockedContext = getMockedContext();
     MapboxTelemetry.applicationContext = mockedContext;
     OkHttpClient localOkHttpClientWithShortTimeout = new OkHttpClient.Builder()
       .readTimeout(100, TimeUnit.MILLISECONDS)
       .build();
     HttpUrl localUrl = obtainBaseEndpointUrl();
-    TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder()
+    TelemetryClientSettings telemetryClientSettings = new TelemetryClientSettings.Builder(mockedContext)
       .client(localOkHttpClientWithShortTimeout)
       .baseUrl(localUrl)
       .sslSocketFactory(clientCertificates.sslSocketFactory())
@@ -213,9 +218,9 @@ public class TelemetryClientTest extends MockWebServerTest {
 
   @Test
   public void checksDebugLoggingEnabledBatch() throws Exception {
-    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    Context mockedContext = getMockedContext();
     MapboxTelemetry.applicationContext = mockedContext;
-    TelemetryClientSettings clientSettings = provideDefaultTelemetryClientSettings();
+    TelemetryClientSettings clientSettings = provideDefaultTelemetryClientSettings(mockedContext);
     Logger mockedLogger = mock(Logger.class);
     List<Event> mockedEvent = obtainAnEvent();
     Callback mockedCallback = mock(Callback.class);
@@ -232,9 +237,9 @@ public class TelemetryClientTest extends MockWebServerTest {
 
   @Test
   public void checksDebugLoggingEnabledAttachment() throws Exception {
-    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    Context mockedContext = getMockedContext();
     MapboxTelemetry.applicationContext = mockedContext;
-    TelemetryClientSettings clientSettings = provideDefaultTelemetryClientSettings();
+    TelemetryClientSettings clientSettings = provideDefaultTelemetryClientSettings(mockedContext);
     Logger mockedLogger = mock(Logger.class);
 
     TelemetryClient telemetryClient = new TelemetryClient("anyAccessToken", "anyUserAgent", clientSettings,
@@ -280,5 +285,15 @@ public class TelemetryClientTest extends MockWebServerTest {
     TelemetryResponse actualTelemetryResponse = new Gson().fromJson(responseBody, TelemetryResponse.class);
 
     assertEquals(expectedTelemetryResponse, actualTelemetryResponse);
+  }
+
+  static Context getMockedContext() {
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    ConnectivityManager mockedCm = mock(ConnectivityManager.class, RETURNS_DEEP_STUBS);
+    NetworkInfo mockedNetworkInfo = mock(NetworkInfo.class, RETURNS_DEEP_STUBS);
+    when(mockedNetworkInfo.getType()).thenReturn(TYPE_WIFI);
+    when(mockedCm.getActiveNetworkInfo()).thenReturn(mockedNetworkInfo);
+    when(mockedContext.getSystemService(anyString())).thenReturn(mockedCm);
+    return mockedContext;
   }
 }

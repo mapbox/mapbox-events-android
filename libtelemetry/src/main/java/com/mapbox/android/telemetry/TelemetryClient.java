@@ -150,7 +150,7 @@ class TelemetryClient {
       .post(body)
       .build();
 
-    OkHttpClient client = setting.getClient(certificateBlacklist);
+    OkHttpClient client = setting.getClient(certificateBlacklist, batch.size());
     client.newCall(request).enqueue(callback);
   }
 

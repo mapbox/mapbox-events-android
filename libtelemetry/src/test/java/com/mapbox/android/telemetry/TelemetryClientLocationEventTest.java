@@ -20,12 +20,13 @@ public class TelemetryClientLocationEventTest extends MockWebServerTest {
 
   @Test
   public void sendsTheCorrectBodyPostingLocationEvent() throws Exception {
-    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    Context mockedContext = TelemetryClientTest.getMockedContext();
     MapboxTelemetry.applicationContext = mockedContext;
     ActivityManager mockedActivityManager = mock(ActivityManager.class, RETURNS_DEEP_STUBS);
     when(mockedContext.getSystemService(Context.ACTIVITY_SERVICE)).thenReturn(mockedActivityManager);
 
-    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent");
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent",
+      mockedContext);
     double aLatitude = 40.416775;
     double aLongitude = -3.703790;
     Event aLocationEvent = new LocationEvent("aSessionId", aLatitude, aLongitude, "");
