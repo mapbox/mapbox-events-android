@@ -3,11 +3,11 @@ package com.mapbox.android.telemetry;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.X509TrustManager;
 
+import android.content.Context;
 import okhttp3.ConnectionSpec;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
@@ -25,6 +25,7 @@ class TelemetryClientSettings {
     }
   };
   private static final String HTTPS_SCHEME = "https";
+  private final Context context;
   private Environment environment;
   private final OkHttpClient client;
   private final HttpUrl baseUrl;
@@ -34,6 +35,7 @@ class TelemetryClientSettings {
   private boolean debugLoggingEnabled;
 
   TelemetryClientSettings(Builder builder) {
+    this.context = builder.context;
     this.environment = builder.environment;
     this.client = builder.client;
     this.baseUrl = builder.baseUrl;
@@ -47,8 +49,14 @@ class TelemetryClientSettings {
     return environment;
   }
 
-  OkHttpClient getClient(CertificateBlacklist certificateBlacklist) {
-    return configureHttpClient(certificateBlacklist, new GzipRequestInterceptor());
+  OkHttpClient getClient(CertificateBlacklist certificateBlacklist, int eventCount) {
+    // Order in which interceptors are added matter!
+    Interceptor[] interceptors = {
+      new GzipRequestInterceptor() };
+    // TODO: add network interceptors in the following order
+    // new NetworkUsageInterceptor(new NetworkUsageMetricsCollector(context, metrics)),
+    // new NetworkErrorInterceptor(metrics, eventCount) };
+    return configureHttpClient(certificateBlacklist, interceptors);
   }
 
   OkHttpClient getAttachmentClient(CertificateBlacklist certificateBlacklist) {
@@ -64,7 +72,7 @@ class TelemetryClientSettings {
   }
 
   Builder toBuilder() {
-    return new Builder()
+    return new Builder(context)
       .environment(environment)
       .client(client)
       .baseUrl(baseUrl)
@@ -81,6 +89,7 @@ class TelemetryClientSettings {
   }
 
   static final class Builder {
+    Context context;
     Environment environment = Environment.COM;
     OkHttpClient client = new OkHttpClient();
     HttpUrl baseUrl = null;
@@ -89,7 +98,8 @@ class TelemetryClientSettings {
     HostnameVerifier hostnameVerifier = null;
     boolean debugLoggingEnabled = false;
 
-    Builder() {
+    Builder(Context context) {
+      this.context = context;
     }
 
     Builder environment(Environment environment) {
@@ -141,15 +151,17 @@ class TelemetryClientSettings {
   }
 
   private OkHttpClient configureHttpClient(CertificateBlacklist certificateBlacklist,
-                                           Interceptor interceptor) {
+                                           Interceptor[] interceptors) {
     CertificatePinnerFactory factory = new CertificatePinnerFactory();
     OkHttpClient.Builder builder = client.newBuilder()
       .retryOnConnectionFailure(true)
       .certificatePinner(factory.provideCertificatePinnerFor(environment, certificateBlacklist))
       .connectionSpecs(Arrays.asList(ConnectionSpec.MODERN_TLS, ConnectionSpec.COMPATIBLE_TLS));
 
-    if (interceptor != null) {
-      builder.addInterceptor(interceptor);
+    if (interceptors != null) {
+      for (Interceptor interceptor: interceptors) {
+        builder.addInterceptor(interceptor);
+      }
     }
 
     if (isSocketFactoryUnset(sslSocketFactory, x509TrustManager)) {

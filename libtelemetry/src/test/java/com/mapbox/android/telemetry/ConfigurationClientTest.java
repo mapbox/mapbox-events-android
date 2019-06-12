@@ -63,7 +63,7 @@ public class ConfigurationClientTest {
 
     TelemetryClientSettings settings = provideDefaultTelemetryClientSettings();
     CertificateBlacklist mockedBlacklist = mock(CertificateBlacklist.class);
-    OkHttpClient client = settings.getClient(mockedBlacklist);
+    OkHttpClient client = settings.getClient(mockedBlacklist, 0);
     Context mockedContext = getConfigContext();
 
     File mockedFile = mock(File.class);
@@ -129,7 +129,7 @@ public class ConfigurationClientTest {
   private TelemetryClientSettings provideDefaultTelemetryClientSettings() {
     HttpUrl localUrl = obtainBaseEndpointUrl();
 
-    return new TelemetryClientSettings.Builder()
+    return new TelemetryClientSettings.Builder(mock(Context.class))
       .baseUrl(localUrl)
       .sslSocketFactory(clientCertificates.sslSocketFactory())
       .x509TrustManager(clientCertificates.trustManager())

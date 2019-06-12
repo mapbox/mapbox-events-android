@@ -147,8 +147,8 @@ class MockWebServerTest {
     return stringBuilder.toString();
   }
 
-  TelemetryClient obtainATelemetryClient(String accessToken, String userAgent) {
-    TelemetryClientSettings telemetryClientSettings = provideDefaultTelemetryClientSettings();
+  TelemetryClient obtainATelemetryClient(String accessToken, String userAgent, Context context) {
+    TelemetryClientSettings telemetryClientSettings = provideDefaultTelemetryClientSettings(context);
     Logger mockedLogger = mock(Logger.class);
     CertificateBlacklist mockedBlacklist = mock(CertificateBlacklist.class);
     return new TelemetryClient(accessToken, userAgent, telemetryClientSettings, mockedLogger, mockedBlacklist);
@@ -188,10 +188,10 @@ class MockWebServerTest {
     return result;
   }
 
-  TelemetryClientSettings provideDefaultTelemetryClientSettings() {
+  TelemetryClientSettings provideDefaultTelemetryClientSettings(Context context) {
     HttpUrl localUrl = obtainBaseEndpointUrl();
 
-    return new TelemetryClientSettings.Builder()
+    return new TelemetryClientSettings.Builder(context)
       .baseUrl(localUrl)
       .sslSocketFactory(clientCertificates.sslSocketFactory())
       .x509TrustManager(clientCertificates.trustManager())
