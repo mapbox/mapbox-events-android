@@ -3,6 +3,7 @@ package com.mapbox.android.telemetry;
 import android.app.AlarmManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.support.test.InstrumentationRegistry;
 
 import org.junit.Assert;
@@ -39,9 +40,8 @@ public class AlarmMangerInstrumentationTest {
     theAlarmSchedulerFlusher.scheduleExact(elapsedMockedTime2);
 
     Assert.assertFalse(latch.await(30, TimeUnit.SECONDS));
-    int result = broadcastTrack.get();
 
-    Assert.assertEquals(1, result);
+    Assert.assertEquals(new Integer(1), broadcastTrack.get());
   }
 
   @Test
@@ -63,8 +63,9 @@ public class AlarmMangerInstrumentationTest {
     AlarmReceiver mockedAlarmReceiver = mock(AlarmReceiver.class);
     AlarmSchedulerFlusher theAlarmSchedulerFlusher = new AlarmSchedulerFlusher(mockedContext, mockedAlarmManager,
       mockedAlarmReceiver);
-
-    Assert.assertTrue(theAlarmSchedulerFlusher.scheduleExact(25));
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+      Assert.assertTrue(theAlarmSchedulerFlusher.scheduleExact(25));
+    }
   }
 
   private static AlarmReceiver obtainAlarmReceiver(final AtomicReference<Integer> broadcastTrack,
