@@ -7,6 +7,7 @@ import android.os.Build;
 import android.support.test.InstrumentationRegistry;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
@@ -19,6 +20,7 @@ import static org.mockito.Mockito.mock;
 public class AlarmMangerInstrumentationTest {
 
   @Test
+  @Ignore
   public void checksAlarmCancelledProperly() throws InterruptedException {
     final CountDownLatch latch = new CountDownLatch(2);
     final AtomicReference<Integer> broadcastTrack = new AtomicReference<>();
