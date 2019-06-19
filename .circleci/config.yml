@@ -94,6 +94,20 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Run libcore instrumentation tests on Firebase with more devices
+          no_output_timeout: 20m
+          command: |
+            build_dir="libcore/build"
+            test_apk_path="outputs/apk/androidTest/debug/libcore-debug-androidTest.apk"
+            ./cloud_test.sh $build_dir $test_apk_path $CIRCLE_BUILD_NUM true
+      - run:
+          name: Run libtelemetry instrumentation tests on Firebase with more devices
+          no_output_timeout: 20m
+          command: |
+            build_dir="libtelemetry/build"
+            test_apk_path="outputs/apk/androidTest/full/debug/libtelemetry-full-debug-androidTest.apk"
+            ./cloud_test.sh $build_dir $test_apk_path $CIRCLE_BUILD_NUM true
+      - run:
           name: Generate Maven credentials
           shell: /bin/bash -euo pipefail
           command: |
