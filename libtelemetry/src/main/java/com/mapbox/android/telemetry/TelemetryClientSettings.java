@@ -13,15 +13,16 @@ import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 
+import static com.mapbox.android.telemetry.MapboxTelemetryConstants.DEFAULT_CHINA_EVENTS_HOST;
+import static com.mapbox.android.telemetry.MapboxTelemetryConstants.DEFAULT_COM_EVENTS_HOST;
+import static com.mapbox.android.telemetry.MapboxTelemetryConstants.DEFAULT_STAGING_EVENTS_HOST;
+
 class TelemetryClientSettings {
-  private static final String STAGING_EVENTS_HOST = "api-events-staging.tilestream.net";
-  private static final String COM_EVENTS_HOST = "events.mapbox.com";
-  private static final String CHINA_EVENTS_HOST = "events.mapbox.cn";
   private static final Map<Environment, String> HOSTS = new HashMap<Environment, String>() {
     {
-      put(Environment.STAGING, STAGING_EVENTS_HOST);
-      put(Environment.COM, COM_EVENTS_HOST);
-      put(Environment.CHINA, CHINA_EVENTS_HOST);
+      put(Environment.STAGING, DEFAULT_STAGING_EVENTS_HOST);
+      put(Environment.COM, DEFAULT_COM_EVENTS_HOST);
+      put(Environment.CHINA, DEFAULT_CHINA_EVENTS_HOST);
     }
   };
   private static final String HTTPS_SCHEME = "https";

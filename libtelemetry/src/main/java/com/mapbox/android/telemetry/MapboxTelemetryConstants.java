@@ -32,4 +32,22 @@ public final class MapboxTelemetryConstants {
    */
   public static final String MAPBOX_TELEMETRY_PACKAGE = "com.mapbox.android.telemetry";
 
+
+  /**
+   * Default telemetry host for STAGING Environment
+   */
+  @SuppressWarnings("WeakerAccess")
+  public static final String DEFAULT_STAGING_EVENTS_HOST = "api-events-staging.tilestream.net";
+
+  /**
+   * Default telemetry host for COM Environment
+   */
+  @SuppressWarnings("WeakerAccess")
+  public static final String DEFAULT_COM_EVENTS_HOST = "events.mapbox.com";
+
+  /**
+   * Default telemetry host for CHINA Environment
+   */
+  @SuppressWarnings("WeakerAccess")
+  public static final String DEFAULT_CHINA_EVENTS_HOST = "events.mapbox.cn";
 }

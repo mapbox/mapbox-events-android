@@ -257,6 +257,20 @@ public class TelemetryClientTest extends MockWebServerTest {
       .debug(eq("TelemetryClient"), contains(" with 1 event(s) (user agent: anyUserAgent) with payload:"));
   }
 
+  @Test
+  public void checksSetBaseUrl() throws Exception {
+    TelemetryClientSettings clientSettings = provideDefaultTelemetryClientSettings(getMockedContext());
+    Logger mockedLogger = mock(Logger.class);
+    TelemetryClient telemetryClient = new TelemetryClient("", "", clientSettings,
+            mockedLogger, mock(CertificateBlacklist.class));
+
+    String newUrl = "new-custom-url.com";
+    telemetryClient.setBaseUrl(newUrl);
+
+    assertEquals("https://" + newUrl + "/", telemetryClient.obtainSetting().getBaseUrl().toString());
+  }
+
+
   private Callback provideACallback(final CountDownLatch latch, final AtomicReference<String> bodyRef,
                                     final AtomicBoolean failureRef) {
     Callback aCallback = new Callback() {
