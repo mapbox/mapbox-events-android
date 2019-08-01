@@ -18,6 +18,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Pattern;
 
 import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
@@ -475,5 +476,17 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
         }
       };
     }
+  }
+
+  @SuppressWarnings("WeakerAccess")
+  public void setBaseUrl(String eventsHost) {
+    if (isValidUrl(eventsHost)) {
+      telemetryClient.setBaseUrl(eventsHost);
+    }
+  }
+
+  private static boolean isValidUrl(String eventsHost) {
+    Pattern urlPattern = Pattern.compile("^[a-z0-9]+([\\-.][a-z0-9]+)*\\.[a-z]{2,5}(:[0-9]{1,5})?(/.*)?$");
+    return eventsHost != null && !eventsHost.isEmpty() && urlPattern.matcher(eventsHost).matches();
   }
 }
