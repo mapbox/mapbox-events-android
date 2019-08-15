@@ -403,11 +403,25 @@ public class MapboxTelemetryTest {
   }
 
   @Test
-  public void checksSetBaseUrlWithValidHost() throws Exception {
+  public void checksSetBaseUrlWithValidHostAndWithConnection() throws Exception {
+    Context mockedContext = obtainNetworkConnectedMockedContext();
     TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
-    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedTelemetryClient);
+    Callback mockedHttpCallback = mock(Callback.class);
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext, mockedTelemetryClient,
+            mockedHttpCallback);
     theMapboxTelemetry.setBaseUrl(DEFAULT_STAGING_EVENTS_HOST);
     verify(mockedTelemetryClient, times(1)).setBaseUrl(eq(DEFAULT_STAGING_EVENTS_HOST));
+  }
+
+  @Test
+  public void checksSetBaseUrlWithValidHostAndWithoutConnection() throws Exception {
+    Context mockedContext = obtainNetworkNotConnectedMockedContext();
+    TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
+    Callback mockedHttpCallback = mock(Callback.class);
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext, mockedTelemetryClient,
+            mockedHttpCallback);
+    theMapboxTelemetry.setBaseUrl(DEFAULT_STAGING_EVENTS_HOST);
+    verify(mockedTelemetryClient, never()).setBaseUrl(eq(DEFAULT_STAGING_EVENTS_HOST));
   }
 
   @Test

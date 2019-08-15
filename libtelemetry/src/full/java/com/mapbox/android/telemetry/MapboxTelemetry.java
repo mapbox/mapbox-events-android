@@ -479,8 +479,8 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   }
 
   @SuppressWarnings("WeakerAccess")
-  public void setBaseUrl(String eventsHost) {
-    if (isValidUrl(eventsHost)) {
+  public synchronized void setBaseUrl(String eventsHost) {
+    if (isValidUrl(eventsHost) && checkNetworkAndParameters()) {
       telemetryClient.setBaseUrl(eventsHost);
     }
   }
