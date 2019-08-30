@@ -78,7 +78,8 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
     final SharedPreferences sharedPreferences = getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
     final SharedPreferences.Editor editor = sharedPreferences.edit();
 
-    String telemetryStateName = sharedPreferences.getString(TelemetryEnabler.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE,
+    String telemetryStateName = sharedPreferences
+            .getString(TelemetryEnabler.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE,
             TelemetryEnabler.State.ENABLED.name());
 
     if (telemetryStateName.equals(TelemetryEnabler.State.ENABLED.name())) {
@@ -94,9 +95,11 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
       public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
 
         if (b) {
-          editor.putString(TelemetryEnabler.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE, TelemetryEnabler.State.ENABLED.name());
+          editor.putString(TelemetryEnabler.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE,
+                  TelemetryEnabler.State.ENABLED.name());
         } else {
-          editor.putString(TelemetryEnabler.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE, TelemetryEnabler.State.DISABLED.name());
+          editor.putString(TelemetryEnabler.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE,
+                  TelemetryEnabler.State.DISABLED.name());
         }
 
         editor.apply();
@@ -173,7 +176,8 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
       Location location = result.getLastLocation();
       MainActivity mainActivity = weakReference.get();
       if (location != null && mainActivity != null) {
-        Toast.makeText(mainActivity, String.format("%s: %s", "Location Update", getLocationText(location)), Toast.LENGTH_SHORT).show();
+        Toast.makeText(mainActivity, String.format("%s: %s", "Location Update", getLocationText(location)),
+                Toast.LENGTH_SHORT).show();
       }
     }
 
