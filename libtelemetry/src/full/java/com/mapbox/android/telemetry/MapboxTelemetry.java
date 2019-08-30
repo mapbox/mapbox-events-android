@@ -57,7 +57,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     this.userAgent = userAgent;
     AlarmReceiver alarmReceiver = obtainAlarmReceiver();
     this.schedulerFlusher = new SchedulerFlusherFactory(applicationContext, alarmReceiver).supply();
-    this.telemetryEnabler = new TelemetryEnabler(true);
+    this.telemetryEnabler = new TelemetryEnabler(true, applicationContext);
     initializeTelemetryListeners();
     initializeAttachmentListeners();
     // Initializing callback after listeners object is instantiated

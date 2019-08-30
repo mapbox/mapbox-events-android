@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.support.annotation.NonNull;
+import android.support.annotation.UiThread;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +21,13 @@ public class TelemetryEnabler {
     ENABLED, DISABLED
   }
 
-  static final String MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE = "mapboxTelemetryState";
+
+  // It is intentional to keep this a Class Level variable, so as to keep its life tied to. Otherwise these listeners are stored as WeakReference's and gets garbage collected over time.
+  // https://stackoverflow.com/questions/2542938/sharedpreferences-onsharedpreferencechangelistener-not-being-called-consistently
+  @SuppressWarnings("FieldCanBeLocal")
+  private SharedPreferences.OnSharedPreferenceChangeListener prefListener;
+
+  public  static final String MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE = "mapboxTelemetryState";
   static final Map<TelemetryEnabler.State, Boolean> TELEMETRY_STATES =
     new HashMap<TelemetryEnabler.State, Boolean>() {
       {
@@ -27,46 +35,84 @@ public class TelemetryEnabler {
         put(TelemetryEnabler.State.DISABLED, false);
       }
     };
+
   private static final Map<String, State> STATES = new HashMap<String, State>() {
     {
       put(State.ENABLED.name(), State.ENABLED);
       put(State.DISABLED.name(), State.DISABLED);
     }
   };
+
   private static final String KEY_META_DATA_ENABLED = "com.mapbox.EnableEvents";
-  private boolean isFromPreferences = true;
-  private State currentTelemetryState = State.ENABLED;
+  private boolean isFromPreferences;
+  private State currentTelemetryState;
 
-  TelemetryEnabler(boolean isFromPreferences) {
+  private Context context;
+
+  TelemetryEnabler(boolean isFromPreferences, Context applicationContext) {
+
     this.isFromPreferences = isFromPreferences;
-  }
 
-  public static State retrieveTelemetryStateFromPreferences() {
-    if (MapboxTelemetry.applicationContext == null) {
-      return STATES.get(State.ENABLED.name());
+    if(isFromPreferences){
+
+      if(applicationContext == null){
+        throw new IllegalStateException(" Context not provided. Can not fetch Telemetry State");
+      }
+
+      this.context = applicationContext;
+
+      SharedPreferences sharedPreferences = obtainSharedPreferences(context);
+      String telemetryStateName = sharedPreferences.getString(MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE,
+              State.ENABLED.name());
+
+      currentTelemetryState = STATES.get(telemetryStateName);
+
+      prefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+
+          if(s.equals(MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE)){
+
+            String telemetryStateName = sharedPreferences.getString(MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE,
+                    State.ENABLED.name());
+
+            currentTelemetryState = STATES.get(telemetryStateName);
+          }
+        }
+      };
+
+      sharedPreferences.registerOnSharedPreferenceChangeListener(prefListener);
+
+    }else{
+
+      currentTelemetryState = State.ENABLED;
     }
-
-    SharedPreferences sharedPreferences = obtainSharedPreferences(MapboxTelemetry.applicationContext);
-    String telemetryStateName = sharedPreferences.getString(MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE,
-      State.ENABLED.name());
-
-    return STATES.get(telemetryStateName);
   }
 
-  public static State updateTelemetryState(State telemetryState) {
-    if (MapboxTelemetry.applicationContext == null) {
-      return telemetryState;
+  private State retrieveTelemetryStateFromPreferences() {
+
+    return currentTelemetryState;
+  }
+
+  synchronized State updateTelemetryState(State telemetryState) {
+
+    if (isFromPreferences) {
+
+      if(context == null){
+        return telemetryState;
+      }
+
+      updatePreferences(telemetryState);
+
+    }else{
+
+      currentTelemetryState = telemetryState;
     }
+    return currentTelemetryState;
 
-    SharedPreferences sharedPreferences = obtainSharedPreferences(MapboxTelemetry.applicationContext);
-    SharedPreferences.Editor editor = sharedPreferences.edit();
-
-    editor.putString(MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE, telemetryState.name());
-    editor.apply();
-
-    return telemetryState;
   }
 
+  @NonNull
   State obtainTelemetryState() {
     if (isFromPreferences) {
       return retrieveTelemetryStateFromPreferences();
@@ -75,13 +121,14 @@ public class TelemetryEnabler {
     return currentTelemetryState;
   }
 
-  State updatePreferences(State telemetryState) {
-    if (isFromPreferences) {
-      return updateTelemetryState(telemetryState);
-    }
+  private void updatePreferences(State telemetryState) {
 
-    currentTelemetryState = telemetryState;
-    return currentTelemetryState;
+    SharedPreferences sharedPreferences = obtainSharedPreferences(context);
+    SharedPreferences.Editor editor = sharedPreferences.edit();
+
+    editor.putString(MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE, telemetryState.name());
+    editor.apply();
+
   }
 
   static boolean isEventsEnabled(Context context) {

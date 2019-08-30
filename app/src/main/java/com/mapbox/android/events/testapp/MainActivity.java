@@ -1,6 +1,8 @@
 package com.mapbox.android.events.testapp;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -8,6 +10,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.mapbox.android.core.location.LocationEngine;
@@ -20,10 +24,13 @@ import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.android.telemetry.AppUserTurnstile;
 import com.mapbox.android.telemetry.LocationEvent;
 import com.mapbox.android.telemetry.MapboxTelemetry;
+import com.mapbox.android.telemetry.TelemetryEnabler;
 import com.mapbox.android.telemetry.TelemetryListener;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
+
+import static com.mapbox.android.telemetry.MapboxTelemetryConstants.MAPBOX_SHARED_PREFERENCES;
 
 public class MainActivity extends AppCompatActivity implements PermissionsListener {
   private static final String LOG_TAG = "TelemetryTestApp";
@@ -66,6 +73,37 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
         }
       }
     });
+
+    Switch telemetrySettingSwitch = findViewById(R.id.telemetry_setting);
+    final SharedPreferences sharedPreferences = getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
+    final SharedPreferences.Editor editor = sharedPreferences.edit();
+
+    String telemetryStateName = sharedPreferences.getString(TelemetryEnabler.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE,
+            TelemetryEnabler.State.ENABLED.name());
+
+    if (telemetryStateName.equals(TelemetryEnabler.State.ENABLED.name())) {
+
+      telemetrySettingSwitch.setChecked(true);
+    } else {
+
+      telemetrySettingSwitch.setChecked(false);
+    }
+
+    telemetrySettingSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+      @Override
+      public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+
+        if (b) {
+          editor.putString(TelemetryEnabler.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE, TelemetryEnabler.State.ENABLED.name());
+        } else {
+          editor.putString(TelemetryEnabler.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE, TelemetryEnabler.State.DISABLED.name());
+        }
+
+        editor.apply();
+      }
+    });
+
+
   }
 
   @SuppressLint("MissingPermission")
@@ -135,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
       Location location = result.getLastLocation();
       MainActivity mainActivity = weakReference.get();
       if (location != null && mainActivity != null) {
-        Toast.makeText(mainActivity, getLocationText(location), Toast.LENGTH_SHORT).show();
+        Toast.makeText(mainActivity, String.format("%s: %s", "Location Update", getLocationText(location)), Toast.LENGTH_SHORT).show();
       }
     }
 
@@ -163,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
     @SuppressLint("DefaultLocale")
     @Override
     public void onHttpResponse(boolean successful, int code) {
-      final String message = successful ? String.format("Transmission succeed with code: %d", code) :
+      final String message = successful ? String.format("Telemetry Event: Transmission succeed with code: %d", code) :
         String.format("Transmission failed with code: %d", code);
       final MainActivity activity = weakReference.get();
       if (activity != null) {

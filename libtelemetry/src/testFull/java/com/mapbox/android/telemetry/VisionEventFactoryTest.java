@@ -112,7 +112,7 @@ public class VisionEventFactoryTest {
     Callback mockedHttpCallback = mock(Callback.class);
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
-    TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false);
+    TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false, MapboxTelemetry.applicationContext);
     new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
       telemetryEnabler, mock(ExecutorService.class));

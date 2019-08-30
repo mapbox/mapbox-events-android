@@ -38,7 +38,7 @@ public class AppUserTurnstile extends Event implements Parcelable {
     this.event = APP_USER_TURNSTILE;
     this.created = TelemetryUtils.obtainCurrentDate();
     this.userId = TelemetryUtils.retrieveVendorId();
-    TelemetryEnabler telemetryEnabler = new TelemetryEnabler(isFromPreferences);
+    TelemetryEnabler telemetryEnabler = new TelemetryEnabler(isFromPreferences, MapboxTelemetry.applicationContext);
     this.enabledTelemetry = TELEMETRY_STATES.get(telemetryEnabler.obtainTelemetryState());
     this.device = Build.DEVICE;
     this.sdkIdentifier = sdkIdentifier;

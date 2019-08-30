@@ -482,7 +482,7 @@ public class MapboxTelemetryTest {
     TelemetryClient telemetryClient = mock(TelemetryClient.class);
     Callback httpCallback = mock(Callback.class);
     Clock mockedClock = mock(Clock.class);
-    TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false);
+    TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false, MapboxTelemetry.applicationContext);
     return new MapboxTelemetry(MapboxTelemetry.applicationContext,
       aValidAccessToken, aValidUserAgent, eventsQueue, telemetryClient, httpCallback, mockedSchedulerFlusher,
       mockedClock, telemetryEnabler, mockedExecutor);
@@ -499,7 +499,7 @@ public class MapboxTelemetryTest {
     Callback mockedHttpCallback = mock(Callback.class);
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
-    TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false);
+    TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false, MapboxTelemetry.applicationContext);
     return new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, telemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
       telemetryEnabler, mock(ExecutorService.class));
@@ -513,7 +513,7 @@ public class MapboxTelemetryTest {
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
-    TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false);
+    TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false, MapboxTelemetry.applicationContext);
     ExecutorService mockedExecutor = mock(ExecutorService.class);
     setupDirectExecutor(mockedExecutor);
     return new MapboxTelemetry(context, aValidAccessToken, aValidUserAgent,
@@ -530,8 +530,8 @@ public class MapboxTelemetryTest {
     Callback mockedHttpCallback = mock(Callback.class);
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
-    TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false);
-    telemetryEnabler.updatePreferences(state);
+    TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false, MapboxTelemetry.applicationContext);
+    telemetryEnabler.updateTelemetryState(state);
     ExecutorService mockedExecutor = mock(ExecutorService.class);
     setupDirectExecutor(mockedExecutor);
     return new MapboxTelemetry(context, aValidAccessToken, aValidUserAgent,
@@ -547,7 +547,7 @@ public class MapboxTelemetryTest {
     Callback mockedHttpCallback = mock(Callback.class);
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
-    TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false);
+    TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false, MapboxTelemetry.applicationContext);
     MapboxTelemetry mapboxTelemetry = new MapboxTelemetry(context, aValidAccessToken, aValidUserAgent,
       eventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
       telemetryEnabler, mock(ExecutorService.class));
@@ -562,7 +562,7 @@ public class MapboxTelemetryTest {
     TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
     Callback mockedHttpCallback = mock(Callback.class);
     Clock mockedClock = mock(Clock.class);
-    TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false);
+    TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false, MapboxTelemetry.applicationContext);
     return new MapboxTelemetry(context, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, schedulerFlusher, mockedClock,
       telemetryEnabler, mock(ExecutorService.class));
@@ -575,7 +575,7 @@ public class MapboxTelemetryTest {
     Callback mockedHttpCallback = mock(Callback.class);
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
-    TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false);
+    TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false, MapboxTelemetry.applicationContext);
     return new MapboxTelemetry(context, accessToken, userAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
       telemetryEnabler, mock(ExecutorService.class));
@@ -587,7 +587,7 @@ public class MapboxTelemetryTest {
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
-    TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false);
+    TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false, MapboxTelemetry.applicationContext);
     return new MapboxTelemetry(context, accessToken, userAgent,
       mockedEventsQueue, telemetryClient, httpCallback, mockedSchedulerFlusher, mockedClock,
       telemetryEnabler, mock(ExecutorService.class));
