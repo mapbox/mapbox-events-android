@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
-import android.support.annotation.UiThread;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,12 +21,14 @@ public class TelemetryEnabler {
   }
 
 
-  // It is intentional to keep this a Class Level variable, so as to keep its life tied to. Otherwise these listeners are stored as WeakReference's and gets garbage collected over time.
+  // It is intentional to keep this a Class Level variable, so as to keep its life tied to the instance.
+  // Since these listeners are stored as WeakReference's, they may get garbage collected
+  // over time if declared as a local variable.
   // https://stackoverflow.com/questions/2542938/sharedpreferences-onsharedpreferencechangelistener-not-being-called-consistently
   @SuppressWarnings("FieldCanBeLocal")
   private SharedPreferences.OnSharedPreferenceChangeListener prefListener;
 
-  public  static final String MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE = "mapboxTelemetryState";
+  public static final String MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE = "mapboxTelemetryState";
   static final Map<TelemetryEnabler.State, Boolean> TELEMETRY_STATES =
     new HashMap<TelemetryEnabler.State, Boolean>() {
       {
@@ -53,9 +54,9 @@ public class TelemetryEnabler {
 
     this.isFromPreferences = isFromPreferences;
 
-    if(isFromPreferences){
+    if (isFromPreferences) {
 
-      if(applicationContext == null){
+      if (applicationContext == null) {
         throw new IllegalStateException(" Context not provided. Can not fetch Telemetry State");
       }
 
@@ -63,7 +64,7 @@ public class TelemetryEnabler {
 
       SharedPreferences sharedPreferences = obtainSharedPreferences(context);
       String telemetryStateName = sharedPreferences.getString(MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE,
-              State.ENABLED.name());
+        State.ENABLED.name());
 
       currentTelemetryState = STATES.get(telemetryStateName);
 
@@ -71,10 +72,10 @@ public class TelemetryEnabler {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
 
-          if(s.equals(MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE)){
+          if (s.equals(MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE)) {
 
             String telemetryStateName = sharedPreferences.getString(MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE,
-                    State.ENABLED.name());
+              State.ENABLED.name());
 
             currentTelemetryState = STATES.get(telemetryStateName);
           }
@@ -83,7 +84,7 @@ public class TelemetryEnabler {
 
       sharedPreferences.registerOnSharedPreferenceChangeListener(prefListener);
 
-    }else{
+    } else {
 
       currentTelemetryState = State.ENABLED;
     }
@@ -98,13 +99,13 @@ public class TelemetryEnabler {
 
     if (isFromPreferences) {
 
-      if(context == null){
+      if (context == null) {
         return telemetryState;
       }
 
       updatePreferences(telemetryState);
 
-    }else{
+    } else {
 
       currentTelemetryState = telemetryState;
     }

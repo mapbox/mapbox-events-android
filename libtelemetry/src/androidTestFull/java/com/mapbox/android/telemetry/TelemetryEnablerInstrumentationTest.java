@@ -45,8 +45,8 @@ public class TelemetryEnablerInstrumentationTest {
 
     try {
       Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      Log.e(LOG_TAG, e.toString());
+    } catch (InterruptedException exception) {
+      Log.e(LOG_TAG, exception.toString());
     }
 
     TelemetryEnabler.State updatedState = enabler.obtainTelemetryState();
@@ -67,8 +67,8 @@ public class TelemetryEnablerInstrumentationTest {
 
     try {
       Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      Log.e(LOG_TAG, e.toString());
+    } catch (InterruptedException exception) {
+      Log.e(LOG_TAG, exception.toString());
     }
     assertEquals(TelemetryEnabler.State.DISABLED, currentState);
 
@@ -78,8 +78,8 @@ public class TelemetryEnablerInstrumentationTest {
 
     try {
       Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      Log.e(LOG_TAG, e.toString());
+    } catch (InterruptedException exception) {
+      Log.e(LOG_TAG, exception.toString());
     }
 
     TelemetryEnabler.State updatedState = enabler.obtainTelemetryState();
