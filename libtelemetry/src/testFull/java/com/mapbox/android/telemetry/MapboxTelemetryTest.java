@@ -409,7 +409,7 @@ public class MapboxTelemetryTest {
     Callback mockedHttpCallback = mock(Callback.class);
     MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext, mockedTelemetryClient,
             mockedHttpCallback);
-    theMapboxTelemetry.setBaseUrl(DEFAULT_STAGING_EVENTS_HOST);
+    assertTrue(theMapboxTelemetry.setBaseUrl(DEFAULT_STAGING_EVENTS_HOST));
     verify(mockedTelemetryClient, times(1)).setBaseUrl(eq(DEFAULT_STAGING_EVENTS_HOST));
   }
 
@@ -420,7 +420,7 @@ public class MapboxTelemetryTest {
     Callback mockedHttpCallback = mock(Callback.class);
     MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext, mockedTelemetryClient,
             mockedHttpCallback);
-    theMapboxTelemetry.setBaseUrl(DEFAULT_STAGING_EVENTS_HOST);
+    assertFalse(theMapboxTelemetry.setBaseUrl(DEFAULT_STAGING_EVENTS_HOST));
     verify(mockedTelemetryClient, never()).setBaseUrl(eq(DEFAULT_STAGING_EVENTS_HOST));
   }
 
@@ -428,7 +428,7 @@ public class MapboxTelemetryTest {
   public void checksSetBaseUrlWithNullHost() throws Exception {
     TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
     MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedTelemetryClient);
-    theMapboxTelemetry.setBaseUrl(null);
+    assertFalse(theMapboxTelemetry.setBaseUrl(null));
     verify(mockedTelemetryClient, never()).setBaseUrl(any(String.class));
   }
 
@@ -436,7 +436,7 @@ public class MapboxTelemetryTest {
   public void checksSetBaseUrlWithEmptyHost() throws Exception {
     TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
     MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedTelemetryClient);
-    theMapboxTelemetry.setBaseUrl("");
+    assertFalse(theMapboxTelemetry.setBaseUrl(""));
     verify(mockedTelemetryClient, never()).setBaseUrl(any(String.class));
   }
 
@@ -444,7 +444,7 @@ public class MapboxTelemetryTest {
   public void checksSetBaseUrlWithInvalidHostOne() throws Exception {
     TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
     MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedTelemetryClient);
-    theMapboxTelemetry.setBaseUrl("h@st.com");
+    assertFalse(theMapboxTelemetry.setBaseUrl("h@st.com"));
     verify(mockedTelemetryClient, never()).setBaseUrl(any(String.class));
   }
 
@@ -452,7 +452,7 @@ public class MapboxTelemetryTest {
   public void checksSetBaseUrlWithInvalidHostTwo() throws Exception {
     TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
     MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedTelemetryClient);
-    theMapboxTelemetry.setBaseUrl("new host.com");
+    assertFalse(theMapboxTelemetry.setBaseUrl("new host.com"));
     verify(mockedTelemetryClient, never()).setBaseUrl(any(String.class));
   }
 
@@ -460,7 +460,7 @@ public class MapboxTelemetryTest {
   public void checksSetBaseUrlWithInvalidHostThree() throws Exception {
     TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
     MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedTelemetryClient);
-    theMapboxTelemetry.setBaseUrl("host..com");
+    assertFalse(theMapboxTelemetry.setBaseUrl("host..com"));
     verify(mockedTelemetryClient, never()).setBaseUrl(any(String.class));
   }
 
@@ -468,7 +468,7 @@ public class MapboxTelemetryTest {
   public void checksSetBaseUrlWithInvalidHostFour() throws Exception {
     TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
     MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedTelemetryClient);
-    theMapboxTelemetry.setBaseUrl("host.c");
+    assertFalse(theMapboxTelemetry.setBaseUrl("host.c"));
     verify(mockedTelemetryClient, never()).setBaseUrl(any(String.class));
   }
 
@@ -476,7 +476,7 @@ public class MapboxTelemetryTest {
   public void checksSetBaseUrlWithInvalidHostFive() throws Exception {
     TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
     MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedTelemetryClient);
-    theMapboxTelemetry.setBaseUrl("host.com.");
+    assertFalse(theMapboxTelemetry.setBaseUrl("host.com."));
     verify(mockedTelemetryClient, never()).setBaseUrl(any(String.class));
   }
 
