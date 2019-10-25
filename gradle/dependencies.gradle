@@ -18,7 +18,8 @@ ext {
             espressoVersion     : '3.0.1',
             archLifecycleVersion: "1.1.0",
             assertJ             : "3.11.1",
-            leakCanaryVersion   : "1.6.3"
+            leakCanaryVersion   : "1.6.3",
+            kotlin              : "1.3.41"
     ]
 
     pluginVersion = [
@@ -28,13 +29,15 @@ ext {
     ]
 
     dependenciesList = [
+            kotlin                 : "org.jetbrains.kotlin:kotlin-gradle-plugin:${version.kotlin}",
+
             // play services
             gmsLocation            : "com.google.android.gms:play-services-location:${version.gmsLocation}",
 
             // okhttp
             okhttp3                : "com.squareup.okhttp3:okhttp:${version.okhttp3}",
             okhttp3Mockwebserver   : "com.squareup.okhttp3:mockwebserver:${version.okhttp3}",
-            okhttpTls             : "com.squareup.okhttp3:okhttp-tls:${version.okhttp3}",
+            okhttpTls              : "com.squareup.okhttp3:okhttp-tls:${version.okhttp3}",
             // gson
             gson                   : "com.google.code.gson:gson:${version.gson}",
 
