@@ -55,7 +55,7 @@ class PluginProviderGenerator : AbstractProcessor() {
     processingEnv.messager.noteMessage { "Generating plugin provider entry for ${plugin.implPackage}.${plugin.implClassName}" }
 
     val file = FileSpec.builder(
-        PLUGIN_PROVIDER_PACKAGE,
+      PLUGIN_PROVIDER_PACKAGE,
       "${PLUGIN_PROVIDER_CLASS_NAME_PREFIX}_${plugin.pluginType.name}_${plugin.implClassName}"
     )
       .addImport(plugin.pluginType.interfacePackage, plugin.pluginType.interfaceClassName)
@@ -79,8 +79,8 @@ class PluginProviderGenerator : AbstractProcessor() {
       // Generate plugin config file in assets directory
       val projectPath = Paths.get(it).parent.parent.parent.parent.parent
       val assetsDirectory = File(
-          projectPath.toFile(),
-          "src/main/assets/$KAPT_PLUGIN_ASSET_DIR_NAME/"
+        projectPath.toFile(),
+        "src/main/assets/$KAPT_PLUGIN_ASSET_DIR_NAME/"
       )
       assetsDirectory.deleteRecursively()
       val assetFile = File(
@@ -99,7 +99,7 @@ class PluginProviderGenerator : AbstractProcessor() {
 }
 
 private class Plugin(
-    val pluginType: MapPluginType,
-    val implPackage: String,
-    val implClassName: String
+  val pluginType: MapPluginType,
+  val implPackage: String,
+  val implClassName: String
 )

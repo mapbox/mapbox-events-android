@@ -4,14 +4,14 @@ plugins {
 }
 
 android {
-  compileSdkVersion(AndroidVersions.compileSdkVersion)
+  compileSdkVersion(28)
   defaultConfig {
-    minSdkVersion(AndroidVersions.minSdkVersion)
-    targetSdkVersion(AndroidVersions.targetSdkVersion)
+    minSdkVersion(14)
+    targetSdkVersion(28)
   }
 }
 
 dependencies {
-  implementation(Dependencies.kotlin)
-  implementation(Dependencies.annotations)
+  implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.41")
+  implementation("androidx.annotation:annotation:1.1.0")
 }

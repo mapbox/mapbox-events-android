@@ -1,4 +1,4 @@
-package com.mapbox.annotation.module
+package com.mapbox.annotation.navigation.module
 
 /**
  * @param skipConfiguration Defaults to false. If set to true, the generator will not expose the module provider.
@@ -7,5 +7,5 @@ package com.mapbox.annotation.module
  */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
-annotation class MapboxModule(val type: MapboxModuleType,
-                              val skipConfiguration: Boolean = false)
+annotation class MapboxNavigationModule(val type: MapboxNavigationModuleType,
+                                        val skipConfiguration: Boolean = false)
