@@ -5,8 +5,8 @@ plugins {
 
 dependencies {
   implementation(project(":annotations"))
-  implementation(Dependencies.kotlin)
-  implementation(Dependencies.kotlinPoet)
-  implementation(Dependencies.serviceProvider)
-  kapt(Dependencies.serviceProvider)
+  implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.41")
+  implementation("com.squareup:kotlinpoet:1.3.0")
+  implementation("com.google.auto.service:auto-service:1.0-rc6")
+  kapt("com.google.auto.service:auto-service:1.0-rc6")
 }
