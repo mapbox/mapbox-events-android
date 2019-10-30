@@ -1,6 +1,7 @@
 package com.mapbox.android.telemetry.location;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -63,6 +64,7 @@ class LocationEngineControllerImpl implements LocationEngineController {
     }
   }
 
+  @SuppressLint("MissingPermission")
   private void requestLocationUpdates() {
     if (!checkPermissions()) {
       Log.w(TAG, "Location permissions are not granted");
