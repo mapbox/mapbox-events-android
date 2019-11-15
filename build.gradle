@@ -7,6 +7,7 @@ buildscript {
 
     dependencies {
         classpath pluginDependencies.gradle
+        classpath pluginDependencies.mapboxSdkVersions
     }
 }
 
@@ -42,6 +43,7 @@ subprojects { subproject ->
     if (RELEASE_MODULES.contains(subproject.name)) {
         subproject.afterEvaluate {
             subproject.apply from: "javadoc.gradle"
+            subproject.apply plugin: 'com.mapbox.android.sdk.versions'
         }
         subproject.apply from: "${rootDir}/gradle/mvn-push-android.gradle"
     }
