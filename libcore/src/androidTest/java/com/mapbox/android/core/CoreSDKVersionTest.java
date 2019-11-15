@@ -26,19 +26,19 @@ public class CoreSDKVersionTest {
   public void testPersistedCoreSDKInfo() {
     Context context = InstrumentationRegistry.getTargetContext();
     AssetManager assetManager = context.getAssets();
-    InputStream is = null;
+    InputStream inputStream = null;
 
     try {
-      is = assetManager.open(SDK_VERSIONS_FOLDER + File.separator + context.getPackageName()
-        .replace(".test", ""));
-      BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+      String packageName = context.getPackageName().replace(".test", "");
+      inputStream = assetManager.open(SDK_VERSIONS_FOLDER + File.separator + packageName);
+      BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
       Assert.assertEquals(reader.readLine().split("/")[1], BuildConfig.VERSION_NAME);
       Assert.assertEquals(reader.readLine(), String.format(SECOND_LINE_FORMAT, BuildConfig.VERSION_CODE));
     } catch (IOException exception) {
       Log.e(LOG_TAG, exception.toString());
-      fail();
+      fail(exception.toString());
     } finally {
-      FileUtils.closeQuietly(is);
+      FileUtils.closeQuietly(inputStream);
     }
   }
 }

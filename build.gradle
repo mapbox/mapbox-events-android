@@ -7,7 +7,7 @@ buildscript {
 
     dependencies {
         classpath pluginDependencies.gradle
-        classpath pluginDependencies.mapboxSDKVersions
+        classpath pluginDependencies.mapboxSdkVersions
     }
 }
 
