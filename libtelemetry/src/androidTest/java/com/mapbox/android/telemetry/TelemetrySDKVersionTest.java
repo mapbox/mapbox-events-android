@@ -1,0 +1,46 @@
+package com.mapbox.android.telemetry;
+
+import android.content.Context;
+import android.content.res.AssetManager;
+import android.support.test.InstrumentationRegistry;
+import android.util.Log;
+
+import com.mapbox.android.core.FileUtils;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
+import static org.junit.Assert.fail;
+
+public class TelemetrySDKVersionTest {
+
+  private static final String SECOND_LINE_FORMAT = "v%d";
+  private static final String SDK_VERSIONS_FOLDER = "sdk_versions";
+  private static final String LOG_TAG = "TelemetrySDKVersionTest";
+
+  @Test
+  public void testPersistedTelemetrySDKInfo() {
+    Context context = InstrumentationRegistry.getTargetContext();
+    AssetManager assetManager = context.getAssets();
+    InputStream is = null;
+
+    try {
+      is = assetManager.open(SDK_VERSIONS_FOLDER + File.separator + context.getPackageName()
+        .replace(".test", ""));
+      BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+      Assert.assertEquals(reader.readLine().split("/")[1], BuildConfig.VERSION_NAME);
+      Assert.assertEquals(reader.readLine(), String.format(SECOND_LINE_FORMAT, BuildConfig.VERSION_CODE));
+    } catch (IOException exception) {
+      Log.e(LOG_TAG, exception.toString());
+      fail(exception.toString());
+    } finally {
+      FileUtils.closeQuietly(is);
+    }
+  }
+}

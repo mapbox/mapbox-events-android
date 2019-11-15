@@ -2,8 +2,10 @@ package com.mapbox.android.core;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -144,5 +146,16 @@ public final class FileUtils {
       long o2LastModified = o2.lastModified();
       return o1LastModified < o2LastModified ? -1 : (o1LastModified == o2LastModified ? 0 : 1);
     }
+  }
+
+  public static void closeQuietly(@Nullable Closeable closeable) {
+    if (closeable != null) {
+      try {
+        closeable.close();
+      } catch (IOException var1) {
+        //This is ok to happen.
+      }
+    }
+
   }
 }
