@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-    mapboxTelemetry = new MapboxTelemetry(this, obtainAccessToken(), LOG_TAG);
+    mapboxTelemetry = new MapboxTelemetry(this, obtainAccessToken());
     mapboxTelemetry.updateDebugLoggingEnabled(true);
     mapboxTelemetry.addTelemetryListener(new TelemetryListenerWrapper(this));
     mapboxTelemetry.push(new AppUserTurnstile("fooSdk", "1.0.0"));

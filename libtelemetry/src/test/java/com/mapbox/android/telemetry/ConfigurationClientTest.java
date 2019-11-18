@@ -79,7 +79,7 @@ public class ConfigurationClientTest {
       .thenReturn(Long.valueOf(0));
     when(mockedSharedPreferences.edit()).thenReturn(mockedEditor);
 
-    this.configurationClient = new ConfigurationClient(mockedContext, TelemetryUtils.createFullUserAgent("AnUserAgent",
+    this.configurationClient = new ConfigurationClient(mockedContext, TelemetryUtils.createFullUserAgent(
       mockedContext), "anAccessToken", client);
   }
 

@@ -39,7 +39,7 @@ public class ConfigurationClientInstrumentationTest {
   public void setup() {
     Context context = InstrumentationRegistry.getTargetContext();
     this.configurationClient = new ConfigurationClient(context,
-      TelemetryUtils.createFullUserAgent("AnUserAgent", context), "anAccessToken", new OkHttpClient());
+      TelemetryUtils.createFullUserAgent(context), "anAccessToken", new OkHttpClient());
   }
 
   @Test
@@ -48,7 +48,7 @@ public class ConfigurationClientInstrumentationTest {
     OkHttpClient httpClient = mock(OkHttpClient.class);
     when(httpClient.newCall(any(Request.class))).thenReturn(mock(Call.class));
     this.configurationClient = new ConfigurationClient(context,
-      TelemetryUtils.createFullUserAgent("AnUserAgent", context), "anAccessToken", httpClient);
+      TelemetryUtils.createFullUserAgent(context), "anAccessToken", httpClient);
     configurationClient.update();
     ArgumentCaptor<Request> argument = ArgumentCaptor.forClass(Request.class);
     verify(httpClient).newCall(argument.capture());
@@ -71,7 +71,7 @@ public class ConfigurationClientInstrumentationTest {
     OkHttpClient httpClient = mock(OkHttpClient.class);
     when(httpClient.newCall((Request) any())).thenReturn(mock(Call.class));
     this.configurationClient = new ConfigurationClient(context,
-      TelemetryUtils.createFullUserAgent("AnUserAgent", InstrumentationRegistry.getTargetContext()),
+      TelemetryUtils.createFullUserAgent(InstrumentationRegistry.getTargetContext()),
       "anAccessToken", httpClient);
 
     configurationClient.update();

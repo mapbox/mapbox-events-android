@@ -106,15 +106,14 @@ public class VisionEventFactoryTest {
     when(mockedContext.getSystemService(Context.ALARM_SERVICE)).thenReturn(mockedAlarmManager);
     MapboxTelemetry.applicationContext = mockedContext;
     String aValidAccessToken = "validAccessToken";
-    String aValidUserAgent = "MapboxTelemetryAndroid/";
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
     TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
     Callback mockedHttpCallback = mock(Callback.class);
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);
     TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false);
-    new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
-      mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
+    new MapboxTelemetry(mockedContext, aValidAccessToken, mockedEventsQueue,
+      mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
       telemetryEnabler, mock(ExecutorService.class));
   }
 }

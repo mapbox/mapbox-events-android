@@ -33,7 +33,7 @@ public class CertificateBlacklistInstrumentationTests {
     setSystemPrefs();
 
     ConfigurationClient configurationClient = new ConfigurationClient(context,
-      TelemetryUtils.createFullUserAgent("AnUserAgent", context), "anAccessToken", new OkHttpClient());
+      TelemetryUtils.createFullUserAgent(context), "anAccessToken", new OkHttpClient());
     this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
   }
 
@@ -95,7 +95,7 @@ public class CertificateBlacklistInstrumentationTests {
 
     Context context = InstrumentationRegistry.getTargetContext();
     ConfigurationClient configurationClient = new ConfigurationClient(context,
-      TelemetryUtils.createFullUserAgent("AnUserAgent", context), "anAccessToken", new OkHttpClient());
+      TelemetryUtils.createFullUserAgent(context), "anAccessToken", new OkHttpClient());
     this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
     assertTrue(certificateBlacklist.isBlacklisted("test12345"));
   }

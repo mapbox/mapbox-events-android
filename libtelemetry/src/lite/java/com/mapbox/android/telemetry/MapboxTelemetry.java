@@ -1,6 +1,7 @@
 package com.mapbox.android.telemetry;
 
 import android.content.Context;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,29 +25,42 @@ public class MapboxTelemetry {
   private final ConfigurationClient configurationClient;
   static Context applicationContext = null;
 
+  @Deprecated
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
     // FIXME: Propagate certificate blacklist changes from full version
-    this.configurationClient = new ConfigurationClient(context, TelemetryUtils.createFullUserAgent(userAgent,
-            context), accessToken, new OkHttpClient());
+    this.configurationClient = new ConfigurationClient(context, TelemetryUtils.createFullUserAgent(context),
+      accessToken, new OkHttpClient());
     this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
-    checkRequiredParameters(accessToken, userAgent);
+    checkRequiredParameters(accessToken);
+    initializeTelemetryListeners();
+    // Initializing callback after listeners object is instantiated
+    this.httpCallback = getHttpCallback(telemetryListeners);
+  }
+
+  public MapboxTelemetry(Context context, String accessToken) {
+    initializeContext(context);
+    // FIXME: Propagate certificate blacklist changes from full version
+    this.configurationClient = new ConfigurationClient(context, TelemetryUtils.createFullUserAgent(context),
+      accessToken, new OkHttpClient());
+    this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
+    checkRequiredParameters(accessToken);
     initializeTelemetryListeners();
     // Initializing callback after listeners object is instantiated
     this.httpCallback = getHttpCallback(telemetryListeners);
   }
 
   // For testing only
-  MapboxTelemetry(Context context, String accessToken, String userAgent, EventsQueue queue,
+  MapboxTelemetry(Context context, String accessToken, EventsQueue queue,
                   TelemetryClient telemetryClient, Callback httpCallback, SchedulerFlusher schedulerFlusher,
                   Clock clock, boolean isServiceBound, TelemetryEnabler telemetryEnabler) {
     initializeContext(context);
-    checkRequiredParameters(accessToken, userAgent);
+    checkRequiredParameters(accessToken);
     this.telemetryClient = telemetryClient;
     this.httpCallback = httpCallback;
     initializeTelemetryListeners();
-    this.configurationClient = new ConfigurationClient(context, TelemetryUtils.createFullUserAgent(userAgent,
-            context), accessToken, new OkHttpClient());
+    this.configurationClient = new ConfigurationClient(context, TelemetryUtils.createFullUserAgent(context),
+      accessToken, new OkHttpClient());
     this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
   }
 
@@ -86,10 +100,9 @@ public class MapboxTelemetry {
     }
   }
 
+  @Deprecated
   public void updateUserAgent(String userAgent) {
-    if (isUserAgentValid(userAgent)) {
-      telemetryClient.updateUserAgent(TelemetryUtils.createFullUserAgent(userAgent, applicationContext));
-    }
+
   }
 
   public boolean updateAccessToken(String accessToken) {
@@ -119,8 +132,8 @@ public class MapboxTelemetry {
   }
 
   // Package private (no modifier) for testing purposes
-  boolean checkRequiredParameters(String accessToken, String userAgent) {
-    boolean areValidParameters = areRequiredParametersValid(accessToken, userAgent);
+  boolean checkRequiredParameters(String accessToken) {
+    boolean areValidParameters = areRequiredParametersValid(accessToken);
     if (areValidParameters) {
       initializeTelemetryClient();
     }
@@ -137,8 +150,8 @@ public class MapboxTelemetry {
     }
   }
 
-  private boolean areRequiredParametersValid(String accessToken, String userAgent) {
-    return isAccessTokenValid(accessToken) && isUserAgentValid(userAgent);
+  private boolean areRequiredParametersValid(String accessToken) {
+    return isAccessTokenValid(accessToken);
   }
 
   private boolean isAccessTokenValid(String accessToken) {
@@ -149,22 +162,14 @@ public class MapboxTelemetry {
     return false;
   }
 
-  private boolean isUserAgentValid(String userAgent) {
-    if (!TelemetryUtils.isEmpty(userAgent)) {
-      this.userAgent = userAgent;
-      return true;
-    }
-    return false;
-  }
-
   private void initializeTelemetryClient() {
     if (telemetryClient == null) {
-      telemetryClient = createTelemetryClient(accessToken, userAgent);
+      telemetryClient = createTelemetryClient(accessToken);
     }
   }
 
-  private TelemetryClient createTelemetryClient(String accessToken, String userAgent) {
-    String fullUserAgent = TelemetryUtils.createFullUserAgent(userAgent, applicationContext);
+  private TelemetryClient createTelemetryClient(String accessToken) {
+    String fullUserAgent = TelemetryUtils.createFullUserAgent(applicationContext);
     TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(accessToken, fullUserAgent,
       new Logger(), certificateBlacklist);
     telemetryClient = telemetryClientFactory.obtainTelemetryClient(applicationContext);
@@ -180,7 +185,7 @@ public class MapboxTelemetry {
   }
 
   private void sendEvents(List<Event> events) {
-    if (checkRequiredParameters(accessToken, userAgent)) {
+    if (checkRequiredParameters(accessToken)) {
       telemetryClient.sendEvents(events, httpCallback, true);
     }
   }
