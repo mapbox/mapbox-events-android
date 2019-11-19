@@ -7,7 +7,6 @@ import android.support.annotation.VisibleForTesting;
 import java.util.concurrent.TimeUnit;
 
 public class TelemetryMetricsClient {
-  private static final String TELEMETRY_METRICS_USER_AGENT = "mapbox-android-metrics";
   private static TelemetryMetricsClient telemetryMetricsClient;
   private static final Object lock = new Object();
   private final TelemetryMetrics telemetryMetrics;

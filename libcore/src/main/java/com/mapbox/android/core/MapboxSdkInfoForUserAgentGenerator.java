@@ -13,6 +13,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Locale;
 
+/**
+ * Generator that reads(from assets/sdk_versions folder) and constructs Mapbox SDK versions for user agent.
+ * Generates strings in format for each Mapbox library in the host app and concatenates them seperated by spaces.
+ * <p> User agent format for Mapbox SDK : {SDK Name}/{Version} {(packageName; versionCode)} </p>
+ */
 public class MapboxSdkInfoForUserAgentGenerator {
 
   private static MapboxSdkInfoForUserAgentGenerator userAgentGenerator;
@@ -48,10 +53,10 @@ public class MapboxSdkInfoForUserAgentGenerator {
       if (files != null) {
         for (String fileName : files) {
           if (fileName.contains(MAPBOX_IDENTIFIER)) {
-            InputStream is = null;
+            InputStream inputStream = null;
             try {
-              is = assetManager.open(SDK_VERSIONS_FOLDER + File.separator + fileName);
-              BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+              inputStream = assetManager.open(SDK_VERSIONS_FOLDER + File.separator + fileName);
+              BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
               String nameAndVersion = reader.readLine();
               nameAndVersion = nameAndVersion != null ? nameAndVersion : EMPTY_STRING;
               StringBuilder sdkSubInfo = new StringBuilder(EMPTY_STRING);
@@ -60,12 +65,13 @@ public class MapboxSdkInfoForUserAgentGenerator {
                 sdkSubInfo.append("; ");
                 sdkSubInfo.append(subInfo);
               }
+              reader.close();
               stringBuilder.append(String.format(DEFAULT_LOCALE, USER_AGENT_SDK_VERSION_FORMAT,
                 nameAndVersion, fileName, sdkSubInfo.toString()));
             } catch (IOException exception) {
               Log.e(LOG_TAG, exception.toString());
             } finally {
-              FileUtils.closeQuietly(is);
+              FileUtils.closeQuietly(inputStream);
             }
           }
         }

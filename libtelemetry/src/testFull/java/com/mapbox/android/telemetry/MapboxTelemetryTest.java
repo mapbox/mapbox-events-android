@@ -44,8 +44,7 @@ public class MapboxTelemetryTest {
   public void checksNonNullContextRequired() throws Exception {
     MapboxTelemetry.applicationContext = null;
     String anyAccessToken = "anyAccessToken";
-    String anyUserAgent = "anyUserAgent";
-    new MapboxTelemetry(null, anyAccessToken, anyUserAgent);
+    new MapboxTelemetry(null, anyAccessToken);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -54,8 +53,7 @@ public class MapboxTelemetryTest {
     Context nullApplicationContext = mock(Context.class);
     when(nullApplicationContext.getApplicationContext()).thenReturn(null);
     String anyAccessToken = "anyAccessToken";
-    String anyUserAgent = "anyUserAgent";
-    new MapboxTelemetry(nullApplicationContext, anyAccessToken, anyUserAgent);
+    new MapboxTelemetry(nullApplicationContext, anyAccessToken);
   }
 
   @Test
@@ -548,7 +546,7 @@ public class MapboxTelemetryTest {
   private MapboxTelemetry obtainMapboxTelemetryWith(Context context, String accessToken,
                                                     TelemetryClient telemetryClient, Callback httpCallback) {
     MapboxTelemetry.applicationContext = context;
-    MapboxTelemetry.resetAccessToken(context,"");
+    MapboxTelemetry.clearAccessToken(context);
     EventsQueue mockedEventsQueue = mock(EventsQueue.class);
     SchedulerFlusher mockedSchedulerFlusher = mock(SchedulerFlusher.class);
     Clock mockedClock = mock(Clock.class);

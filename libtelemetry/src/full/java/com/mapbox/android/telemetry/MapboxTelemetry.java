@@ -21,10 +21,12 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.RestrictTo;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.content.LocalBroadcastManager;
 
 import android.util.Log;
+
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -37,8 +39,7 @@ import static com.mapbox.android.telemetry.MapboxTelemetryConstants.SESSION_ROTA
 public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   private static final String LOG_TAG = "MapboxTelemetry";
   private static final String NON_NULL_APPLICATION_CONTEXT_REQUIRED = "Non-null application context required.";
-  private static AtomicReference<String> sAccessToken = new AtomicReference<>("");
-  private String userAgent;
+  private static AtomicReference<String> accessToken = new AtomicReference<>("");
   private final EventsQueue queue;
   private TelemetryClient telemetryClient;
   private Callback httpCallback;
@@ -52,11 +53,15 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   private final ExecutorService executorService;
   static Context applicationContext = null;
 
+  /**
+   * @deprecated as of Release 4.7.0.
+   * Custom user agent is no longer accepted. Telemetry constructs the User Agent.
+   * Use {@link #MapboxTelemetry(Context, String)}
+   */
   @Deprecated
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
     setAccessToken(context, accessToken);
-    this.userAgent = userAgent;
     AlarmReceiver alarmReceiver = obtainAlarmReceiver();
     this.schedulerFlusher = new SchedulerFlusherFactory(applicationContext, alarmReceiver).supply();
     this.telemetryEnabler = new TelemetryEnabler(true);
@@ -166,14 +171,17 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     }
   }
 
+  /**
+   * @deprecated This method has no significance as of Release 4.7.0
+   * Custom user agent is not accepted any longer. Telemetry constructs the user agent.
+   */
   @Deprecated
   public void updateUserAgent(String userAgent) {
-
   }
 
   public boolean updateAccessToken(String accessToken) {
     if (isAccessTokenValid(accessToken) && updateTelemetryClient(accessToken)) {
-      sAccessToken.set(accessToken);
+      MapboxTelemetry.accessToken.set(accessToken);
       return true;
     }
     return false;
@@ -224,7 +232,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
 
   private boolean isAccessTokenValid(String accessToken) {
     if (!TelemetryUtils.isEmpty(accessToken)) {
-      sAccessToken.set(accessToken);
+      MapboxTelemetry.accessToken.set(accessToken);
       return true;
     }
     return false;
@@ -233,7 +241,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   private void initializeTelemetryClient() {
     if (configurationClient == null) {
       this.configurationClient = new ConfigurationClient(applicationContext,
-        TelemetryUtils.createFullUserAgent(applicationContext), sAccessToken.get(), new OkHttpClient());
+        TelemetryUtils.createFullUserAgent(applicationContext), accessToken.get(), new OkHttpClient());
     }
 
     if (certificateBlacklist == null) {
@@ -241,7 +249,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     }
 
     if (telemetryClient == null) {
-      telemetryClient = createTelemetryClient(sAccessToken.get());
+      telemetryClient = createTelemetryClient(accessToken.get());
     }
   }
 
@@ -308,7 +316,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   }
 
   private synchronized void sendEvents(List<Event> events, boolean serializeNulls) {
-    if (isNetworkConnected() && checkRequiredParameters(sAccessToken.get())) {
+    if (isNetworkConnected() && checkRequiredParameters(accessToken.get())) {
       telemetryClient.sendEvents(events, httpCallback, serializeNulls);
     }
   }
@@ -414,22 +422,16 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     if (TelemetryUtils.isEmpty(accessToken)) {
       return;
     }
-    if (sAccessToken.getAndSet(accessToken).isEmpty()) {
+    if (MapboxTelemetry.accessToken.getAndSet(accessToken).isEmpty()) {
       LocalBroadcastManager.getInstance(context)
         .sendBroadcast(new Intent(MapboxTelemetryConstants.ACTION_TOKEN_CHANGED));
     }
   }
 
+  @RestrictTo(RestrictTo.Scope.TESTS)
   @VisibleForTesting
-  static synchronized void resetAccessToken(@NonNull Context context, @NonNull String accessToken) {
-    if (TelemetryUtils.isEmpty(accessToken)) {
-      sAccessToken.getAndSet("");
-      return;
-    }
-    if (sAccessToken.getAndSet(accessToken).isEmpty()) {
-      LocalBroadcastManager.getInstance(context)
-        .sendBroadcast(new Intent(MapboxTelemetryConstants.ACTION_TOKEN_CHANGED));
-    }
+  static synchronized void clearAccessToken(@NonNull Context context) {
+    accessToken.set("");
   }
 
   private void executeRunnable(final Runnable command) {
@@ -451,7 +453,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   }
 
   private Boolean checkNetworkAndParameters() {
-    return isNetworkConnected() && checkRequiredParameters(sAccessToken.get());
+    return isNetworkConnected() && checkRequiredParameters(accessToken.get());
   }
 
   private static Callback getHttpCallback(final Set<TelemetryListener> listeners) {

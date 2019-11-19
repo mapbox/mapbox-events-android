@@ -227,14 +227,14 @@ public class TelemetryUtils {
   }
 
   private static String getApplicationName(Context context) {
-    final PackageManager pm = context.getApplicationContext().getPackageManager();
-    ApplicationInfo ai;
+    final PackageManager packagemanager = context.getApplicationContext().getPackageManager();
+    ApplicationInfo applicationInfo;
     try {
-      ai = pm.getApplicationInfo(context.getPackageName(), 0);
+      applicationInfo = packagemanager.getApplicationInfo(context.getPackageName(), 0);
     } catch (final PackageManager.NameNotFoundException nameNotFoundException) {
-      ai = null;
+      applicationInfo = null;
     }
-    return (String) (ai != null ? pm.getApplicationLabel(ai) : "(unknown)");
+    return (String) (applicationInfo != null ? packagemanager.getApplicationLabel(applicationInfo) : "(unknown)");
   }
 
   /**

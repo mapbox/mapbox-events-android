@@ -17,7 +17,6 @@ import okhttp3.ResponseBody;
 public class MapboxTelemetry {
   private static final String NON_NULL_APPLICATION_CONTEXT_REQUIRED = "Non-null application context required.";
   private String accessToken;
-  private String userAgent;
   private TelemetryClient telemetryClient;
   private Callback httpCallback;
   private CopyOnWriteArraySet<TelemetryListener> telemetryListeners = null;
@@ -25,6 +24,11 @@ public class MapboxTelemetry {
   private final ConfigurationClient configurationClient;
   static Context applicationContext = null;
 
+  /**
+   * @deprecated as of Release 4.7.0.
+   * Custom user agent is no longer accepted. Telemetry constructs the User Agent.
+   * Use {@link #MapboxTelemetry(Context, String)}
+   */
   @Deprecated
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
@@ -100,10 +104,12 @@ public class MapboxTelemetry {
     }
   }
 
+  /**
+   * @deprecated This method has no significance as of Release 4.7.0
+   * Custom user agent is not accepted any longer. Telemetry constructs the user agent.
+   */
   @Deprecated
-  public void updateUserAgent(String userAgent) {
-
-  }
+  public void updateUserAgent(String userAgent) {}
 
   public boolean updateAccessToken(String accessToken) {
     if (isAccessTokenValid(accessToken) && updateTelemetryClient(accessToken)) {
