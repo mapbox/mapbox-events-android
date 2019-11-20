@@ -81,7 +81,7 @@ public class LocationEngineRequest {
    * @return distance between location updates in meters.
    * @since 1.0.0
    */
-  public float getDisplacemnt() {
+  public float getDisplacement() {
     return displacement;
   }
 

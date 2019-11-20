@@ -19,8 +19,9 @@ public class TelemetryClientAppUserTurnstileEventTest extends MockWebServerTest 
   public void sendsTheCorrectBodyPostingAppUserTurnstileEvent() throws Exception {
     Context mockedContext = TelemetryClientTest.getMockedContext();
     MapboxTelemetry.applicationContext = mockedContext;
-    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", "anyUserAgent",
-      mockedContext);
+    String anyUserAgent = "anyUserAgent";
+    TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", anyUserAgent,
+      anyUserAgent , mockedContext);
     Event anAppUserTurnstile = new AppUserTurnstile("anySdkIdentifier", "anySdkVersion", false);
     List<Event> theAppUserTurnstile = obtainEvents(anAppUserTurnstile);
     Callback mockedCallback = mock(Callback.class);
