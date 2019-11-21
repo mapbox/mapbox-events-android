@@ -4,6 +4,9 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+## v4.6.1
+- Fix crash `setBaseUrl()` on null `TelemetryClient` [#423](https://github.com/mapbox/mapbox-events-android/pull/423)
+
 ## v4.6.0
 - Add public api to change base url for telemetry endpoint [#420](https://github.com/mapbox/mapbox-events-android/pull/420)
 - Telemetry metrics [#397](https://github.com/mapbox/mapbox-events-android/pull/397)
