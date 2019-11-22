@@ -83,7 +83,7 @@ class GoogleLocationEngineImpl implements LocationEngineImpl<LocationCallback> {
     LocationRequest locationRequest = new LocationRequest();
     locationRequest.setInterval(request.getInterval());
     locationRequest.setFastestInterval(request.getFastestInterval());
-    locationRequest.setSmallestDisplacement(request.getDisplacemnt());
+    locationRequest.setSmallestDisplacement(request.getDisplacement());
     locationRequest.setMaxWaitTime(request.getMaxWaitTime());
     locationRequest.setPriority(toGMSLocationPriority(request.getPriority()));
     return locationRequest;

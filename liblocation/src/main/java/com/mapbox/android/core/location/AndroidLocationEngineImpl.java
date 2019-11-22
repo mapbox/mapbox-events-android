@@ -71,7 +71,7 @@ class AndroidLocationEngineImpl implements LocationEngineImpl<LocationListener> 
                                      @Nullable Looper looper) throws SecurityException {
     // Pick best provider only if user has not explicitly chosen passive mode
     currentProvider = getBestProvider(request.getPriority());
-    locationManager.requestLocationUpdates(currentProvider, request.getInterval(), request.getDisplacemnt(),
+    locationManager.requestLocationUpdates(currentProvider, request.getInterval(), request.getDisplacement(),
       listener, looper);
   }
 
@@ -82,7 +82,7 @@ class AndroidLocationEngineImpl implements LocationEngineImpl<LocationListener> 
     // Pick best provider only if user has not explicitly chosen passive mode
     currentProvider = getBestProvider(request.getPriority());
     locationManager.requestLocationUpdates(currentProvider, request.getInterval(),
-      request.getDisplacemnt(), pendingIntent);
+      request.getDisplacement(), pendingIntent);
   }
 
   @SuppressLint("MissingPermission")
