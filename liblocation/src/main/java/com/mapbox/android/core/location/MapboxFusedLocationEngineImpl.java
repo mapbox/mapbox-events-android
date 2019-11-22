@@ -53,7 +53,7 @@ class MapboxFusedLocationEngineImpl extends AndroidLocationEngineImpl {
     if (shouldStartNetworkProvider(request.getPriority())) {
       try {
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-          request.getInterval(), request.getDisplacemnt(),
+          request.getInterval(), request.getDisplacement(),
           listener, looper);
       } catch (IllegalArgumentException iae) {
         iae.printStackTrace();
@@ -71,7 +71,7 @@ class MapboxFusedLocationEngineImpl extends AndroidLocationEngineImpl {
     if (shouldStartNetworkProvider(request.getPriority())) {
       try {
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, request.getInterval(),
-          request.getDisplacemnt(), pendingIntent);
+          request.getDisplacement(), pendingIntent);
       } catch (IllegalArgumentException iae) {
         iae.printStackTrace();
       }
