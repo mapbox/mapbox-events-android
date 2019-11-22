@@ -9,6 +9,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.BatteryManager;
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
@@ -22,6 +23,9 @@ import java.util.Map;
 import java.util.UUID;
 
 import android.util.Log;
+
+import com.mapbox.android.core.MapboxSdkInfoForUserAgentGenerator;
+
 import okio.Buffer;
 
 import static com.mapbox.android.telemetry.MapboxTelemetryConstants.MAPBOX_SHARED_PREFERENCES;
@@ -32,6 +36,8 @@ public class TelemetryUtils {
   private static final String KEY_META_DATA_WAKE_UP = "com.mapbox.AdjustWakeUp";
   private static final String DATE_AND_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
   private static final String EMPTY_STRING = "";
+  private static final String USER_AGENT_APP_ID_FORMAT = "%s/%s (%s; %s; %s)";
+  private static final String USER_AGENT_VERSION_CODE_FORMAT = "v%d";
   private static final String TWO_STRING_FORMAT = "%s %s";
   private static final String THREE_STRING_FORMAT = "%s/%s/%s";
   private static final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_AND_TIME_PATTERN, Locale.US);
@@ -58,6 +64,7 @@ public class TelemetryUtils {
   private static final String LONG_TERM_EVOLUTION = "LTE";
   private static final String UNIVERSAL_MOBILE_TELCO_SERVICE = "UMTS";
   private static final String UNKNOWN = "Unknown";
+  private static final String OPERATING_SYSTEM = "Android - " + Build.VERSION.RELEASE;
   private static final Map<Integer, String> NETWORKS = new HashMap<Integer, String>() {
     {
       put(TelephonyManager.NETWORK_TYPE_1xRTT, SINGLE_CARRIER_RTT);
@@ -167,6 +174,13 @@ public class TelemetryUtils {
     return fullUserAgent;
   }
 
+  static String createReformedFullUserAgent(Context context) {
+    String appIdentifier = TelemetryUtils.obtainApplicationIdentifierForReformedUserAgent(context);
+    String reformedUserAgent = toHumanReadableAscii(String.format(DEFAULT_LOCALE, TWO_STRING_FORMAT, appIdentifier,
+      MapboxSdkInfoForUserAgentGenerator.getInstance(context.getAssets()).getSdkInfoForUserAgent()));
+    return TextUtils.isEmpty(reformedUserAgent) ? appIdentifier : reformedUserAgent;
+  }
+
   static boolean isEmpty(String string) {
     if (string == null || string.length() == 0) {
       return true;
@@ -221,9 +235,36 @@ public class TelemetryUtils {
     }
   }
 
+  private static String obtainApplicationIdentifierForReformedUserAgent(Context context) {
+    try {
+      String packageName = context.getPackageName();
+      PackageInfo packageInfo = context.getPackageManager().getPackageInfo(packageName, 0);
+      String versionCode = String.format(DEFAULT_LOCALE, USER_AGENT_VERSION_CODE_FORMAT, packageInfo.versionCode);
+      String version = (packageInfo.versionName == null) ? "0" : packageInfo.versionName;
+      String appIdentifier = String.format(DEFAULT_LOCALE, USER_AGENT_APP_ID_FORMAT,
+        getApplicationName(context), version, packageName, versionCode, OPERATING_SYSTEM);
+      return appIdentifier;
+    } catch (Exception exception) {
+      return EMPTY_STRING;
+    }
+  }
+
+  private static String getApplicationName(Context context) {
+    final PackageManager packagemanager = context.getApplicationContext().getPackageManager();
+    ApplicationInfo applicationInfo;
+    try {
+      applicationInfo = packagemanager.getApplicationInfo(context.getPackageName(), 0);
+    } catch (final PackageManager.NameNotFoundException nameNotFoundException) {
+      applicationInfo = null;
+    }
+    String unknown = "(unknown)";
+    return (String) (applicationInfo != null ? packagemanager.getApplicationLabel(applicationInfo) : unknown);
+  }
+
   /**
    * This method can return null on devices without
    * any battery (like a TV) or because of buggy firmware.
+   *
    * @param context application context
    * @return intent
    */
@@ -233,7 +274,7 @@ public class TelemetryUtils {
       return context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
     } catch (Exception exc) {
       // There is a weird intermittent bug that causes SecurityException in android versions <= 4.2
-      Log.e(TAG,  String.format("%s: Failed receiver registration for ACTION_BATTERY_CHANGED", exc.toString()));
+      Log.e(TAG, String.format("%s: Failed receiver registration for ACTION_BATTERY_CHANGED", exc.toString()));
       return null;
     }
   }

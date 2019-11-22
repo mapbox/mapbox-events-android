@@ -27,6 +27,7 @@ class TelemetryClient {
   private static final String EVENTS_ENDPOINT = "/events/v2";
   private static final String ATTACHMENTS_ENDPOINT = "/attachments/v1";
   private static final String USER_AGENT_REQUEST_HEADER = "User-Agent";
+  private static final String MAPBOX_AGENT_REQUEST_HEADER = "X-Mapbox-Agent";
   private static final String ACCESS_TOKEN_QUERY_PARAMETER = "access_token";
   private static final String EXTRA_DEBUGGING_LOG = "Sending POST to %s with %d event(s) (user agent: %s) "
     + "with payload: %s";
@@ -34,14 +35,16 @@ class TelemetryClient {
 
   private String accessToken;
   private String userAgent;
+  private String reformedUserAgent;
   private TelemetryClientSettings setting;
   private final Logger logger;
   private CertificateBlacklist certificateBlacklist;
 
-  TelemetryClient(String accessToken, String userAgent, TelemetryClientSettings setting, Logger logger,
-                  CertificateBlacklist certificateBlacklist) {
+  TelemetryClient(String accessToken, String userAgent, String reformedUserAgent, TelemetryClientSettings setting,
+                  Logger logger, CertificateBlacklist certificateBlacklist) {
     this.accessToken = accessToken;
     this.userAgent = userAgent;
+    this.reformedUserAgent = reformedUserAgent;
     this.setting = setting;
     this.logger = logger;
     this.certificateBlacklist = certificateBlacklist;
@@ -96,6 +99,7 @@ class TelemetryClient {
     Request request = new Request.Builder()
       .url(requestUrl)
       .header(USER_AGENT_REQUEST_HEADER, userAgent)
+      .addHeader(MAPBOX_AGENT_REQUEST_HEADER, reformedUserAgent)
       .post(requestBody)
       .build();
 
@@ -147,6 +151,7 @@ class TelemetryClient {
     Request request = new Request.Builder()
       .url(url)
       .header(USER_AGENT_REQUEST_HEADER, userAgent)
+      .addHeader(MAPBOX_AGENT_REQUEST_HEADER, reformedUserAgent)
       .post(body)
       .build();
 

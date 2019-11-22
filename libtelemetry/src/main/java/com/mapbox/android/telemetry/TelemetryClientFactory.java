@@ -38,9 +38,8 @@ class TelemetryClientFactory {
                                                CertificateBlacklist certificateBlacklist,
                                                Context context) {
     return new TelemetryClient(accessToken, userAgent,
-      new TelemetryClientSettings.Builder(context)
-            .environment(environment)
-            .build(),
+      TelemetryUtils.createReformedFullUserAgent(context), new TelemetryClientSettings.Builder(context)
+      .environment(environment).build(),
       logger, certificateBlacklist);
   }
 
@@ -51,8 +50,9 @@ class TelemetryClientFactory {
       .environment(serverInformation.getEnvironment())
       .baseUrl(TelemetryClientSettings.configureUrlHostname(serverInformation.getHostname()))
       .build();
-    return new TelemetryClient(serverInformation.getAccessToken(), userAgent, telemetryClientSettings, logger,
-      certificateBlacklist);
+    return new TelemetryClient(serverInformation.getAccessToken(), userAgent,
+      TelemetryUtils.createReformedFullUserAgent(context),
+      telemetryClientSettings, logger, certificateBlacklist);
   }
 
   private TelemetryClient buildClientFrom(ServerInformation serverInformation, Context context) {
