@@ -1,5 +1,6 @@
 package com.mapbox.android.core.location;
 
+import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.location.Criteria;
@@ -52,6 +53,7 @@ class AndroidLocationEngineImpl implements LocationEngineImpl<LocationListener> 
     callback.onFailure(new Exception("Last location unavailable"));
   }
 
+  @SuppressLint("MissingPermission")
   Location getLastLocationFor(String provider) throws SecurityException {
     Location location = null;
     try {
@@ -62,6 +64,7 @@ class AndroidLocationEngineImpl implements LocationEngineImpl<LocationListener> 
     return location;
   }
 
+  @SuppressLint("MissingPermission")
   @Override
   public void requestLocationUpdates(@NonNull LocationEngineRequest request,
                                      @NonNull LocationListener listener,
@@ -72,6 +75,7 @@ class AndroidLocationEngineImpl implements LocationEngineImpl<LocationListener> 
       listener, looper);
   }
 
+  @SuppressLint("MissingPermission")
   @Override
   public void requestLocationUpdates(@NonNull LocationEngineRequest request,
                                      @NonNull PendingIntent pendingIntent) throws SecurityException {
@@ -81,6 +85,7 @@ class AndroidLocationEngineImpl implements LocationEngineImpl<LocationListener> 
       request.getDisplacemnt(), pendingIntent);
   }
 
+  @SuppressLint("MissingPermission")
   @Override
   public void removeLocationUpdates(@NonNull LocationListener listener) {
     if (listener != null) {

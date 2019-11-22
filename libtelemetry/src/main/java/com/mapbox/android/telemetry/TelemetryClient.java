@@ -170,4 +170,9 @@ class TelemetryClient {
 
     return builder.build();
   }
+
+  synchronized void setBaseUrl(String eventsHost) {
+    HttpUrl baseUrl = TelemetryClientSettings.configureUrlHostname(eventsHost);
+    setting = setting.toBuilder().baseUrl(baseUrl).build();
+  }
 }
