@@ -24,6 +24,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 
 import android.util.Log;
+
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -225,8 +226,16 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
 
   private void initializeTelemetryClient() {
     if (configurationClient == null) {
-      this.configurationClient = new ConfigurationClient(applicationContext,
-        TelemetryUtils.createFullUserAgent(userAgent, applicationContext), sAccessToken.get(), new OkHttpClient());
+      if (BuildConfig.DEBUG) {
+        // Strict mode work around : https://github.com/square/okhttp/issues/3537
+        this.configurationClient = new ConfigurationClient(applicationContext,
+          TelemetryUtils.createFullUserAgent(userAgent, applicationContext), sAccessToken.get(),
+          TelemetryUtils.createOkHttpClientWithStrictModeWorkAround());
+      } else {
+        this.configurationClient = new ConfigurationClient(applicationContext,
+          TelemetryUtils.createFullUserAgent(userAgent, applicationContext), sAccessToken.get(),
+          new OkHttpClient());
+      }
     }
 
     if (certificateBlacklist == null) {
