@@ -1,6 +1,6 @@
 {
   "name": "@mapbox/mapbox-events-android",
-  "version": "4.0.0",
+  "version": "4.7.1",
   "description": "Telemetry and Location Services",
   "keywords": [
     "mapbox",
@@ -20,7 +20,7 @@
     "pretty-bytes": "^5.1.0"
   },
   "engines": {
-    "node": ">=6"
+    "node": ">=10"
   },
   "dependencies": {
     "@mapbox/cloudfriend": "^2.5.0"
