@@ -1,5 +1,6 @@
 package com.mapbox.android.core.location;
 
+import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.location.Criteria;
@@ -52,6 +53,7 @@ class AndroidLocationEngineImpl implements LocationEngineImpl<LocationListener> 
     callback.onFailure(new Exception("Last location unavailable"));
   }
 
+  @SuppressLint("MissingPermission")
   Location getLastLocationFor(String provider) throws SecurityException {
     Location location = null;
     try {
@@ -62,25 +64,28 @@ class AndroidLocationEngineImpl implements LocationEngineImpl<LocationListener> 
     return location;
   }
 
+  @SuppressLint("MissingPermission")
   @Override
   public void requestLocationUpdates(@NonNull LocationEngineRequest request,
                                      @NonNull LocationListener listener,
                                      @Nullable Looper looper) throws SecurityException {
     // Pick best provider only if user has not explicitly chosen passive mode
     currentProvider = getBestProvider(request.getPriority());
-    locationManager.requestLocationUpdates(currentProvider, request.getInterval(), request.getDisplacemnt(),
+    locationManager.requestLocationUpdates(currentProvider, request.getInterval(), request.getDisplacement(),
       listener, looper);
   }
 
+  @SuppressLint("MissingPermission")
   @Override
   public void requestLocationUpdates(@NonNull LocationEngineRequest request,
                                      @NonNull PendingIntent pendingIntent) throws SecurityException {
     // Pick best provider only if user has not explicitly chosen passive mode
     currentProvider = getBestProvider(request.getPriority());
     locationManager.requestLocationUpdates(currentProvider, request.getInterval(),
-      request.getDisplacemnt(), pendingIntent);
+      request.getDisplacement(), pendingIntent);
   }
 
+  @SuppressLint("MissingPermission")
   @Override
   public void removeLocationUpdates(@NonNull LocationListener listener) {
     if (listener != null) {

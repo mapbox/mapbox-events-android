@@ -18,14 +18,15 @@ import static org.mockito.Mockito.when;
 
 public class TelemetryClientFactoryTest {
 
+
   @Test
   public void checksChinaEnvironment() throws Exception {
     String anyAccessToken = "anyAccessToken";
     String anyUserAgent = "anyUserAgent";
     Logger mockedLogger = mock(Logger.class);
     CertificateBlacklist mockedBlacklist = mock(CertificateBlacklist.class);
-    TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(anyAccessToken, anyUserAgent,
-      mockedLogger, mockedBlacklist);
+    TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(anyAccessToken,
+      anyUserAgent, mockedLogger, mockedBlacklist);
     Bundle mockedBundle = mock(Bundle.class);
     when(mockedBundle
       .getBoolean(eq("com.mapbox.CnEventsServer")))
@@ -61,8 +62,8 @@ public class TelemetryClientFactoryTest {
     String anyUserAgent = "anyUserAgent";
     Logger mockedLogger = mock(Logger.class);
     CertificateBlacklist mockedBlacklist = mock(CertificateBlacklist.class);
-    TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(anyAccessToken, anyUserAgent,
-      mockedLogger, mockedBlacklist);
+    TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(anyAccessToken,
+      anyUserAgent, mockedLogger, mockedBlacklist);
     String theAppInfoHostname = "the.app.info.hostname";
     String anyAppInfoAccessToken = "anyAppInfoAccessToken";
     Bundle mockedBundle = obtainStagingBundle(theAppInfoHostname, anyAppInfoAccessToken);

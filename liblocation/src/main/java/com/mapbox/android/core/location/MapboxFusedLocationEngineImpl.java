@@ -1,5 +1,6 @@
 package com.mapbox.android.core.location;
 
+import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.location.Location;
@@ -41,6 +42,7 @@ class MapboxFusedLocationEngineImpl extends AndroidLocationEngineImpl {
     }
   }
 
+  @SuppressLint("MissingPermission")
   @Override
   public void requestLocationUpdates(@NonNull LocationEngineRequest request,
                                      @NonNull LocationListener listener,
@@ -51,7 +53,7 @@ class MapboxFusedLocationEngineImpl extends AndroidLocationEngineImpl {
     if (shouldStartNetworkProvider(request.getPriority())) {
       try {
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-          request.getInterval(), request.getDisplacemnt(),
+          request.getInterval(), request.getDisplacement(),
           listener, looper);
       } catch (IllegalArgumentException iae) {
         iae.printStackTrace();
@@ -59,6 +61,7 @@ class MapboxFusedLocationEngineImpl extends AndroidLocationEngineImpl {
     }
   }
 
+  @SuppressLint("MissingPermission")
   @Override
   public void requestLocationUpdates(@NonNull LocationEngineRequest request,
                                      @NonNull PendingIntent pendingIntent) throws SecurityException {
@@ -68,7 +71,7 @@ class MapboxFusedLocationEngineImpl extends AndroidLocationEngineImpl {
     if (shouldStartNetworkProvider(request.getPriority())) {
       try {
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, request.getInterval(),
-          request.getDisplacemnt(), pendingIntent);
+          request.getDisplacement(), pendingIntent);
       } catch (IllegalArgumentException iae) {
         iae.printStackTrace();
       }

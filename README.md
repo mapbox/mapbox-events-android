@@ -46,7 +46,7 @@ You'll find all of the documentation for the Core Library on [our Mapbox Core pa
 
 ## Using Snapshots
 
-If you want to test recent bug fixes or features that have not been packaged in an official release yet, you can use a `-SNAPSHOT` release of the current development version of the Mapbox Core Library via Gradle, available on [Sonatype](https://oss.sonatype.org/content/repositories/snapshots/com/mapbox/mapboxsdk/).
+If you want to test recent bug fixes or features that have not been packaged in an official release yet, you can use a `-SNAPSHOT` release of the current development version of the Mapbox Core Library via Gradle, available on [Sonatype](https://oss.sonatype.org/content/repositories/snapshots/com/mapbox/mapboxsdk/mapbox-sdk-core/).
 
 ```gradle
 repositories {
@@ -55,7 +55,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.mapbox.mapboxsdk:mapbox-android-core:0.3.0-SNAPSHOT'
+    compile 'com.mapbox.mapboxsdk:mapbox-android-core:X.X.X-SNAPSHOT'
 }
 ```
 

@@ -1,6 +1,7 @@
 package com.mapbox.android.telemetry;
 
 import android.content.Context;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,7 @@ public class MapboxTelemetry {
     initializeContext(context);
     // FIXME: Propagate certificate blacklist changes from full version
     this.configurationClient = new ConfigurationClient(context, TelemetryUtils.createFullUserAgent(userAgent,
-            context), accessToken, new OkHttpClient());
+      context), accessToken, new OkHttpClient());
     this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
     checkRequiredParameters(accessToken, userAgent);
     initializeTelemetryListeners();
@@ -46,7 +47,7 @@ public class MapboxTelemetry {
     this.httpCallback = httpCallback;
     initializeTelemetryListeners();
     this.configurationClient = new ConfigurationClient(context, TelemetryUtils.createFullUserAgent(userAgent,
-            context), accessToken, new OkHttpClient());
+      context), accessToken, new OkHttpClient());
     this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
   }
 
@@ -165,6 +166,7 @@ public class MapboxTelemetry {
 
   private TelemetryClient createTelemetryClient(String accessToken, String userAgent) {
     String fullUserAgent = TelemetryUtils.createFullUserAgent(userAgent, applicationContext);
+
     TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(accessToken, fullUserAgent,
       new Logger(), certificateBlacklist);
     telemetryClient = telemetryClientFactory.obtainTelemetryClient(applicationContext);

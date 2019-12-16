@@ -41,3 +41,8 @@ publish-local-telem-lite:
 graphs:
 	./gradlew :libcore:generateDependencyGraphMapboxLibraries
 	./gradlew :libtelemetry:generateDependencyGraphMapboxLibraries
+
+.PHONY: brew-java-install
+brew-java-install:
+	brew tap homebrew/cask-versions
+	brew cask install adoptopen./jdk8

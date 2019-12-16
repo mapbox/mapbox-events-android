@@ -4,6 +4,13 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+## v4.7.0
+- Fix crash `setBaseUrl()` on null `TelemetryClient` [#423](https://github.com/mapbox/mapbox-events-android/pull/423)
+- Remove all location permissions from sdk manifest [#430] (https://github.com/mapbox/mapbox-events-android/pull/430)
+- Add make target to fetch java from brew [#433] (https://github.com/mapbox/mapbox-events-android/pull/433)
+- Apply android-sdk-versions-plugin to Telemetry and Core modules [#435] (https://github.com/mapbox/mapbox-events-android/pull/435)
+- Add Reformed User Agent to Telemetry Client [#437] Add Reformed User Agent to Telemetry Client https://github.com/mapbox/mapbox-events-android/pull/437)
+
 ## v4.6.0
 - Add public api to change base url for telemetry endpoint [#420](https://github.com/mapbox/mapbox-events-android/pull/420)
 - Telemetry metrics [#397](https://github.com/mapbox/mapbox-events-android/pull/397)
@@ -218,7 +225,15 @@ Mapbox welcomes participation and contributions from everyone.
 - Check for Location Permission - [#12](https://github.com/mapbox/mapbox-events-android/pull/12)
 - Port Location Code from MAS - [#6](https://github.com/mapbox/mapbox-events-android/pull/6)
 
+
 ## Mapbox Android Core
+
+### v1.4.0
+- Apply android-sdk-versions-plugin to Telemetry and Core modules [#435] (https://github.com/mapbox/mapbox-events-android/pull/435)
+- Remove all location permissions from sdk manifest [#430] (https://github.com/mapbox/mapbox-events-android/pull/430)
+- README update for core SNAPSHOT section [#431] (https://github.com/mapbox/mapbox-events-android/pull/431)
+- Add Reformed User Agent to Telemetry Client [#437] Add Reformed User Agent to Telemetry Client https://github.com/mapbox/mapbox-events-android/pull/437)
+- Fix: typo displacemnt => displacement  [#438] fix: typo displacemnt => displacement
 
 ### v1.3.0
 - Crash reporter telemetry integration - [#361](https://github.com/mapbox/mapbox-events-android/pull/361)
