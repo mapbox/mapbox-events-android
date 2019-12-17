@@ -7,7 +7,8 @@ test_apk_path="$2"
 results_dir="$3"
 is_release="$4"
 
-devices="--device model=hammerhead,version=21,locale=en,orientation=portrait  \
+devices="--device model=m0,version=18,locale=en,orientation=portrait \
+--device model=hammerhead,version=21,locale=en,orientation=portrait  \
 --device model=hammerhead,version=23,locale=en,orientation=landscape \
 --device model=sailfish,version=26,locale=en,orientation=portrait \
 --device model=sailfish,version=28,locale=en,orientation=portrait \
@@ -29,7 +30,6 @@ devices="$devices
 --device model=walleye,version=27,locale=en,orientation=portrait \
 --device model=walleye,version=28,locale=en,orientation=portrait \
 --device model=zeroflte,version=23,locale=en,orientation=portrait \
---device model=m0,version=18,locale=en,orientation=portrait \
 --device model=hero2lte,version=23,locale=en,orientation=portrait \
 --device model=cheryl,version=25,locale=en,orientation=portrait \
 --device model=HWMHA,version=24,locale=en,orientation=portrait \

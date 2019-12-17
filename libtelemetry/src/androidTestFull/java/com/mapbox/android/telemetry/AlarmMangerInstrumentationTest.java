@@ -3,11 +3,9 @@ package com.mapbox.android.telemetry;
 import android.app.AlarmManager;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.support.test.InstrumentationRegistry;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
@@ -20,7 +18,6 @@ import static org.mockito.Mockito.mock;
 public class AlarmMangerInstrumentationTest {
 
   @Test
-  @Ignore
   public void checksAlarmCancelledProperly() throws InterruptedException {
     final CountDownLatch latch = new CountDownLatch(2);
     final AtomicReference<Integer> broadcastTrack = new AtomicReference<>();
@@ -30,7 +27,7 @@ public class AlarmMangerInstrumentationTest {
     AlarmReceiver alarmReceiver = obtainAlarmReceiver(broadcastTrack, latch);
 
     AlarmSchedulerFlusher theAlarmSchedulerFlusher = new AlarmSchedulerFlusher(context, alarmManager,
-      alarmReceiver);
+        alarmReceiver);
 
     long elapsedMockedTime = 2000;
     long elapsedMockedTime2 = 5000;
@@ -64,20 +61,20 @@ public class AlarmMangerInstrumentationTest {
     AlarmManager mockedAlarmManager = mock(AlarmManager.class);
     AlarmReceiver mockedAlarmReceiver = mock(AlarmReceiver.class);
     AlarmSchedulerFlusher theAlarmSchedulerFlusher = new AlarmSchedulerFlusher(mockedContext, mockedAlarmManager,
-      mockedAlarmReceiver);
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      Assert.assertTrue(theAlarmSchedulerFlusher.scheduleExact(25));
-    }
+        mockedAlarmReceiver);
+    Assert.assertTrue(theAlarmSchedulerFlusher.scheduleExact(25));
   }
 
   private static AlarmReceiver obtainAlarmReceiver(final AtomicReference<Integer> broadcastTrack,
                                                    final CountDownLatch latch) {
     return new AlarmReceiver(new SchedulerCallback() {
       @Override
-      public void onPeriodRaised() {}
+      public void onPeriodRaised() {
+      }
 
       @Override
-      public void onError() {}
+      public void onError() {
+      }
     }) {
       @Override
       public void onReceive(Context context, Intent intent) {
