@@ -2,8 +2,8 @@ package com.mapbox.android.telemetry;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -28,7 +28,7 @@ public class CertificateBlacklistInstrumentationTests {
 
   @Before
   public void setup() {
-    Context context = InstrumentationRegistry.getTargetContext();
+    Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
     context.deleteFile("MapboxBlacklist");
     setSystemPrefs();
 
@@ -41,7 +41,7 @@ public class CertificateBlacklistInstrumentationTests {
   public void checkUpdateOnCreate() {
     ConfigurationClient configurationClient = mock(ConfigurationClient.class);
     when(configurationClient.shouldUpdate()).thenReturn(true);
-    Context context = InstrumentationRegistry.getTargetContext();
+    Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
     this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
     verify(configurationClient, times(1)).update();
   }
@@ -62,7 +62,7 @@ public class CertificateBlacklistInstrumentationTests {
   @Test
   public void checkMultiBlackList() {
     String preContent = "{\"RevokedCertKeys\" : [\"test1\",\"test2\",\"test3\"]}";
-    Context context = InstrumentationRegistry.getTargetContext();
+    Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
     File file = new File(context.getFilesDir(), "MapboxBlacklist");
     assertFalse(file.exists());
 
@@ -93,7 +93,7 @@ public class CertificateBlacklistInstrumentationTests {
     certificateBlacklist.onUpdate(fileContent);
     assertTrue(certificateBlacklist.isBlacklisted("test12345"));
 
-    Context context = InstrumentationRegistry.getTargetContext();
+    Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
     ConfigurationClient configurationClient = new ConfigurationClient(context,
       TelemetryUtils.createFullUserAgent("AnUserAgent", context), "anAccessToken", new OkHttpClient());
     this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
@@ -121,7 +121,7 @@ public class CertificateBlacklistInstrumentationTests {
 
   private void setSystemPrefs() {
     SharedPreferences sharedPreferences =
-      TelemetryUtils.obtainSharedPreferences(InstrumentationRegistry.getTargetContext());
+      TelemetryUtils.obtainSharedPreferences(InstrumentationRegistry.getInstrumentation().getTargetContext());
     SharedPreferences.Editor editor = sharedPreferences.edit();
     editor.putLong("mapboxConfigSyncTimestamp", System.currentTimeMillis());
     editor.apply();

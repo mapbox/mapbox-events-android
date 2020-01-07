@@ -9,7 +9,7 @@ android {
         targetSdkVersion androidVersions.targetSdkVersion
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -28,13 +28,6 @@ android {
             dimension "version"
             versionNameSuffix "-lite"
         }
-    }
-}
-
-configurations.all {
-    resolutionStrategy {
-        // Force our version of support-v4 to silence lint
-        force dependenciesList.supportV4
     }
 }
 

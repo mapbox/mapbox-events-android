@@ -3,7 +3,7 @@ package com.mapbox.android.core.location;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import com.google.android.gms.location.LocationResult;
 
 import java.util.ArrayList;

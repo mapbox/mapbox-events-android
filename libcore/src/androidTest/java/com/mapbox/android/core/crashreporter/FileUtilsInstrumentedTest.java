@@ -1,6 +1,6 @@
 package com.mapbox.android.core.crashreporter;
 
-import android.support.test.InstrumentationRegistry;
+import androidx.test.platform.app.InstrumentationRegistry;
 import com.mapbox.android.core.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,7 +22,8 @@ public class FileUtilsInstrumentedTest {
 
   @Before
   public void setUp() {
-    directory = FileUtils.getFile(InstrumentationRegistry.getTargetContext(), TELEM_MAPBOX_PACKAGE);
+    directory = FileUtils.getFile(InstrumentationRegistry.getInstrumentation().getTargetContext(),
+        TELEM_MAPBOX_PACKAGE);
     if (!directory.exists()) {
       directory.mkdir();
     }
@@ -31,7 +32,7 @@ public class FileUtilsInstrumentedTest {
       file.delete();
     }
 
-    file = FileUtils.getFile(InstrumentationRegistry.getTargetContext(), filename);
+    file = FileUtils.getFile(InstrumentationRegistry.getInstrumentation().getTargetContext(), filename);
   }
 
   @Test

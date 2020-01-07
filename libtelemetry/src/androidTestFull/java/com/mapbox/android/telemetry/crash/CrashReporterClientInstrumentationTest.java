@@ -2,7 +2,7 @@ package com.mapbox.android.telemetry.crash;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.test.InstrumentationRegistry;
+import androidx.test.platform.app.InstrumentationRegistry;
 import com.mapbox.android.core.FileUtils;
 import com.mapbox.android.telemetry.CrashEvent;
 import org.junit.Before;
@@ -31,7 +31,7 @@ public class CrashReporterClientInstrumentationTest {
 
   @Before
   public void setUp() {
-    context = InstrumentationRegistry.getTargetContext();
+    context = InstrumentationRegistry.getInstrumentation().getTargetContext();
     directory = FileUtils.getFile(context, TEST_DIR_PATH);
     if (!directory.exists()) {
       directory.mkdir();

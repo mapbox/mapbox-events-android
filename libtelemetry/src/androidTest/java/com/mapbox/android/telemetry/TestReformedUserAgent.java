@@ -1,7 +1,7 @@
 package com.mapbox.android.telemetry;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import org.junit.Assert;
 import org.junit.Test;

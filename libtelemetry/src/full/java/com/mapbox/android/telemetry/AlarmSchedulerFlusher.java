@@ -7,8 +7,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.SystemClock;
-import android.support.annotation.RestrictTo;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.RestrictTo;
+import androidx.annotation.VisibleForTesting;
 
 import static com.mapbox.android.telemetry.SchedulerFlusherFactory.SCHEDULER_FLUSHER_INTENT;
 import static com.mapbox.android.telemetry.SchedulerFlusherFactory.flushingPeriod;

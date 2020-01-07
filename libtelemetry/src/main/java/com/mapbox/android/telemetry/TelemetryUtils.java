@@ -11,7 +11,7 @@ import android.content.pm.PackageManager;
 import android.net.TrafficStats;
 import android.os.BatteryManager;
 import android.os.Build;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
