@@ -47,6 +47,6 @@ gcloud firebase test android run --type instrumentation \
     --timeout 20m
 
 bucket="test-lab-r47d1tyt8h0hm-iku3c1i8kjrux"
-artifacts_path="sailfish-28-en-portrait/artifacts"
+artifacts_path="FRT-27-en-portrait/artifacts"
 covfile_path="gs://${bucket}/${results_dir}/${artifacts_path}/${module}_coverage.ec"
 gsutil cp $covfile_path "${build_dir}/jacoco"
