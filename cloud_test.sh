@@ -44,7 +44,8 @@ gcloud firebase test android run --type instrumentation \
     $(echo ${devices}) \
     --environment-variables coverage=true,coverageFile="/sdcard/${module}_coverage.ec" \
     --directories-to-pull /sdcard \
-    --timeout 20m
+    --timeout 25m \
+    --use-orchestrator
 
 bucket="test-lab-r47d1tyt8h0hm-iku3c1i8kjrux"
 artifacts_path="sailfish-28-en-portrait/artifacts"
