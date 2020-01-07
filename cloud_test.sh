@@ -13,7 +13,7 @@ devices="--device model=m0,version=18,locale=en,orientation=portrait \
 --device model=sailfish,version=26,locale=en,orientation=portrait \
 --device model=sailfish,version=28,locale=en,orientation=portrait \
 "
-if [ "$is_release" == "true" ]; then
+if [[ "$is_release" == "true" ]]; then
 echo "Is release, adding more devices"
 devices="--device model=g3,version=19,locale=en,orientation=portrait \
 --device model=Nexus6,version=21,locale=en,orientation=portrait \
@@ -41,12 +41,15 @@ gcloud firebase test android run --type instrumentation \
     --app app/build/outputs/apk/full/debug/app-full-debug.apk \
     --test "${build_dir}/${test_apk_path}" \
     --results-dir="$results_dir" \
-    $(echo $devices) \
+    $(echo ${devices}) \
     --environment-variables coverage=true,coverageFile="/sdcard/${module}_coverage.ec" \
     --directories-to-pull /sdcard \
     --timeout 20m
 
 bucket="test-lab-r47d1tyt8h0hm-iku3c1i8kjrux"
+artifacts_path="sailfish-28-en-portrait/artifacts"
+if [[ "$is_release" == "true" ]]; then
 artifacts_path="FRT-27-en-portrait/artifacts"
+fi
 covfile_path="gs://${bucket}/${results_dir}/${artifacts_path}/${module}_coverage.ec"
-gsutil cp $covfile_path "${build_dir}/jacoco"
+gsutil cp ${covfile_path} "${build_dir}/jacoco"
