@@ -15,8 +15,7 @@ devices="--device model=m0,version=18,locale=en,orientation=portrait \
 "
 if [ "$is_release" == "true" ]; then
 echo "Is release, adding more devices"
-devices="$devices
---device model=g3,version=19,locale=en,orientation=portrait \
+devices="--device model=g3,version=19,locale=en,orientation=portrait \
 --device model=Nexus6,version=21,locale=en,orientation=portrait \
 --device model=Nexus6,version=22,locale=en,orientation=portrait \
 --device model=Nexus6,version=23,locale=en,orientation=portrait \
