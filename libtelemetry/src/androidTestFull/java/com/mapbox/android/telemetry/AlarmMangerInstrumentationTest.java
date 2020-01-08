@@ -18,6 +18,7 @@ import static org.mockito.Mockito.mock;
 
 public class AlarmMangerInstrumentationTest {
 
+  // TODO Resolve
   @Test
   @Ignore
   public void checksAlarmCancelledProperly() throws InterruptedException {
