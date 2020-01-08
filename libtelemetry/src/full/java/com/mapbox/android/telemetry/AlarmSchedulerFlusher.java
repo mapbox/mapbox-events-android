@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.SystemClock;
-import android.support.annotation.RestrictTo;
 import android.support.annotation.VisibleForTesting;
 
 import static com.mapbox.android.telemetry.SchedulerFlusherFactory.SCHEDULER_FLUSHER_INTENT;
@@ -42,16 +41,14 @@ class AlarmSchedulerFlusher implements SchedulerFlusher {
 
   /* only exposed for testing not dealing directly with alarm logic */
   @VisibleForTesting
-  @RestrictTo(RestrictTo.Scope.TESTS)
   boolean scheduleExact(long interval) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       manager.setExact(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + interval,
-          pendingIntent);
-    } else {
-      manager.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + interval,
-          pendingIntent);
+        pendingIntent);
+      return true;
     }
-    return true;
+
+    return false;
   }
 
   @Override
