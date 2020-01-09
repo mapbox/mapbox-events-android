@@ -35,9 +35,7 @@ dependencies {
     testImplementation dependenciesList.assertJ
     testImplementation dependenciesList.gmsLocation
 
-    androidTestImplementation(dependenciesList.testEspressoCore, {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
+    androidTestImplementation(dependenciesList.testEspressoCore)
     androidTestImplementation dependenciesList.gmsLocation
     androidTestImplementation dependenciesList.testRunner
     androidTestImplementation dependenciesList.testRules

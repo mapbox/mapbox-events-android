@@ -41,9 +41,7 @@ dependencies {
 
     testImplementation dependenciesList.junit
     testImplementation dependenciesList.mockito
-    androidTestImplementation(dependenciesList.testEspressoCore, {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
+    androidTestImplementation(dependenciesList.testEspressoCore)
 
     implementation project(":libcore")
     implementation project(":libtelemetry")
