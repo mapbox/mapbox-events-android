@@ -27,7 +27,7 @@ public class AlarmMangerInstrumentationTest {
     AlarmReceiver alarmReceiver = obtainAlarmReceiver(broadcastTrack, latch);
 
     AlarmSchedulerFlusher theAlarmSchedulerFlusher = new AlarmSchedulerFlusher(context, alarmManager,
-        alarmReceiver);
+      alarmReceiver);
 
     long elapsedMockedTime = 2000;
     long elapsedMockedTime2 = 5000;
@@ -39,8 +39,9 @@ public class AlarmMangerInstrumentationTest {
     theAlarmSchedulerFlusher.scheduleExact(elapsedMockedTime2);
 
     Assert.assertFalse(latch.await(30, TimeUnit.SECONDS));
+    int result = broadcastTrack.get();
 
-    Assert.assertEquals(new Integer(1), broadcastTrack.get());
+    Assert.assertEquals(1, result);
   }
 
   @Test
@@ -61,7 +62,8 @@ public class AlarmMangerInstrumentationTest {
     AlarmManager mockedAlarmManager = mock(AlarmManager.class);
     AlarmReceiver mockedAlarmReceiver = mock(AlarmReceiver.class);
     AlarmSchedulerFlusher theAlarmSchedulerFlusher = new AlarmSchedulerFlusher(mockedContext, mockedAlarmManager,
-        mockedAlarmReceiver);
+      mockedAlarmReceiver);
+
     Assert.assertTrue(theAlarmSchedulerFlusher.scheduleExact(25));
   }
 
@@ -69,12 +71,10 @@ public class AlarmMangerInstrumentationTest {
                                                    final CountDownLatch latch) {
     return new AlarmReceiver(new SchedulerCallback() {
       @Override
-      public void onPeriodRaised() {
-      }
+      public void onPeriodRaised() {}
 
       @Override
-      public void onError() {
-      }
+      public void onError() {}
     }) {
       @Override
       public void onReceive(Context context, Intent intent) {
