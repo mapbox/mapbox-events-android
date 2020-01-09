@@ -13,7 +13,7 @@ public class TestReformedUserAgent {
 
   @Test
   public void testReformedUserAgent() {
-    Context context = InstrumentationRegistry.getContext();
+    Context context = InstrumentationRegistry.getInstrumentation().getContext();
     String reformedUserAgent = TelemetryUtils.createReformedFullUserAgent(context);
     Assert.assertTrue(reformedUserAgent.contains(context.getPackageName()));
     Assert.assertTrue(reformedUserAgent.contains(CORE_PACKAGE));
