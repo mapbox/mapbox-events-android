@@ -47,4 +47,6 @@ dependencies {
     testImplementation dependenciesList.mockito
     testImplementation dependenciesList.assertJ
     androidTestImplementation dependenciesList.testEspressoCore
+    androidTestImplementation dependenciesList.testRunner
+    androidTestImplementation dependenciesList.testRules
 }
