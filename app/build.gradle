@@ -32,7 +32,7 @@ android {
 }
 
 dependencies {
-    implementation dependenciesList.supportAppcompatV7
+    implementation dependenciesList.supportAppcompat
     implementation dependenciesList.supportConstraintLayout
     implementation dependenciesList.gmsLocation
 
@@ -41,7 +41,9 @@ dependencies {
 
     testImplementation dependenciesList.junit
     testImplementation dependenciesList.mockito
-    androidTestImplementation(dependenciesList.testEspressoCore)
+    androidTestImplementation dependenciesList.testEspressoCore
+    androidTestImplementation dependenciesList.testRunner
+    androidTestImplementation dependenciesList.testRules
 
     implementation project(":libcore")
     implementation project(":libtelemetry")

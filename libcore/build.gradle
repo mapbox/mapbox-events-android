@@ -46,5 +46,5 @@ dependencies {
     testImplementation dependenciesList.junit
     testImplementation dependenciesList.mockito
     testImplementation dependenciesList.assertJ
-    androidTestImplementation(dependenciesList.testEspressoCore)
+    androidTestImplementation dependenciesList.testEspressoCore
 }

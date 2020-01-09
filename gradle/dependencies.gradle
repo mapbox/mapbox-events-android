@@ -44,7 +44,7 @@ ext {
 
             // support
             supportAnnotation      : "androidx.annotation:annotation:${version.androidXVersion}",
-            supportAppcompatV7     : "androidx.appcompat:appcompat:${version.androidXVersion}",
+            supportAppcompat       : "androidx.appcompat:appcompat:${version.androidXVersion}",
             supportConstraintLayout: "androidx.constraintlayout:constraintlayout:${version.constraintLayout}",
             supportCoreUtils       : "androidx.legacy:legacy-support-core-utils:${version.androidXVersion}",
 
