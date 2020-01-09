@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.SystemClock;
-import androidx.annotation.RestrictTo;
+
 import androidx.annotation.VisibleForTesting;
 
 import static com.mapbox.android.telemetry.SchedulerFlusherFactory.SCHEDULER_FLUSHER_INTENT;
@@ -37,21 +37,19 @@ class AlarmSchedulerFlusher implements SchedulerFlusher {
   public void schedule(long elapsedRealTime) {
     long firstFlushingInMillis = elapsedRealTime + flushingPeriod;
     manager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, firstFlushingInMillis,
-      flushingPeriod, pendingIntent);
+        flushingPeriod, pendingIntent);
   }
 
   /* only exposed for testing not dealing directly with alarm logic */
   @VisibleForTesting
-  @RestrictTo(RestrictTo.Scope.TESTS)
   boolean scheduleExact(long interval) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       manager.setExact(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + interval,
           pendingIntent);
-    } else {
-      manager.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + interval,
-          pendingIntent);
+      return true;
     }
-    return true;
+
+    return false;
   }
 
   @Override
