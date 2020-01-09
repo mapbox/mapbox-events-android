@@ -1,9 +1,10 @@
 package com.mapbox.android.core.location;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.rule.GrantPermissionRule;
-import android.support.test.runner.AndroidJUnit4;
+
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.GrantPermissionRule;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -91,17 +92,17 @@ public class LocationEngineInstrumentedTest {
   }
 
   private static LocationEngine getMapboxEngine() {
-    Context context = InstrumentationRegistry.getTargetContext();
+    Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
     return getEngine(new MapboxFusedLocationEngineImpl(context));
   }
 
   private static LocationEngine getAndroidEngine() {
-    Context context = InstrumentationRegistry.getTargetContext();
+    Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
     return getEngine(new AndroidLocationEngineImpl(context));
   }
 
   private static LocationEngine getGoogleEngine() {
-    Context context = InstrumentationRegistry.getTargetContext();
+    Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
     return getEngine(new GoogleLocationEngineImpl(context));
   }
 

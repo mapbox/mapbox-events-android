@@ -9,7 +9,7 @@ android {
         targetSdkVersion androidVersions.targetSdkVersion
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -31,15 +31,8 @@ android {
     }
 }
 
-configurations.all {
-    resolutionStrategy {
-        // Force our version of support-v4 to silence lint
-        force dependenciesList.supportV4
-    }
-}
-
 dependencies {
-    implementation dependenciesList.supportAppcompatV7
+    implementation dependenciesList.supportAppcompat
     implementation dependenciesList.supportConstraintLayout
     implementation dependenciesList.gmsLocation
 
@@ -48,9 +41,9 @@ dependencies {
 
     testImplementation dependenciesList.junit
     testImplementation dependenciesList.mockito
-    androidTestImplementation(dependenciesList.testEspressoCore, {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
+    androidTestImplementation dependenciesList.testEspressoCore
+    androidTestImplementation dependenciesList.testRunner
+    androidTestImplementation dependenciesList.testRules
 
     implementation project(":libcore")
     implementation project(":libtelemetry")

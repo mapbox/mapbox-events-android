@@ -2,7 +2,7 @@ package com.mapbox.android.telemetry;
 
 import android.content.Context;
 import android.content.res.AssetManager;
-import android.support.test.InstrumentationRegistry;
+import androidx.test.platform.app.InstrumentationRegistry;
 import android.util.Log;
 
 import com.mapbox.android.core.FileUtils;
@@ -26,7 +26,7 @@ public class TelemetrySDKVersionTest {
 
   @Test
   public void testPersistedTelemetrySDKInfo() {
-    Context context = InstrumentationRegistry.getTargetContext();
+    Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
     AssetManager assetManager = context.getAssets();
     InputStream inputStream = null;
 

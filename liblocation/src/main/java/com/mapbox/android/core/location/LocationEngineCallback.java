@@ -1,6 +1,6 @@
 package com.mapbox.android.core.location;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * Invoked for asynchronous notifications when new data

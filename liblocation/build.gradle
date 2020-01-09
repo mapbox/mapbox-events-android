@@ -8,7 +8,7 @@ android {
         targetSdkVersion androidVersions.targetSdkVersion
         versionCode 1
         versionName "0.1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -35,8 +35,8 @@ dependencies {
     testImplementation dependenciesList.assertJ
     testImplementation dependenciesList.gmsLocation
 
-    androidTestImplementation(dependenciesList.testEspressoCore, {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
+    androidTestImplementation dependenciesList.testEspressoCore
     androidTestImplementation dependenciesList.gmsLocation
+    androidTestImplementation dependenciesList.testRunner
+    androidTestImplementation dependenciesList.testRules
 }

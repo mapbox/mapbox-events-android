@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.annotation.UiThread;
+import androidx.annotation.UiThread;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 

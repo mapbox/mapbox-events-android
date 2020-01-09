@@ -2,8 +2,8 @@ package com.mapbox.android.core.crashreporter;
 
 import android.content.Context;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 import org.json.JSONException;
 
 import java.util.ArrayList;
