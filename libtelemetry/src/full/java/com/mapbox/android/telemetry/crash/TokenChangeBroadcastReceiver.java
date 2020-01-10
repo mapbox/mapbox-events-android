@@ -4,9 +4,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import android.util.Log;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.WorkManager;
+
 import com.mapbox.android.telemetry.MapboxTelemetryConstants;
 
 /**
@@ -24,14 +28,17 @@ public class TokenChangeBroadcastReceiver extends BroadcastReceiver {
    */
   public static void register(@NonNull Context context) {
     LocalBroadcastManager.getInstance(context).registerReceiver(new TokenChangeBroadcastReceiver(),
-      new IntentFilter(MapboxTelemetryConstants.ACTION_TOKEN_CHANGED));
+        new IntentFilter(MapboxTelemetryConstants.ACTION_TOKEN_CHANGED));
   }
 
   @Override
   public void onReceive(Context context, Intent intent) {
     try {
-      // Start background job
-      CrashReporterJobIntentService.enqueueWork(context);
+      // Start background work
+      WorkManager.getInstance(context).beginUniqueWork(CrashReporterWorker.CRASH_REPORT_UPLOAD_WORK_NAME,
+          ExistingWorkPolicy.KEEP,
+          CrashReporterWorker.createWorkRequest())
+          .enqueue();
       // Unregister receiver - we need it once at startup
       LocalBroadcastManager.getInstance(context).unregisterReceiver(this);
     } catch (Throwable throwable) {
