@@ -40,7 +40,7 @@ public class CrashReporterClientInstrumentationTest {
     for (File file: directory.listFiles()) {
       file.delete();
     }
-    crashReporterClient = CrashReporterClient.create(context);
+    crashReporterClient = CrashReporterClient.create(context, "");
   }
 
   @Test

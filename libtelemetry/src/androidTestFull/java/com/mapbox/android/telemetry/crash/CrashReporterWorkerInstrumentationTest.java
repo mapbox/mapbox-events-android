@@ -5,11 +5,13 @@ import android.content.SharedPreferences;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.work.Constraints;
+import androidx.work.Data;
 import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.testing.TestWorkerBuilder;
 
 import com.mapbox.android.core.FileUtils;
+import com.mapbox.android.telemetry.MapboxTelemetryConstants;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -33,11 +35,13 @@ public class CrashReporterWorkerInstrumentationTest {
 
   private File directory;
   private Context context;
+  private String token;
 
   @Before
   public void setUp() {
     context = InstrumentationRegistry.getInstrumentation().getTargetContext();
     directory = FileUtils.getFile(context, MAPBOX_TELEMETRY_PACKAGE);
+    token = "test-token";
     if (!directory.exists()) {
       directory.mkdir();
     }
@@ -49,19 +53,22 @@ public class CrashReporterWorkerInstrumentationTest {
 
   @Test
   public void checkWorkRequest() {
-    assertEquals(CrashReporterWorker.createWorkRequest() instanceof OneTimeWorkRequest, true);
+    assertEquals(CrashReporterWorker.createWorkRequest(token) instanceof OneTimeWorkRequest, true);
   }
 
   @Test
   public void checkRequestConstraints() {
-    OneTimeWorkRequest workRequest = CrashReporterWorker.createWorkRequest();
+    OneTimeWorkRequest workRequest = CrashReporterWorker.createWorkRequest(token);
     Constraints constraints = workRequest.getWorkSpec().constraints;
     assertEquals(constraints.getRequiredNetworkType(), NetworkType.CONNECTED);
   }
 
   @Test
   public void doWork() {
-    CrashReporterWorker crashReporterWorker = TestWorkerBuilder.from(context, CrashReporterWorker.class).build();
+    CrashReporterWorker crashReporterWorker = (CrashReporterWorker)
+        TestWorkerBuilder.from(context, CrashReporterWorker.class)
+            .setInputData(new Data.Builder().putString(MapboxTelemetryConstants.ERROR_REPORT_DATA_KEY, token).build())
+            .build();
     Result result = crashReporterWorker.doWork();
     assertThat(result, is(Result.success()));
   }
@@ -79,7 +86,7 @@ public class CrashReporterWorkerInstrumentationTest {
 
     CrashReporterWorker crashReporterWorker = TestWorkerBuilder.from(context, CrashReporterWorker.class).build();
     crashReporterWorker.handleCrashReports(CrashReporterClient
-        .create(context)
+        .create(context, "")
         .loadFrom(directory)
         .debug(true));
     assertEquals(0, FileUtils.listAllFiles(directory).length);

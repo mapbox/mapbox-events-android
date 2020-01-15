@@ -48,12 +48,12 @@ final class CrashReporterClient {
     this.isDebug = false;
   }
 
-  static CrashReporterClient create(@NonNull Context context) {
+  static CrashReporterClient create(@NonNull Context context, String accessToken) {
     SharedPreferences sharedPreferences =
       context.getSharedPreferences(MAPBOX_CRASH_REPORTER_PREFERENCES, Context.MODE_PRIVATE);
     return new CrashReporterClient(sharedPreferences,
-      new MapboxTelemetry(context, "",
-        String.format("%s/%s", CRASH_REPORTER_CLIENT_USER_AGENT, BuildConfig.VERSION_NAME)), new File[0]);
+      new MapboxTelemetry(context, accessToken,
+        String.format("%s/%s", CRASH_REPORTER_CLIENT_USER_AGENT, BuildConfig.VERSION_NAME), false), new File[0]);
   }
 
   CrashReporterClient loadFrom(@NonNull File rootDir) {
