@@ -35,13 +35,11 @@ public class CrashReporterWorkerInstrumentationTest {
 
   private File directory;
   private Context context;
-  private String token;
 
   @Before
   public void setUp() {
     context = InstrumentationRegistry.getInstrumentation().getTargetContext();
     directory = FileUtils.getFile(context, MAPBOX_TELEMETRY_PACKAGE);
-    token = "test-token";
     if (!directory.exists()) {
       directory.mkdir();
     }
@@ -53,11 +51,13 @@ public class CrashReporterWorkerInstrumentationTest {
 
   @Test
   public void checkWorkRequest() {
+    String token = "test-token";
     assertEquals(CrashReporterWorker.createWorkRequest(token) instanceof OneTimeWorkRequest, true);
   }
 
   @Test
   public void checkRequestConstraints() {
+    String token = "test-token";
     OneTimeWorkRequest workRequest = CrashReporterWorker.createWorkRequest(token);
     Constraints constraints = workRequest.getWorkSpec().constraints;
     assertEquals(constraints.getRequiredNetworkType(), NetworkType.CONNECTED);
@@ -65,12 +65,23 @@ public class CrashReporterWorkerInstrumentationTest {
 
   @Test
   public void doWork() {
+    String token = "test-token";
     CrashReporterWorker crashReporterWorker = (CrashReporterWorker)
         TestWorkerBuilder.from(context, CrashReporterWorker.class)
             .setInputData(new Data.Builder().putString(MapboxTelemetryConstants.ERROR_REPORT_DATA_KEY, token).build())
             .build();
     Result result = crashReporterWorker.doWork();
     assertThat(result, is(Result.success()));
+  }
+
+  @Test
+  public void doWorkEmptyToken() {
+    CrashReporterWorker crashReporterWorker = (CrashReporterWorker)
+        TestWorkerBuilder.from(context, CrashReporterWorker.class)
+            .setInputData(new Data.Builder().putString(MapboxTelemetryConstants.ERROR_REPORT_DATA_KEY, "").build())
+            .build();
+    Result result = crashReporterWorker.doWork();
+    assertThat(result, is(Result.failure()));
   }
 
   @Test

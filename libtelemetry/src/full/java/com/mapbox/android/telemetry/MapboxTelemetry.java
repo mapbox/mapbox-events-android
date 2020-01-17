@@ -40,7 +40,6 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   private static final String LOG_TAG = "MapboxTelemetry";
   private static final String NON_NULL_APPLICATION_CONTEXT_REQUIRED = "Non-null application context required.";
   private static AtomicReference<String> sAccessToken = new AtomicReference<>("");
-  private static boolean scheduleCrashUploadWork = true;
   private String userAgent;
   private final EventsQueue queue;
   private TelemetryClient telemetryClient;
@@ -56,9 +55,8 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   static Context applicationContext = null;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
-    scheduleCrashUploadWork = true;
     initializeContext(context);
-    setAccessToken(context, accessToken);
+    setAccessToken(context, accessToken, true);
     this.userAgent = userAgent;
     AlarmReceiver alarmReceiver = obtainAlarmReceiver();
     this.schedulerFlusher = new SchedulerFlusherFactory(applicationContext, alarmReceiver).supply();
@@ -73,9 +71,8 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
 
   @RestrictTo(RestrictTo.Scope.LIBRARY)
   public MapboxTelemetry(Context context, String accessToken, String userAgent, boolean scheduleUploadWork) {
-    scheduleCrashUploadWork = scheduleUploadWork;
     initializeContext(context);
-    setAccessToken(context, accessToken);
+    setAccessToken(context, accessToken, scheduleUploadWork);
     this.userAgent = userAgent;
     AlarmReceiver alarmReceiver = obtainAlarmReceiver();
     this.schedulerFlusher = new SchedulerFlusherFactory(applicationContext, alarmReceiver).supply();
@@ -432,7 +429,9 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     });
   }
 
-  private static synchronized void setAccessToken(@NonNull Context context, @NonNull String accessToken) {
+  private static synchronized void setAccessToken(@NonNull Context context,
+                                                  @NonNull String accessToken,
+                                                  boolean scheduleCrashUploadWork) {
     if (TelemetryUtils.isEmpty(accessToken)) {
       return;
     }
