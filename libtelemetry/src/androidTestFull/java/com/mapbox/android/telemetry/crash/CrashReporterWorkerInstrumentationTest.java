@@ -14,7 +14,9 @@ import com.mapbox.android.core.FileUtils;
 import com.mapbox.android.telemetry.MapboxTelemetryConstants;
 
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +30,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CrashReporterWorkerInstrumentationTest {
   private static final String CRASH_FILENAME_FORMAT = "%s/%s.crash";
   private static final String crashEvent =
@@ -51,20 +54,19 @@ public class CrashReporterWorkerInstrumentationTest {
 
   @Test
   public void checkWorkRequest() {
-    String token = "test-token";
-    assertEquals(CrashReporterWorker.createWorkRequest(token) instanceof OneTimeWorkRequest, true);
+    assertEquals(CrashReporterWorker.createWorkRequest("") instanceof OneTimeWorkRequest, true);
   }
 
   @Test
   public void checkRequestConstraints() {
-    String token = "test-token";
-    OneTimeWorkRequest workRequest = CrashReporterWorker.createWorkRequest(token);
+    OneTimeWorkRequest workRequest = CrashReporterWorker.createWorkRequest("");
     Constraints constraints = workRequest.getWorkSpec().constraints;
     assertEquals(constraints.getRequiredNetworkType(), NetworkType.CONNECTED);
   }
 
+  // Must execute last in the test suite because test will set token
   @Test
-  public void doWork() {
+  public void testDoWork() {
     String token = "test-token";
     CrashReporterWorker crashReporterWorker = (CrashReporterWorker)
         TestWorkerBuilder.from(context, CrashReporterWorker.class)

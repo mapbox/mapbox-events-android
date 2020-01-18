@@ -431,11 +431,11 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
 
   private static synchronized void setAccessToken(@NonNull Context context,
                                                   @NonNull String accessToken,
-                                                  boolean scheduleCrashUploadWork) {
+                                                  boolean scheduleUploadWork) {
     if (TelemetryUtils.isEmpty(accessToken)) {
       return;
     }
-    if (sAccessToken.getAndSet(accessToken).isEmpty() && scheduleCrashUploadWork) {
+    if (sAccessToken.getAndSet(accessToken).isEmpty() && scheduleUploadWork) {
       WorkManager.getInstance(context).beginUniqueWork(MapboxTelemetryConstants.ERROR_REPORT_WORK_TAG,
           ExistingWorkPolicy.KEEP,
           CrashReporterWorker.createWorkRequest(accessToken))
