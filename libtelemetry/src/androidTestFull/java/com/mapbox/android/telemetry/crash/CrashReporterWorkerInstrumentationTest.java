@@ -34,7 +34,7 @@ import static org.junit.Assert.assertThat;
 public class CrashReporterWorkerInstrumentationTest {
   private static final String CRASH_FILENAME_FORMAT = "%s/%s.crash";
   private static final String crashEvent =
-      "{\"event\":\"mobile.crash\",\"created\":\"2019-02-21T21:58:43.000Z\",\"stackTraceHash\":\"%s\"}";
+    "{\"event\":\"mobile.crash\",\"created\":\"2019-02-21T21:58:43.000Z\",\"stackTraceHash\":\"%s\"}";
 
   private File directory;
   private Context context;
@@ -69,9 +69,9 @@ public class CrashReporterWorkerInstrumentationTest {
   public void testDoWork() {
     String token = "test-token";
     CrashReporterWorker crashReporterWorker = (CrashReporterWorker)
-        TestWorkerBuilder.from(context, CrashReporterWorker.class)
-            .setInputData(new Data.Builder().putString(MapboxTelemetryConstants.ERROR_REPORT_DATA_KEY, token).build())
-            .build();
+      TestWorkerBuilder.from(context, CrashReporterWorker.class)
+        .setInputData(new Data.Builder().putString(MapboxTelemetryConstants.ERROR_REPORT_DATA_KEY, token).build())
+        .build();
     Result result = crashReporterWorker.doWork();
     assertThat(result, is(Result.success()));
   }
@@ -79,9 +79,9 @@ public class CrashReporterWorkerInstrumentationTest {
   @Test
   public void doWorkEmptyToken() {
     CrashReporterWorker crashReporterWorker = (CrashReporterWorker)
-        TestWorkerBuilder.from(context, CrashReporterWorker.class)
-            .setInputData(new Data.Builder().putString(MapboxTelemetryConstants.ERROR_REPORT_DATA_KEY, "").build())
-            .build();
+      TestWorkerBuilder.from(context, CrashReporterWorker.class)
+        .setInputData(new Data.Builder().putString(MapboxTelemetryConstants.ERROR_REPORT_DATA_KEY, "").build())
+        .build();
     Result result = crashReporterWorker.doWork();
     assertThat(result, is(Result.failure()));
   }
@@ -89,7 +89,7 @@ public class CrashReporterWorkerInstrumentationTest {
   @Test
   public void handleCrashReports() throws IOException {
     SharedPreferences sharedPreferences =
-        context.getSharedPreferences(MAPBOX_CRASH_REPORTER_PREFERENCES, Context.MODE_PRIVATE);
+      context.getSharedPreferences(MAPBOX_CRASH_REPORTER_PREFERENCES, Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = sharedPreferences.edit();
     editor.putBoolean(MAPBOX_PREF_ENABLE_CRASH_REPORTER, true);
     editor.commit();
@@ -99,9 +99,9 @@ public class CrashReporterWorkerInstrumentationTest {
 
     CrashReporterWorker crashReporterWorker = TestWorkerBuilder.from(context, CrashReporterWorker.class).build();
     crashReporterWorker.handleCrashReports(CrashReporterClient
-        .create(context, "")
-        .loadFrom(directory)
-        .debug(true));
+      .create(context, "")
+      .loadFrom(directory)
+      .debug(true));
     assertEquals(0, FileUtils.listAllFiles(directory).length);
   }
 }

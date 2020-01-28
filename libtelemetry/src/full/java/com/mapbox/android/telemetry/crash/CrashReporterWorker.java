@@ -24,8 +24,8 @@ public final class CrashReporterWorker extends Worker {
   private static final String LOG_TAG = "CrashReporterWorker";
 
   public CrashReporterWorker(
-      @NonNull Context context,
-      @NonNull WorkerParameters params) {
+    @NonNull Context context,
+    @NonNull WorkerParameters params) {
     super(context, params);
   }
 
@@ -45,8 +45,8 @@ public final class CrashReporterWorker extends Worker {
       }
 
       handleCrashReports(CrashReporterClient
-          .create(getApplicationContext(), token)
-          .loadFrom(rootDirectory));
+        .create(getApplicationContext(), token)
+        .loadFrom(rootDirectory));
     } catch (Throwable throwable) {
       Log.e(LOG_TAG, throwable.toString());
       return Result.failure();
@@ -80,8 +80,8 @@ public final class CrashReporterWorker extends Worker {
 
   public static OneTimeWorkRequest createWorkRequest(String accessToken) {
     return new OneTimeWorkRequest.Builder(CrashReporterWorker.class)
-        .setConstraints(new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
-        .setInputData(new Data.Builder().putString(MapboxTelemetryConstants.ERROR_REPORT_DATA_KEY, accessToken).build())
-        .build();
+      .setConstraints(new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+      .setInputData(new Data.Builder().putString(MapboxTelemetryConstants.ERROR_REPORT_DATA_KEY, accessToken).build())
+      .build();
   }
 }
