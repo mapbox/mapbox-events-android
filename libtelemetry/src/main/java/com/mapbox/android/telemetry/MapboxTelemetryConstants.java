@@ -23,7 +23,7 @@ public final class MapboxTelemetryConstants {
   public static final String SESSION_ROTATION_INTERVAL_MILLIS = "mapboxSessionRotationInterval";
 
   /**
-   * Tag for Work scheduled in {@link com.mapbox.android.telemetry.crash.CrashReporterWorker}
+   * Work scheduled in {@link com.mapbox.android.telemetry.crash.CrashReporterWorker}
    */
   public static final String ERROR_REPORT_WORK_TAG = "com.mapbox.android.telemetry.error.report.work";
 

@@ -436,10 +436,9 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
       return;
     }
     if (sAccessToken.getAndSet(accessToken).isEmpty() && scheduleUploadWork) {
-      WorkManager.getInstance(context).beginUniqueWork(MapboxTelemetryConstants.ERROR_REPORT_WORK_TAG,
+      WorkManager.getInstance(context).enqueueUniqueWork(MapboxTelemetryConstants.ERROR_REPORT_WORK_TAG,
           ExistingWorkPolicy.KEEP,
-          CrashReporterWorker.createWorkRequest(accessToken))
-          .enqueue();
+          CrashReporterWorker.createWorkRequest(accessToken));
     }
   }
 
