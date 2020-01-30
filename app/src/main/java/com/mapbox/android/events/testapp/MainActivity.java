@@ -55,7 +55,6 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
     });
 
     Button fillQueue = findViewById(R.id.fill_queue);
-
     fillQueue.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
@@ -65,6 +64,12 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
           ;
         }
       }
+    });
+
+    Button crashButton = findViewById(R.id.crash_app);
+    crashButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) { throw new RuntimeException("I meant to do that!"); }
     });
   }
 
