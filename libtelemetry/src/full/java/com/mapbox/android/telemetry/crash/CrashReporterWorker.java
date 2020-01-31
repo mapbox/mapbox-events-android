@@ -78,6 +78,11 @@ public final class CrashReporterWorker extends Worker {
     }
   }
 
+  @VisibleForTesting
+  public static void crashTest(String message) throws RuntimeException {
+    throw new RuntimeException(message);
+  }
+
   public static OneTimeWorkRequest createWorkRequest(String accessToken) {
     return new OneTimeWorkRequest.Builder(CrashReporterWorker.class)
       .setConstraints(new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())

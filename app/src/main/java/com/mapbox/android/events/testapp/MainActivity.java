@@ -21,6 +21,7 @@ import com.mapbox.android.telemetry.AppUserTurnstile;
 import com.mapbox.android.telemetry.LocationEvent;
 import com.mapbox.android.telemetry.MapboxTelemetry;
 import com.mapbox.android.telemetry.TelemetryListener;
+import com.mapbox.android.telemetry.crash.CrashReporterWorker;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -69,7 +70,9 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
     Button crashButton = findViewById(R.id.crash_app);
     crashButton.setOnClickListener(new View.OnClickListener() {
       @Override
-      public void onClick(View v) { throw new RuntimeException("I meant to do that!"); }
+      public void onClick(View v) {
+        CrashReporterWorker.crashTest("I meant to do that!");
+      }
     });
   }
 
