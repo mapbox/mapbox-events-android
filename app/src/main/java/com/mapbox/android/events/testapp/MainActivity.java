@@ -3,13 +3,15 @@ package com.mapbox.android.events.testapp;
 import android.annotation.SuppressLint;
 import android.location.Location;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.mapbox.android.core.crashreporter.MapboxUncaughtExceptionHanlder;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineCallback;
 import com.mapbox.android.core.location.LocationEngineProvider;
@@ -55,6 +57,14 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
       }
     });
 
+    Button crash = findViewById(R.id.error);
+    crash.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        MapboxUncaughtExceptionHanlder.simulateTelemetryError(getApplicationContext());
+      }
+    });
+
     Button fillQueue = findViewById(R.id.fill_queue);
     fillQueue.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -64,14 +74,6 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
             new LocationEvent("testSessionId", 0.0, 0.0, "testAppState"))
           ;
         }
-      }
-    });
-
-    Button crashButton = findViewById(R.id.crash_app);
-    crashButton.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        CrashReporterWorker.crashTest("I meant to do that!");
       }
     });
   }

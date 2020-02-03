@@ -2,13 +2,16 @@ package com.mapbox.android.core.crashreporter;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import androidx.annotation.IntRange;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import android.util.Log;
 
+import androidx.annotation.IntRange;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RestrictTo;
+import androidx.annotation.VisibleForTesting;
+
+import com.mapbox.android.core.BuildConfig;
 import com.mapbox.android.core.FileUtils;
 
 import java.io.File;
@@ -84,6 +87,23 @@ public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionH
     Thread.setDefaultUncaughtExceptionHandler(new MapboxUncaughtExceptionHanlder(applicationContext,
       applicationContext.getSharedPreferences(MAPBOX_CRASH_REPORTER_PREFERENCES, Context.MODE_PRIVATE),
       mapboxPackage, version, Thread.getDefaultUncaughtExceptionHandler()));
+  }
+
+  @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+  public static void simulateTelemetryError(@NonNull Context context) {
+    Context applicationContext = context.getApplicationContext();
+    String packageName = "com.mapbox.android.telemetry";
+
+    try {
+      CrashReport report = CrashReportBuilder.setup(applicationContext, packageName, BuildConfig.VERSION_NAME).build();
+
+      ensureDirectoryWritable(applicationContext, packageName);
+
+      File file = FileUtils.getFile(applicationContext, getReportFileName(packageName, report.getDateString()));
+      FileUtils.writeToFile(file, report.toJson());
+    } catch (Exception ex) {
+      Log.e(TAG, ex.toString());
+    }
   }
 
   @Override
@@ -186,7 +206,7 @@ public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionH
     }
 
     // Cleanup directory if we've reached our max limit
-    File [] allFiles = FileUtils.listAllFiles(directory);
+    File[] allFiles = FileUtils.listAllFiles(directory);
     if (allFiles.length >= DEFAULT_MAX_REPORTS) {
       FileUtils.deleteFirst(allFiles, new FileUtils.LastModifiedComparator(), DEFAULT_MAX_REPORTS - 1);
     }
