@@ -35,6 +35,7 @@ dependencies {
     implementation dependenciesList.supportAppcompat
     implementation dependenciesList.supportConstraintLayout
     implementation dependenciesList.gmsLocation
+    implementation dependenciesList.workManager
 
     debugImplementation dependenciesList.leakCanary
     releaseImplementation dependenciesList.leakCanaryNoOp
