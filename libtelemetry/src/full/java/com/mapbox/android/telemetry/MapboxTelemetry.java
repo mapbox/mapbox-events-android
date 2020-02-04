@@ -1,29 +1,31 @@
 package com.mapbox.android.telemetry;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RestrictTo;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.WorkManager;
+
+import com.mapbox.android.telemetry.crash.CrashReporterWorker;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
-
-import androidx.annotation.NonNull;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
-import android.util.Log;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -54,7 +56,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
-    setAccessToken(context, accessToken);
+    setAccessToken(context, accessToken, true);
     this.userAgent = userAgent;
     AlarmReceiver alarmReceiver = obtainAlarmReceiver();
     this.schedulerFlusher = new SchedulerFlusherFactory(applicationContext, alarmReceiver).supply();
@@ -63,17 +65,32 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     initializeAttachmentListeners();
     // Initializing callback after listeners object is instantiated
     this.httpCallback = getHttpCallback(telemetryListeners);
-    this.executorService = ExecutorServiceFactory.create("MapboxTelemetryExecutor", 3,
-      20);
+    this.executorService = ExecutorServiceFactory.create("MapboxTelemetryExecutor", 3, 20);
     this.queue = EventsQueue.create(this, executorService);
   }
 
-  // For testing only
+  @RestrictTo(RestrictTo.Scope.LIBRARY)
+  public MapboxTelemetry(Context context, String accessToken, String userAgent, boolean scheduleUploadWork) {
+    initializeContext(context);
+    setAccessToken(context, accessToken, scheduleUploadWork);
+    this.userAgent = userAgent;
+    AlarmReceiver alarmReceiver = obtainAlarmReceiver();
+    this.schedulerFlusher = new SchedulerFlusherFactory(applicationContext, alarmReceiver).supply();
+    this.telemetryEnabler = new TelemetryEnabler(true);
+    initializeTelemetryListeners();
+    initializeAttachmentListeners();
+    // Initializing callback after listeners object is instantiated
+    this.httpCallback = getHttpCallback(telemetryListeners);
+    this.executorService = ExecutorServiceFactory.create("MapboxTelemetryExecutor", 3, 20);
+    this.queue = EventsQueue.create(this, executorService);
+  }
+
+  @RestrictTo({RestrictTo.Scope.LIBRARY, RestrictTo.Scope.TESTS})
   MapboxTelemetry(Context context, String accessToken, String userAgent, EventsQueue queue,
                   TelemetryClient telemetryClient, Callback httpCallback, SchedulerFlusher schedulerFlusher,
                   Clock clock, TelemetryEnabler telemetryEnabler, ExecutorService executorService) {
     initializeContext(context);
-    setAccessToken(context, accessToken);
+    setAccessToken(accessToken);
     this.userAgent = userAgent;
     this.telemetryClient = telemetryClient;
     this.schedulerFlusher = schedulerFlusher;
@@ -412,14 +429,25 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     });
   }
 
-  private static synchronized void setAccessToken(@NonNull Context context, @NonNull String accessToken) {
+  private static synchronized void setAccessToken(@NonNull Context context,
+                                                  @NonNull String accessToken,
+                                                  boolean scheduleUploadWork) {
     if (TelemetryUtils.isEmpty(accessToken)) {
       return;
     }
-    if (sAccessToken.getAndSet(accessToken).isEmpty()) {
-      LocalBroadcastManager.getInstance(context)
-        .sendBroadcast(new Intent(MapboxTelemetryConstants.ACTION_TOKEN_CHANGED));
+    if (sAccessToken.getAndSet(accessToken).isEmpty() && scheduleUploadWork) {
+      WorkManager.getInstance(context).enqueueUniqueWork(MapboxTelemetryConstants.ERROR_REPORT_WORK_TAG,
+        ExistingWorkPolicy.KEEP,
+        CrashReporterWorker.createWorkRequest(accessToken));
     }
+  }
+
+  @RestrictTo({RestrictTo.Scope.LIBRARY, RestrictTo.Scope.TESTS})
+  private static synchronized void setAccessToken(@NonNull String accessToken) {
+    if (TelemetryUtils.isEmpty(accessToken)) {
+      return;
+    }
+    sAccessToken.set(accessToken);
   }
 
   private void executeRunnable(final Runnable command) {
