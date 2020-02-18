@@ -1,49 +1,58 @@
 package com.mapbox.android.telemetry.crash;
 
 import android.content.Context;
-import android.content.Intent;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
-import androidx.core.app.JobIntentService;
-import android.util.Log;
+import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
+
 import com.mapbox.android.core.FileUtils;
 import com.mapbox.android.telemetry.CrashEvent;
+import com.mapbox.android.telemetry.MapboxTelemetryConstants;
 
 import java.io.File;
 
 import static com.mapbox.android.telemetry.MapboxTelemetryConstants.MAPBOX_TELEMETRY_PACKAGE;
 
-/**
- * This is a background job that sends crash events to the telemetry endpoint
- * at startup.
- */
-public final class CrashReporterJobIntentService extends JobIntentService {
-  private static final String LOG_TAG = "CrashJobIntentService";
-  private static final int JOB_ID = 666;
+public final class CrashReporterWorker extends Worker {
+  private static final String LOG_TAG = "CrashReporterWorker";
 
-  static void enqueueWork(@NonNull Context context) {
-    enqueueWork(context, CrashReporterJobIntentService.class, JOB_ID,
-      new Intent(context, CrashReporterJobIntentService.class));
+  public CrashReporterWorker(
+    @NonNull Context context,
+    @NonNull WorkerParameters params) {
+    super(context, params);
   }
 
   @Override
-  protected void onHandleWork(@NonNull Intent intent) {
-    Log.d(LOG_TAG, "onHandleWork");
+  public Result doWork() {
     try {
       File rootDirectory = FileUtils.getFile(getApplicationContext(), MAPBOX_TELEMETRY_PACKAGE);
       if (!rootDirectory.exists()) {
         Log.w(LOG_TAG, "Root directory doesn't exist");
-        return;
+        return Result.failure();
+      }
+
+      String token = getInputData().getString(MapboxTelemetryConstants.ERROR_REPORT_DATA_KEY);
+
+      if (token == null || token.isEmpty()) {
+        return Result.failure();
       }
 
       handleCrashReports(CrashReporterClient
-        .create(getApplicationContext())
-        .loadFrom(rootDirectory)
-      );
+        .create(getApplicationContext(), token)
+        .loadFrom(rootDirectory));
     } catch (Throwable throwable) {
-      // TODO: log silent crash
       Log.e(LOG_TAG, throwable.toString());
+      return Result.failure();
     }
+
+    return Result.success();
   }
 
   @VisibleForTesting
@@ -67,5 +76,12 @@ public final class CrashReporterJobIntentService extends JobIntentService {
         Log.w(LOG_TAG, "Failed to deliver crash event");
       }
     }
+  }
+
+  public static OneTimeWorkRequest createWorkRequest(String accessToken) {
+    return new OneTimeWorkRequest.Builder(CrashReporterWorker.class)
+      .setConstraints(new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+      .setInputData(new Data.Builder().putString(MapboxTelemetryConstants.ERROR_REPORT_DATA_KEY, accessToken).build())
+      .build();
   }
 }
