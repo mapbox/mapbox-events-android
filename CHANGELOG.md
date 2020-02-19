@@ -13,7 +13,10 @@ Mapbox welcomes participation and contributions from everyone.
 - Update Node version to >=10 [#445] (https://github.com/mapbox/mapbox-events-android/pull/445))
 - Update Gradle Versions [#444] (https://github.com/mapbox/mapbox-events-android/pull/444)
 
--
+## v4.7.2
+
+- Transition JobIntentService to WorkManager [#453] (https://github.com/mapbox/mapbox-events-android/pull/453)
+
 ## v4.7.0
 - Fix crash `setBaseUrl()` on null `TelemetryClient` [#423](https://github.com/mapbox/mapbox-events-android/pull/423)
 - Remove all location permissions from sdk manifest [#430] (https://github.com/mapbox/mapbox-events-android/pull/430)
