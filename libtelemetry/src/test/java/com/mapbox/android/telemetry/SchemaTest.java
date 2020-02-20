@@ -32,6 +32,13 @@ public class SchemaTest {
   private static final String LOCATION = "location";
   private static ArrayList<JsonObject> schemaArray;
 
+  /**
+   * Properties in Location Schema that are added in backend
+   * but not incorporated into the Android SDK yet.
+   **/
+  private String[] additionalLocationProperties =
+    {"speed", "course", "floor", "speedAccuracy", "courseAccuracy", "verticalAccuracy"};
+
   @BeforeClass
   public static void downloadSchema() throws Exception {
     unpackSchemas();
@@ -56,6 +63,12 @@ public class SchemaTest {
   @Test
   public void checkLocationEventSize() throws Exception {
     JsonObject schema = grabSchema(LOCATION);
+    if (schema != null) {
+      // Ignore the location properties that are not incorporated into the android sdk yet.
+      for (String string : additionalLocationProperties) {
+        schema.remove(string);
+      }
+    }
     List<Field> fields = grabClassFields(LocationEvent.class);
 
     assertEquals(schema.size(), fields.size());
@@ -68,7 +81,6 @@ public class SchemaTest {
 
     schemaContainsFields(schema, fields);
   }
-
 
 
   @Test
@@ -175,7 +187,7 @@ public class SchemaTest {
   }
 
   private JsonObject grabSchema(String eventName) {
-    for (JsonObject thisSchema: schemaArray) {
+    for (JsonObject thisSchema : schemaArray) {
       String name = thisSchema.get("name").getAsString();
 
       if (name.equalsIgnoreCase(eventName)) {

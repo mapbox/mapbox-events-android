@@ -2,11 +2,16 @@ package com.mapbox.android.telemetry;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import androidx.annotation.Keep;
+
 import com.google.gson.annotations.SerializedName;
 
 /**
  * Vision object detection event v2.
  */
+
+@Keep
 public class VisionObjectDetectionEvent extends Event implements Parcelable {
   static final String VIS_OBJECT_DETECTION = "vision.objectDetection";
 
