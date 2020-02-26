@@ -4,18 +4,19 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
-## v4.7.1
+## v4.7.3
+- Fix Turnstile Obfuscation [#457] (https://github.com/mapbox/mapbox-events-android/pull/457)
 
+## v4.7.2
+- Transition JobIntentService to WorkManager [#453] (https://github.com/mapbox/mapbox-events-android/pull/453)
+
+## v4.7.1
 - Upgrade to AndroidX [#446] (https://github.com/mapbox/mapbox-events-android/pull/446)
 - Revert "Add test device for CI in release process [#449] (https://github.com/mapbox/mapbox-events-android/pull/449)
 - Add test device for CI in release process  [#417] (https://github.com/mapbox/mapbox-events-android/pull/417)
 - Workaround for Strict mode socket issue [#443] (https://github.com/mapbox/mapbox-events-android/pull/443)
 - Update Node version to >=10 [#445] (https://github.com/mapbox/mapbox-events-android/pull/445))
 - Update Gradle Versions [#444] (https://github.com/mapbox/mapbox-events-android/pull/444)
-
-## v4.7.2
-
-- Transition JobIntentService to WorkManager [#453] (https://github.com/mapbox/mapbox-events-android/pull/453)
 
 ## v4.7.0
 - Fix crash `setBaseUrl()` on null `TelemetryClient` [#423](https://github.com/mapbox/mapbox-events-android/pull/423)
