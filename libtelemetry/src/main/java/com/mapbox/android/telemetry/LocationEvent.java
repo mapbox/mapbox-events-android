@@ -5,8 +5,11 @@ import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.Keep;
+
 import com.google.gson.annotations.SerializedName;
 
+@Keep
 public class LocationEvent extends Event implements Parcelable {
   private static final String LOCATION = "location";
   private static final String SOURCE_MAPBOX = "mapbox";
