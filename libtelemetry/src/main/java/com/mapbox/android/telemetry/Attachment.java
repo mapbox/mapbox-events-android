@@ -3,11 +3,14 @@ package com.mapbox.android.telemetry;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.Keep;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Keep
 public class Attachment extends Event implements Parcelable {
   private static final String VIS_ATTACHMENT = "vis.attachment";
 
