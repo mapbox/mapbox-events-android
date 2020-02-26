@@ -2,7 +2,11 @@ package com.mapbox.android.telemetry;
 
 import android.annotation.SuppressLint;
 import android.os.Parcel;
+import android.support.annotation.Keep;
 import android.text.TextUtils;
+
+
+import com.google.gson.annotations.SerializedName;
 
 /**
  * This class is temporary and exists only
@@ -12,20 +16,34 @@ import android.text.TextUtils;
  * back and forth json serialization overhead.
  */
 @SuppressLint("ParcelCreator")
+@Keep
 public class CrashEvent extends Event {
+  @SerializedName("event")
   private final String event;
+  @SerializedName("created")
   private final String created;
 
+  @SerializedName("sdkIdentifier")
   private String sdkIdentifier;
+  @SerializedName("sdkVersion")
   private String sdkVersion;
+  @SerializedName("osVersion")
   private String osVersion;
+  @SerializedName("model")
   private String model;
+  @SerializedName("device")
   private String device;
+  @SerializedName("isSilent")
   private String isSilent;
+  @SerializedName("stackTraceHash")
   private String stackTraceHash;
+  @SerializedName("stackTrace")
   private String stackTrace;
+  @SerializedName("threadDetails")
   private String threadDetails;
+  @SerializedName("appId")
   private String appId;
+  @SerializedName("appVersion")
   private String appVersion;
 
   public CrashEvent(String event, String created) {
