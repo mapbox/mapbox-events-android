@@ -50,27 +50,30 @@ jobs:
       - run:
           name: Build all the test APK
           command: ./gradlew assembleAndroidTest
+#      - run:
+#          name: Log in to Google Cloud Platform
+#          shell: /bin/bash -euo pipefail
+#          command: |
+#            echo "${GCLOUD_SERVICE_ACCOUNT_JSON}" > secret.json
+#            gcloud auth activate-service-account --key-file secret.json --project mapbox-events-android
+#            rm secret.json
+#      - run:
+#          name: Run libcore instrumentation tests on Firebase
+#          no_output_timeout: 20m
+#          command: |
+#            build_dir="libcore/build"
+#            test_apk_path="outputs/apk/androidTest/debug/libcore-debug-androidTest.apk"
+#            ./cloud_test.sh $build_dir $test_apk_path $CIRCLE_BUILD_NUM
+#      - run:
+#          name: Run libtelemetry instrumentation tests on Firebase
+#          no_output_timeout: 20m
+#          command: |
+#            build_dir="libtelemetry/build"
+#            test_apk_path="outputs/apk/androidTest/full/debug/libtelemetry-full-debug-androidTest.apk"
+#            ./cloud_test.sh $build_dir $test_apk_path $CIRCLE_BUILD_NUM
       - run:
-          name: Log in to Google Cloud Platform
-          shell: /bin/bash -euo pipefail
-          command: |
-            echo "${GCLOUD_SERVICE_ACCOUNT_JSON}" > secret.json
-            gcloud auth activate-service-account --key-file secret.json --project mapbox-events-android
-            rm secret.json
-      - run:
-          name: Run libcore instrumentation tests on Firebase
-          no_output_timeout: 20m
-          command: |
-            build_dir="libcore/build"
-            test_apk_path="outputs/apk/androidTest/debug/libcore-debug-androidTest.apk"
-            ./cloud_test.sh $build_dir $test_apk_path $CIRCLE_BUILD_NUM
-      - run:
-          name: Run libtelemetry instrumentation tests on Firebase
-          no_output_timeout: 20m
-          command: |
-            build_dir="libtelemetry/build"
-            test_apk_path="outputs/apk/androidTest/full/debug/libtelemetry-full-debug-androidTest.apk"
-            ./cloud_test.sh $build_dir $test_apk_path $CIRCLE_BUILD_NUM
+          name: Setup Environment
+          command: npm install
       - run:
           name: Check & Publish Binary Size
           command: |
