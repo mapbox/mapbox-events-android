@@ -98,7 +98,7 @@ public class LocationCollectionClient implements SharedPreferences.OnSharedPrefe
           applicationContext.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE),
           // Provide empty token as it is not available yet
           new MapboxTelemetry(applicationContext, "",
-            String.format("%s/%s", LOCATION_COLLECTOR_USER_AGENT, BuildConfig.VERSION_NAME)));
+            String.format("%s/%s", LOCATION_COLLECTOR_USER_AGENT, BuildConfig.VERSION_NAME), false));
       }
     }
     return locationCollectionClient;

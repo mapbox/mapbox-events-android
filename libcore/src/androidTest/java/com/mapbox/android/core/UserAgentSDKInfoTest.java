@@ -41,6 +41,5 @@ public class UserAgentSDKInfoTest {
   public void testSDKInformationInUserAgentWithNullContext() {
     MapboxSdkInfoForUserAgentGenerator.getInstance(null)
       .getSdkInfoForUserAgent();
-
   }
 }

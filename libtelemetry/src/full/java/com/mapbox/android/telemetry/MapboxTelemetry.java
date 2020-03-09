@@ -52,6 +52,8 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   private CopyOnWriteArraySet<AttachmentListener> attachmentListeners = null;
   private ConfigurationClient configurationClient;
   private final ExecutorService executorService;
+  private boolean isExternal = true;
+  private boolean isTelemetryEnabled = false;
   static Context applicationContext = null;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
@@ -83,12 +85,14 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     this.httpCallback = getHttpCallback(telemetryListeners);
     this.executorService = ExecutorServiceFactory.create("MapboxTelemetryExecutor", 3, 20);
     this.queue = EventsQueue.create(this, executorService);
+    this.isExternal = false;
   }
 
   @RestrictTo({RestrictTo.Scope.LIBRARY, RestrictTo.Scope.TESTS})
   MapboxTelemetry(Context context, String accessToken, String userAgent, EventsQueue queue,
                   TelemetryClient telemetryClient, Callback httpCallback, SchedulerFlusher schedulerFlusher,
-                  Clock clock, TelemetryEnabler telemetryEnabler, ExecutorService executorService) {
+                  Clock clock, TelemetryEnabler telemetryEnabler, ExecutorService executorService,
+                  boolean isTelemetryEnabled) {
     initializeContext(context);
     setAccessToken(accessToken);
     this.userAgent = userAgent;
@@ -101,12 +105,12 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     this.httpCallback = httpCallback;
     this.executorService = executorService;
     this.queue = queue;
+    this.isTelemetryEnabled = isTelemetryEnabled;
   }
 
   @Override // Callback is dispatched on background thread
   public void onFullQueue(List<Event> fullQueue) {
-    TelemetryEnabler.State telemetryState = telemetryEnabler.obtainTelemetryState();
-    if (TelemetryEnabler.State.ENABLED.equals(telemetryState)
+    if (TelemetryEnabler.isEventsEnabled(telemetryEnabler)
       && !TelemetryUtils.adjustWakeUpMode(applicationContext)) {
       sendEvents(fullQueue, false);
     }
@@ -128,7 +132,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   }
 
   public boolean enable() {
-    if (TelemetryEnabler.isEventsEnabled(applicationContext)) {
+    if (TelemetryEnabler.isEventsEnabled(telemetryEnabler)) {
       startTelemetry();
       return true;
     }
@@ -136,7 +140,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   }
 
   public boolean disable() {
-    if (TelemetryEnabler.isEventsEnabled(applicationContext)) {
+    if (isTelemetryEnabled) {
       stopTelemetry();
       return true;
     }
@@ -242,17 +246,23 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   }
 
   private void initializeTelemetryClient() {
-    if (configurationClient == null) {
-      if (BuildConfig.DEBUG) {
-        // Strict mode work around : https://github.com/square/okhttp/issues/3537
-        this.configurationClient = new ConfigurationClient(applicationContext,
-          TelemetryUtils.createFullUserAgent(userAgent, applicationContext), sAccessToken.get(),
-          TelemetryUtils.createOkHttpClientWithStrictModeWorkAround());
-      } else {
-        this.configurationClient = new ConfigurationClient(applicationContext,
-          TelemetryUtils.createFullUserAgent(userAgent, applicationContext), sAccessToken.get(),
-          new OkHttpClient());
+    ConfigurationCallback callback = new ConfigurationCallback() {
+      @Override
+      public void enabled() {
+        enable();
       }
+
+      @Override
+      public void disabled() {
+        disable();
+      }
+    };
+
+    if (configurationClient == null) {
+      this.configurationClient = new ConfigurationClient(applicationContext,
+        TelemetryUtils.createFullUserAgent(userAgent, applicationContext), sAccessToken.get(),
+        BuildConfig.DEBUG ? TelemetryUtils.createOkHttpClientWithStrictModeWorkAround() : new OkHttpClient(),
+        isExternal ? callback : null);
     }
 
     if (certificateBlacklist == null) {
@@ -341,8 +351,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   }
 
   private boolean pushToQueue(Event event) {
-    TelemetryEnabler.State telemetryState = telemetryEnabler.obtainTelemetryState();
-    if (TelemetryEnabler.State.ENABLED.equals(telemetryState)) {
+    if (TelemetryEnabler.isEventsEnabled(telemetryEnabler)) {
       return queue.push(event);
     }
     return false;
@@ -383,10 +392,10 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   }
 
   private void startTelemetry() {
-    TelemetryEnabler.State telemetryState = telemetryEnabler.obtainTelemetryState();
-    if (TelemetryEnabler.State.ENABLED.equals(telemetryState)) {
+    if (TelemetryEnabler.isEventsEnabled(telemetryEnabler)) {
       startAlarm();
       enableLocationCollector(true);
+      isTelemetryEnabled = true;
     }
   }
 
@@ -404,11 +413,11 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   }
 
   private void stopTelemetry() {
-    TelemetryEnabler.State telemetryState = telemetryEnabler.obtainTelemetryState();
-    if (TelemetryEnabler.State.ENABLED.equals(telemetryState)) {
+    if (isTelemetryEnabled) {
       flushEnqueuedEvents();
       unregisterTelemetry();
       enableLocationCollector(false);
+      isTelemetryEnabled = false;
     }
   }
 

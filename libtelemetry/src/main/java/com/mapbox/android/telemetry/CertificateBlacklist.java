@@ -1,27 +1,16 @@
 package com.mapbox.android.telemetry;
 
 import android.content.Context;
-import android.text.TextUtils;
+import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
+import androidx.annotation.RestrictTo;
 
-import java.io.BufferedReader;
+import com.google.gson.Gson;
+
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Type;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -38,12 +27,13 @@ class CertificateBlacklist implements ConfigurationChangeHandler {
   CertificateBlacklist(Context context, ConfigurationClient configurationClient) {
     this.context = context;
     this.revokedKeys = new CopyOnWriteArrayList<>();
+    attemptCleanUp();
     configurationClient.addHandler(this);
     // Check if it's time to update
     if (configurationClient.shouldUpdate()) {
       configurationClient.update();
     } else {
-      retrieveBlackList(context.getFilesDir(), false);
+      retrieveBlackList(false);
     }
   }
 
@@ -51,99 +41,57 @@ class CertificateBlacklist implements ConfigurationChangeHandler {
     return revokedKeys.contains(hash);
   }
 
-  private void retrieveBlackList(File path, boolean overwrite) {
-    if (!path.isDirectory()) {
-      return;
-    }
-
-    File file = new File(path, BLACKLIST_FILE);
-    if (file.exists()) {
-      try {
-        List<String> blacklist = obtainBlacklistContents(file);
-        if (blacklist.isEmpty()) {
-          return;
-        }
-
-        if (overwrite) {
-          revokedKeys.clear();
-        }
-        revokedKeys.addAll(blacklist);
-      } catch (IOException exception) {
-        Log.e(LOG_TAG, exception.getMessage());
+  boolean attemptCleanUp() {
+    boolean isDeleted = false;
+    try {
+      File path = context.getFilesDir();
+      if (!path.isDirectory()) {
+        return false;
       }
+
+      File file = new File(path, BLACKLIST_FILE);
+      if (file.exists()) {
+        isDeleted = file.delete();
+      }
+    } catch (Exception exception) {
+      Log.d(LOG_TAG, "Error deleting file!");
     }
+
+    return isDeleted;
   }
 
-  private boolean saveBlackList(String data) {
-    if (!isValidContent(data)) {
-      return false;
-    }
-
-    boolean success = true;
-    FileOutputStream outputStream = null;
-    try {
-      outputStream = context.openFileOutput(BLACKLIST_FILE, Context.MODE_PRIVATE);
-      outputStream.write(data.getBytes());
-    } catch (IOException exception) {
-      Log.e(LOG_TAG, exception.getMessage());
-      success = false;
-    } finally {
-      try {
-        if (outputStream != null) {
-          outputStream.close();
-        }
-      } catch (IOException exception) {
-        Log.e(LOG_TAG, exception.getMessage());
-        success = false;
-      }
-    }
-    return success;
+  @RestrictTo(RestrictTo.Scope.TESTS)
+  void retrieveBlackListForTest(boolean overwrite) {
+    retrieveBlackList(overwrite);
   }
 
-  private static boolean isValidContent(String data) {
-    if (TextUtils.isEmpty(data)) {
-      return false;
-    }
-    Gson gson = new GsonBuilder().create();
-    JsonArray jsonArray;
+  private void retrieveBlackList(boolean overwrite) {
+    List<String> blacklist = new ArrayList<>();
     try {
-      JsonObject responseJson = gson.fromJson(data, JsonObject.class);
-      JsonElement jsonElement = responseJson.get("RevokedCertKeys");
+      SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences(context);
+      String configurationString = sharedPreferences.getString(MapboxTelemetryConstants.MAPBOX_CONFIGURATION, null);
 
-      jsonArray = jsonElement.isJsonArray() ? gson.fromJson(jsonElement, JsonArray.class) : null;
-    } catch (JsonSyntaxException exception) {
-      Log.e(LOG_TAG, exception.getMessage());
-      return false;
-    }
-    return jsonArray != null && jsonArray.size() > 0;
-  }
-
-  private List<String> obtainBlacklistContents(File file) throws IOException {
-    InputStream inputStream = new FileInputStream(file);
-    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-    Gson gson = new Gson();
-
-    List<String> blacklist = null;
-    try {
-      JsonObject jsonObject = gson.fromJson(reader, JsonObject.class);
-      if (jsonObject != null) {
-        JsonArray jsonArray = jsonObject.getAsJsonArray("RevokedCertKeys");
-        Type listType = new TypeToken<List<String>>() {
-        }.getType();
-        blacklist = gson.fromJson(jsonArray.toString(), listType);
+      if (configurationString != null) {
+        Configuration configuration = new Gson().fromJson(configurationString, Configuration.class);
+        blacklist = Arrays.asList(configuration.getCertificateBlacklists());
       }
-    } catch (JsonIOException | JsonSyntaxException exception) {
+
+      if (blacklist.isEmpty()) {
+        return;
+      }
+
+      if (overwrite) {
+        revokedKeys.clear();
+      }
+      revokedKeys.addAll(blacklist);
+    } catch (Exception exception) {
       Log.e(LOG_TAG, exception.getMessage());
     }
-    reader.close();
-    return blacklist != null ? blacklist : Collections.<String>emptyList();
   }
 
   @Override
-  public void onUpdate(String data) {
+  public void onUpdate() {
     // This callback is dispatched on background thread
-    if (saveBlackList(data)) {
-      retrieveBlackList(context.getFilesDir(), true);
-    }
+    retrieveBlackList(true);
   }
 }

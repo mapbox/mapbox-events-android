@@ -16,21 +16,25 @@ import static com.mapbox.android.telemetry.TelemetryUtils.obtainSharedPreference
  */
 public class TelemetryEnabler {
   public enum State {
-    ENABLED, DISABLED
+    ENABLED, DISABLED, OVERRIDE, CONFIG_DISABLED
   }
 
   static final String MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_STATE = "mapboxTelemetryState";
   static final Map<TelemetryEnabler.State, Boolean> TELEMETRY_STATES =
     new HashMap<TelemetryEnabler.State, Boolean>() {
       {
-        put(TelemetryEnabler.State.ENABLED, true);
-        put(TelemetryEnabler.State.DISABLED, false);
+        put(State.ENABLED, true);
+        put(State.OVERRIDE, true);
+        put(State.DISABLED, false);
+        put(State.CONFIG_DISABLED, false);
       }
     };
   private static final Map<String, State> STATES = new HashMap<String, State>() {
     {
       put(State.ENABLED.name(), State.ENABLED);
       put(State.DISABLED.name(), State.DISABLED);
+      put(State.OVERRIDE.name(), State.OVERRIDE);
+      put(State.CONFIG_DISABLED.name(), State.CONFIG_DISABLED);
     }
   };
   private static final String KEY_META_DATA_ENABLED = "com.mapbox.EnableEvents";
@@ -84,19 +88,33 @@ public class TelemetryEnabler {
     return currentTelemetryState;
   }
 
-  static boolean isEventsEnabled(Context context) {
+  static boolean isEventsEnabled(TelemetryEnabler telemetryEnabler) {
+    Context context = MapboxTelemetry.applicationContext;
+    if (MapboxTelemetry.applicationContext == null) {
+      return true;
+    }
+
+    boolean isEnabled = true;
     try {
       ApplicationInfo appInformation = context.getPackageManager().getApplicationInfo(
         context.getPackageName(), PackageManager.GET_META_DATA);
 
       if (appInformation != null && appInformation.metaData != null) {
-        boolean isEnabled = appInformation.metaData.getBoolean(KEY_META_DATA_ENABLED, true);
-        return isEnabled;
+        isEnabled = appInformation.metaData.getBoolean(KEY_META_DATA_ENABLED, true);
       }
     } catch (PackageManager.NameNotFoundException exception) {
       exception.printStackTrace();
     }
 
-    return true;
+    State currentState = telemetryEnabler.obtainTelemetryState();
+    if (currentState == State.DISABLED) {
+      isEnabled = false;
+    } else if (currentState == State.OVERRIDE) {
+      isEnabled = true;
+    } else {
+      isEnabled = isEnabled && currentState == State.ENABLED;
+    }
+
+    return isEnabled;
   }
 }

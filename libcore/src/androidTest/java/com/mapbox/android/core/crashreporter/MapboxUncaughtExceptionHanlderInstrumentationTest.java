@@ -67,14 +67,14 @@ public class MapboxUncaughtExceptionHanlderInstrumentationTest {
   @Test
   public void ensureDirectoryWritableHasNoEffect() throws IOException {
     writeToDisk(3);
-    MapboxUncaughtExceptionHanlder.ensureDirectoryWritable(context, TELEM_MAPBOX_PACKAGE);
+    Utils.ensureDirectoryWritable(context, TELEM_MAPBOX_PACKAGE);
     assertEquals(3, directory.listFiles().length);
   }
 
   @Test
   public void ensureDirectoryWritableCleansUp() throws IOException {
     writeToDisk(10);
-    MapboxUncaughtExceptionHanlder.ensureDirectoryWritable(context, TELEM_MAPBOX_PACKAGE);
+    Utils.ensureDirectoryWritable(context, TELEM_MAPBOX_PACKAGE);
     assertEquals(1, directory.listFiles().length);
   }
 

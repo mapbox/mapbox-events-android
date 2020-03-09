@@ -17,6 +17,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static com.mapbox.android.core.crashreporter.Utils.ensureDirectoryWritable;
+import static com.mapbox.android.core.crashreporter.Utils.getReportFileName;
+
 /**
  * Mapbox custom exception handler, which catches unhandled fatal exceptions
  * caused by Mapbox classes. This is an attempt to capture mapbox exceptions as reliably
@@ -30,9 +33,7 @@ public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionH
   public static final String MAPBOX_CRASH_REPORTER_PREFERENCES = "MapboxCrashReporterPrefs";
 
   private static final String TAG = "MbUncaughtExcHandler";
-  private static final String CRASH_FILENAME_FORMAT = "%s/%s.crash";
   private static final int DEFAULT_EXCEPTION_CHAIN_DEPTH = 2;
-  private static final int DEFAULT_MAX_REPORTS = 10;
 
   private final Thread.UncaughtExceptionHandler defaultExceptionHandler;
   private final Context applicationContext;
@@ -176,27 +177,6 @@ public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionH
 
   private boolean isMidOrLowLevelException(int level) {
     return level >= exceptionChainDepth;
-  }
-
-  @VisibleForTesting
-  static void ensureDirectoryWritable(@NonNull Context context, @NonNull String dirPath) {
-    File directory = FileUtils.getFile(context, dirPath);
-    if (!directory.exists()) {
-      directory.mkdir();
-    }
-
-    // Cleanup directory if we've reached our max limit
-    File [] allFiles = FileUtils.listAllFiles(directory);
-    if (allFiles.length >= DEFAULT_MAX_REPORTS) {
-      FileUtils.deleteFirst(allFiles, new FileUtils.LastModifiedComparator(), DEFAULT_MAX_REPORTS - 1);
-    }
-  }
-
-  @VisibleForTesting
-  @NonNull
-  static String getReportFileName(@NonNull String mapboxPackage,
-                                  @NonNull String timestamp) {
-    return String.format(CRASH_FILENAME_FORMAT, mapboxPackage, timestamp);
   }
 
   private void initializeSharedPreferences(SharedPreferences sharedPreferences) {

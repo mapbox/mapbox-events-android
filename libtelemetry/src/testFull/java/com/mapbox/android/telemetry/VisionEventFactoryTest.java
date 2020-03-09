@@ -115,6 +115,6 @@ public class VisionEventFactoryTest {
     TelemetryEnabler telemetryEnabler = new TelemetryEnabler(false);
     new MapboxTelemetry(mockedContext, aValidAccessToken, aValidUserAgent,
       mockedEventsQueue, mockedTelemetryClient, mockedHttpCallback, mockedSchedulerFlusher, mockedClock,
-      telemetryEnabler, mock(ExecutorService.class));
+      telemetryEnabler, mock(ExecutorService.class), true);
   }
 }

@@ -13,6 +13,11 @@ public final class MapboxTelemetryConstants {
   public static final String MAPBOX_SHARED_PREFERENCES = "MapboxSharedPreferences";
 
   /**
+   * Mapbox configuration
+   */
+  public static final String MAPBOX_CONFIGURATION = "MapboxConfiguration";
+
+  /**
    * Location collector status
    */
   public static final String LOCATION_COLLECTOR_ENABLED = "mapboxTelemetryLocationState";
@@ -36,7 +41,6 @@ public final class MapboxTelemetryConstants {
    * Mapbox telemetry package name (reserved for crash reporting)
    */
   public static final String MAPBOX_TELEMETRY_PACKAGE = "com.mapbox.android.telemetry";
-
 
   /**
    * Default telemetry host for STAGING Environment

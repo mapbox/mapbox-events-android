@@ -301,11 +301,22 @@ public class TelemetryUtils {
     return false;
   }
 
+  /**
+   * This method creates an OkHttpClient object with strict mode work around.
+   * Refer: https://github.com/square/okhttp/issues/3537
+   * @return OkHttpClient
+   */
   static OkHttpClient createOkHttpClientWithStrictModeWorkAround() {
     return new OkHttpClient().newBuilder()
       .socketFactory(new SocketFactory() {
         SocketFactory socketFactory = SocketFactory.getDefault();
         private static final int THREAD_ID = 10000;
+
+        @Override
+        public Socket createSocket() throws IOException {
+          TrafficStats.setThreadStatsTag(THREAD_ID);
+          return socketFactory.createSocket();
+        }
 
         @Override
         public Socket createSocket(String host, int port) throws IOException, UnknownHostException {

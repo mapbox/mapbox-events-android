@@ -89,6 +89,7 @@ public final class CrashReportBuilder {
   String getStackTrace(@NonNull List<Throwable> throwables) {
     StringBuilder result = new StringBuilder();
     for (Throwable throwable : throwables) {
+      result.append(String.format("%s %s\n", throwable.getClass().getName(), throwable.getMessage()));
       StackTraceElement[] stackTraceElements = throwable.getStackTrace();
       for (StackTraceElement element : stackTraceElements) {
         if (element.getClassName().startsWith(sdkIdentifier)) {

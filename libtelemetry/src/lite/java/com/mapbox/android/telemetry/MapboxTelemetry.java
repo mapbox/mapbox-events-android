@@ -20,6 +20,7 @@ public class MapboxTelemetry {
   private String userAgent;
   private TelemetryClient telemetryClient;
   private Callback httpCallback;
+  private TelemetryEnabler telemetryEnabler;
   private CopyOnWriteArraySet<TelemetryListener> telemetryListeners = null;
   private final CertificateBlacklist certificateBlacklist;
   private final ConfigurationClient configurationClient;
@@ -28,13 +29,25 @@ public class MapboxTelemetry {
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
     // FIXME: Propagate certificate blacklist changes from full version
+    ConfigurationCallback callback = new ConfigurationCallback() {
+      @Override
+      public void enabled() {
+        enable();
+      }
+
+      @Override
+      public void disabled() {
+        disable();
+      }
+    };
     this.configurationClient = new ConfigurationClient(context, TelemetryUtils.createFullUserAgent(userAgent,
-      context), accessToken, new OkHttpClient());
+      context), accessToken, new OkHttpClient(), callback);
     this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
     checkRequiredParameters(accessToken, userAgent);
     initializeTelemetryListeners();
     // Initializing callback after listeners object is instantiated
     this.httpCallback = getHttpCallback(telemetryListeners);
+    this.telemetryEnabler = new TelemetryEnabler(true);
   }
 
   // For testing only
@@ -47,8 +60,9 @@ public class MapboxTelemetry {
     this.httpCallback = httpCallback;
     initializeTelemetryListeners();
     this.configurationClient = new ConfigurationClient(context, TelemetryUtils.createFullUserAgent(userAgent,
-      context), accessToken, new OkHttpClient());
+      context), accessToken, new OkHttpClient(), null);
     this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
+    this.telemetryEnabler = new TelemetryEnabler(false);
   }
 
   public boolean push(Event event) {
@@ -63,14 +77,14 @@ public class MapboxTelemetry {
   }
 
   public boolean enable() {
-    if (TelemetryEnabler.isEventsEnabled(applicationContext)) {
+    if (TelemetryEnabler.isEventsEnabled(telemetryEnabler)) {
       return true;
     }
     return false;
   }
 
   public boolean disable() {
-    if (TelemetryEnabler.isEventsEnabled(applicationContext)) {
+    if (TelemetryEnabler.isEventsEnabled(telemetryEnabler)) {
       return true;
     }
     return false;
