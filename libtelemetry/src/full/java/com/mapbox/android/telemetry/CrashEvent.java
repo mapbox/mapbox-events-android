@@ -4,10 +4,6 @@ import android.annotation.SuppressLint;
 import android.os.Parcel;
 import android.text.TextUtils;
 
-import androidx.annotation.Keep;
-
-import com.google.gson.annotations.SerializedName;
-
 /**
  * This class is temporary and exists only
  * to comply with legacy telemetry interface,
@@ -16,34 +12,20 @@ import com.google.gson.annotations.SerializedName;
  * back and forth json serialization overhead.
  */
 @SuppressLint("ParcelCreator")
-@Keep
 public class CrashEvent extends Event {
-  @SerializedName("event")
   private final String event;
-  @SerializedName("created")
   private final String created;
 
-  @SerializedName("sdkIdentifier")
   private String sdkIdentifier;
-  @SerializedName("sdkVersion")
   private String sdkVersion;
-  @SerializedName("osVersion")
   private String osVersion;
-  @SerializedName("model")
   private String model;
-  @SerializedName("device")
   private String device;
-  @SerializedName("isSilent")
   private String isSilent;
-  @SerializedName("stackTraceHash")
   private String stackTraceHash;
-  @SerializedName("stackTrace")
   private String stackTrace;
-  @SerializedName("threadDetails")
   private String threadDetails;
-  @SerializedName("appId")
   private String appId;
-  @SerializedName("appVersion")
   private String appVersion;
 
   public CrashEvent(String event, String created) {

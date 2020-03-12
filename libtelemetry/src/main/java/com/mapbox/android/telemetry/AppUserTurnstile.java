@@ -5,39 +5,28 @@ import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.google.gson.annotations.SerializedName;
 
 import static com.mapbox.android.telemetry.TelemetryEnabler.TELEMETRY_STATES;
 
-@Keep
 public class AppUserTurnstile extends Event implements Parcelable {
   private static final String APP_USER_TURNSTILE = "appUserTurnstile";
   private static final String OPERATING_SYSTEM = "Android - " + Build.VERSION.RELEASE;
   private static final String APPLICATION_CONTEXT_CANT_BE_NULL = "Create a MapboxTelemetry instance before calling "
     + "this method.";
 
-  @SerializedName("event")
   private final String event;
-  @SerializedName("created")
   private final String created;
-  @SerializedName("userId")
   private final String userId;
   @SerializedName("enabled.telemetry")
   private final boolean enabledTelemetry;
-  @SerializedName("device")
   private final String device;
-  @SerializedName("sdkIdentifier")
   private final String sdkIdentifier;
-  @SerializedName("sdkVersion")
   private final String sdkVersion;
-  @SerializedName("model")
   private final String model;
-  @SerializedName("operatingSystem")
   private final String operatingSystem;
-  @SerializedName("skuId")
   private String skuId;
 
   public AppUserTurnstile(String sdkIdentifier, String sdkVersion) {

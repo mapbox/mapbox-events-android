@@ -16,9 +16,6 @@ android {
         release {
             minifyEnabled true
         }
-        debug {
-            minifyEnabled true
-        }
     }
 
     flavorDimensions "version"

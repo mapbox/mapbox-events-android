@@ -3,10 +3,8 @@ package com.mapbox.android.events.testapp;
 import android.annotation.SuppressLint;
 import android.location.Location;
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -66,15 +64,6 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
             new LocationEvent("testSessionId", 0.0, 0.0, "testAppState"))
           ;
         }
-      }
-    });
-
-    Button sendTurnstile = findViewById(R.id.turnstile);
-
-    sendTurnstile.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        mapboxTelemetry.push(new AppUserTurnstile("fooSdk", "1.0.0"));
       }
     });
   }
@@ -186,9 +175,6 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
         });
       }
       Log.i(LOG_TAG, message);
-      if (!successful) {
-        throw new AssertionError("Failed to POST Event: " + code);
-      }
     }
 
     @Override
@@ -203,7 +189,6 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
         });
       }
       Log.e(LOG_TAG, "Failure: " + message);
-      throw new AssertionError("Failed to POST Event");
     }
   }
 }
