@@ -2,8 +2,8 @@ package com.mapbox.android.core.location;
 
 import android.app.PendingIntent;
 import android.os.Looper;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /**
  * Internal location engine implementation interface.

@@ -2,7 +2,7 @@ package com.mapbox.android.core.location;
 
 import android.location.Location;
 import android.os.Looper;
-import androidx.annotation.NonNull;
+import android.support.annotation.NonNull;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;

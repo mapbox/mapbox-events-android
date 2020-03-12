@@ -1,7 +1,7 @@
 package com.mapbox.android.telemetry.metrics;
 
-import androidx.annotation.IntRange;
-import androidx.annotation.VisibleForTesting;
+import android.support.annotation.IntRange;
+import android.support.annotation.VisibleForTesting;
 import com.mapbox.android.core.metrics.AbstractCompositeMetrics;
 import com.mapbox.android.core.metrics.Metrics;
 import com.mapbox.android.core.metrics.MetricsImpl;

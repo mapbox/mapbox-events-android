@@ -1,7 +1,7 @@
 package com.mapbox.android.telemetry;
 
 import android.content.Intent;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
+import android.support.test.runner.AndroidJUnit4;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

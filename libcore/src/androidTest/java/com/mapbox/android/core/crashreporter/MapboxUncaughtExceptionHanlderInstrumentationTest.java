@@ -1,11 +1,8 @@
 package com.mapbox.android.core.crashreporter;
 
 import android.content.Context;
-
-import androidx.test.platform.app.InstrumentationRegistry;
-
+import android.support.test.InstrumentationRegistry;
 import com.mapbox.android.core.FileUtils;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,7 +27,7 @@ public class MapboxUncaughtExceptionHanlderInstrumentationTest {
 
   @Before
   public void setUp() {
-    context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+    context = InstrumentationRegistry.getTargetContext();
     exceptionHanlder = new MapboxUncaughtExceptionHanlder(context,
       context.getSharedPreferences(MAPBOX_CRASH_REPORTER_PREFERENCES, Context.MODE_PRIVATE),
       TELEM_MAPBOX_PACKAGE, TELEM_MAPBOX_VERSION, null);
@@ -47,9 +44,8 @@ public class MapboxUncaughtExceptionHanlderInstrumentationTest {
 
   @Test
   public void testInstall() {
-    MapboxUncaughtExceptionHanlder.install(InstrumentationRegistry.getInstrumentation().getTargetContext(),
-        TELEM_MAPBOX_PACKAGE,
-        TELEM_MAPBOX_VERSION);
+    MapboxUncaughtExceptionHanlder.install(InstrumentationRegistry.getTargetContext(), TELEM_MAPBOX_PACKAGE,
+      TELEM_MAPBOX_VERSION);
     //TODO: verify successful install
   }
 

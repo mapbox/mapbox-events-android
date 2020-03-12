@@ -2,7 +2,7 @@ package com.mapbox.android.telemetry.crash;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import androidx.test.platform.app.InstrumentationRegistry;
+import android.support.test.InstrumentationRegistry;
 import com.mapbox.android.core.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +26,7 @@ public class CrashReporterJobIntentServiceInstrumentationTest {
 
   @Before
   public void setUp() {
-    context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+    context = InstrumentationRegistry.getTargetContext();
     directory = FileUtils.getFile(context, MAPBOX_TELEMETRY_PACKAGE);
     if (!directory.exists()) {
       directory.mkdir();
@@ -39,7 +39,7 @@ public class CrashReporterJobIntentServiceInstrumentationTest {
 
   @Test
   public void enqueueWork() {
-    CrashReporterJobIntentService.enqueueWork(InstrumentationRegistry.getInstrumentation().getTargetContext());
+    CrashReporterJobIntentService.enqueueWork(InstrumentationRegistry.getTargetContext());
     // TODO: verify work is executed
   }
 
@@ -56,7 +56,7 @@ public class CrashReporterJobIntentServiceInstrumentationTest {
 
     CrashReporterJobIntentService jobIntentService = new CrashReporterJobIntentService();
     jobIntentService.handleCrashReports(CrashReporterClient
-      .create(InstrumentationRegistry.getInstrumentation().getTargetContext())
+      .create(InstrumentationRegistry.getTargetContext())
       .loadFrom(directory)
       .debug(true));
     assertEquals(0, FileUtils.listAllFiles(directory).length);

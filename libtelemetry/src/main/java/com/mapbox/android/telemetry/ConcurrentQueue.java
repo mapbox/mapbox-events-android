@@ -1,8 +1,8 @@
 package com.mapbox.android.telemetry;
 
 
-import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 
 import java.util.ArrayList;

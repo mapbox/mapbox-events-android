@@ -3,7 +3,7 @@ package com.mapbox.android.telemetry;
 import android.app.AlarmManager;
 import android.content.Context;
 import android.content.Intent;
-import androidx.test.platform.app.InstrumentationRegistry;
+import android.support.test.InstrumentationRegistry;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -22,7 +22,7 @@ public class AlarmMangerInstrumentationTest {
     final CountDownLatch latch = new CountDownLatch(2);
     final AtomicReference<Integer> broadcastTrack = new AtomicReference<>();
 
-    Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+    Context context = InstrumentationRegistry.getTargetContext();
     AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
     AlarmReceiver alarmReceiver = obtainAlarmReceiver(broadcastTrack, latch);
 
@@ -46,7 +46,7 @@ public class AlarmMangerInstrumentationTest {
 
   @Test
   public void checksSupplyAlarmManager() {
-    Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+    Context context = InstrumentationRegistry.getTargetContext();
     AlarmReceiver mockedAlarmReceiver = mock(AlarmReceiver.class);
     SchedulerFlusherFactory schedulerFlusherFactory = new SchedulerFlusherFactory(context, mockedAlarmReceiver);
 
@@ -58,7 +58,7 @@ public class AlarmMangerInstrumentationTest {
 
   @Test
   public void checksScheduleExact() throws Exception {
-    Context mockedContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+    Context mockedContext = InstrumentationRegistry.getTargetContext();
     AlarmManager mockedAlarmManager = mock(AlarmManager.class);
     AlarmReceiver mockedAlarmReceiver = mock(AlarmReceiver.class);
     AlarmSchedulerFlusher theAlarmSchedulerFlusher = new AlarmSchedulerFlusher(mockedContext, mockedAlarmManager,

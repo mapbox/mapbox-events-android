@@ -2,7 +2,7 @@ package com.mapbox.android.core;
 
 import android.content.Context;
 import android.content.res.AssetManager;
-import androidx.test.platform.app.InstrumentationRegistry;
+import android.support.test.InstrumentationRegistry;
 import android.util.Log;
 
 import org.junit.Assert;
@@ -24,7 +24,7 @@ public class CoreSDKVersionTest {
 
   @Test
   public void testPersistedCoreSDKInfo() {
-    Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+    Context context = InstrumentationRegistry.getTargetContext();
     AssetManager assetManager = context.getAssets();
     InputStream inputStream = null;
 

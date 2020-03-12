@@ -1,8 +1,7 @@
 package com.mapbox.android.core.crashreporter;
 
 import android.content.Context;
-import androidx.test.platform.app.InstrumentationRegistry;
-
+import android.support.test.InstrumentationRegistry;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,7 +23,7 @@ public class CrashReportBuilderInstrumentedTest {
 
   @Before
   public void setUp() {
-    Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+    Context context = InstrumentationRegistry.getTargetContext();
     exceptionHanlder = new MapboxUncaughtExceptionHanlder(context,
         context.getSharedPreferences(MAPBOX_CRASH_REPORTER_PREFERENCES, Context.MODE_PRIVATE),
         TELEM_MAPBOX_PACKAGE, TELEM_MAPBOX_VERSION, Thread.getDefaultUncaughtExceptionHandler());

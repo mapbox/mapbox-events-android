@@ -1,7 +1,7 @@
 package com.mapbox.android.core;
 
 import android.content.Context;
-import androidx.test.platform.app.InstrumentationRegistry;
+import android.support.test.InstrumentationRegistry;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -17,7 +17,7 @@ public class UserAgentSDKInfoTest {
 
   @Test
   public void testSDKInformation() {
-    Context context = InstrumentationRegistry.getInstrumentation().getContext();
+    Context context = InstrumentationRegistry.getContext();
     String packageName = context.getPackageName().replace(".test", "");
     String versionCode = String.format(LOCALE_DEFAULT, SDK_UA_VERSION_CODE_FORMAT, BuildConfig.VERSION_CODE);
     String sdkInfo = MapboxSdkInfoForUserAgentGenerator.getInstance(context.getAssets())
@@ -28,7 +28,7 @@ public class UserAgentSDKInfoTest {
 
   @Test
   public void testUserAgentSdkInfo() {
-    Context context = InstrumentationRegistry.getInstrumentation().getContext();
+    Context context = InstrumentationRegistry.getContext();
     String sdkInfo = MapboxSdkInfoForUserAgentGenerator.getInstance(context.getAssets())
       .getSdkInfoForUserAgent();
     String packageName = context.getPackageName().replace(".test", "");

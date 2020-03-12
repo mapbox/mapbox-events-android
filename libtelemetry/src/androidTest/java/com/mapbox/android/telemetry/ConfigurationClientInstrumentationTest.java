@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import androidx.test.platform.app.InstrumentationRegistry;
+import android.support.test.InstrumentationRegistry;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -37,14 +37,14 @@ public class ConfigurationClientInstrumentationTest {
 
   @Before
   public void setup() {
-    Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+    Context context = InstrumentationRegistry.getTargetContext();
     this.configurationClient = new ConfigurationClient(context,
       TelemetryUtils.createFullUserAgent("AnUserAgent", context), "anAccessToken", new OkHttpClient());
   }
 
   @Test
   public void checkComEndpoint() {
-    Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+    Context context = InstrumentationRegistry.getTargetContext();
     OkHttpClient httpClient = mock(OkHttpClient.class);
     when(httpClient.newCall(any(Request.class))).thenReturn(mock(Call.class));
     this.configurationClient = new ConfigurationClient(context,
@@ -71,8 +71,8 @@ public class ConfigurationClientInstrumentationTest {
     OkHttpClient httpClient = mock(OkHttpClient.class);
     when(httpClient.newCall((Request) any())).thenReturn(mock(Call.class));
     this.configurationClient = new ConfigurationClient(context,
-      TelemetryUtils.createFullUserAgent("AnUserAgent",
-          InstrumentationRegistry.getInstrumentation().getTargetContext()), "anAccessToken", httpClient);
+      TelemetryUtils.createFullUserAgent("AnUserAgent", InstrumentationRegistry.getTargetContext()),
+      "anAccessToken", httpClient);
 
     configurationClient.update();
     ArgumentCaptor<Request> argument = ArgumentCaptor.forClass(Request.class);
@@ -121,7 +121,7 @@ public class ConfigurationClientInstrumentationTest {
 
   private void setTimeStamp(long milliseconds) {
     SharedPreferences sharedPreferences =
-      TelemetryUtils.obtainSharedPreferences(InstrumentationRegistry.getInstrumentation().getTargetContext());
+      TelemetryUtils.obtainSharedPreferences(InstrumentationRegistry.getTargetContext());
     SharedPreferences.Editor editor = sharedPreferences.edit();
     editor.putLong("mapboxConfigSyncTimestamp", milliseconds);
     editor.apply();

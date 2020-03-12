@@ -1,7 +1,7 @@
 package com.mapbox.android.core.location;
 
 import android.location.Location;
-import androidx.annotation.Nullable;
+import android.support.annotation.Nullable;
 
 final class Utils {
   private static final int TWO_MINUTES = 1000 * 60 * 2;

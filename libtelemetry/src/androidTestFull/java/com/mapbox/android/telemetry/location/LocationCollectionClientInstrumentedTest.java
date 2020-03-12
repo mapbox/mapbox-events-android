@@ -2,8 +2,7 @@ package com.mapbox.android.telemetry.location;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-
-import androidx.test.platform.app.InstrumentationRegistry;
+import android.support.test.InstrumentationRegistry;
 
 import com.mapbox.android.telemetry.MapboxTelemetry;
 
@@ -25,7 +24,7 @@ public class LocationCollectionClientInstrumentedTest {
 
   @Before
   public void setUp() {
-    ref = LocationCollectionClient.install(InstrumentationRegistry.getInstrumentation().getTargetContext(),
+    ref = LocationCollectionClient.install(InstrumentationRegistry.getTargetContext(),
       DEFAULT_INTERVAL);
   }
 
@@ -43,8 +42,7 @@ public class LocationCollectionClientInstrumentedTest {
   @Test
   public void verifySharedPreferences() throws InterruptedException {
     SharedPreferences sharedPreferences =
-      InstrumentationRegistry.getInstrumentation().getTargetContext().getSharedPreferences(MAPBOX_SHARED_PREFERENCES,
-          Context.MODE_PRIVATE);
+      InstrumentationRegistry.getTargetContext().getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
     assertFalse(sharedPreferences.getBoolean(LOCATION_COLLECTOR_ENABLED, true));
     SharedPreferences.Editor editor = sharedPreferences.edit();
     editor.putBoolean(LOCATION_COLLECTOR_ENABLED, true);
@@ -70,16 +68,15 @@ public class LocationCollectionClientInstrumentedTest {
 
   @Test
   public void verifySingletonInstall() {
-    assertEquals(ref, LocationCollectionClient.install(InstrumentationRegistry.getInstrumentation().getTargetContext(),
+    assertEquals(ref, LocationCollectionClient.install(InstrumentationRegistry.getTargetContext(),
       DEFAULT_INTERVAL));
   }
 
   @Test
   public void verifyCollectorUninstalled() {
     LocationCollectionClient.uninstall();
-    assertNotEquals(ref,
-        LocationCollectionClient.install(InstrumentationRegistry.getInstrumentation().getTargetContext(),
-        DEFAULT_INTERVAL));
+    assertNotEquals(ref, LocationCollectionClient.install(InstrumentationRegistry.getTargetContext(),
+      DEFAULT_INTERVAL));
   }
 
   @Test

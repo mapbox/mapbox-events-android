@@ -1,7 +1,7 @@
 package com.mapbox.android.telemetry;
 
 import android.content.Context;
-import androidx.test.platform.app.InstrumentationRegistry;
+import android.support.test.InstrumentationRegistry;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -13,7 +13,7 @@ public class TestReformedUserAgent {
 
   @Test
   public void testReformedUserAgent() {
-    Context context = InstrumentationRegistry.getInstrumentation().getContext();
+    Context context = InstrumentationRegistry.getContext();
     String reformedUserAgent = TelemetryUtils.createReformedFullUserAgent(context);
     Assert.assertTrue(reformedUserAgent.contains(context.getPackageName()));
     Assert.assertTrue(reformedUserAgent.contains(CORE_PACKAGE));

@@ -1,7 +1,7 @@
 package com.mapbox.android.telemetry.location;
 
 import android.content.Intent;
-import androidx.test.platform.app.InstrumentationRegistry;
+import android.support.test.InstrumentationRegistry;
 
 import com.mapbox.android.telemetry.MapboxTelemetry;
 
@@ -22,7 +22,7 @@ public class LocationUpdatesBroadcastReceiverInstrumentedTest {
 
   @Before
   public void setUp() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    LocationCollectionClient.install(InstrumentationRegistry.getInstrumentation().getTargetContext(), 1000);
+    LocationCollectionClient.install(InstrumentationRegistry.getTargetContext(), 1000);
     LocationCollectionClient collectionClient = LocationCollectionClient.getInstance();
     collectionClient.setEnabled(true);
     telemetry = collectionClient.getTelemetry();
@@ -41,7 +41,7 @@ public class LocationUpdatesBroadcastReceiverInstrumentedTest {
 
   @Test
   public void verifyEmptyIntent() throws InvocationTargetException, IllegalAccessException {
-    InstrumentationRegistry.getInstrumentation().getTargetContext().sendBroadcast(intent);
+    InstrumentationRegistry.getTargetContext().sendBroadcast(intent);
     assertTrue((Boolean) isQueueEmpty.invoke(telemetry));
   }
 }
