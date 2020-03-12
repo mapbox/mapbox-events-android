@@ -8,17 +8,12 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.net.TrafficStats;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,9 +26,6 @@ import android.util.Log;
 
 import com.mapbox.android.core.MapboxSdkInfoForUserAgentGenerator;
 
-import javax.net.SocketFactory;
-
-import okhttp3.OkHttpClient;
 import okio.Buffer;
 
 import static com.mapbox.android.telemetry.MapboxTelemetryConstants.MAPBOX_SHARED_PREFERENCES;
@@ -299,40 +291,5 @@ public class TelemetryUtils {
       exception.printStackTrace();
     }
     return false;
-  }
-
-  static OkHttpClient createOkHttpClientWithStrictModeWorkAround() {
-    return new OkHttpClient().newBuilder()
-      .socketFactory(new SocketFactory() {
-        SocketFactory socketFactory = SocketFactory.getDefault();
-        private static final int THREAD_ID = 10000;
-
-        @Override
-        public Socket createSocket(String host, int port) throws IOException, UnknownHostException {
-          TrafficStats.setThreadStatsTag(THREAD_ID);
-          return socketFactory.createSocket(host, port);
-        }
-
-        @Override
-        public Socket createSocket(String host, int port, InetAddress localHost, int localPort) throws
-          IOException, UnknownHostException {
-          TrafficStats.setThreadStatsTag(THREAD_ID);
-          return socketFactory.createSocket(host, port, localHost, localPort);
-        }
-
-        @Override
-        public Socket createSocket(InetAddress host, int port) throws IOException {
-          TrafficStats.setThreadStatsTag(THREAD_ID);
-          return socketFactory.createSocket(host, port);
-        }
-
-        @Override
-        public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort) throws
-          IOException {
-          TrafficStats.setThreadStatsTag(THREAD_ID);
-          return socketFactory.createSocket(address, port, localAddress, localPort);
-        }
-      })
-      .build();
   }
 }
