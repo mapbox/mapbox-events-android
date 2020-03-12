@@ -2,6 +2,9 @@ package com.mapbox.android.core.crashreporter;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,9 +44,10 @@ public class CrashReportBuilderInstrumentedTest {
   }
 
   @Test
-  public void validBodyfromJson() {
+  public void validBodyfromJson() throws JSONException {
     CrashReport report = CrashReportBuilder.fromJson(validJson);
-    assertEquals(validJson.trim(), report.toJson());
+    JSONObject jsonValidJson = new JSONObject(validJson);
+    assertEquals(jsonValidJson.toString(), report.toJson());
   }
 
   @Test
