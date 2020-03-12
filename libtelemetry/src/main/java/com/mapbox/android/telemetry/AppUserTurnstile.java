@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.google.gson.annotations.SerializedName;

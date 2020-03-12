@@ -4,8 +4,8 @@ package com.mapbox.android.telemetry;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Keep;
 
-import androidx.annotation.Keep;
 
 import com.google.gson.annotations.SerializedName;
 
