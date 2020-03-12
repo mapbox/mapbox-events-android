@@ -3,6 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.mapbox.android.telemetry">
 
+    <!--Required for CrashReporterJobIntentService on API levels below 25-->
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -12,5 +14,7 @@
             android:authorities="${applicationId}.mapboxtelemetryinitprovider"
             android:exported="false"
             android:initOrder="100"/>
+        <service android:name=".crash.CrashReporterJobIntentService"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
     </application>
 </manifest>

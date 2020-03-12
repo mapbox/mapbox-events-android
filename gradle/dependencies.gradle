@@ -18,8 +18,7 @@ ext {
             espressoVersion     : '3.1.0',
             archLifecycleVersion: "1.1.0",
             assertJ             : "3.11.1",
-            leakCanaryVersion   : "1.6.3",
-            workManagerVersion  : "2.2.0"
+            leakCanaryVersion   : "1.6.3"
     ]
 
     pluginVersion = [
@@ -48,7 +47,6 @@ ext {
             supportAppcompat       : "androidx.appcompat:appcompat:${version.androidXVersion}",
             supportConstraintLayout: "androidx.constraintlayout:constraintlayout:${version.constraintLayout}",
             supportCoreUtils       : "androidx.legacy:legacy-support-core-utils:${version.androidXVersion}",
-            workManager            : "androidx.work:work-runtime:${version.workManagerVersion}",
 
             // instrumentation test
             testRunner             : "androidx.test.ext:junit:${version.testRunnerVersion}",
@@ -60,7 +58,6 @@ ext {
             mockito                : "org.mockito:mockito-core:${version.mockito}",
             mockitoAndroid         : "org.mockito:mockito-android:${version.mockito}",
             assertJ                : "org.assertj:assertj-core:${version.assertJ}",
-            workManagerTesting     : "androidx.work:work-testing:${version.workManagerVersion}",
 
             leakCanary             : "com.squareup.leakcanary:leakcanary-android:${version.leakCanaryVersion}",
             leakCanaryNoOp         : "com.squareup.leakcanary:leakcanary-android-no-op:${version.leakCanaryVersion}"
