@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import androidx.annotation.RestrictTo;
+import androidx.annotation.VisibleForTesting;
 
 import com.google.gson.Gson;
 
@@ -60,12 +60,8 @@ class CertificateBlacklist implements ConfigurationChangeHandler {
     return isDeleted;
   }
 
-  @RestrictTo(RestrictTo.Scope.TESTS)
-  void retrieveBlackListForTest(boolean overwrite) {
-    retrieveBlackList(overwrite);
-  }
-
-  private void retrieveBlackList(boolean overwrite) {
+  @VisibleForTesting
+  void retrieveBlackList(boolean overwrite) {
     List<String> blacklist = new ArrayList<>();
     try {
       SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences(context);

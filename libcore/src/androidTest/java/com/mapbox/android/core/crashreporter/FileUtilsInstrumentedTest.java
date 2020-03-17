@@ -14,8 +14,7 @@ import static org.junit.Assert.assertEquals;
 public class FileUtilsInstrumentedTest {
   private static final String TELEM_MAPBOX_PACKAGE = "com.mapbox.android.telemetry";
   private final String validJson = "{\"query\":\"Pizza\",\"locations\":[94043,90210]}";
-  private static final String filename = MapboxUncaughtExceptionHanlder
-    .getReportFileName(TELEM_MAPBOX_PACKAGE, "12345678");
+  private static final String filename = Utils.getReportFileName(TELEM_MAPBOX_PACKAGE, "12345678");
 
   private File directory;
   private File file;

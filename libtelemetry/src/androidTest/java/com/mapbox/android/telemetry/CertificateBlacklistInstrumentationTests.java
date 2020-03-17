@@ -69,7 +69,7 @@ public class CertificateBlacklistInstrumentationTests {
     SharedPreferences.Editor editor = sharedPreferences.edit();
     editor.putString(MAPBOX_CONFIGURATION, data);
     editor.apply();
-    certificateBlacklist.retrieveBlackListForTest(true);
+    certificateBlacklist.retrieveBlackList(true);
   }
 
   @Test
@@ -119,7 +119,7 @@ public class CertificateBlacklistInstrumentationTests {
     ConfigurationClient configurationClient = new ConfigurationClient(context,
       TelemetryUtils.createFullUserAgent("AnUserAgent", context), "anAccessToken", new OkHttpClient(), null);
     this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
-    certificateBlacklist.retrieveBlackListForTest(true);
+    certificateBlacklist.retrieveBlackList(true);
     assertTrue(certificateBlacklist.isBlacklisted("test12345"));
   }
 
