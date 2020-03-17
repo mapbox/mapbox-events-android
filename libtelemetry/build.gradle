@@ -50,7 +50,6 @@ dependencies {
     implementation dependenciesList.okhttp3
     implementation dependenciesList.gson
     implementation dependenciesList.supportAnnotation
-    implementation dependenciesList.workManager
     implementation project(':libcore')
 
     fullImplementation dependenciesList.supportCoreUtils
@@ -65,5 +64,4 @@ dependencies {
     androidTestImplementation dependenciesList.mockitoAndroid
     androidTestImplementation dependenciesList.testRunner
     androidTestImplementation dependenciesList.testRules
-    androidTestImplementation dependenciesList.workManagerTesting
 }
