@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import android.util.Log;
 import com.mapbox.android.core.crashreporter.MapboxUncaughtExceptionHanlder;
 import com.mapbox.android.telemetry.BuildConfig;
+import com.mapbox.android.telemetry.crash.TokenChangeBroadcastReceiver;
 import com.mapbox.android.telemetry.location.LocationCollectionClient;
 
 import java.util.concurrent.TimeUnit;
@@ -28,6 +29,10 @@ public class MapboxTelemetryInitProvider extends ContentProvider {
   public boolean onCreate() {
     try {
       if (!BuildConfig.DEBUG) {
+        // Register broadcast receiver to get notification
+        // when valid token becomes available
+        TokenChangeBroadcastReceiver.register(getContext());
+
         // Install crash reporter for telemetry packages only!
         MapboxUncaughtExceptionHanlder.install(getContext(), MAPBOX_TELEMETRY_PACKAGE, BuildConfig.VERSION_NAME);
       }
