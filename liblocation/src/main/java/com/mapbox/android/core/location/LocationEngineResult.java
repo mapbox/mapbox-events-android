@@ -3,14 +3,15 @@ package com.mapbox.android.core.location;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
+
 import androidx.annotation.Nullable;
+
 import com.google.android.gms.location.LocationResult;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.mapbox.android.core.location.Utils.checkNotNull;
 import static com.mapbox.android.core.location.Utils.isOnClasspath;
 
 /**
@@ -37,9 +38,10 @@ public final class LocationEngineResult {
    * @since 1.0.0
    */
   public static LocationEngineResult create(Location location) {
-    checkNotNull(location, "location can't be null");
     List<Location> locations = new ArrayList<>();
-    locations.add(location);
+    if (location != null) {
+      locations.add(location);
+    }
     return new LocationEngineResult(locations);
   }
 
@@ -51,8 +53,9 @@ public final class LocationEngineResult {
    * @since 1.0.0
    */
   public static LocationEngineResult create(List<Location> locations) {
-    checkNotNull(locations, "locations can't be null");
-    return new LocationEngineResult(locations);
+    return locations != null
+      ? new LocationEngineResult(locations)
+      : new LocationEngineResult(Collections.<Location>emptyList());
   }
 
   /**
