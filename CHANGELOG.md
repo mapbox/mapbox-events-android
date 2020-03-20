@@ -4,6 +4,9 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+## v5.0.0
+- Revert "Transition JobIntentService to WorkManager (#453)
+
 ## v4.7.3
 - Fix Turnstile Obfuscation [#457] (https://github.com/mapbox/mapbox-events-android/pull/457)
 
@@ -241,6 +244,9 @@ Mapbox welcomes participation and contributions from everyone.
 
 
 ## Mapbox Android Core
+
+### V2.0.0
+- No Changes. Align the major release with Telemetry.
 
 ### v1.4.1
 
