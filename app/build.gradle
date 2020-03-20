@@ -17,7 +17,12 @@ android {
             minifyEnabled true
         }
         debug {
+            minifyEnabled false
+        }
+        debugMinify {
+            initWith debug
             minifyEnabled true
+            matchingFallbacks = ['debug']
         }
     }
 
@@ -41,6 +46,7 @@ dependencies {
 
     debugImplementation dependenciesList.leakCanary
     releaseImplementation dependenciesList.leakCanaryNoOp
+    debugMinifyImplementation dependenciesList.leakCanary
 
     testImplementation dependenciesList.junit
     testImplementation dependenciesList.mockito
