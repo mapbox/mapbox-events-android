@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.gms.location.LocationResult;
@@ -37,6 +38,7 @@ public final class LocationEngineResult {
    * @return instance of the new location result.
    * @since 1.0.0
    */
+  @NonNull
   public static LocationEngineResult create(@Nullable Location location) {
     List<Location> locations = new ArrayList<>();
     if (location != null) {
@@ -52,6 +54,7 @@ public final class LocationEngineResult {
    * @return instance of the new location result.
    * @since 1.0.0
    */
+  @NonNull
   public static LocationEngineResult create(@Nullable List<Location> locations) {
     if (locations != null) {
       List<Location> locationsList = new ArrayList<>(locations);
