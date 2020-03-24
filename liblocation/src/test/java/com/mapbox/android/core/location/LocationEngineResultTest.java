@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -43,26 +44,62 @@ public class LocationEngineResultTest {
 
   @Test
   public void passNullLocation() {
-    LocationEngineResult result = LocationEngineResult.create((Location) null);
+    Location location = null;
+    LocationEngineResult result = LocationEngineResult.create(location);
     assertForNullInput(result);
   }
 
   @Test
   public void passNullLocationList() {
-    LocationEngineResult result = LocationEngineResult.create((List<Location>) null);
+    List<Location> locations = null;
+    LocationEngineResult result = LocationEngineResult.create(locations);
     assertForNullInput(result);
   }
 
   @Test
   public void passValidLocation() {
-    LocationEngineResult result = LocationEngineResult.create(getValidLocation());
+    Location location = getValidLocation();
+    LocationEngineResult result = LocationEngineResult.create(location);
     assertForValidInput(result);
   }
 
   @Test
   public void passValidLocationList() {
-    LocationEngineResult result = LocationEngineResult.create(Collections.singletonList(getValidLocation()));
+    List<Location> locations = Collections.singletonList(getValidLocation());
+    LocationEngineResult result = LocationEngineResult.create(locations);
     assertForValidInput(result);
+  }
+
+  @Test
+  public void passMutableLocationListWithNulls() {
+    List<Location> locations = getLocationsWithNulls();
+    LocationEngineResult result = LocationEngineResult.create(locations);
+    assertForValidInput(result);
+  }
+
+  @Test
+  public void passImmutableLocationListWithNulls() {
+    List<Location> locations = Collections.unmodifiableList(getLocationsWithNulls());
+    LocationEngineResult result = LocationEngineResult.create(locations);
+    assertForValidInput(result);
+  }
+
+  @Test
+  public void passImmutableListWithNullLocation() {
+    List<Location> locations = Collections.singletonList(null);
+    LocationEngineResult result = LocationEngineResult.create(locations);
+    assertThat(result != null);
+    assertThat(result.getLocations().size() == 0);
+  }
+
+  private static List<Location> getLocationsWithNulls() {
+    return new ArrayList<Location>() {
+      {
+        add(null);
+        add(getValidLocation());
+        add(null);
+      }
+    };
   }
 
   private static Location getValidLocation() {

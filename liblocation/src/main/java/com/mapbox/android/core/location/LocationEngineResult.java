@@ -37,7 +37,7 @@ public final class LocationEngineResult {
    * @return instance of the new location result.
    * @since 1.0.0
    */
-  public static LocationEngineResult create(Location location) {
+  public static LocationEngineResult create(@Nullable Location location) {
     List<Location> locations = new ArrayList<>();
     if (location != null) {
       locations.add(location);
@@ -52,10 +52,14 @@ public final class LocationEngineResult {
    * @return instance of the new location result.
    * @since 1.0.0
    */
-  public static LocationEngineResult create(List<Location> locations) {
-    return locations != null
-      ? new LocationEngineResult(locations)
-      : new LocationEngineResult(Collections.<Location>emptyList());
+  public static LocationEngineResult create(@Nullable List<Location> locations) {
+    if (locations != null) {
+      List<Location> locationsList = new ArrayList<>(locations);
+      locationsList.removeAll(Collections.singleton(null));
+      return new LocationEngineResult(locationsList);
+    }
+
+    return new LocationEngineResult(Collections.<Location>emptyList());
   }
 
   /**
