@@ -5,25 +5,27 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Collections;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.regex.Pattern;
+import android.os.Build;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import android.util.Log;
+import com.mapbox.android.telemetry.crash.CrashReporter;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Pattern;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -54,7 +56,8 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
-    setAccessToken(context, accessToken);
+    this.executorService = ExecutorServiceFactory.create("MapboxTelemetryExecutor", 3, 20);
+    setAccessToken(context, accessToken, executorService);
     this.userAgent = userAgent;
     AlarmReceiver alarmReceiver = obtainAlarmReceiver();
     this.schedulerFlusher = new SchedulerFlusherFactory(applicationContext, alarmReceiver).supply();
@@ -63,8 +66,6 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     initializeAttachmentListeners();
     // Initializing callback after listeners object is instantiated
     this.httpCallback = getHttpCallback(telemetryListeners);
-    this.executorService = ExecutorServiceFactory.create("MapboxTelemetryExecutor", 3,
-      20);
     this.queue = EventsQueue.create(this, executorService);
   }
 
@@ -73,7 +74,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
                   TelemetryClient telemetryClient, Callback httpCallback, SchedulerFlusher schedulerFlusher,
                   Clock clock, TelemetryEnabler telemetryEnabler, ExecutorService executorService) {
     initializeContext(context);
-    setAccessToken(context, accessToken);
+    setAccessToken(context, accessToken, executorService);
     this.userAgent = userAgent;
     this.telemetryClient = telemetryClient;
     this.schedulerFlusher = schedulerFlusher;
@@ -412,13 +413,34 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     });
   }
 
-  private static synchronized void setAccessToken(@NonNull Context context, @NonNull String accessToken) {
+  private static synchronized void setAccessToken(@NonNull final Context context,
+                                                  @NonNull String accessToken,
+                                                  @NonNull ExecutorService executorService) {
     if (TelemetryUtils.isEmpty(accessToken)) {
       return;
     }
     if (sAccessToken.getAndSet(accessToken).isEmpty()) {
+      sendErrorReports(context, executorService);
+    }
+  }
+
+  private static void sendErrorReports(@NonNull final Context context,
+                                       @NonNull final ExecutorService executorService) {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
       LocalBroadcastManager.getInstance(context)
         .sendBroadcast(new Intent(MapboxTelemetryConstants.ACTION_TOKEN_CHANGED));
+    } else {
+      try {
+        executorService.execute(new Runnable() {
+          @Override
+          public void run() {
+            CrashReporter crashReporter = new CrashReporter(context);
+            crashReporter.sendErrorReports();
+          }
+        });
+      } catch (Throwable throwable) {
+        Log.e(LOG_TAG, throwable.toString());
+      }
     }
   }
 
