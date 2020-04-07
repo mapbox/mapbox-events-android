@@ -1,4 +1,4 @@
-package com.mapbox.android.telemetry.crash;
+package com.mapbox.android.telemetry.errors;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -19,7 +19,7 @@ import static com.mapbox.android.core.crashreporter.MapboxUncaughtExceptionHanld
 import static com.mapbox.android.telemetry.MapboxTelemetryConstants.MAPBOX_TELEMETRY_PACKAGE;
 import static org.junit.Assert.assertEquals;
 
-public class CrashReporterEngineInstrumentedTest {
+public class ErrorReporterEngineInstrumentedTest {
 
   private static final String CRASH_FILENAME_FORMAT = "%s/%s.crash";
   private static final String crashEvent =
@@ -52,7 +52,7 @@ public class CrashReporterEngineInstrumentedTest {
     File file = FileUtils.getFile(context, String.format(CRASH_FILENAME_FORMAT, MAPBOX_TELEMETRY_PACKAGE, "crash1"));
     FileUtils.writeToFile(file, String.format(crashEvent, UUID.randomUUID().toString()));
 
-    CrashReporterEngine.handleErrorReports(CrashReporterClient
+    ErrorReporterEngine.handleErrorReports(ErrorReporterClient
       .create(context.getApplicationContext())
       .loadFrom(directory)
       .debug(true));

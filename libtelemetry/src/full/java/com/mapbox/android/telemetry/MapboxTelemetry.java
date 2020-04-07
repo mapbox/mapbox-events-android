@@ -8,7 +8,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.mapbox.android.telemetry.crash.CrashReporterEngine;
+import com.mapbox.android.telemetry.errors.ErrorReporterEngine;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -416,8 +416,9 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     if (TelemetryUtils.isEmpty(accessToken)) {
       return;
     }
+    // Set token and check return value to see if it was previously nil and send pending error reports
     if (sAccessToken.getAndSet(accessToken).isEmpty()) {
-      CrashReporterEngine.sendErrorReports(context, executorService);
+      ErrorReporterEngine.sendErrorReports(context, executorService);
     }
   }
 

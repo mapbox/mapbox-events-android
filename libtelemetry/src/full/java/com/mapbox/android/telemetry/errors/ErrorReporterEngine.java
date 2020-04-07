@@ -1,4 +1,4 @@
-package com.mapbox.android.telemetry.crash;
+package com.mapbox.android.telemetry.errors;
 
 import android.content.Context;
 import android.content.Intent;
@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutorService;
 
 import static com.mapbox.android.telemetry.MapboxTelemetryConstants.MAPBOX_TELEMETRY_PACKAGE;
 
-public final class CrashReporterEngine {
+public final class ErrorReporterEngine {
   private static final String LOG_TAG = "CrashReporter";
 
   public static void sendErrorReports(@NonNull final Context context,
@@ -31,7 +31,7 @@ public final class CrashReporterEngine {
         executorService.execute(new Runnable() {
           @Override
           public void run() {
-            CrashReporterEngine.sendReports(context);
+            ErrorReporterEngine.sendReports(context);
           }
         });
       } catch (Throwable throwable) {
@@ -51,13 +51,13 @@ public final class CrashReporterEngine {
       return;
     }
 
-    handleErrorReports(CrashReporterClient
+    handleErrorReports(ErrorReporterClient
       .create(context.getApplicationContext())
       .loadFrom(rootDirectory));
   }
 
   @VisibleForTesting
-  static void handleErrorReports(@NonNull CrashReporterClient client) {
+  static void handleErrorReports(@NonNull ErrorReporterClient client) {
     if (!client.isEnabled()) {
       Log.w(LOG_TAG, "Crash reporter is disabled");
       return;
