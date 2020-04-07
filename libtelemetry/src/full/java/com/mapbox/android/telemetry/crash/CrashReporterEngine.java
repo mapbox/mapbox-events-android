@@ -1,28 +1,46 @@
 package com.mapbox.android.telemetry.crash;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.mapbox.android.core.FileUtils;
 import com.mapbox.android.telemetry.CrashEvent;
+import com.mapbox.android.telemetry.MapboxTelemetryConstants;
 
 import java.io.File;
+import java.util.concurrent.ExecutorService;
 
 import static com.mapbox.android.telemetry.MapboxTelemetryConstants.MAPBOX_TELEMETRY_PACKAGE;
 
-public final class CrashReporter {
+public final class CrashReporterEngine {
   private static final String LOG_TAG = "CrashReporter";
 
-  private Context context;
-
-  public CrashReporter(@NonNull Context context) {
-    this.context = context;
+  public static void sendErrorReports(@NonNull final Context context,
+                                      @NonNull final ExecutorService executorService) {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+      LocalBroadcastManager.getInstance(context)
+        .sendBroadcast(new Intent(MapboxTelemetryConstants.ACTION_TOKEN_CHANGED));
+    } else {
+      try {
+        executorService.execute(new Runnable() {
+          @Override
+          public void run() {
+            CrashReporterEngine.sendReports(context);
+          }
+        });
+      } catch (Throwable throwable) {
+        Log.e(LOG_TAG, throwable.toString());
+      }
+    }
   }
 
-  public void sendErrorReports() {
+  static void sendReports(@NonNull Context context) {
     if (context == null || context.getApplicationContext() == null) {
       return;
     }
@@ -33,13 +51,13 @@ public final class CrashReporter {
       return;
     }
 
-    handleCrashReports(CrashReporterClient
+    handleErrorReports(CrashReporterClient
       .create(context.getApplicationContext())
       .loadFrom(rootDirectory));
   }
 
   @VisibleForTesting
-  void handleCrashReports(@NonNull CrashReporterClient client) {
+  static void handleErrorReports(@NonNull CrashReporterClient client) {
     if (!client.isEnabled()) {
       Log.w(LOG_TAG, "Crash reporter is disabled");
       return;

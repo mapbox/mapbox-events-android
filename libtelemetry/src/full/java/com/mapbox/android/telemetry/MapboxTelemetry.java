@@ -1,17 +1,14 @@
 package com.mapbox.android.telemetry;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.mapbox.android.telemetry.crash.CrashReporter;
+import com.mapbox.android.telemetry.crash.CrashReporterEngine;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -420,27 +417,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
       return;
     }
     if (sAccessToken.getAndSet(accessToken).isEmpty()) {
-      sendErrorReports(context, executorService);
-    }
-  }
-
-  private static void sendErrorReports(@NonNull final Context context,
-                                       @NonNull final ExecutorService executorService) {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-      LocalBroadcastManager.getInstance(context)
-        .sendBroadcast(new Intent(MapboxTelemetryConstants.ACTION_TOKEN_CHANGED));
-    } else {
-      try {
-        executorService.execute(new Runnable() {
-          @Override
-          public void run() {
-            CrashReporter crashReporter = new CrashReporter(context);
-            crashReporter.sendErrorReports();
-          }
-        });
-      } catch (Throwable throwable) {
-        Log.e(LOG_TAG, throwable.toString());
-      }
+      CrashReporterEngine.sendErrorReports(context, executorService);
     }
   }
 

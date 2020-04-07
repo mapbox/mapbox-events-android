@@ -24,8 +24,7 @@ public final class CrashReporterJobIntentService extends JobIntentService {
   protected void onHandleWork(@NonNull Intent intent) {
     Log.d(LOG_TAG, "onHandleWork");
     try {
-      CrashReporter crashReporter = new CrashReporter(getApplicationContext());
-      crashReporter.sendErrorReports();
+      CrashReporterEngine.sendReports(getApplicationContext());
     } catch (Throwable throwable) {
       // TODO: log silent crash
       Log.e(LOG_TAG, throwable.toString());

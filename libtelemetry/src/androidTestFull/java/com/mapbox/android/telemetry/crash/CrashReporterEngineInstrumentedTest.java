@@ -19,7 +19,7 @@ import static com.mapbox.android.core.crashreporter.MapboxUncaughtExceptionHanld
 import static com.mapbox.android.telemetry.MapboxTelemetryConstants.MAPBOX_TELEMETRY_PACKAGE;
 import static org.junit.Assert.assertEquals;
 
-public class CrashReporterInstrumentedTest {
+public class CrashReporterEngineInstrumentedTest {
 
   private static final String CRASH_FILENAME_FORMAT = "%s/%s.crash";
   private static final String crashEvent =
@@ -42,7 +42,7 @@ public class CrashReporterInstrumentedTest {
   }
 
   @Test
-  public void handleCrashReports() throws IOException {
+  public void handleErrorReports() throws IOException {
     SharedPreferences sharedPreferences =
       context.getSharedPreferences(MAPBOX_CRASH_REPORTER_PREFERENCES, Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -52,8 +52,7 @@ public class CrashReporterInstrumentedTest {
     File file = FileUtils.getFile(context, String.format(CRASH_FILENAME_FORMAT, MAPBOX_TELEMETRY_PACKAGE, "crash1"));
     FileUtils.writeToFile(file, String.format(crashEvent, UUID.randomUUID().toString()));
 
-    CrashReporter crashReporter = new CrashReporter(context);
-    crashReporter.handleCrashReports(CrashReporterClient
+    CrashReporterEngine.handleErrorReports(CrashReporterClient
       .create(context.getApplicationContext())
       .loadFrom(directory)
       .debug(true));
