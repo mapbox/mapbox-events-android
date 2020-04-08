@@ -28,14 +28,9 @@ public final class MapboxTelemetryConstants {
   public static final String SESSION_ROTATION_INTERVAL_MILLIS = "mapboxSessionRotationInterval";
 
   /**
-   * Work scheduled in {@link com.mapbox.android.telemetry.crash.CrashReporterWorker}
+   * Intent broadcast when valid token becomes available
    */
-  public static final String ERROR_REPORT_WORK_TAG = "com.mapbox.android.telemetry.error.report.work";
-
-  /**
-   * Data key for input to {@link com.mapbox.android.telemetry.crash.CrashReporterWorker}
-   */
-  public static final String ERROR_REPORT_DATA_KEY = "com.mapbox.android.telemetry.error.data";
+  public static final String ACTION_TOKEN_CHANGED = "com.mapbox.android.telemetry.action.TOKEN_CHANGED";
 
   /**
    * Mapbox telemetry package name (reserved for crash reporting)
