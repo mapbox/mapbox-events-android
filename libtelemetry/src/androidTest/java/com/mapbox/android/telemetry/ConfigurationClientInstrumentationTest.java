@@ -43,7 +43,8 @@ public class ConfigurationClientInstrumentationTest {
     Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
     this.configurationService = mock(ConfigurationService.class);
     this.configurationClient = new ConfigurationClient(context,
-      TelemetryUtils.createFullUserAgent("AnUserAgent", context), "anAccessToken", new OkHttpClient(), null);
+      TelemetryUtils.createFullUserAgent("AnUserAgent", context), "anAccessToken", new OkHttpClient(),
+      configurationService);
   }
 
   @Test
