@@ -36,97 +36,14 @@ import static org.mockito.Mockito.when;
 public class ConfigurationClientInstrumentationTest {
   private ConfigurationClient configurationClient;
   private static final long DAY_IN_MILLIS = 86400000;
-  private ConfigurationCallback configurationCallback;
+  private ConfigurationService configurationService;
 
   @Before
   public void setup() {
     Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-    this.configurationCallback = mock(ConfigurationCallback.class);
+    this.configurationService = mock(ConfigurationService.class);
     this.configurationClient = new ConfigurationClient(context,
       TelemetryUtils.createFullUserAgent("AnUserAgent", context), "anAccessToken", new OkHttpClient(), null);
-  }
-
-  @Test
-  public void checkStateChanged() {
-    TelemetryEnabler.updateTelemetryState(TelemetryEnabler.State.ENABLED);
-    TelemetryEnabler telemetryEnabler = new TelemetryEnabler(true);
-    Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-    ConfigurationClient configurationClient = new ConfigurationClient(context,
-      TelemetryUtils.createFullUserAgent("AnUserAgent", context), "anAccessToken", new OkHttpClient(),
-      mock(ConfigurationCallback.class));
-    Configuration configuration = new Configuration(new String[]{}, null, null);
-    assertFalse(configurationClient.updateTelemetryState(configuration));
-    assertTrue(telemetryEnabler.obtainTelemetryState() == TelemetryEnabler.State.ENABLED);
-
-    configuration = new Configuration(new String[]{}, 0, null);
-    assertFalse(configurationClient.updateTelemetryState(configuration));
-    assertTrue(telemetryEnabler.obtainTelemetryState() == TelemetryEnabler.State.OVERRIDE);
-
-    configuration = new Configuration(new String[]{}, 1, null);
-    assertTrue(configurationClient.updateTelemetryState(configuration));
-    assertTrue(telemetryEnabler.obtainTelemetryState() == TelemetryEnabler.State.CONFIG_DISABLED);
-
-    configuration = new Configuration(new String[]{}, null, null);
-    assertTrue(configurationClient.updateTelemetryState(configuration));
-    assertTrue(telemetryEnabler.obtainTelemetryState() == TelemetryEnabler.State.ENABLED);
-
-    configuration = new Configuration(new String[]{}, 1, null);
-    assertTrue(configurationClient.updateTelemetryState(configuration));
-    assertTrue(telemetryEnabler.obtainTelemetryState() == TelemetryEnabler.State.CONFIG_DISABLED);
-
-    configuration = new Configuration(new String[]{}, 0, null);
-    assertTrue(configurationClient.updateTelemetryState(configuration));
-    assertTrue(telemetryEnabler.obtainTelemetryState() == TelemetryEnabler.State.OVERRIDE);
-
-    configuration = new Configuration(new String[]{}, null, null);
-    assertFalse(configurationClient.updateTelemetryState(configuration));
-    assertTrue(telemetryEnabler.obtainTelemetryState() == TelemetryEnabler.State.ENABLED);
-  }
-
-  @Test
-  public void checkStateNotChanged() {
-    TelemetryEnabler.updateTelemetryState(TelemetryEnabler.State.DISABLED);
-    TelemetryEnabler telemetryEnabler = new TelemetryEnabler(true);
-    Configuration configuration = new Configuration(new String[]{}, null, null);
-    assertFalse(configurationClient.updateTelemetryState(configuration));
-    assertTrue(telemetryEnabler.obtainTelemetryState() == TelemetryEnabler.State.DISABLED);
-
-    configuration = new Configuration(new String[]{}, 0, null);
-    assertFalse(configurationClient.updateTelemetryState(configuration));
-    assertTrue(telemetryEnabler.obtainTelemetryState() == TelemetryEnabler.State.DISABLED);
-
-    configuration = new Configuration(new String[]{}, 1, null);
-    assertFalse(configurationClient.updateTelemetryState(configuration));
-    assertTrue(telemetryEnabler.obtainTelemetryState() == TelemetryEnabler.State.DISABLED);
-
-    configuration = new Configuration(new String[]{}, null, null);
-    assertFalse(configurationClient.updateTelemetryState(configuration));
-    assertTrue(telemetryEnabler.obtainTelemetryState() == TelemetryEnabler.State.DISABLED);
-
-    configuration = new Configuration(new String[]{}, 1, null);
-    assertFalse(configurationClient.updateTelemetryState(configuration));
-    assertTrue(telemetryEnabler.obtainTelemetryState() == TelemetryEnabler.State.DISABLED);
-  }
-
-  @Test
-  public void validateEventsStateAfterConfigChange() {
-    TelemetryEnabler.updateTelemetryState(TelemetryEnabler.State.ENABLED);
-    TelemetryEnabler telemetryEnabler = new TelemetryEnabler(true);
-    Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-    ConfigurationClient configurationClient = new ConfigurationClient(context,
-      TelemetryUtils.createFullUserAgent("AnUserAgent", context), "anAccessToken", new OkHttpClient(),
-      mock(ConfigurationCallback.class));
-    Configuration configuration = new Configuration(new String[]{}, null, null);
-    assertFalse(configurationClient.updateTelemetryState(configuration));
-    assertTrue(TelemetryEnabler.isEventsEnabled(telemetryEnabler));
-
-    configuration = new Configuration(new String[]{}, 0, null);
-    assertFalse(configurationClient.updateTelemetryState(configuration));
-    assertTrue(TelemetryEnabler.isEventsEnabled(telemetryEnabler));
-
-    configuration = new Configuration(new String[]{}, 1, null);
-    assertTrue(configurationClient.updateTelemetryState(configuration));
-    assertFalse(TelemetryEnabler.isEventsEnabled(telemetryEnabler));
   }
 
   @Test
@@ -135,7 +52,7 @@ public class ConfigurationClientInstrumentationTest {
     OkHttpClient httpClient = mock(OkHttpClient.class);
     when(httpClient.newCall(any(Request.class))).thenReturn(mock(Call.class));
     this.configurationClient = new ConfigurationClient(context,
-      TelemetryUtils.createFullUserAgent("AnUserAgent", context), "anAccessToken", httpClient, configurationCallback);
+      TelemetryUtils.createFullUserAgent("AnUserAgent", context), "anAccessToken", httpClient, configurationService);
     configurationClient.update();
     ArgumentCaptor<Request> argument = ArgumentCaptor.forClass(Request.class);
     verify(httpClient).newCall(argument.capture());
@@ -158,7 +75,7 @@ public class ConfigurationClientInstrumentationTest {
     OkHttpClient httpClient = mock(OkHttpClient.class);
     when(httpClient.newCall((Request) any())).thenReturn(mock(Call.class));
     this.configurationClient = new ConfigurationClient(context, "AnUserAgent", "anAccessToken",
-      httpClient, configurationCallback);
+      httpClient, configurationService);
 
     configurationClient.update();
     ArgumentCaptor<Request> argument = ArgumentCaptor.forClass(Request.class);

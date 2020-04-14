@@ -30,8 +30,6 @@ import okhttp3.tls.HandshakeCertificates;
 import okhttp3.tls.HeldCertificate;
 
 import static com.mapbox.android.telemetry.MapboxTelemetryConstants.MAPBOX_SHARED_PREFERENCES;
-import static com.mapbox.android.telemetry.TelemetryEnabler.State;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -82,45 +80,7 @@ public class ConfigurationClientTest {
     when(mockedSharedPreferences.edit()).thenReturn(mockedEditor);
 
     this.configurationClient = new ConfigurationClient(mockedContext, TelemetryUtils.createFullUserAgent("AnUserAgent",
-      mockedContext), "anAccessToken", client, null);
-  }
-
-  @Test
-  public void checkTelemetryStateForConfig() {
-    ConfigurationClient configClient = this.configurationClient;
-    Configuration configuration = new Configuration(new String[]{}, null, null);
-    assertTrue(configClient.getUpdatedTelemetryState(State.CONFIG_DISABLED, configuration) == State.ENABLED);
-
-    configuration = new Configuration(new String[]{}, 0, null);
-    assertTrue(configClient.getUpdatedTelemetryState(State.ENABLED, configuration) == State.OVERRIDE);
-
-    configuration = new Configuration(new String[]{}, 1, null);
-    assertTrue(configClient.getUpdatedTelemetryState(State.OVERRIDE, configuration) == State.CONFIG_DISABLED);
-
-    configuration = new Configuration(new String[]{}, 2, null);
-    assertTrue(configClient.getUpdatedTelemetryState(State.CONFIG_DISABLED, configuration) == State.CONFIG_DISABLED);
-
-    configuration = new Configuration(new String[]{}, 2, null);
-    assertTrue(configClient.getUpdatedTelemetryState(State.ENABLED, configuration) == State.ENABLED);
-  }
-
-  @Test
-  public void shouldUpdateTelemetryState() {
-    assertTrue(configurationClient.shouldUpdateTelemetryState(State.ENABLED, State.OVERRIDE));
-    assertTrue(configurationClient.shouldUpdateTelemetryState(State.ENABLED, State.CONFIG_DISABLED));
-    assertFalse(configurationClient.shouldUpdateTelemetryState(State.ENABLED, State.ENABLED));
-
-    assertTrue(configurationClient.shouldUpdateTelemetryState(State.OVERRIDE, State.ENABLED));
-    assertTrue(configurationClient.shouldUpdateTelemetryState(State.OVERRIDE, State.CONFIG_DISABLED));
-    assertFalse(configurationClient.shouldUpdateTelemetryState(State.OVERRIDE, State.OVERRIDE));
-
-    assertTrue(configurationClient.shouldUpdateTelemetryState(State.CONFIG_DISABLED, State.ENABLED));
-    assertTrue(configurationClient.shouldUpdateTelemetryState(State.CONFIG_DISABLED, State.OVERRIDE));
-    assertFalse(configurationClient.shouldUpdateTelemetryState(State.CONFIG_DISABLED, State.CONFIG_DISABLED));
-
-    assertFalse(configurationClient.shouldUpdateTelemetryState(State.DISABLED, State.ENABLED));
-    assertFalse(configurationClient.shouldUpdateTelemetryState(State.DISABLED, State.OVERRIDE));
-    assertFalse(configurationClient.shouldUpdateTelemetryState(State.DISABLED, State.CONFIG_DISABLED));
+      mockedContext), "anAccessToken", client, mock(ConfigurationService.class));
   }
 
   @After

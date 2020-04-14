@@ -7,11 +7,8 @@ import android.content.pm.PackageManager;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.mapbox.android.core.crashreporter.ErrorReporter;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -28,10 +25,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-
-import static com.mapbox.android.telemetry.MapboxTelemetryConstants.MAPBOX_CONFIGURATION;
-import static com.mapbox.android.telemetry.MapboxTelemetryConstants.MAPBOX_TELEMETRY_PACKAGE;
-import static com.mapbox.android.telemetry.TelemetryEnabler.State;
 
 class ConfigurationClient implements Callback {
   private static final String LOG_TAG = "ConfigurationClient";
@@ -54,25 +47,28 @@ class ConfigurationClient implements Callback {
     }
   };
 
+  @Nullable
+  private final ConfigurationService service;
   private final Context context;
   private final String userAgent;
   private final String reformedUserAgent;
   private final String accessToken;
   private final OkHttpClient client;
   private final List<ConfigurationChangeHandler> handlers;
-  private final ConfigurationCallback callback;
+
 
   ConfigurationClient(Context context,
                       String userAgent,
                       String accessToken,
                       OkHttpClient client,
-                      @Nullable ConfigurationCallback callback) {
+                      @Nullable ConfigurationService service) {
     this.context = context;
     this.userAgent = userAgent;
     this.accessToken = accessToken;
     this.client = client;
+    this.service = service;
     this.handlers = new CopyOnWriteArrayList<>();
-    this.callback = callback;
+
     this.reformedUserAgent = TelemetryUtils.createReformedFullUserAgent(context);
   }
 
@@ -88,7 +84,7 @@ class ConfigurationClient implements Callback {
   }
 
   void update() {
-    if (callback != null) {
+    if (service != null) {
       HttpUrl requestUrl = generateRequestUrl(context, accessToken);
       String payload = "{}";
       RequestBody requestBody = RequestBody.create(JSON, payload);
@@ -105,7 +101,7 @@ class ConfigurationClient implements Callback {
   @Override
   public void onFailure(Call call, IOException exception) {
     saveTimestamp();
-    reportError(exception.getMessage());
+    service.reportError(exception.getMessage());
   }
 
   @Override
@@ -123,7 +119,7 @@ class ConfigurationClient implements Callback {
     try {
       Configuration configuration = new Gson().fromJson(body.string(), Configuration.class);
       if (configuration != null) {
-        persistConfiguration(configuration);
+        service.updateConfiguration(configuration);
 
         for (final ConfigurationChangeHandler handler : handlers) {
           if (handler != null) {
@@ -133,73 +129,8 @@ class ConfigurationClient implements Callback {
       }
     } catch (Exception exception) {
       Log.e(LOG_TAG, exception.toString());
-      reportError(exception.toString());
+      service.reportError(exception.toString());
     }
-  }
-
-  private void persistConfiguration(Configuration configuration) {
-    Gson gson = new GsonBuilder().serializeNulls().create();
-    SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences(context);
-    SharedPreferences.Editor editor = sharedPreferences.edit();
-    editor.putString(MAPBOX_CONFIGURATION, gson.toJson(configuration));
-    editor.apply();
-
-    updateTelemetryState(configuration);
-  }
-
-  @VisibleForTesting
-  boolean updateTelemetryState(Configuration configuration) {
-    boolean updated = false;
-    State currentState = new TelemetryEnabler(true).obtainTelemetryState();
-    State updatedState = getUpdatedTelemetryState(currentState, configuration);
-
-    if (shouldUpdateTelemetryState(currentState, updatedState)) {
-      TelemetryEnabler.updateTelemetryState(updatedState);
-      if (currentState == State.CONFIG_DISABLED && (updatedState == State.ENABLED || updatedState == State.OVERRIDE)) {
-        callback.enabled();
-        updated = true;
-      } else if ((currentState == State.ENABLED || currentState == State.OVERRIDE)
-        && updatedState == State.CONFIG_DISABLED) {
-        callback.disabled();
-        updated = true;
-      } else {
-        Log.d(LOG_TAG, "updateTelemetryState");
-      }
-    }
-
-    return updated;
-  }
-
-  @VisibleForTesting
-  boolean shouldUpdateTelemetryState(State currentState, State updatedState) {
-    return updatedState != currentState && currentState != State.DISABLED;
-  }
-
-  @VisibleForTesting
-  State getUpdatedTelemetryState(State currentState, Configuration configuration) {
-    State updatedState = currentState;
-    Integer type = configuration.getType();
-    if (type != null) {
-      switch (type) {
-        case 0:
-          updatedState = State.OVERRIDE;
-          break;
-        case 1:
-          updatedState = State.CONFIG_DISABLED;
-          break;
-        default:
-          reportError(String.format(CONFIG_ERROR_MESSAGE, configuration.toString()));
-      }
-    } else {
-      updatedState = State.ENABLED;
-    }
-
-    return updatedState;
-  }
-
-  @VisibleForTesting
-  void reportError(final String message) {
-    ErrorReporter.reportError(context, MAPBOX_TELEMETRY_PACKAGE, new Throwable(message));
   }
 
   private void saveTimestamp() {

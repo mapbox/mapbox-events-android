@@ -5,25 +5,24 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Collections;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.regex.Pattern;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import android.util.Log;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Pattern;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -50,6 +49,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   private CopyOnWriteArraySet<AttachmentListener> attachmentListeners = null;
   private ConfigurationClient configurationClient;
   private final ExecutorService executorService;
+  private final ConfigurationService service;
   private boolean isExternal = true;
   private boolean isTelemetryEnabled = false;
   static Context applicationContext = null;
@@ -68,13 +68,50 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     this.executorService = ExecutorServiceFactory.create("MapboxTelemetryExecutor", 3,
       20);
     this.queue = EventsQueue.create(this, executorService);
+    this.service = new ConfigurationService(applicationContext, new ConfigurationCallback() {
+      @Override
+      public void configurationChanged(boolean enabled) {
+        if (enabled) {
+          enable();
+        } else {
+          disable();
+        }
+      }
+    });
+  }
+
+  public MapboxTelemetry(Context context, String accessToken, String userAgent, boolean isExternal) {
+    initializeContext(context);
+    setAccessToken(context, accessToken);
+    this.userAgent = userAgent;
+    this.isExternal = isExternal;
+    AlarmReceiver alarmReceiver = obtainAlarmReceiver();
+    this.schedulerFlusher = new SchedulerFlusherFactory(applicationContext, alarmReceiver).supply();
+    this.telemetryEnabler = new TelemetryEnabler(true);
+    initializeTelemetryListeners();
+    initializeAttachmentListeners();
+    // Initializing callback after listeners object is instantiated
+    this.httpCallback = getHttpCallback(telemetryListeners);
+    this.executorService = ExecutorServiceFactory.create("MapboxTelemetryExecutor", 3,
+      20);
+    this.queue = EventsQueue.create(this, executorService);
+    this.service = new ConfigurationService(applicationContext, new ConfigurationCallback() {
+      @Override
+      public void configurationChanged(boolean enabled) {
+        if (enabled) {
+          enable();
+        } else {
+          disable();
+        }
+      }
+    });
   }
 
   // For testing only
   MapboxTelemetry(Context context, String accessToken, String userAgent, EventsQueue queue,
                   TelemetryClient telemetryClient, Callback httpCallback, SchedulerFlusher schedulerFlusher,
                   Clock clock, TelemetryEnabler telemetryEnabler, ExecutorService executorService,
-                  boolean isTelemetryEnabled) {
+                  boolean isTelemetryEnabled, ConfigurationService service) {
     initializeContext(context);
     setAccessToken(context, accessToken);
     this.userAgent = userAgent;
@@ -88,6 +125,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     this.executorService = executorService;
     this.queue = queue;
     this.isTelemetryEnabled = isTelemetryEnabled;
+    this.service = service;
   }
 
   @Override // Callback is dispatched on background thread
@@ -122,6 +160,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   }
 
   public boolean disable() {
+    service.onDestroy();
     if (isTelemetryEnabled) {
       stopTelemetry();
       return true;
@@ -228,23 +267,11 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   }
 
   private void initializeTelemetryClient() {
-    ConfigurationCallback callback = new ConfigurationCallback() {
-      @Override
-      public void enabled() {
-        enable();
-      }
-
-      @Override
-      public void disabled() {
-        disable();
-      }
-    };
-
     if (configurationClient == null) {
       this.configurationClient = new ConfigurationClient(applicationContext,
         TelemetryUtils.createFullUserAgent(userAgent, applicationContext), sAccessToken.get(),
         BuildConfig.DEBUG ? TelemetryUtils.createOkHttpClientWithStrictModeWorkAround() : new OkHttpClient(),
-        isExternal ? callback : null);
+        isExternal ? service : null);
     }
 
     if (certificateBlacklist == null) {

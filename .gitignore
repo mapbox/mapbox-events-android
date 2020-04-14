@@ -8,3 +8,4 @@ local.properties
 .externalNativeBuild
 gradlew
 gradlew.bat
+*.exec

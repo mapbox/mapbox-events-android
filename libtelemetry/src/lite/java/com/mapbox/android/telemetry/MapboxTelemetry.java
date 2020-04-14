@@ -24,24 +24,24 @@ public class MapboxTelemetry {
   private CopyOnWriteArraySet<TelemetryListener> telemetryListeners = null;
   private final CertificateBlacklist certificateBlacklist;
   private final ConfigurationClient configurationClient;
+  private final ConfigurationService service;
   static Context applicationContext = null;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
     initializeContext(context);
     // FIXME: Propagate certificate blacklist changes from full version
-    ConfigurationCallback callback = new ConfigurationCallback() {
+    this.service = new ConfigurationService(applicationContext, new ConfigurationCallback() {
       @Override
-      public void enabled() {
-        enable();
+      public void configurationChanged(boolean enabled) {
+        if (enabled) {
+          enable();
+        } else {
+          disable();
+        }
       }
-
-      @Override
-      public void disabled() {
-        disable();
-      }
-    };
+    });
     this.configurationClient = new ConfigurationClient(context, TelemetryUtils.createFullUserAgent(userAgent,
-      context), accessToken, new OkHttpClient(), callback);
+      context), accessToken, new OkHttpClient(), service);
     this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
     checkRequiredParameters(accessToken, userAgent);
     initializeTelemetryListeners();
@@ -53,12 +53,14 @@ public class MapboxTelemetry {
   // For testing only
   MapboxTelemetry(Context context, String accessToken, String userAgent, EventsQueue queue,
                   TelemetryClient telemetryClient, Callback httpCallback, SchedulerFlusher schedulerFlusher,
-                  Clock clock, boolean isServiceBound, TelemetryEnabler telemetryEnabler) {
+                  Clock clock, boolean isServiceBound, TelemetryEnabler telemetryEnabler,
+                  ConfigurationService service) {
     initializeContext(context);
     checkRequiredParameters(accessToken, userAgent);
     this.telemetryClient = telemetryClient;
     this.httpCallback = httpCallback;
     initializeTelemetryListeners();
+    this.service = service;
     this.configurationClient = new ConfigurationClient(context, TelemetryUtils.createFullUserAgent(userAgent,
       context), accessToken, new OkHttpClient(), null);
     this.certificateBlacklist = new CertificateBlacklist(context, configurationClient);
