@@ -1,4 +1,4 @@
-package com.mapbox.android.telemetry.crash;
+package com.mapbox.android.telemetry.errors;
 
 import android.content.Intent;
 import androidx.test.platform.app.InstrumentationRegistry;

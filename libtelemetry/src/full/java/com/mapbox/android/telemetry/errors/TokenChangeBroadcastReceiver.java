@@ -1,4 +1,4 @@
-package com.mapbox.android.telemetry.crash;
+package com.mapbox.android.telemetry.errors;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -31,7 +31,7 @@ public class TokenChangeBroadcastReceiver extends BroadcastReceiver {
   public void onReceive(Context context, Intent intent) {
     try {
       // Start background job
-      CrashReporterJobIntentService.enqueueWork(context);
+      ErrorReporterJobIntentService.enqueueWork(context);
       // Unregister receiver - we need it once at startup
       LocalBroadcastManager.getInstance(context).unregisterReceiver(this);
     } catch (Throwable throwable) {
