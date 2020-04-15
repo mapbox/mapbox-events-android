@@ -1,4 +1,4 @@
-package com.mapbox.android.telemetry.crash;
+package com.mapbox.android.telemetry.errors;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static com.mapbox.android.core.crashreporter.MapboxUncaughtExceptionHanlder.MAPBOX_CRASH_REPORTER_PREFERENCES;
 import static com.mapbox.android.core.crashreporter.MapboxUncaughtExceptionHanlder.MAPBOX_PREF_ENABLE_CRASH_REPORTER;
 
-final class CrashReporterClient {
+final class ErrorReporterClient {
   private static final String LOG_TAG = "CrashReporterClient";
   private static final String CRASH_REPORTER_CLIENT_USER_AGENT = "mapbox-android-crash";
   private final SharedPreferences sharedPreferences;
@@ -38,7 +38,7 @@ final class CrashReporterClient {
   private boolean isDebug;
 
   @VisibleForTesting
-  CrashReporterClient(@NonNull SharedPreferences sharedPreferences,
+  ErrorReporterClient(@NonNull SharedPreferences sharedPreferences,
                       @NonNull MapboxTelemetry telemetry,
                       File[] crashReports) {
     this.sharedPreferences = sharedPreferences;
@@ -48,22 +48,22 @@ final class CrashReporterClient {
     this.isDebug = false;
   }
 
-  static CrashReporterClient create(@NonNull Context context) {
+  static ErrorReporterClient create(@NonNull Context context) {
     SharedPreferences sharedPreferences =
       context.getSharedPreferences(MAPBOX_CRASH_REPORTER_PREFERENCES, Context.MODE_PRIVATE);
-    return new CrashReporterClient(sharedPreferences,
+    return new ErrorReporterClient(sharedPreferences,
       new MapboxTelemetry(context, "",
         String.format("%s/%s", CRASH_REPORTER_CLIENT_USER_AGENT, BuildConfig.VERSION_NAME), false), new File[0]);
   }
 
-  CrashReporterClient loadFrom(@NonNull File rootDir) {
+  ErrorReporterClient loadFrom(@NonNull File rootDir) {
     fileCursor = 0;
     crashReports = FileUtils.listAllFiles(rootDir);
     Arrays.sort(crashReports, new FileUtils.LastModifiedComparator());
     return this;
   }
 
-  CrashReporterClient debug(boolean isDebug) {
+  ErrorReporterClient debug(boolean isDebug) {
     this.isDebug = isDebug;
     return this;
   }

@@ -1,9 +1,12 @@
-package com.mapbox.android.telemetry.crash;
+package com.mapbox.android.telemetry.errors;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
 import androidx.test.platform.app.InstrumentationRegistry;
+
 import com.mapbox.android.core.FileUtils;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -16,7 +19,8 @@ import static com.mapbox.android.core.crashreporter.MapboxUncaughtExceptionHanld
 import static com.mapbox.android.telemetry.MapboxTelemetryConstants.MAPBOX_TELEMETRY_PACKAGE;
 import static org.junit.Assert.assertEquals;
 
-public class CrashReporterJobIntentServiceInstrumentationTest {
+public class ErrorReporterEngineInstrumentedTest {
+
   private static final String CRASH_FILENAME_FORMAT = "%s/%s.crash";
   private static final String crashEvent =
     "{\"event\":\"mobile.crash\",\"created\":\"2019-02-21T21:58:43.000Z\",\"stackTraceHash\":\"%s\"}";
@@ -32,19 +36,13 @@ public class CrashReporterJobIntentServiceInstrumentationTest {
       directory.mkdir();
     }
 
-    for (File file: directory.listFiles()) {
+    for (File file : directory.listFiles()) {
       file.delete();
     }
   }
 
   @Test
-  public void enqueueWork() {
-    CrashReporterJobIntentService.enqueueWork(InstrumentationRegistry.getInstrumentation().getTargetContext());
-    // TODO: verify work is executed
-  }
-
-  @Test
-  public void handleCrashReports() throws IOException {
+  public void handleErrorReports() throws IOException {
     SharedPreferences sharedPreferences =
       context.getSharedPreferences(MAPBOX_CRASH_REPORTER_PREFERENCES, Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -54,9 +52,8 @@ public class CrashReporterJobIntentServiceInstrumentationTest {
     File file = FileUtils.getFile(context, String.format(CRASH_FILENAME_FORMAT, MAPBOX_TELEMETRY_PACKAGE, "crash1"));
     FileUtils.writeToFile(file, String.format(crashEvent, UUID.randomUUID().toString()));
 
-    CrashReporterJobIntentService jobIntentService = new CrashReporterJobIntentService();
-    jobIntentService.handleCrashReports(CrashReporterClient
-      .create(InstrumentationRegistry.getInstrumentation().getTargetContext())
+    ErrorReporterEngine.handleErrorReports(ErrorReporterClient
+      .create(context.getApplicationContext())
       .loadFrom(directory)
       .debug(true));
     assertEquals(0, FileUtils.listAllFiles(directory).length);

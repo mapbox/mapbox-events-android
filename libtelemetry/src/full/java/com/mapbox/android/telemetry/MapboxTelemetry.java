@@ -1,14 +1,14 @@
 package com.mapbox.android.telemetry;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import com.mapbox.android.telemetry.errors.ErrorReporterEngine;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -55,8 +55,9 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   static Context applicationContext = null;
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent) {
+    this.executorService = ExecutorServiceFactory.create("MapboxTelemetryExecutor", 3, 20);
     initializeContext(context);
-    setAccessToken(context, accessToken);
+    setAccessToken(context, accessToken, executorService);
     this.userAgent = userAgent;
     AlarmReceiver alarmReceiver = obtainAlarmReceiver();
     this.schedulerFlusher = new SchedulerFlusherFactory(applicationContext, alarmReceiver).supply();
@@ -65,8 +66,6 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     initializeAttachmentListeners();
     // Initializing callback after listeners object is instantiated
     this.httpCallback = getHttpCallback(telemetryListeners);
-    this.executorService = ExecutorServiceFactory.create("MapboxTelemetryExecutor", 3,
-      20);
     this.queue = EventsQueue.create(this, executorService);
     this.service = new ConfigurationService(applicationContext, new ConfigurationCallback() {
       @Override
@@ -81,8 +80,9 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   }
 
   public MapboxTelemetry(Context context, String accessToken, String userAgent, boolean isExternal) {
+    this.executorService = ExecutorServiceFactory.create("MapboxTelemetryExecutor", 3, 20);
     initializeContext(context);
-    setAccessToken(context, accessToken);
+    setAccessToken(context, accessToken, executorService);
     this.userAgent = userAgent;
     this.isExternal = isExternal;
     AlarmReceiver alarmReceiver = obtainAlarmReceiver();
@@ -92,8 +92,6 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     initializeAttachmentListeners();
     // Initializing callback after listeners object is instantiated
     this.httpCallback = getHttpCallback(telemetryListeners);
-    this.executorService = ExecutorServiceFactory.create("MapboxTelemetryExecutor", 3,
-      20);
     this.queue = EventsQueue.create(this, executorService);
     this.service = new ConfigurationService(applicationContext, new ConfigurationCallback() {
       @Override
@@ -113,7 +111,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
                   Clock clock, TelemetryEnabler telemetryEnabler, ExecutorService executorService,
                   boolean isTelemetryEnabled, ConfigurationService service) {
     initializeContext(context);
-    setAccessToken(context, accessToken);
+    setAccessToken(context, accessToken, executorService);
     this.userAgent = userAgent;
     this.telemetryClient = telemetryClient;
     this.schedulerFlusher = schedulerFlusher;
@@ -447,13 +445,15 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     });
   }
 
-  private static synchronized void setAccessToken(@NonNull Context context, @NonNull String accessToken) {
+  private static synchronized void setAccessToken(@NonNull final Context context,
+                                                  @NonNull String accessToken,
+                                                  @NonNull ExecutorService executorService) {
     if (TelemetryUtils.isEmpty(accessToken)) {
       return;
     }
+    // Set token and check return value to see if it was previously nil and send pending error reports
     if (sAccessToken.getAndSet(accessToken).isEmpty()) {
-      LocalBroadcastManager.getInstance(context)
-        .sendBroadcast(new Intent(MapboxTelemetryConstants.ACTION_TOKEN_CHANGED));
+      ErrorReporterEngine.sendErrorReports(context, executorService);
     }
   }
 
