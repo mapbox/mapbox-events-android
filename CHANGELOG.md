@@ -4,6 +4,9 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+## v5.1.0
+- Modify error reporting for API >= 26 (#472)
+
 ## v5.0.0
 - Revert "Transition JobIntentService to WorkManager (#453)
 
@@ -244,6 +247,8 @@ Mapbox welcomes participation and contributions from everyone.
 
 
 ## Mapbox Android Core
+
+- Handle null input while creating LocationEngineResult (#469)
 
 ### V2.0.0
 - No Changes. Align the major release with Telemetry.
