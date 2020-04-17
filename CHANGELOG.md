@@ -5,10 +5,10 @@ Mapbox welcomes participation and contributions from everyone.
 ## Mapbox Android Telemetry
 
 ### v5.0.1
-- Modify error reporting for API >= 26 (#472)
+- Modify error reporting for API >= 26 [#472] (https://github.com/mapbox/mapbox-events-android/pull/472)
 
 ### v5.0.0
-- Revert "Transition JobIntentService to WorkManager (#453)
+- Revert "Transition JobIntentService to WorkManager [#467] (https://github.com/mapbox/mapbox-events-android/pull/467)
 
 ### v4.7.3
 - Fix Turnstile Obfuscation [#457] (https://github.com/mapbox/mapbox-events-android/pull/457)
@@ -249,7 +249,7 @@ Mapbox welcomes participation and contributions from everyone.
 ## Mapbox Android Core
 
 ### V2.0.1
-- Handle null input while creating LocationEngineResult (#469)
+- Handle null input while creating LocationEngineResult [#469] (https://github.com/mapbox/mapbox-events-android/pull/469)
 
 ### V2.0.0
 - No Changes. Align the major release with Telemetry.
