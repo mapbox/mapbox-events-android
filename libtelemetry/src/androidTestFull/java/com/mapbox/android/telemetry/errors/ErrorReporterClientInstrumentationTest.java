@@ -1,4 +1,4 @@
-package com.mapbox.android.telemetry.crash;
+package com.mapbox.android.telemetry.errors;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -19,14 +19,14 @@ import static com.mapbox.android.core.crashreporter.MapboxUncaughtExceptionHanld
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class CrashReporterClientInstrumentationTest {
+public class ErrorReporterClientInstrumentationTest {
   private static final String TEST_DIR_PATH = "com.mapbox.android.telemetry.test";
   private static final String CRASH_FILENAME_FORMAT = "%s/%s.crash";
   private static final String crashEvent =
     "{\"event\":\"mobile.crash\",\"created\":\"2019-02-21T21:58:43.000Z\",\"stackTraceHash\":\"%s\"}";
 
   private File directory;
-  private CrashReporterClient crashReporterClient;
+  private ErrorReporterClient errorReporterClient;
   private Context context;
 
   @Before
@@ -40,24 +40,24 @@ public class CrashReporterClientInstrumentationTest {
     for (File file: directory.listFiles()) {
       file.delete();
     }
-    crashReporterClient = CrashReporterClient.create(context);
+    errorReporterClient = ErrorReporterClient.create(context);
   }
 
   @Test
   public void loadInvalidNullPath() {
-    CrashReporterClient client = crashReporterClient.loadFrom(null);
+    ErrorReporterClient client = errorReporterClient.loadFrom(null);
     assertFalse(client.hasNextEvent());
   }
 
   @Test
   public void loadInvalidPath() {
-    CrashReporterClient client = crashReporterClient.loadFrom(new File(""));
+    ErrorReporterClient client = errorReporterClient.loadFrom(new File(""));
     assertFalse(client.hasNextEvent());
   }
 
   @Test
   public void verifyEventNotLoadedFromEmptyPath() {
-    CrashReporterClient client = crashReporterClient.loadFrom(directory);
+    ErrorReporterClient client = errorReporterClient.loadFrom(directory);
     assertFalse(client.hasNextEvent());
   }
 
@@ -67,7 +67,7 @@ public class CrashReporterClientInstrumentationTest {
     File file = FileUtils.getFile(context, String.format(CRASH_FILENAME_FORMAT, TEST_DIR_PATH, crashHash));
     FileUtils.writeToFile(file, String.format(crashEvent, crashHash));
 
-    CrashReporterClient client = crashReporterClient.loadFrom(directory);
+    ErrorReporterClient client = errorReporterClient.loadFrom(directory);
     assertTrue(client.hasNextEvent());
   }
 
@@ -77,7 +77,7 @@ public class CrashReporterClientInstrumentationTest {
     File file = FileUtils.getFile(context, String.format(CRASH_FILENAME_FORMAT, TEST_DIR_PATH, crashHash));
     FileUtils.writeToFile(file, String.format(crashEvent, crashHash));
 
-    CrashReporterClient client = crashReporterClient.loadFrom(directory);
+    ErrorReporterClient client = errorReporterClient.loadFrom(directory);
     assertTrue(client.hasNextEvent());
   }
 
@@ -87,10 +87,10 @@ public class CrashReporterClientInstrumentationTest {
     File file = FileUtils.getFile(context, String.format(CRASH_FILENAME_FORMAT, TEST_DIR_PATH, crashHash));
     FileUtils.writeToFile(file, String.format(crashEvent, crashHash));
 
-    CrashReporterClient client = crashReporterClient.loadFrom(directory);
+    ErrorReporterClient client = errorReporterClient.loadFrom(directory);
     assertTrue(client.hasNextEvent());
 
-    client = crashReporterClient.loadFrom(new File(""));
+    client = errorReporterClient.loadFrom(new File(""));
     assertFalse(client.hasNextEvent());
   }
 
@@ -100,7 +100,7 @@ public class CrashReporterClientInstrumentationTest {
     SharedPreferences.Editor editor = sharedPreferences.edit();
     editor.putBoolean(MAPBOX_PREF_ENABLE_CRASH_REPORTER, false);
     editor.commit();
-    assertFalse(crashReporterClient.isEnabled());
+    assertFalse(errorReporterClient.isEnabled());
   }
 
   @Test
@@ -109,7 +109,7 @@ public class CrashReporterClientInstrumentationTest {
     SharedPreferences.Editor editor = sharedPreferences.edit();
     editor.putBoolean(MAPBOX_PREF_ENABLE_CRASH_REPORTER, true);
     editor.commit();
-    assertTrue(crashReporterClient.isEnabled());
+    assertTrue(errorReporterClient.isEnabled());
   }
 
   @Test
@@ -122,21 +122,21 @@ public class CrashReporterClientInstrumentationTest {
     FileUtils.writeToFile(file, String.format(crashEvent, crashHash));
 
     // Need to toggle this flag to simulate telem success
-    crashReporterClient.loadFrom(directory);
-    CrashEvent event = crashReporterClient.nextEvent();
-    assertFalse(crashReporterClient.isDuplicate(event));
+    errorReporterClient.loadFrom(directory);
+    CrashEvent event = errorReporterClient.nextEvent();
+    assertFalse(errorReporterClient.isDuplicate(event));
 
     AtomicBoolean success = new AtomicBoolean(true);
     CountDownLatch latch = new CountDownLatch(1);
-    crashReporterClient.sendSync(event, success, latch);
+    errorReporterClient.sendSync(event, success, latch);
 
-    event = crashReporterClient.nextEvent();
-    assertTrue(crashReporterClient.isDuplicate(event));
+    event = errorReporterClient.nextEvent();
+    assertTrue(errorReporterClient.isDuplicate(event));
   }
 
   @Test(expected = IllegalStateException.class)
   public void nextCalledPriorLoadEvent() {
-    crashReporterClient.nextEvent();
+    errorReporterClient.nextEvent();
   }
 
   @Test
@@ -158,19 +158,19 @@ public class CrashReporterClientInstrumentationTest {
 
   @Test
   public void deleteInvalidEvent() {
-    crashReporterClient.loadFrom(directory);
-    assertFalse(crashReporterClient.delete(new CrashEvent("mobile.crash", "2019-02-21T21:58:43.000Z")));
+    errorReporterClient.loadFrom(directory);
+    assertFalse(errorReporterClient.delete(new CrashEvent("mobile.crash", "2019-02-21T21:58:43.000Z")));
   }
 
   @Test
   public void attemptToDeleteAlreadyDeletedFile() throws IOException {
     File file = FileUtils.getFile(context, String.format(CRASH_FILENAME_FORMAT, TEST_DIR_PATH, "crash"));
     FileUtils.writeToFile(file, String.format(crashEvent, UUID.randomUUID().toString()));
-    crashReporterClient.loadFrom(directory);
-    CrashEvent crashEvent = crashReporterClient.nextEvent();
+    errorReporterClient.loadFrom(directory);
+    CrashEvent crashEvent = errorReporterClient.nextEvent();
 
     assertTrue(file.delete());
-    assertFalse(crashReporterClient.delete(crashEvent));
+    assertFalse(errorReporterClient.delete(crashEvent));
   }
 
   private SharedPreferences getSharedPreferences() {
