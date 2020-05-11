@@ -51,32 +51,40 @@ brew-java-install:
 
 .PHONY: prep
 prep:
-	echo "TODO prep Android Project"
+	@echo "TODO prep Project"
 
 .PHONY: build
 build:
-	echo "TODO build Android Project"
+	@echo "TODO build Project"
 
 .PHONY: test
 test:
-	echo "TODO test Android Project"
+	@echo "TODO test Project"
 
 .PHONY: docs
 docs:
-	echo "TODO docs Android Project"
+	@echo "TODO docs Project"
 
 .PHONY: pack
 pack:
-	echo "TODO pack Android Project"
+	@echo "TODO pack Project"
 
 .PHONY: farm
 farm:
-	echo "TODO farm Android Project"
+	@echo "TODO farm Project"
 
 .PHONY: stage
 stage:
-	echo "TODO stage Android Project"
+	@echo "TODO stage Project"
 
 .PHONY: clean
 clean:
-	echo "TODO clean Android Project"
+	@echo "TODO clean Project"
+
+# local and ci build Targets
+
+.DEFAULT: run
+run: prep build test docs pack
+
+.PHONY: ci-run
+ci-run: tools build
