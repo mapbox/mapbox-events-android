@@ -30,10 +30,12 @@ class ComServerInformation implements EnvironmentResolver {
   public ServerInformation obtainServerInformation(Bundle appMetaData) {
     ServerInformation com = new ServerInformation(Environment.COM);
     String hostname = appMetaData.getString(KEY_META_DATA_COM_SERVER);
-    String hostnameHash = obtainHash(hostname);
-    if (!TelemetryUtils.isEmpty(hostnameHash)
-      && configurationList.contains(hostnameHash)) {
-      com.setHostname(hostname);
+    if (!TelemetryUtils.isEmpty(hostname)) {
+      String hostnameHash = obtainHash(hostname);
+      if (!TelemetryUtils.isEmpty(hostnameHash)
+        && configurationList.contains(hostnameHash)) {
+        com.setHostname(hostname);
+      }
     }
     return com;
   }
