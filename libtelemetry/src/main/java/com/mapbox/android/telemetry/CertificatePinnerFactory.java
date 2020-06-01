@@ -4,7 +4,6 @@ package com.mapbox.android.telemetry;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import okhttp3.CertificatePinner;
 
@@ -47,18 +46,14 @@ class CertificatePinnerFactory {
 
   private Map<String, List<String>> removeBlacklistedPins(Map<String, List<String>> pins,
                                                           CertificateBlacklist certificateBlacklist) {
-    String key = retrievePinKey(pins);
-    List<String> hashList = pins.get(key);
-    if (hashList != null) {
-      hashList = removeBlacklistedHashes(certificateBlacklist, hashList);
-      pins.put(key, hashList);
+    for (Map.Entry<String, List<String>> entry : pins.entrySet()) {
+      List<String> hashList = entry.getValue();
+      if (hashList != null) {
+        hashList = removeBlacklistedHashes(certificateBlacklist, hashList);
+        pins.put(entry.getKey(), hashList);
+      }
     }
     return pins;
-  }
-
-  private String retrievePinKey(Map<String, List<String>> pins) {
-    Set<String> pinsKey = pins.keySet();
-    return pinsKey.iterator().next();
   }
 
   private List<String> removeBlacklistedHashes(CertificateBlacklist certificateBlacklist, List<String> hashList) {
