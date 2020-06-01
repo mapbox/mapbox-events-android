@@ -4,14 +4,25 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
-## v4.7.0
+### v4.7.5
+- Modify error reporting for API >= 26 [#472] (https://github.com/mapbox/mapbox-events-android/pull/472)
+
+### v4.7.4
+This release is based off off 4.7.0.
+- Address backwards compatibility issues with AndroidX [#464] (https://github.com/mapbox/mapbox-events-android/pull/464)
+- Fix Turnstile Obfuscation [#457] (https://github.com/mapbox/mapbox-events-android/pull/457)
+- Update Node version to >=10 [#445] (https://github.com/mapbox/mapbox-events-android/pull/445))
+- Update Gradle Versions [#444] (https://github.com/mapbox/mapbox-events-android/pull/444)
+- Workaround for Strict mode socket issue [#443] (https://github.com/mapbox/mapbox-events-android/pull/443)
+
+### v4.7.0
 - Fix crash `setBaseUrl()` on null `TelemetryClient` [#423](https://github.com/mapbox/mapbox-events-android/pull/423)
 - Remove all location permissions from sdk manifest [#430] (https://github.com/mapbox/mapbox-events-android/pull/430)
 - Add make target to fetch java from brew [#433] (https://github.com/mapbox/mapbox-events-android/pull/433)
 - Apply android-sdk-versions-plugin to Telemetry and Core modules [#435] (https://github.com/mapbox/mapbox-events-android/pull/435)
 - Add Reformed User Agent to Telemetry Client [#437] Add Reformed User Agent to Telemetry Client https://github.com/mapbox/mapbox-events-android/pull/437)
 
-## v4.6.0
+### v4.6.0
 - Add public api to change base url for telemetry endpoint [#420](https://github.com/mapbox/mapbox-events-android/pull/420)
 - Telemetry metrics [#397](https://github.com/mapbox/mapbox-events-android/pull/397)
 
@@ -227,6 +238,15 @@ Mapbox welcomes participation and contributions from everyone.
 
 
 ## Mapbox Android Core
+
+### v1.4.3
+- Handle null input while creating LocationEngineResult [#475][469] (https://github.com/mapbox/mapbox-events-android/pull/475)
+
+### v1.4.2
+This release is based off off 1.4.0.
+- Address backwards compatibility issues with AndroidX [#464] (https://github.com/mapbox/mapbox-events-android/pull/464)
+- Update Node version to >=10 [#445] (https://github.com/mapbox/mapbox-events-android/pull/445))
+- Update Gradle Versions [#444] (https://github.com/mapbox/mapbox-events-android/pull/444)
 
 ### v1.4.0
 - Apply android-sdk-versions-plugin to Telemetry and Core modules [#435] (https://github.com/mapbox/mapbox-events-android/pull/435)

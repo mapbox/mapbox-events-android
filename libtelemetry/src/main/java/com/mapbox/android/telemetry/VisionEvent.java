@@ -2,12 +2,15 @@ package com.mapbox.android.telemetry;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Keep;
+
 
 import com.google.gson.annotations.SerializedName;
 
 import java.util.HashMap;
 
-public class VisionEvent  extends Event implements Parcelable {
+@Keep
+public class VisionEvent extends Event implements Parcelable {
   private static final String VIS_GENERAL = "vision.general";
 
   @SerializedName("event")

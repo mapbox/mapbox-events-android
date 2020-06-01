@@ -119,7 +119,7 @@ jobs:
       - deploy:
           name: Publish to Maven Central
           command: |
-            if [[ $CIRCLE_BRANCH == master ]]; then
+            if [[ $CIRCLE_BRANCH == long-term-support ]]; then
               make publish-core ;
               make publish-telem ;
             elif [[ $CIRCLE_TAG == telem-* ]]; then
@@ -145,8 +145,8 @@ jobs:
           name: Check & Publish Binary Size
           command: |
             binary_path="libtelemetry/build/outputs/aar/libtelemetry-full-release.aar"
-            if [[ $CIRCLE_BRANCH == master ]] || [[ $CIRCLE_BRANCH == release-* ]]; then
-              ./scripts/capture_binary_size_for_aws.sh $binary_path "mapbox-events-android"
+            if [[ $CIRCLE_BRANCH == long-term-support ]] || [[ $CIRCLE_BRANCH == release-* ]]; then
+              ./scripts/capture_binary_size_for_aws.sh $binary_path "mapbox-events-android-lts"
             else
-              ./scripts/check_binary_size.sh $binary_path "Telemetry-AAR"
+              ./scripts/check_binary_size.sh $binary_path "Telemetry-AAR-lts"
             fi
