@@ -73,6 +73,12 @@ class ComCertificatePins {
           add("PA1lecwXNRXY/Vpy0VN+jQEYChN4hCAF36oB0Ygx3wQ=");
         }
       });
+      put("FVQ3CP/SEI8eLPxHJnjyew2P5DTC1OBKK4Y6XkmC0WI=", new ArrayList<String>() {
+        {
+          add("qjl/5X6sDeDCP4DEcR4VFPw0qa/El98EU/ZHwY0jTx0=");
+          add("Xw7GYmoUa7YVrYJj7t7RnqYcO58dRFLYEL7UEOuIlX8=");
+        }
+      });
     }
   };
 }

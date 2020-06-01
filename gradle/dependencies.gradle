@@ -23,7 +23,7 @@ ext {
 
     pluginVersion = [
             checkstyle       : '8.4',
-            gradle           : '3.6.2',
+            gradle           : '3.6.3',
             dependencyGraph  : '0.5.0',
             mapboxSdkVersions: '1.0.1'
     ]

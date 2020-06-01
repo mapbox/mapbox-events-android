@@ -50,9 +50,13 @@ class TelemetryClientFactory {
       .environment(serverInformation.getEnvironment())
       .baseUrl(TelemetryClientSettings.configureUrlHostname(serverInformation.getHostname()))
       .build();
-    return new TelemetryClient(serverInformation.getAccessToken(), userAgent,
+    String serverToken = serverInformation.getAccessToken();
+    return new TelemetryClient(serverToken != null ? serverToken : accessToken,
+      userAgent,
       TelemetryUtils.createReformedFullUserAgent(context),
-      telemetryClientSettings, logger, certificateBlacklist);
+      telemetryClientSettings,
+      logger,
+      certificateBlacklist);
   }
 
   private TelemetryClient buildClientFrom(ServerInformation serverInformation, Context context) {
@@ -61,7 +65,11 @@ class TelemetryClientFactory {
       case STAGING:
         return buildTelemetryClientCustom(serverInformation, certificateBlacklist, context);
       default:
-        return buildTelemetryClient(environment, certificateBlacklist, context);
+        if (!TelemetryUtils.isEmpty(serverInformation.getHostname())) {
+          return buildTelemetryClientCustom(serverInformation, certificateBlacklist, context);
+        } else {
+          return buildTelemetryClient(environment, certificateBlacklist, context);
+        }
     }
   }
 }
