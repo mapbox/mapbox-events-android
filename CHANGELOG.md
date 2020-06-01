@@ -4,6 +4,9 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v5.1.0
+- Endpoint Configuration [#477] (https://github.com/mapbox/mapbox-events-android/pull/477)
+
 ### v5.0.1
 - Modify error reporting for API >= 26 [#472] (https://github.com/mapbox/mapbox-events-android/pull/472)
 
