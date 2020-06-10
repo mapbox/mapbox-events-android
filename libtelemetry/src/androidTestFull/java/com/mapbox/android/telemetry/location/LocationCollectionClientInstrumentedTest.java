@@ -25,6 +25,7 @@ public class LocationCollectionClientInstrumentedTest {
 
   @Before
   public void setUp() {
+    LocationCollectionClient.uninstall();
     ref = LocationCollectionClient.install(InstrumentationRegistry.getInstrumentation().getTargetContext(),
       DEFAULT_INTERVAL);
   }

@@ -9,6 +9,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.mapbox.android.telemetry.errors.ErrorReporterEngine;
+import com.mapbox.android.telemetry.location.LocationCollectionClient;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -32,6 +33,7 @@ import okhttp3.ResponseBody;
 
 import static com.mapbox.android.telemetry.MapboxTelemetryConstants.LOCATION_COLLECTOR_ENABLED;
 import static com.mapbox.android.telemetry.MapboxTelemetryConstants.SESSION_ROTATION_INTERVAL_MILLIS;
+import static com.mapbox.android.telemetry.location.LocationCollectionClient.DEFAULT_SESSION_ROTATION_INTERVAL_HOURS;
 
 public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   private static final String LOG_TAG = "MapboxTelemetry";
@@ -398,6 +400,9 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
       @Override
       public void run() {
         try {
+          // lazy install if required
+          LocationCollectionClient.install(applicationContext,
+            TimeUnit.HOURS.toMillis(DEFAULT_SESSION_ROTATION_INTERVAL_HOURS));
           SharedPreferences sharedPreferences = TelemetryUtils.obtainSharedPreferences(applicationContext);
           SharedPreferences.Editor editor = sharedPreferences.edit();
           editor.putBoolean(LOCATION_COLLECTOR_ENABLED, enable);

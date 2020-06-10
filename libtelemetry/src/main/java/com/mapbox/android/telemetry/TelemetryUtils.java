@@ -11,9 +11,14 @@ import android.content.pm.PackageManager;
 import android.net.TrafficStats;
 import android.os.BatteryManager;
 import android.os.Build;
-import androidx.annotation.Nullable;
+import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.util.Log;
+
+import androidx.annotation.Nullable;
+
+import com.mapbox.android.core.MapboxSdkInfoForUserAgentGenerator;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -27,14 +32,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
-import android.util.Log;
-
-import com.mapbox.android.core.MapboxSdkInfoForUserAgentGenerator;
-
 import javax.net.SocketFactory;
 
 import okhttp3.OkHttpClient;
 import okio.Buffer;
+
 
 import static com.mapbox.android.telemetry.MapboxTelemetryConstants.MAPBOX_SHARED_PREFERENCES;
 
@@ -53,6 +55,8 @@ public class TelemetryUtils {
   private static final int UNAVAILABLE_BATTERY_LEVEL = -1;
   private static final int DEFAULT_BATTERY_LEVEL = -1;
   private static final int PERCENT_SCALE = 100;
+  private static final int DEFAULT_INIT_DELAY = 1; // seconds
+  private static final int MAX_INIT_DELAY = 100; // seconds
   private static final String FOREGROUND = "Foreground";
   private static final String BACKGROUND = "Background";
   private static final String NO_STATE = "";
@@ -73,6 +77,7 @@ public class TelemetryUtils {
   private static final String UNIVERSAL_MOBILE_TELCO_SERVICE = "UMTS";
   private static final String UNKNOWN = "Unknown";
   private static final String OPERATING_SYSTEM = "Android - " + Build.VERSION.RELEASE;
+  private static final String KEY_META_DATA_INIT_DELAY = "com.mapbox.ComEventsInitDelaySeconds";
   private static final Map<Integer, String> NETWORKS = new HashMap<Integer, String>() {
     {
       put(TelephonyManager.NETWORK_TYPE_1xRTT, SINGLE_CARRIER_RTT);
@@ -171,6 +176,37 @@ public class TelemetryUtils {
 
   public static String generateCreateDateFormatted(Date date) {
     return dateFormat.format(date);
+  }
+
+  /**
+   * This method retrieves metadata.
+   *
+   * @param context application context
+   * @return metadata
+   */
+  @Nullable
+  public static Bundle obtainMetaData(Context context) {
+    try {
+      return context.getPackageManager().getApplicationInfo(context.getPackageName(),
+        PackageManager.GET_META_DATA).metaData;
+    } catch (Exception exception) {
+      Log.e(TAG, exception.getMessage());
+      return null;
+    }
+  }
+
+  public static int obtainInitDelay(Context context) {
+    int initDelay = DEFAULT_INIT_DELAY;
+    Bundle metadata = obtainMetaData(context);
+
+    if (metadata != null) {
+      int configuredDelay = metadata.getInt(KEY_META_DATA_INIT_DELAY);
+      if (configuredDelay != 0 && configuredDelay <= MAX_INIT_DELAY) {
+        initDelay = configuredDelay;
+      }
+    }
+
+    return initDelay * 1000; // converting to ms
   }
 
   static String createFullUserAgent(String userAgent, Context context) {
