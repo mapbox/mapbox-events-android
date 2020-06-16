@@ -153,7 +153,7 @@ class MockWebServerTest {
     Logger mockedLogger = mock(Logger.class);
     CertificateBlacklist mockedBlacklist = mock(CertificateBlacklist.class);
     return new TelemetryClient(accessToken, userAgent, reformedUserAgent,
-      telemetryClientSettings, mockedLogger, mockedBlacklist);
+      telemetryClientSettings, mockedLogger, mockedBlacklist, false);
   }
 
   List<Event> obtainAnEvent() {

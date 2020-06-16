@@ -19,22 +19,24 @@ import java.util.concurrent.ExecutorService;
 
 import okhttp3.Callback;
 
+
 import static com.mapbox.android.telemetry.MapboxTelemetryConstants.DEFAULT_STAGING_EVENTS_HOST;
 import static com.mapbox.android.telemetry.MapboxTelemetryConstants.MAPBOX_SHARED_PREFERENCES;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class MapboxTelemetryTest {
   @Rule
@@ -478,6 +480,77 @@ public class MapboxTelemetryTest {
     MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedTelemetryClient);
     assertFalse(theMapboxTelemetry.setBaseUrl("host.com."));
     verify(mockedTelemetryClient, never()).setBaseUrl(any(String.class));
+  }
+
+  @Test
+  public void checkCnRegion() {
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
+    Callback mockedHttpCallback = mock(Callback.class);
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext, mockedTelemetryClient,
+      mockedHttpCallback);
+    when(mockedTelemetryClient.isCnRegion()).thenReturn(true);
+
+    assertTrue(theMapboxTelemetry.isCnRegion());
+  }
+
+  @Test
+  public void checkNotCnRegion() {
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
+    Callback mockedHttpCallback = mock(Callback.class);
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext, mockedTelemetryClient,
+      mockedHttpCallback);
+    when(mockedTelemetryClient.isCnRegion()).thenReturn(false);
+
+    assertFalse(theMapboxTelemetry.isCnRegion());
+  }
+
+  @Test
+  public void checkSetCnRegion() {
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
+    Callback mockedHttpCallback = mock(Callback.class);
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext, mockedTelemetryClient,
+      mockedHttpCallback);
+    when(mockedTelemetryClient.isCnRegion()).thenReturn(false);
+
+    assertFalse(theMapboxTelemetry.isCnRegion());
+
+    theMapboxTelemetry.setCnRegion(true);
+
+    assertTrue(theMapboxTelemetry.isCnRegion());
+  }
+
+  @Test
+  public void checkUnSetCnRegion() {
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
+    Callback mockedHttpCallback = mock(Callback.class);
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext, mockedTelemetryClient,
+      mockedHttpCallback);
+    when(mockedTelemetryClient.isCnRegion()).thenReturn(true);
+
+    assertTrue(theMapboxTelemetry.isCnRegion());
+
+    theMapboxTelemetry.setCnRegion(false);
+
+    assertFalse(theMapboxTelemetry.isCnRegion());
+  }
+
+  @Test
+  public void checkTelemetryClientFactory() {
+    String anyToken = "anyToken";
+    String anyUserAgent = "anyUserAgent";
+    Context mockedContext = mock(Context.class, RETURNS_DEEP_STUBS);
+    TelemetryClient mockedTelemetryClient = mock(TelemetryClient.class);
+    Callback mockedHttpCallback = mock(Callback.class);
+    MapboxTelemetry theMapboxTelemetry = obtainMapboxTelemetryWith(mockedContext, mockedTelemetryClient,
+      mockedHttpCallback);
+
+    TelemetryClientFactory factory = theMapboxTelemetry.getTelemetryClientFactory(anyToken, anyUserAgent);
+
+    assertNotNull(factory);
   }
 
   private MapboxTelemetry obtainMapboxTelemetry() {
