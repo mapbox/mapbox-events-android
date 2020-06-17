@@ -7,6 +7,7 @@ import android.net.NetworkInfo;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 
 import com.mapbox.android.telemetry.errors.ErrorReporterEngine;
 
@@ -246,12 +247,16 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   }
 
   private TelemetryClient createTelemetryClient(String accessToken, String userAgent) {
-    String fullUserAgent = TelemetryUtils.createFullUserAgent(userAgent, applicationContext);
-    TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(accessToken, fullUserAgent,
-      new Logger(), certificateBlacklist);
+    TelemetryClientFactory telemetryClientFactory = getTelemetryClientFactory(accessToken, userAgent);
     telemetryClient = telemetryClientFactory.obtainTelemetryClient(applicationContext);
 
     return telemetryClient;
+  }
+
+  @VisibleForTesting
+  TelemetryClientFactory getTelemetryClientFactory(String accessToken, String userAgent) {
+    String fullUserAgent = TelemetryUtils.createFullUserAgent(userAgent, applicationContext);
+    return new TelemetryClientFactory(accessToken, fullUserAgent, new Logger(), certificateBlacklist);
   }
 
   private boolean updateTelemetryClient(String accessToken) {
@@ -488,6 +493,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   }
 
   @SuppressWarnings("WeakerAccess")
+  @Deprecated
   public synchronized boolean setBaseUrl(String eventsHost) {
     if (isValidUrl(eventsHost) && checkNetworkAndParameters()) {
       telemetryClient.setBaseUrl(eventsHost);
@@ -499,5 +505,25 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   private static boolean isValidUrl(String eventsHost) {
     Pattern urlPattern = Pattern.compile("^[a-z0-9]+([\\-.][a-z0-9]+)*\\.[a-z]{2,5}(:[0-9]{1,5})?(/.*)?$");
     return eventsHost != null && !eventsHost.isEmpty() && urlPattern.matcher(eventsHost).matches();
+  }
+
+  public boolean isCnRegion() {
+    if (checkRequiredParameters(sAccessToken.get(), userAgent)) {
+      return telemetryClient.isCnRegion();
+    }
+    return false;
+  }
+
+  /**
+   * This method will set region, set region appropriate token prior to calling this method.
+   * @param setCnRegion flag to set appropriate region
+   */
+  public synchronized void setCnRegion(boolean setCnRegion) {
+    if (isCnRegion() == setCnRegion) {
+      return;
+    }
+    TelemetryClientFactory telemetryClientFactory = getTelemetryClientFactory(sAccessToken.get(), userAgent);
+    Environment environment = setCnRegion ? Environment.CHINA : Environment.COM;
+    telemetryClient = telemetryClientFactory.obtainTelemetryClient(environment, applicationContext);
   }
 }
