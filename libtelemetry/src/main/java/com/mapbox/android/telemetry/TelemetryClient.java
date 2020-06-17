@@ -39,15 +39,21 @@ class TelemetryClient {
   private TelemetryClientSettings setting;
   private final Logger logger;
   private CertificateBlacklist certificateBlacklist;
+  private boolean isCnRegion;
 
   TelemetryClient(String accessToken, String userAgent, String reformedUserAgent, TelemetryClientSettings setting,
-                  Logger logger, CertificateBlacklist certificateBlacklist) {
+                  Logger logger, CertificateBlacklist certificateBlacklist, boolean isCnRegion) {
     this.accessToken = accessToken;
     this.userAgent = userAgent;
     this.reformedUserAgent = reformedUserAgent;
     this.setting = setting;
     this.logger = logger;
     this.certificateBlacklist = certificateBlacklist;
+    this.isCnRegion = isCnRegion;
+  }
+
+  boolean isCnRegion() {
+    return this.isCnRegion;
   }
 
   void updateAccessToken(String accessToken) {
