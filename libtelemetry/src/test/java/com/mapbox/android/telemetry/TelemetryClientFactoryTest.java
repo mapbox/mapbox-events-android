@@ -39,6 +39,38 @@ public class TelemetryClientFactoryTest {
   }
 
   @Test
+  public void checksChinaSwitchEnvironment() throws Exception {
+    String anyAccessToken = "anyAccessToken";
+    String anyUserAgent = "anyUserAgent";
+    Logger mockedLogger = mock(Logger.class);
+    CertificateBlacklist mockedBlacklist = mock(CertificateBlacklist.class);
+    TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(anyAccessToken,
+      anyUserAgent, mockedLogger, mockedBlacklist);
+    Bundle mockedBundle = mock(Bundle.class);
+    Context mockedContext = obtainMockedContext(mockedBundle);
+
+    TelemetryClient actual = telemetryClientFactory.obtainTelemetryClient(Environment.CHINA, mockedContext);
+
+    assertEquals(Environment.CHINA, actual.obtainSetting().getEnvironment());
+  }
+
+  @Test
+  public void checksComSwitchEnvironment() throws Exception {
+    String anyAccessToken = "anyAccessToken";
+    String anyUserAgent = "anyUserAgent";
+    Logger mockedLogger = mock(Logger.class);
+    CertificateBlacklist mockedBlacklist = mock(CertificateBlacklist.class);
+    TelemetryClientFactory telemetryClientFactory = new TelemetryClientFactory(anyAccessToken,
+      anyUserAgent, mockedLogger, mockedBlacklist);
+    Bundle mockedBundle = mock(Bundle.class);
+    Context mockedContext = obtainMockedContext(mockedBundle);
+
+    TelemetryClient actual = telemetryClientFactory.obtainTelemetryClient(Environment.COM, mockedContext);
+
+    assertEquals(Environment.COM, actual.obtainSetting().getEnvironment());
+  }
+
+  @Test
   public void checksStagingEnvironment() throws Exception {
     String anyAccessToken = "anyAccessToken";
     String anyUserAgent = "anyUserAgent";
