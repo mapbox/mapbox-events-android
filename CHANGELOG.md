@@ -4,6 +4,12 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v6.0.0
+- Compile and Target sdkVersion = 29 [#484](https://github.com/mapbox/mapbox-events-android/pull/484)
+- Dynamic isCnRegion/setCnRegion APIs [#486](https://github.com/mapbox/mapbox-events-android/pull/486)
+- Add Proguard rules for gms classes [#488](https://github.com/mapbox/mapbox-events-android/pull/488)
+- Update gradle version [#485](https://github.com/mapbox/mapbox-events-android/pull/485)
+
 ### v5.1.0
 - Endpoint Configuration [#477] (https://github.com/mapbox/mapbox-events-android/pull/477)
 
@@ -250,6 +256,11 @@ Mapbox welcomes participation and contributions from everyone.
 
 
 ## Mapbox Android Core
+
+### v3.0.0
+- Compile and Target sdkVersion = 29 [#484](https://github.com/mapbox/mapbox-events-android/pull/484)
+- Add Proguard rules for gms classes [#488](https://github.com/mapbox/mapbox-events-android/pull/488)
+- Update gradle version [#485](https://github.com/mapbox/mapbox-events-android/pull/485)
 
 ### V2.0.1
 - Handle null input while creating LocationEngineResult [#469] (https://github.com/mapbox/mapbox-events-android/pull/469)
