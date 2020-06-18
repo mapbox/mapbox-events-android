@@ -23,29 +23,28 @@ project.afterEvaluate {
                 group = 'Reporting'
                 description = "Generate Jacoco coverage reports for the ${sourceName.capitalize()} build."
 
-                classDirectories.setFrom(files(classDirectories.files.collect {
-                    fileTree(
-                            dir: "${project.buildDir}/intermediates/javac/${sourcePath}",
-                            excludes: ['**/R.class',
-                                       '**/R$*.class',
-                                       '**/BuildConfig.*',
-                                       '**/Manifest*.*',
-                                       '**/*$Lambda$*.*'])
-                }))
+                classDirectories.setFrom(
+                        fileTree(
+                                dir: "${project.buildDir}/intermediates/javac/${sourcePath}",
+                                excludes: ['**/R.class',
+                                           '**/R$*.class',
+                                           '**/BuildConfig.*',
+                                           '**/Manifest*.*',
+                                           '**/*$Lambda$*.*'])
+                )
 
-                sourceDirectories.setFrom(files(classDirectories.files.collect {
-                    files(["src/main/java",
-                           "src/$productFlavorName/java",
-                           "src/$buildTypeName/java"])
-                    println("${project.buildDir}")
-                }))
+                sourceDirectories.setFrom(
+                        files(["src/main/java",
+                               "src/$productFlavorName/java",
+                               "src/$buildTypeName/java"])
+                )
 
-                executionData.setFrom(files(classDirectories.files.collect {
-                    fileTree(dir: "${project.buildDir}",
-                            includes: ["jacoco/${testTaskName}.exec",
-                                       "jacoco/*.ec",
-                                       "outputs/code_coverage/${sourceName}AndroidTest/connected/*.ec"])
-                }))
+                executionData.setFrom(files(
+                        fileTree(dir: "${project.buildDir}",
+                                includes: ["jacoco/${testTaskName}.exec",
+                                           "jacoco/*.ec",
+                                           "outputs/code_coverage/${sourceName}AndroidTest/connected/*.ec"])
+                ))
 
                 reports {
                     xml.enabled = true
