@@ -25,7 +25,7 @@ ext {
             checkstyle       : '8.4',
             gradle           : '4.0.0',
             dependencyGraph  : '0.5.0',
-            mapboxSdkVersions: '1.0.1'
+            mapboxSdkVersions: '1.1.0'
     ]
 
     dependenciesList = [
