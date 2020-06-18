@@ -221,7 +221,7 @@ public class TelemetryClientTest extends MockWebServerTest {
     String anyUserAgent = "anyUserAgent";
     TelemetryClient telemetryClient = new TelemetryClient("anyAccessToken", anyUserAgent, anyUserAgent,
       telemetryClientSettings,
-      mock(Logger.class), mock(CertificateBlacklist.class));
+      mock(Logger.class), mock(CertificateBlacklist.class), false);
     List<Event> theEvent = obtainAnEvent();
     final CountDownLatch latch = new CountDownLatch(1);
     final AtomicReference<String> bodyRef = new AtomicReference<>();
@@ -245,7 +245,7 @@ public class TelemetryClientTest extends MockWebServerTest {
     Callback mockedCallback = mock(Callback.class);
     String anyUserAgent = "anyUserAgent";
     TelemetryClient telemetryClient = new TelemetryClient("anyAccessToken", anyUserAgent, anyUserAgent,
-      clientSettings, mockedLogger, mock(CertificateBlacklist.class));
+      clientSettings, mockedLogger, mock(CertificateBlacklist.class), false);
     telemetryClient.updateDebugLoggingEnabled(true);
 
     telemetryClient.sendEvents(mockedEvent, mockedCallback, false);
@@ -262,7 +262,7 @@ public class TelemetryClientTest extends MockWebServerTest {
     Logger mockedLogger = mock(Logger.class);
     String anyUserAgent = "anyUserAgent";
     TelemetryClient telemetryClient = new TelemetryClient("anyAccessToken", anyUserAgent, anyUserAgent,
-      clientSettings, mockedLogger, mock(CertificateBlacklist.class));
+      clientSettings, mockedLogger, mock(CertificateBlacklist.class), false);
     telemetryClient.updateDebugLoggingEnabled(true);
 
     AttachmentListener attachmentListener = mock(AttachmentListener.class);
@@ -281,7 +281,7 @@ public class TelemetryClientTest extends MockWebServerTest {
     TelemetryClientSettings clientSettings = provideDefaultTelemetryClientSettings(getMockedContext());
     Logger mockedLogger = mock(Logger.class);
     TelemetryClient telemetryClient = new TelemetryClient("", "", "", clientSettings,
-      mockedLogger, mock(CertificateBlacklist.class));
+      mockedLogger, mock(CertificateBlacklist.class), false);
 
     String newUrl = "new-custom-url.com";
     telemetryClient.setBaseUrl(newUrl);

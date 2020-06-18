@@ -34,13 +34,34 @@ class TelemetryClientFactory {
     return buildTelemetryClient(Environment.COM, certificateBlacklist, context);
   }
 
+  TelemetryClient obtainTelemetryClient(Environment environment, Context context) {
+    if (environment == Environment.CHINA) {
+      return buildTelemetryClient(environment, certificateBlacklist, context);
+    } else {
+      try {
+        ApplicationInfo appInformation = context.getPackageManager().getApplicationInfo(context.getPackageName(),
+          PackageManager.GET_META_DATA);
+        if (appInformation != null && appInformation.metaData != null) {
+          return buildClientFrom(new ComServerInformation().obtainServerInformation(appInformation.metaData), context);
+        }
+      } catch (Exception exception) {
+        logger.error(LOG_TAG, String.format(RETRIEVING_APP_META_DATA_ERROR_MESSAGE, exception.getMessage()));
+      }
+    }
+
+    return buildTelemetryClient(Environment.COM, certificateBlacklist, context);
+  }
+
   private TelemetryClient buildTelemetryClient(Environment environment,
                                                CertificateBlacklist certificateBlacklist,
                                                Context context) {
-    return new TelemetryClient(accessToken, userAgent,
-      TelemetryUtils.createReformedFullUserAgent(context), new TelemetryClientSettings.Builder(context)
-      .environment(environment).build(),
-      logger, certificateBlacklist);
+    return new TelemetryClient(accessToken,
+      userAgent,
+      TelemetryUtils.createReformedFullUserAgent(context),
+      new TelemetryClientSettings.Builder(context).environment(environment).build(),
+      logger,
+      certificateBlacklist,
+      environment == Environment.CHINA);
   }
 
   private TelemetryClient buildTelemetryClientCustom(ServerInformation serverInformation,
@@ -56,7 +77,8 @@ class TelemetryClientFactory {
       TelemetryUtils.createReformedFullUserAgent(context),
       telemetryClientSettings,
       logger,
-      certificateBlacklist);
+      certificateBlacklist,
+      serverInformation.getEnvironment() == Environment.CHINA);
   }
 
   private TelemetryClient buildClientFrom(ServerInformation serverInformation, Context context) {
