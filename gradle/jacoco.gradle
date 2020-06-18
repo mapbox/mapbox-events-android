@@ -39,12 +39,12 @@ project.afterEvaluate {
                                "src/$buildTypeName/java"])
                 )
 
-                executionData.setFrom(files(
+                executionData.setFrom(
                         fileTree(dir: "${project.buildDir}",
                                 includes: ["jacoco/${testTaskName}.exec",
                                            "jacoco/*.ec",
                                            "outputs/code_coverage/${sourceName}AndroidTest/connected/*.ec"])
-                ))
+                )
 
                 reports {
                     xml.enabled = true
