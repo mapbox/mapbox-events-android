@@ -23,6 +23,11 @@ When is the release scheduled?
 - [ ] Publish `x.x.x` artifact to Maven Central
 
 **Post Release**
-- [ ] Add release javadocs to appropriate spot in /android-docs `api` folder @langsmith
+- [ ] Add release javadocs to appropriate spot in /android-docs `api` folder @nkukday @harvsu
+- Create integration tickets in downstream SDK repositories
+- [ ] Create Itegration ticket for [Maps SDK](https://github.com/mapbox/gl-internal/issues)
+- [ ] Create Integration ticket for [Navigation SDK](https://github.com/mapbox/navigation-sdks/issues)
+- [ ] Create Integration ticket for [Vision SDK](https://github.com/mapbox/mapbox-vision/issues)
+- [ ] Create Integration ticket for [Search SDK](https://github.com/mapbox/mapbox-search-android/issues)
 
 /cc: @mapbox/mobile-telemetry
