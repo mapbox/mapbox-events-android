@@ -1,5 +1,6 @@
 package com.mapbox.android.telemetry;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +12,8 @@ import android.content.pm.PackageManager;
 import android.net.TrafficStats;
 import android.os.BatteryManager;
 import android.os.Build;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
@@ -160,9 +163,23 @@ public class TelemetryUtils {
     return pluggedIntoUSB || pluggedIntoAC;
   }
 
+  @SuppressLint("MissingPermission")
+  @NonNull
   public static String obtainCellularNetworkType(Context context) {
     TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-    return NETWORKS.get(telephonyManager.getNetworkType());
+    int output = TelephonyManager.NETWORK_TYPE_UNKNOWN;
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+      try {
+        output = telephonyManager.getDataNetworkType();
+      } catch (SecurityException se) {
+        // Developer did not add READ_PHONE_STATE permission to their app
+        // or user did not accept the permission.
+        Log.e(TAG, se.toString());
+      }
+    } else {
+      output = telephonyManager.getNetworkType();
+    }
+    return NETWORKS.get(output);
   }
 
   public static String obtainCurrentDate() {
