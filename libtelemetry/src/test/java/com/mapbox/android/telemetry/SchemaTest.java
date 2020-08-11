@@ -37,7 +37,7 @@ public class SchemaTest {
    * but not incorporated into the Android SDK yet.
    **/
   private String[] additionalLocationProperties =
-    {"speed", "course", "floor", "speedAccuracy", "courseAccuracy", "verticalAccuracy"};
+    {"speed", "course", "floor", "speedAccuracy", "courseAccuracy", "verticalAccuracy", "config"};
 
   @BeforeClass
   public static void downloadSchema() throws Exception {
