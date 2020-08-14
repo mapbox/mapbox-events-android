@@ -4,6 +4,11 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### devel
+
+### v6.1.0
+- Fix a crash on Android 11 due to a depreacted API usage [#492](https://github.com/mapbox/mapbox-events-android/pull/492)
+
 ### v6.0.0
 - Compile and Target sdkVersion = 29 [#484](https://github.com/mapbox/mapbox-events-android/pull/484)
 - Dynamic isCnRegion/setCnRegion APIs [#486](https://github.com/mapbox/mapbox-events-android/pull/486)
