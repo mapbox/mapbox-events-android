@@ -168,7 +168,7 @@ public class TelemetryUtils {
   public static String obtainCellularNetworkType(Context context) {
     TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
     int output = TelephonyManager.NETWORK_TYPE_UNKNOWN;
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
       try {
         output = telephonyManager.getDataNetworkType();
       } catch (SecurityException se) {
