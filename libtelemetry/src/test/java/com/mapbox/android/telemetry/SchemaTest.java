@@ -207,6 +207,7 @@ public class SchemaTest {
         }
 
         schema.remove("userAgent");
+        schema.remove("mapboxAgent");
         schema.remove("received");
         schema.remove("token");
         schema.remove("authorization");
