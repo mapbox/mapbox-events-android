@@ -10,4 +10,4 @@ gradlew
 gradlew.bat
 libcore/src/main/assets/sdk_versions/com.mapbox.android.core
 libtelemetry/src/main/assets/sdk_versions/com.mapbox.android.telemetry
-.exec
+*.exec
