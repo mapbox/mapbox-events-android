@@ -3,20 +3,27 @@ package com.mapbox.android.core.permissions;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.util.Log;
+
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Helps request permissions at runtime.
  */
 public class PermissionsManager {
 
+  private static final String LOG_TAG = "PermissionsManager";
   private static final String COARSE_LOCATION_PERMISSION = Manifest.permission.ACCESS_COARSE_LOCATION;
   private static final String FINE_LOCATION_PERMISSION = Manifest.permission.ACCESS_FINE_LOCATION;
+  private static final String BACKGROUND_LOCATION_PERMISSION = "android.permission.ACCESS_BACKGROUND_LOCATION";
 
   private final int REQUEST_PERMISSIONS_CODE = 0;
 
@@ -47,6 +54,14 @@ public class PermissionsManager {
     return isPermissionGranted(context, FINE_LOCATION_PERMISSION);
   }
 
+  public static boolean isBackgroundLocationPermissionGranted(Context context) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+      return isPermissionGranted(context, BACKGROUND_LOCATION_PERMISSION);
+    }
+
+    return areLocationPermissionsGranted(context);
+  }
+
   public static boolean areLocationPermissionsGranted(Context context) {
     return isCoarseLocationPermissionGranted(context)
       || isFineLocationPermissionGranted(context);
@@ -57,15 +72,45 @@ public class PermissionsManager {
   }
 
   public void requestLocationPermissions(Activity activity) {
-    // Request fine location permissions by default
-    requestLocationPermissions(activity, true);
+    try {
+      PackageInfo packageInfo = activity.getPackageManager().getPackageInfo(
+              activity.getPackageName(), PackageManager.GET_PERMISSIONS);
+
+      String[] requestedPermissions = packageInfo.requestedPermissions;
+      if (requestedPermissions != null) {
+        List<String> permissionList = Arrays.asList(requestedPermissions);
+        boolean fineLocPermission = permissionList.contains(FINE_LOCATION_PERMISSION);
+        boolean coarseLocPermission = permissionList.contains(COARSE_LOCATION_PERMISSION);
+        boolean backgroundLocPermission = permissionList.contains(BACKGROUND_LOCATION_PERMISSION);
+
+        // Request location permissions
+        if (fineLocPermission) {
+          requestLocationPermissions(activity, true, backgroundLocPermission);
+        } else if (coarseLocPermission) {
+          requestLocationPermissions(activity, false, backgroundLocPermission);
+        } else {
+          Log.w(LOG_TAG, "Location permissions are missing");
+        }
+      }
+    } catch (Exception exception) {
+      Log.w(LOG_TAG, exception.getMessage());
+    }
   }
 
-  private void requestLocationPermissions(Activity activity, boolean requestFineLocation) {
-    String[] permissions = requestFineLocation
-      ? new String[] {FINE_LOCATION_PERMISSION}
-      : new String[] {COARSE_LOCATION_PERMISSION};
-    requestPermissions(activity, permissions);
+  private void requestLocationPermissions(Activity activity, boolean requestFineLocation,
+                                          boolean requestBackgroundLocation) {
+    List<String> permissions = new ArrayList<>();
+    if (requestFineLocation) {
+      permissions.add(FINE_LOCATION_PERMISSION);
+    } else  {
+      permissions.add(COARSE_LOCATION_PERMISSION);
+    }
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && requestBackgroundLocation) {
+      permissions.add(BACKGROUND_LOCATION_PERMISSION);
+    }
+
+    requestPermissions(activity, permissions.toArray(new String[permissions.size()]));
   }
 
   private void requestPermissions(Activity activity, String[] permissions) {

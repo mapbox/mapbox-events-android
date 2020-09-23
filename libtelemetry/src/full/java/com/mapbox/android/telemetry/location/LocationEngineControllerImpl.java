@@ -88,9 +88,14 @@ class LocationEngineControllerImpl implements LocationEngineController {
     return PendingIntent.getBroadcast(applicationContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
   }
 
+  private boolean isPermissionGranted(String permission) {
+    return ContextCompat.checkSelfPermission(applicationContext, permission)
+            == PackageManager.PERMISSION_GRANTED;
+  }
+
   private boolean checkPermissions() {
-    return ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.ACCESS_FINE_LOCATION)
-      == PackageManager.PERMISSION_GRANTED;
+    return isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)
+            || isPermissionGranted(Manifest.permission.ACCESS_COARSE_LOCATION);
   }
 
   private static LocationEngineRequest createRequest(long interval) {
