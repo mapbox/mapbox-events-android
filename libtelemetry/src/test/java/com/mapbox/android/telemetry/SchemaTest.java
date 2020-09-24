@@ -37,7 +37,8 @@ public class SchemaTest {
    * but not incorporated into the Android SDK yet.
    **/
   private String[] additionalLocationProperties =
-    {"speed", "course", "floor", "speedAccuracy", "courseAccuracy", "verticalAccuracy", "config"};
+    {"speed", "course", "floor", "speedAccuracy", "courseAccuracy", "verticalAccuracy", "config",
+     "approximate", "accuracyAuthorization"};
 
   @BeforeClass
   public static void downloadSchema() throws Exception {
@@ -47,6 +48,12 @@ public class SchemaTest {
   @Test
   public void checkAppUserTurnstileEventSize() throws Exception {
     JsonObject schema = grabSchema(APP_USER_TURNSTILE);
+    if (schema != null) {
+      // Ignore the event properties that are not incorporated into the android sdk yet.
+      for (String string : additionalLocationProperties) {
+        schema.remove(string);
+      }
+    }
     List<Field> fields = grabClassFields(AppUserTurnstile.class);
 
     assertEquals(schema.size(), fields.size());
