@@ -6,6 +6,9 @@ Mapbox welcomes participation and contributions from everyone.
 
 ### devel
 
+### v6.2.0
+- [core] Add background location permission [#498](https://github.com/mapbox/mapbox-events-android/pull/498)
+
 ### v6.1.0
 - Fix a crash on Android 11 due to a depreacted API usage [#492](https://github.com/mapbox/mapbox-events-android/pull/492)
 
@@ -261,6 +264,9 @@ Mapbox welcomes participation and contributions from everyone.
 
 
 ## Mapbox Android Core
+
+### v3.1.0
+- [core] Add background location permission [#498](https://github.com/mapbox/mapbox-events-android/pull/498)
 
 ### v3.0.0
 - Compile and Target sdkVersion = 29 [#484](https://github.com/mapbox/mapbox-events-android/pull/484)
