@@ -1,0 +1,6 @@
+com.mapbox.android.core
+com.mapbox.android.core.connectivity
+com.mapbox.android.core.crashreporter
+com.mapbox.android.core.location
+com.mapbox.android.core.metrics
+com.mapbox.android.core.permissions
