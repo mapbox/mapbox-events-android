@@ -1,0 +1,13 @@
+version: 2.1
+jobs:
+  build:
+    docker:
+      - image: buildpack-deps:trusty
+    resource_class: small
+    steps:
+      - run: echo "hello world"
+
+workflows:
+    build-deploy:
+        jobs:
+          - build
