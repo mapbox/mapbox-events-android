@@ -28,7 +28,7 @@ The snippet to add to your app-level `build.gradle` file to use  is the followin
 ```
 // Mapbox Core Library for Android
 
-compile 'com.mapbox.mapboxsdk:mapbox-android-core:0.2.1'
+implementation 'com.mapbox.mapboxsdk:mapbox-android-core:0.2.1'
 
 ```
 
@@ -55,7 +55,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.mapbox.mapboxsdk:mapbox-android-core:X.X.X-SNAPSHOT'
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-core:X.X.X-SNAPSHOT'
 }
 ```
 
