@@ -8,6 +8,7 @@ import java.util.Map;
 import static org.junit.Assert.assertTrue;
 
 public class CertificatePinnerFactoryTest {
+  private static final String MAPBOX_COM = "**.mapbox.com";
 
   @Test
   public void checksStagingHostname() throws Exception {
@@ -40,7 +41,7 @@ public class CertificatePinnerFactoryTest {
     Map<String, List<String>> comCertificatesPins = certificatePinnerFactory
       .provideCertificatesPinsFor(Environment.COM);
 
-    assertTrue(comCertificatesPins.containsKey("events.mapbox.com"));
+    assertTrue(comCertificatesPins.containsKey(MAPBOX_COM));
   }
 
   @Test
@@ -50,8 +51,8 @@ public class CertificatePinnerFactoryTest {
     Map<String, List<String>> comCertificatesPins = certificatePinnerFactory
       .provideCertificatesPinsFor(Environment.COM);
 
-    assertTrue(comCertificatesPins.containsKey("events.mapbox.com"));
-    List<String> stagingPins = comCertificatesPins.get("events.mapbox.com");
+    assertTrue(comCertificatesPins.containsKey(MAPBOX_COM));
+    List<String> stagingPins = comCertificatesPins.get(MAPBOX_COM);
     assertTrue(stagingPins.contains("BhynraKizavqoC5U26qgYuxLZst6pCu9J5stfL6RSYY="));
     assertTrue(stagingPins.contains("owrR9U9FWDWtrFF+myoRIu75JwU4sJwzvhCNLZoY37g="));
     assertTrue(stagingPins.contains("SQVGZiOrQXi+kqxcvWWE96HhfydlLVqFr4lQTqI5qqo="));
@@ -65,8 +66,8 @@ public class CertificatePinnerFactoryTest {
     Map<String, List<String>> comCertificatesPins = certificatePinnerFactory
       .provideCertificatesPinsFor(Environment.COM);
 
-    assertTrue(comCertificatesPins.containsKey("events.mapbox.com"));
-    List<String> stagingPins = comCertificatesPins.get("events.mapbox.com");
+    assertTrue(comCertificatesPins.containsKey(MAPBOX_COM));
+    List<String> stagingPins = comCertificatesPins.get(MAPBOX_COM);
     assertTrue(stagingPins.contains("Tb0uHZ/KQjWh8N9+CZFLc4zx36LONQ55l6laDi1qtT4="));
     assertTrue(stagingPins.contains("RRM1dGqnDFsCJXBTHky16vi1obOlCgFFn/yOhI/y+ho="));
     assertTrue(stagingPins.contains("WoiWRyIOVNa9ihaBciRSC7XHjliYS9VwUGOIud4PB18="));

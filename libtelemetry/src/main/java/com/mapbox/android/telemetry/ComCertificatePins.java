@@ -10,7 +10,7 @@ class ComCertificatePins {
 
   static final Map<String, List<String>> CERTIFICATE_PINS = new HashMap<String, List<String>>() {
     {
-      put("events.mapbox.com", new ArrayList<String>() {
+      put("**.mapbox.com", new ArrayList<String>() {
         {
           add("BhynraKizavqoC5U26qgYuxLZst6pCu9J5stfL6RSYY=");
           add("owrR9U9FWDWtrFF+myoRIu75JwU4sJwzvhCNLZoY37g=");
@@ -71,10 +71,6 @@ class ComCertificatePins {
           add("QMMBDJh3g1QgkGV6m+T4i2weBGj/W2+fVG73slK3mJE=");
           add("ENU8M1yItdL5EP0G+I4hz4iuGlAUIHWCe4ipwXB/c/A=");
           add("PA1lecwXNRXY/Vpy0VN+jQEYChN4hCAF36oB0Ygx3wQ=");
-        }
-      });
-      put("FVQ3CP/SEI8eLPxHJnjyew2P5DTC1OBKK4Y6XkmC0WI=", new ArrayList<String>() {
-        {
           add("qjl/5X6sDeDCP4DEcR4VFPw0qa/El98EU/ZHwY0jTx0=");
           add("Xw7GYmoUa7YVrYJj7t7RnqYcO58dRFLYEL7UEOuIlX8=");
         }
