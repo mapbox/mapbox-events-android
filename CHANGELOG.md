@@ -6,6 +6,9 @@ Mapbox welcomes participation and contributions from everyone.
 
 ### devel
 
+### v6.2.1
+- [telemetry] Use asterisks for domain matching in CertificatePinner [#503](https://github.com/mapbox/mapbox-events-android/pull/503)
+
 ### v6.2.0
 - [core] Add background location permission [#498](https://github.com/mapbox/mapbox-events-android/pull/498)
 
