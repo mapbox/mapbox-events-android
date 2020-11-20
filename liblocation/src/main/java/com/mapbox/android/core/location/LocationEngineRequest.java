@@ -105,6 +105,55 @@ public class LocationEngineRequest {
     return fastestInterval;
   }
 
+  /**
+   * Compares this LocationEngineRequest to the specified object.
+   *
+   * @param o locationEngineRequest to compare to.
+   * @return true when the type and values are equal, false otherwise.
+   * @since 3.1.1
+   */
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    LocationEngineRequest that = (LocationEngineRequest) o;
+
+    if (interval != that.interval) {
+      return false;
+    }
+    if (priority != that.priority) {
+      return false;
+    }
+    if (Float.compare(that.displacement, displacement) != 0) {
+      return false;
+    }
+    if (maxWaitTime != that.maxWaitTime) {
+      return false;
+    }
+    return fastestInterval == that.fastestInterval;
+  }
+
+  /**
+   * Returns a hash code for this object.
+   *
+   * @return integer hash of the values.
+   * @since 3.1.1
+   */
+  @Override
+  public int hashCode() {
+    int result = (int) (interval ^ (interval >>> 32));
+    result = 31 * result + priority;
+    result = 31 * result + (displacement != +0.0f ? Float.floatToIntBits(displacement) : 0);
+    result = 31 * result + (int) (maxWaitTime ^ (maxWaitTime >>> 32));
+    result = 31 * result + (int) (fastestInterval ^ (fastestInterval >>> 32));
+    return result;
+  }
+
   public static final class Builder {
     private final long interval;
 
