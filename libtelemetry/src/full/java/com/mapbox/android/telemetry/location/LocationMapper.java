@@ -2,7 +2,6 @@ package com.mapbox.android.telemetry.location;
 
 import android.location.Location;
 import com.mapbox.android.telemetry.LocationEvent;
-
 import java.math.BigDecimal;
 
 public class LocationMapper {
@@ -15,14 +14,13 @@ public class LocationMapper {
     sessionIdentifier = new SessionIdentifier();
   }
 
+  @Deprecated
   public static LocationEvent create(Location location, String sessionId) {
-    // We don't necessarily want to poke activity manager for every single location
-    // update to fetch app state, cause it's extremely expensive to do so on main thread
-    // and we're not making use of appState internally.
-    // Going forward app state changes will be observed by metrics client and can be
-    // correlated with location events via session id.
-    // Since api-events won't accept empty string, default state to unknown
     return createLocationEvent(location, "unknown", sessionId);
+  }
+
+  public static LocationEvent create(Location location, String applicationState, String sessionId) {
+    return createLocationEvent(location, applicationState, sessionId);
   }
 
   public LocationEvent from(Location location, String applicationState) {
