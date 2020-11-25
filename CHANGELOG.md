@@ -6,6 +6,13 @@ Mapbox welcomes participation and contributions from everyone.
 
 ### devel
 
+### v6.2.2
+
+`telemetry-6.2.2-core-3.1.1` -
+
+- [telemetry] track foreground and background application states and send with events
+- [core] LocationEngineRequest supports Equality and Hashing
+
 ### v6.2.1
 - [telemetry] Use asterisks for domain matching in CertificatePinner [#503](https://github.com/mapbox/mapbox-events-android/pull/503)
 
