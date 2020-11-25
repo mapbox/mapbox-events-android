@@ -6,6 +6,9 @@ Mapbox welcomes participation and contributions from everyone.
 
 ### devel
 
+### v6.2.2
+- [telemetry] Add foreground/background information to location events [#508](https://github.com/mapbox/mapbox-events-android/pull/508)
+
 ### v6.2.1
 - [telemetry] Use asterisks for domain matching in CertificatePinner [#503](https://github.com/mapbox/mapbox-events-android/pull/503)
 
@@ -267,6 +270,9 @@ Mapbox welcomes participation and contributions from everyone.
 
 
 ## Mapbox Android Core
+
+### v3.1.1
+- [core] Add equals and hash to LocationEngineRequest [#507](https://github.com/mapbox/mapbox-events-android/pull/507)
 
 ### v3.1.0
 - [core] Add background location permission [#498](https://github.com/mapbox/mapbox-events-android/pull/498)
