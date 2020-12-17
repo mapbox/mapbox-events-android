@@ -18,5 +18,8 @@
             android:initOrder="100"/>
         <service android:name=".errors.ErrorReporterJobIntentService"
             android:permission="android.permission.BIND_JOB_SERVICE"/>
+
+        <service android:name=".MapboxTelemetryService" android:exported="false"/>
+
     </application>
 </manifest>

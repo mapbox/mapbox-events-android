@@ -1,17 +1,22 @@
 package com.mapbox.android.telemetry.provider;
 
+import android.content.ComponentName;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.ProviderInfo;
 import android.database.Cursor;
 import android.net.Uri;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import android.os.IBinder;
 import android.util.Log;
 import com.mapbox.android.core.crashreporter.MapboxUncaughtExceptionHanlder;
 import com.mapbox.android.telemetry.BuildConfig;
+import com.mapbox.android.telemetry.MapboxTelemetryService;
 import com.mapbox.android.telemetry.errors.TokenChangeBroadcastReceiver;
 import com.mapbox.android.telemetry.location.LocationCollectionClient;
 
@@ -25,18 +30,46 @@ public class MapboxTelemetryInitProvider extends ContentProvider {
   private static final String EMPTY_APPLICATION_ID_PROVIDER_AUTHORITY =
     "com.mapbox.android.telemetry.provider.mapboxtelemetryinitprovider";
 
+  MapboxTelemetryService telemetryService = null;
+
+  private final ServiceConnection telemetryServiceConnection = new ServiceConnection() {
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service) {
+      MapboxTelemetryService.Binder binder = (MapboxTelemetryService.Binder) service;
+      telemetryService = binder.getService();
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName name) {
+      telemetryService = null;
+    }
+  };
+
   @Override
   public boolean onCreate() {
     try {
+      final Context context = getContext();
+
+      if (context == null) {
+        Log.e(TAG, "Failed to initialize: context is null");
+        return false;
+      }
+
+      Intent intent = new Intent(context, MapboxTelemetryService.class);
+      context.bindService(intent, telemetryServiceConnection, Context.BIND_AUTO_CREATE);
+
       if (!BuildConfig.DEBUG) {
         // Register broadcast receiver to get notification
         // when valid token becomes available
-        TokenChangeBroadcastReceiver.register(getContext());
+        TokenChangeBroadcastReceiver.register(context);
 
         // Install crash reporter for telemetry packages only!
-        MapboxUncaughtExceptionHanlder.install(getContext(), MAPBOX_TELEMETRY_PACKAGE, BuildConfig.VERSION_NAME);
+        MapboxUncaughtExceptionHanlder.install(context, MAPBOX_TELEMETRY_PACKAGE, BuildConfig.VERSION_NAME);
       }
-      LocationCollectionClient.install(getContext(), TimeUnit.HOURS.toMillis(DEFAULT_SESSION_ROTATION_INTERVAL_HOURS));
+      LocationCollectionClient.install(context, TimeUnit.HOURS.toMillis(DEFAULT_SESSION_ROTATION_INTERVAL_HOURS));
+
+      return true;
+
     } catch (Throwable throwable) {
       // TODO: log silent crash
       Log.e(TAG, throwable.toString());
