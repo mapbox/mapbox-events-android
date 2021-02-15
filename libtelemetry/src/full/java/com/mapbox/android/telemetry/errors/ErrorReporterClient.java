@@ -5,9 +5,6 @@ import android.content.SharedPreferences;
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import android.util.Log;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
 import com.mapbox.android.core.FileUtils;
 import com.mapbox.android.telemetry.BuildConfig;
 import com.mapbox.android.telemetry.CrashEvent;
@@ -94,7 +91,7 @@ final class ErrorReporterClient {
 
     try {
       File file = crashReports[fileCursor];
-      CrashEvent event = parseJsonCrashEvent(FileUtils.readFromFile(file));
+      CrashEvent event = ErrorUtils.parseJsonCrashEvent(FileUtils.readFromFile(file));
       if (event.isValid()) {
         eventFileHashMap.put(event, file);
       }
@@ -155,15 +152,5 @@ final class ErrorReporterClient {
         telemetry.removeTelemetryListener(this);
       }
     });
-  }
-
-  private static CrashEvent parseJsonCrashEvent(String json) {
-    Gson gson = new GsonBuilder().create();
-    try {
-      return gson.fromJson(json, CrashEvent.class);
-    } catch (JsonSyntaxException jse) {
-      Log.e(LOG_TAG, jse.toString());
-      return new CrashEvent(null, null);
-    }
   }
 }

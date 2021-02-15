@@ -3,6 +3,7 @@ package com.mapbox.android.core.crashreporter;
 import android.content.Context;
 import android.os.Build;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import org.json.JSONException;
 
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * Crash report builder encapsulates report generation logic.
@@ -21,15 +23,18 @@ public final class CrashReportBuilder {
   private final Context applicationContext;
   private final String sdkIdentifier;
   private final String sdkVersion;
+  private final Set<String> allowedStacktracePrefixes;
   private final List<Throwable> causalChain = new ArrayList<>(4);
 
   private Thread uncaughtExceptionThread;
   private boolean isSilent;
 
-  private CrashReportBuilder(Context applicationContext, String sdkIdentifier, String sdkVersion) {
+  private CrashReportBuilder(Context applicationContext, String sdkIdentifier, String sdkVersion,
+                             Set<String> allowedStacktracePrefixes) {
     this.applicationContext = applicationContext;
     this.sdkIdentifier = sdkIdentifier;
     this.sdkVersion = sdkVersion;
+    this.allowedStacktracePrefixes = allowedStacktracePrefixes;
   }
 
   /**
@@ -46,8 +51,9 @@ public final class CrashReportBuilder {
     }
   }
 
-  static CrashReportBuilder setup(Context context, String sdkIdentifier, String sdkVersion) {
-    return new CrashReportBuilder(context, sdkIdentifier, sdkVersion);
+  static CrashReportBuilder setup(Context context, String sdkIdentifier, String sdkVersion,
+                                  Set<String> allowedStacktracePrefixes) {
+    return new CrashReportBuilder(context, sdkIdentifier, sdkVersion, allowedStacktracePrefixes);
   }
 
   CrashReportBuilder isSilent(boolean silent) {
@@ -60,7 +66,7 @@ public final class CrashReportBuilder {
     return this;
   }
 
-  CrashReportBuilder addExceptionThread(@NonNull Thread thread) {
+  CrashReportBuilder addExceptionThread(@Nullable Thread thread) {
     this.uncaughtExceptionThread = thread;
     return this;
   }
@@ -90,15 +96,36 @@ public final class CrashReportBuilder {
     StringBuilder result = new StringBuilder();
     for (Throwable throwable : throwables) {
       StackTraceElement[] stackTraceElements = throwable.getStackTrace();
+      // Add cause message, if exception was raised in allowed package
+      if (stackTraceElements.length > 0
+        && isAllowedStacktraceElement(stackTraceElements[0])
+        && throwable.getMessage() != null) {
+        result.append(throwable.getMessage()).append('\n');
+      } else {
+        result.append("***\n");
+      }
+      // Add cause stack trace, if package is allowed
       for (StackTraceElement element : stackTraceElements) {
-        if (element.getClassName().startsWith(sdkIdentifier)) {
+        if (isAllowedStacktraceElement(element)) {
           result.append(String.format(Locale.US, STACK_TRACE_ELEMENT_FORMAT,
             element.getClassName(), element.getMethodName(),
             element.getFileName(), element.getLineNumber())).append('\n');
+        } else {
+          result.append("*\n");
         }
       }
     }
     return result.toString();
+  }
+
+  private boolean isAllowedStacktraceElement(StackTraceElement stackTraceElement) {
+    String className = stackTraceElement.getClassName();
+    for (String prefix : allowedStacktracePrefixes) {
+      if (className.startsWith(prefix)) {
+        return true;
+      }
+    }
+    return className.startsWith(sdkIdentifier);
   }
 
   @VisibleForTesting
