@@ -56,7 +56,7 @@ public class MapboxUncaughtExceptionHanlderInstrumentationTest {
   @Test
   public void testReportCap() throws IOException {
     writeToDisk(10);
-    exceptionHanlder.setExceptionChainDepth(1);
+    exceptionHanlder.crashReportFactory.setCrashChainDepth(1);
     exceptionHanlder.uncaughtException(Thread.currentThread(), createMapboxThrowable());
 
     File[] files = directory.listFiles();

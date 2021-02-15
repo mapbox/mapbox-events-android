@@ -2,9 +2,7 @@ package com.mapbox.android.core.crashreporter;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import android.util.Log;
@@ -12,9 +10,7 @@ import android.util.Log;
 import com.mapbox.android.core.FileUtils;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -31,16 +27,15 @@ public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionH
 
   private static final String TAG = "MbUncaughtExcHandler";
   private static final String CRASH_FILENAME_FORMAT = "%s/%s.crash";
-  private static final int DEFAULT_EXCEPTION_CHAIN_DEPTH = 2;
   private static final int DEFAULT_MAX_REPORTS = 10;
 
   private final Thread.UncaughtExceptionHandler defaultExceptionHandler;
   private final Context applicationContext;
   private final AtomicBoolean isEnabled = new AtomicBoolean(true);
   private final String mapboxPackage;
-  private final String version;
 
-  private int exceptionChainDepth;
+  @VisibleForTesting
+  final CrashReportFactory crashReportFactory;
 
   @VisibleForTesting
   MapboxUncaughtExceptionHanlder(@NonNull Context applicationContext,
@@ -53,9 +48,9 @@ public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionH
     }
     this.applicationContext = applicationContext;
     this.mapboxPackage = mapboxPackage;
-    this.version = version;
-    this.exceptionChainDepth = DEFAULT_EXCEPTION_CHAIN_DEPTH;
     this.defaultExceptionHandler = defaultExceptionHandler;
+    this.crashReportFactory = new CrashReportFactory(applicationContext,
+      mapboxPackage, version, Collections.<String>emptySet());
     initializeSharedPreferences(sharedPreferences);
   }
 
@@ -90,14 +85,9 @@ public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionH
   public void uncaughtException(Thread thread, Throwable throwable) {
     // If we're not enabled or crash is not in Mapbox code
     // then just pass the Exception on to the defaultExceptionHandler.
-    List<Throwable> causalChain;
-    if (isEnabled.get() && isMapboxCrash(causalChain = getCausalChain(throwable))) {
+    CrashReport report;
+    if (isEnabled.get() && (report = crashReportFactory.createReportForCrash(thread, throwable)) != null) {
       try {
-        CrashReport report = CrashReportBuilder.setup(applicationContext, mapboxPackage, version)
-          .addExceptionThread(thread)
-          .addCausalChain(causalChain)
-          .build();
-
         ensureDirectoryWritable(applicationContext, mapboxPackage);
 
         File file = FileUtils.getFile(applicationContext, getReportFileName(mapboxPackage, report.getDateString()));
@@ -132,50 +122,6 @@ public class MapboxUncaughtExceptionHanlder implements Thread.UncaughtExceptionH
   @VisibleForTesting
   boolean isEnabled() {
     return isEnabled.get();
-  }
-
-  /**
-   * Set exception chain depth we're interested in to dig into backtrace data.
-   *
-   * @param depth of exception chain
-   */
-  @VisibleForTesting
-  void setExceptionChainDepth(@IntRange(from = 1, to = 256) int depth) {
-    this.exceptionChainDepth = depth;
-  }
-
-  @VisibleForTesting
-  boolean isMapboxCrash(List<Throwable> throwables) {
-    for (Throwable cause : throwables) {
-      final StackTraceElement[] stackTraceElements = cause.getStackTrace();
-      for (final StackTraceElement element : stackTraceElements) {
-        if (isMapboxStackTraceElement(element)) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  @VisibleForTesting
-  List<Throwable> getCausalChain(@Nullable Throwable throwable) {
-    List<Throwable> causes = new ArrayList<>(4);
-    int level = 0;
-    while (throwable != null) {
-      if (isMidOrLowLevelException(++level)) {
-        causes.add(throwable);
-      }
-      throwable = throwable.getCause();
-    }
-    return Collections.unmodifiableList(causes);
-  }
-
-  private boolean isMapboxStackTraceElement(@NonNull StackTraceElement element) {
-    return element.getClassName().startsWith(mapboxPackage);
-  }
-
-  private boolean isMidOrLowLevelException(int level) {
-    return level >= exceptionChainDepth;
   }
 
   @VisibleForTesting
