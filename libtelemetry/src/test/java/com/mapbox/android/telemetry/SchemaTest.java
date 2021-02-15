@@ -38,7 +38,13 @@ public class SchemaTest {
    **/
   private String[] additionalLocationProperties =
     {"speed", "course", "floor", "speedAccuracy", "courseAccuracy", "verticalAccuracy", "config",
-     "approximate", "accuracyAuthorization"};
+     "approximate", "accuracyAuthorization", "version"};
+
+  /**
+   * Properties in Vision Schema that are added in backend
+   * but not incorporated into the Android SDK yet.
+   **/
+  private String[] additionalVisionProperties = {"version"};
 
   @BeforeClass
   public static void downloadSchema() throws Exception {
@@ -93,6 +99,12 @@ public class SchemaTest {
   @Test
   public void validateVisionEventFormat() {
     JsonObject schema = grabSchema(VisionObjectDetectionEvent.VIS_OBJECT_DETECTION);
+    if (schema != null) {
+      // Ignore the event properties that are not incorporated into the android sdk yet.
+      for (String string : additionalVisionProperties) {
+        schema.remove(string);
+      }
+    }
     List<Field> fields = grabClassFields(VisionObjectDetectionEvent.class);
     assertEquals(schema.size(), fields.size());
     schemaContainsFields(schema, fields);
