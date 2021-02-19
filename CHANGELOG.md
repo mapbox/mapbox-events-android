@@ -4,7 +4,9 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
-### devel
+### v6.3.0
+
+- [telemetry] Handle activity lifecycle to report more precise application state [#510](https://github.com/mapbox/mapbox-events-android/pull/510)
 
 ### v6.2.2
 
@@ -274,6 +276,10 @@ Mapbox welcomes participation and contributions from everyone.
 
 
 ## Mapbox Android Core
+
+### v3.2.0
+
+- [core] Add API for reporting non-fatal exceptions via Telemetry SDK [#496](https://github.com/mapbox/mapbox-events-android/pull/512)
 
 ### v3.1.0
 - [core] Add background location permission [#498](https://github.com/mapbox/mapbox-events-android/pull/498)
