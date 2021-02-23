@@ -50,7 +50,7 @@ class LocationEngineControllerImpl implements LocationEngineController {
   private void registerReceiver() {
     try {
       applicationContext.registerReceiver(locationUpdatesBroadcastReceiver,
-        new IntentFilter(LocationUpdatesBroadcastReceiver.ACTION_LOCATION_UPDATED));
+          new IntentFilter(LocationUpdatesBroadcastReceiver.ACTION_LOCATION_UPDATED));
     } catch (IllegalArgumentException iae) {
       Log.e(TAG, iae.toString());
     }
@@ -83,8 +83,8 @@ class LocationEngineControllerImpl implements LocationEngineController {
   }
 
   private PendingIntent getPendingIntent() {
-    // Implicit intent is required here to work with registering receiver via context
-    Intent intent = new Intent(LocationUpdatesBroadcastReceiver.ACTION_LOCATION_UPDATED);
+    Intent intent = new Intent(applicationContext, LocationUpdatesBroadcastReceiver.class);
+    intent.setAction(LocationUpdatesBroadcastReceiver.ACTION_LOCATION_UPDATED);
     return PendingIntent.getBroadcast(applicationContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
   }
 

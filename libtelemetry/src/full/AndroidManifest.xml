@@ -21,5 +21,10 @@
 
         <service android:name=".MapboxTelemetryService" android:exported="false"/>
 
+        <receiver android:name="com.mapbox.android.telemetry.location.LocationUpdatesBroadcastReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="com.mapbox.android.telemetry.location.LocationUpdatesBroadcastReceiver.ACTION_LOCATION_UPDATED"/>
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>
