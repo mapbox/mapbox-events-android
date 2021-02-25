@@ -57,7 +57,7 @@ public class MapboxCrashReporter {
     CrashReport report = crashReportFactory.createReportForNonFatal(throwable, customData);
     if (report != null) {
       CrashEvent nonFatalErrorEvent = parseReportAsEvent(report);
-      return telemetry.push(nonFatalErrorEvent);
+      return telemetry.pushToQueue(nonFatalErrorEvent);
     }
     return false;
   }

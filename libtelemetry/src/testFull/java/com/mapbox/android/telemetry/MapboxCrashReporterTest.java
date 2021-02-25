@@ -32,7 +32,7 @@ public class MapboxCrashReporterTest {
 
     boolean isReported = reporter.reportError(error, customData);
 
-    verify(telemetryMock, never()).push(any(Event.class));
+    verify(telemetryMock, never()).pushToQueue(any(Event.class));
     Assert.assertFalse(isReported);
   }
 
@@ -48,11 +48,11 @@ public class MapboxCrashReporterTest {
     CrashEvent crashEvent = new CrashEvent(null, null);
     when(reportFactoryMock.createReportForNonFatal(error, customData)).thenReturn(reportMock);
     doReturn(crashEvent).when(reporter).parseReportAsEvent(reportMock);
-    when(telemetryMock.push(crashEvent)).thenReturn(true);
+    when(telemetryMock.pushToQueue(crashEvent)).thenReturn(true);
 
     boolean isReported = reporter.reportError(error, customData);
 
-    verify(telemetryMock, times(1)).push(crashEvent);
+    verify(telemetryMock, times(1)).pushToQueue(crashEvent);
     Assert.assertTrue(isReported);
   }
 }
