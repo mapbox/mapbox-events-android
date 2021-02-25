@@ -326,7 +326,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     attachmentListeners = new CopyOnWriteArraySet<>();
   }
 
-  private boolean pushToQueue(Event event) {
+  boolean pushToQueue(Event event) {
     TelemetryEnabler.State telemetryState = telemetryEnabler.obtainTelemetryState();
     if (TelemetryEnabler.State.ENABLED.equals(telemetryState)) {
       return queue.push(event);
