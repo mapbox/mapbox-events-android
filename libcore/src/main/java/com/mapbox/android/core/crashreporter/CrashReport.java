@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import android.util.Log;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -36,7 +38,7 @@ public class CrashReport {
    * @param key   valid non-empty key
    * @param value valid string value or null
    */
-  public synchronized void put(@NonNull String key, @Nullable String value) {
+  public synchronized void put(@NonNull String key, @Nullable Object value) {
     if (value == null) {
       putNull(key);
       return;
@@ -45,7 +47,7 @@ public class CrashReport {
     try {
       this.content.put(key, value);
     } catch (JSONException je) {
-      Log.e(TAG, "Failed json encode value: " + String.valueOf(value));
+      Log.e(TAG, "Failed json encode value: " + value);
     }
   }
 
@@ -73,6 +75,12 @@ public class CrashReport {
   @NonNull
   String getString(@NonNull String key) {
     return this.content.optString(key);
+  }
+
+  @VisibleForTesting
+  @Nullable
+  JSONArray getJsonArray(@NonNull String key) {
+    return this.content.optJSONArray(key);
   }
 
   private void putNull(@NonNull String key) {

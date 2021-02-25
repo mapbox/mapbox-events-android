@@ -8,12 +8,16 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 
 public class CrashReportFactoryInstrumentedTest {
   private static final String TELEM_MAPBOX_PACKAGE = "com.mapbox.android.telemetry";
@@ -21,9 +25,11 @@ public class CrashReportFactoryInstrumentedTest {
 
   private static final String JAVA_UTIL_PACKAGE = "java.util";
   private static final Set<String> ALLOWED_PACKAGE_PREFIXES = new HashSet<>();
+  private static final Map<String, String> TEST_CUSTOM_DATA = new HashMap<>();
 
   static  {
     ALLOWED_PACKAGE_PREFIXES.add(JAVA_UTIL_PACKAGE);
+    TEST_CUSTOM_DATA.put("testKey", "testValue");
   }
 
   private CrashReportFactory factory;
@@ -55,6 +61,49 @@ public class CrashReportFactoryInstrumentedTest {
 
     assertNotNull(report);
     assertEquals("mobile.crash", report.getString("event"));
+    assertFalse(report.getString("created").isEmpty());
+  }
+
+  @Test
+  public void checkMandatoryAttributesForCrashWithEmptyCustomData() {
+    CrashReport report = factory.createReportForCrash(Thread.currentThread(),
+      createMapboxThrowable(), Collections.<String, String>emptyMap());
+
+    assertNotNull(report);
+    assertEquals("mobile.crash", report.getString("event"));
+    assertNull(report.getJsonArray("customData"));
+    assertFalse(report.getString("created").isEmpty());
+  }
+
+  @Test
+  public void checkMandatoryAttributesForNonFatalWithEmptyCustomData() {
+    CrashReport report = factory.createReportForNonFatal(createMapboxThrowable(),
+      Collections.<String, String>emptyMap());
+
+    assertNotNull(report);
+    assertEquals("mobile.crash", report.getString("event"));
+    assertNull(report.getJsonArray("customData"));
+    assertFalse(report.getString("created").isEmpty());
+  }
+
+  @Test
+  public void checkMandatoryAttributesForCrashWithCustomData() {
+    CrashReport report = factory.createReportForCrash(Thread.currentThread(),
+      createMapboxThrowable(), TEST_CUSTOM_DATA);
+
+    assertNotNull(report);
+    assertEquals("mobile.crash", report.getString("event"));
+    assertEquals("[{\"name\":\"testKey\",\"value\":\"testValue\"}]", report.getJsonArray("customData").toString());
+    assertFalse(report.getString("created").isEmpty());
+  }
+
+  @Test
+  public void checkMandatoryAttributesForNonFatalWithCustomData() {
+    CrashReport report = factory.createReportForNonFatal(createMapboxThrowable(), TEST_CUSTOM_DATA);
+
+    assertNotNull(report);
+    assertEquals("mobile.crash", report.getString("event"));
+    assertEquals("[{\"name\":\"testKey\",\"value\":\"testValue\"}]", report.getJsonArray("customData").toString());
     assertFalse(report.getString("created").isEmpty());
   }
 

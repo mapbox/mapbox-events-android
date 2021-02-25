@@ -2,21 +2,28 @@ package com.mapbox.android.core.crashreporter;
 
 import android.content.Context;
 import android.os.Build;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 /**
  * Crash report builder encapsulates report generation logic.
  */
 public final class CrashReportBuilder {
+  private static final String TAG = "CrashReportBuilder";
   private static final String OS_VERSION_FORMAT = "Android-%s";
   private static final String THREAD_DETAILS_FORMAT = "tid:%s|name:%s|priority:%s";
   private static final String STACK_TRACE_ELEMENT_FORMAT = "%s.%s(%s:%d)";
@@ -28,6 +35,7 @@ public final class CrashReportBuilder {
 
   private Thread uncaughtExceptionThread;
   private boolean isSilent;
+  private Map<String, String> customData = null;
 
   private CrashReportBuilder(Context applicationContext, String sdkIdentifier, String sdkVersion,
                              Set<String> allowedStacktracePrefixes) {
@@ -71,6 +79,11 @@ public final class CrashReportBuilder {
     return this;
   }
 
+  CrashReportBuilder setCustomData(@Nullable Map<String, String> customData) {
+    this.customData = customData;
+    return this;
+  }
+
   CrashReport build() {
     CrashReport report = new CrashReport(new GregorianCalendar());
     report.put("sdkIdentifier", sdkIdentifier);
@@ -87,7 +100,29 @@ public final class CrashReportBuilder {
     }
     report.put("appId", applicationContext.getPackageName());
     report.put("appVersion", getAppVersion(applicationContext));
+    report.put("customData", getCustomData(customData));
     return report;
+  }
+
+  @Nullable
+  private JSONArray getCustomData(@Nullable Map<String, String> customData) {
+    if (customData == null || customData.isEmpty()) {
+      return null;
+    }
+
+    try {
+      JSONArray jsonArray = new JSONArray();
+      for (Map.Entry<String, String> entry : customData.entrySet()) {
+        JSONObject keyValueObject = new JSONObject();
+        keyValueObject.put("name", entry.getKey());
+        keyValueObject.put("value", entry.getValue());
+        jsonArray.put(keyValueObject);
+      }
+      return jsonArray;
+    } catch (JSONException je) {
+      Log.e(TAG, "Failed to create JSON array for custom data", je);
+      return null;
+    }
   }
 
   @VisibleForTesting
