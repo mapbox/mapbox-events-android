@@ -1,12 +1,14 @@
 package com.mapbox.android.telemetry;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
 import com.mapbox.android.core.crashreporter.CrashReport;
 import com.mapbox.android.core.crashreporter.CrashReportFactory;
 import com.mapbox.android.telemetry.errors.ErrorUtils;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -39,8 +41,20 @@ public class MapboxCrashReporter {
    * @param throwable non-fatal error, that should be reported
    * @return whether error event was added to event queue
    */
-  public boolean reportError(Throwable throwable) {
-    CrashReport report = crashReportFactory.createReportForNonFatal(throwable);
+  public boolean reportError(@NonNull Throwable throwable) {
+    return reportError(throwable, null);
+  }
+
+  /**
+   * Report non-fatal exception via Telemetry.
+   *
+   * @param throwable non-fatal error, that should be reported
+   * @param customData extra data, provided by SDK consumer
+   * @return whether error event was added to event queue
+   */
+  public boolean reportError(@NonNull Throwable throwable,
+                             @Nullable Map<String, String> customData) {
+    CrashReport report = crashReportFactory.createReportForNonFatal(throwable, customData);
     if (report != null) {
       CrashEvent nonFatalErrorEvent = parseReportAsEvent(report);
       return telemetry.push(nonFatalErrorEvent);

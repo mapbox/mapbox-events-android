@@ -8,6 +8,8 @@ import androidx.annotation.Keep;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 /**
  * This class is temporary and exists only
  * to comply with legacy telemetry interface,
@@ -45,6 +47,8 @@ public class CrashEvent extends Event {
   private String appId;
   @SerializedName("appVersion")
   private String appVersion;
+  @SerializedName("customData")
+  private List<KeyValue> customData;
 
   public CrashEvent(String event, String created) {
     this.event = event;

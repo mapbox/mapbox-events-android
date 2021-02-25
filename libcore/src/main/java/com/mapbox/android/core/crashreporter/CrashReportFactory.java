@@ -10,6 +10,7 @@ import androidx.annotation.VisibleForTesting;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -45,7 +46,25 @@ public final class CrashReportFactory {
    *         is returned
    */
   @Nullable
-  public CrashReport createReportForCrash(Thread thread, Throwable throwable) {
+  public CrashReport createReportForCrash(@Nullable Thread thread,
+                                          @Nullable Throwable throwable) {
+    return createReportForCrash(thread, throwable, null);
+  }
+
+  /**
+   * Create {@link CrashReport} for crash.
+   *
+   * @param thread thread, where exception has occurred
+   * @param throwable crash itself
+   * @param customData extra information useful for report, provided by the user
+   * @return report, if crash was partly or fully caused by Mapbox module/sdk with
+   *         {@linkplain CrashReportFactory#mapboxPackage} package name; otherwise, null
+   *         is returned
+   */
+  @Nullable
+  public CrashReport createReportForCrash(@Nullable Thread thread,
+                                          @Nullable Throwable throwable,
+                                          @Nullable Map<String, String> customData) {
     CrashReport report = null;
 
     List<Throwable> causalChain;
@@ -54,6 +73,7 @@ public final class CrashReportFactory {
         .setup(applicationContext, mapboxPackage, mapboxModuleVersion, allowedStacktracePrefixes)
         .addExceptionThread(thread)
         .addCausalChain(causalChain)
+        .setCustomData(customData)
         .build();
     }
 
@@ -69,7 +89,22 @@ public final class CrashReportFactory {
    *         is returned
    */
   @Nullable
-  public CrashReport createReportForNonFatal(Throwable throwable) {
+  public CrashReport createReportForNonFatal(@Nullable Throwable throwable) {
+    return createReportForNonFatal(throwable, null);
+  }
+
+  /**
+   * Create {@link CrashReport} for non-fatal error.
+   *
+   * @param throwable non-fatal error
+   * @param customData extra information useful for report, provided by the user
+   * @return report, if non-fatal error was partly or fully caused by Mapbox module/sdk with
+   *         {@linkplain CrashReportFactory#mapboxPackage} package name; otherwise, null
+   *         is returned
+   */
+  @Nullable
+  public CrashReport createReportForNonFatal(@Nullable Throwable throwable,
+                                             @Nullable Map<String, String> customData) {
     CrashReport report = null;
 
     List<Throwable> causalChain;
@@ -78,6 +113,7 @@ public final class CrashReportFactory {
         .setup(applicationContext, mapboxPackage, mapboxModuleVersion, allowedStacktracePrefixes)
         .isSilent(true)
         .addCausalChain(causalChain)
+        .setCustomData(customData)
         .build();
     }
 
