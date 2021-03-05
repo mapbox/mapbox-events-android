@@ -4,6 +4,10 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v7.0.0
+
+- Add custom data support for reporting non-fatal errors and crashes [#516](https://github.com/mapbox/mapbox-events-android/pull/516)
+
 ### v6.3.0
 
 - [telemetry] Handle activity lifecycle to report more precise application state [#510](https://github.com/mapbox/mapbox-events-android/pull/510)
@@ -276,6 +280,10 @@ Mapbox welcomes participation and contributions from everyone.
 
 
 ## Mapbox Android Core
+
+### v4.0.0
+
+- Add custom data support for reporting non-fatal errors and crashes [#516](https://github.com/mapbox/mapbox-events-android/pull/516)
 
 ### v3.2.0
 
