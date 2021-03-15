@@ -15,6 +15,7 @@ class StagingCertificatePins {
           add("3euxrJOrEZI15R4104UsiAkDqe007EPyZ6eTL/XxdAY=");
           add("5kJvNEMw0KjrCAu7eXY5HZdvyCS13BbA0VJG1RSP91w=");
           add("r/mIkG3eEpVdm+u/ko/cwxzOMo1bk4TyHIlByibiA5E=");
+          add("PA1lecwXNRXY/Vpy0VN+jQEYChN4hCAF36oB0Ygx3wQ=");
         }
       });
     }
