@@ -47,12 +47,6 @@ AWSTemplateFormatVersion: '2010-09-09',
         ]
       }
     },
-    AccessKey: {
-      Type: 'AWS::IAM::AccessKey',
-      Properties: {
-        UserName: cf.ref('User')
-      }
-    }
   },
   Outputs: {
     AccessKeyId: { Value: cf.ref('AccessKey') },
