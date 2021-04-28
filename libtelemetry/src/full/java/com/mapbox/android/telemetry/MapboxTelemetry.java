@@ -101,6 +101,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   }
 
   public boolean push(Event event) {
+    Log.i(LOG_TAG, "push(" + event + ")");
     if (sendEventIfWhitelisted(event)) {
       return true;
     }
@@ -453,6 +454,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     return new Callback() {
       @Override
       public void onFailure(Call call, IOException e) {
+        Log.e(LOG_TAG, "HttpCallback.onFailure(...," + e + ")");
         for (TelemetryListener telemetryListener : listeners) {
           telemetryListener.onHttpFailure(e.getMessage());
         }
@@ -460,6 +462,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
 
       @Override
       public void onResponse(Call call, Response response) throws IOException {
+        Log.e(LOG_TAG, "HttpCallback.onResponse(...," + response + ")");
         ResponseBody body = response.body();
         if (body != null) {
           body.close();

@@ -42,6 +42,7 @@ public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
       MapboxTelemetry telemetry = collectionClient.getTelemetry();
       String sessionId = collectionClient.getSessionId();
       List<Location> locations = result.getLocations();
+      Log.i(TAG, "Received " + locations.size() + " of location updates");
       for (Location location : locations) {
         if (isThereAnyNaN(location) || isThereAnyInfinite(location)) {
           continue;

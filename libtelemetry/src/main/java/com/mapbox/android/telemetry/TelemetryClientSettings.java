@@ -97,7 +97,7 @@ class TelemetryClientSettings {
     SSLSocketFactory sslSocketFactory = null;
     X509TrustManager x509TrustManager = null;
     HostnameVerifier hostnameVerifier = null;
-    boolean debugLoggingEnabled = false;
+    boolean debugLoggingEnabled = true;
 
     Builder(Context context) {
       this.context = context;
