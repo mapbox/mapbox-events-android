@@ -109,12 +109,18 @@ class MapboxFusedLocationEngineImpl extends AndroidLocationEngineImpl {
 
     @Override
     public void onLocationChanged(Location location) {
+      Location deliveredLocation = null;
       if (isBetterLocation(location, currentBestLocation)) {
         currentBestLocation = location;
+        deliveredLocation = location;
       }
 
       if (callback != null) {
-        callback.onSuccess(LocationEngineResult.create(currentBestLocation));
+        if (deliveredLocation != null) {
+          callback.onSuccess(LocationEngineResult.create(deliveredLocation));
+        } else {
+          callback.onFailure(new Exception("New location is significantly worse than the last one, skipping update."));
+        }
       }
     }
 

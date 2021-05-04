@@ -7,6 +7,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Looper;
+
 import androidx.annotation.NonNull;
 
 import org.junit.Before;
@@ -29,6 +30,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyFloat;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -40,13 +42,13 @@ public class MapboxFusedLocationEngineImplAdditionalTest2 {
   private ArrayList<LocationEngineProxy> engines = new ArrayList<>();
   private LocationManager mockLocationManager;
   private Location location = new Location(PROVIDER);
+  private Context mockContext = mock(Context.class);
 
   @Before
   public void setUp() {
     location = mock(Location.class);
     when(location.getLatitude()).thenReturn(1.0);
     when(location.getLongitude()).thenReturn(2.0);
-    Context mockContext = mock(Context.class);
     mockLocationManager = mock(LocationManager.class);
     when(mockContext.getSystemService(anyString())).thenReturn(mockLocationManager);
     List<String> providers = new ArrayList<>();
@@ -65,7 +67,8 @@ public class MapboxFusedLocationEngineImplAdditionalTest2 {
         return null;
       }
     }).when(mockLocationManager)
-      .requestLocationUpdates(anyString(), anyLong(), anyFloat(), any(LocationListener.class), any(Looper.class));
+      .requestLocationUpdates(
+        eq(LocationManager.GPS_PROVIDER), anyLong(), anyFloat(), any(LocationListener.class), any(Looper.class));
     engines.add(new LocationEngineProxy<>(new MapboxFusedLocationEngineImpl(mockContext)));
     engines.add(new LocationEngineProxy<>(new AndroidLocationEngineImpl(mockContext)));
   }
@@ -116,26 +119,24 @@ public class MapboxFusedLocationEngineImplAdditionalTest2 {
 
   @Test
   public void checkRequestAndRemoveLocationUpdates() throws InterruptedException {
-    final CountDownLatch latch = new CountDownLatch(engines.size());
-
-    LocationEngineCallback<LocationEngineResult> engineCallback = new LocationEngineCallback<LocationEngineResult>() {
-      @Override
-      public void onSuccess(LocationEngineResult result) {
-        List<Location> list = result.getLocations();
-        assertEquals(1, list.size());
-        assertEquals(1.0, list.get(0).getLatitude(), 0);
-        assertEquals(2.0, list.get(0).getLongitude(), 0);
-        latch.countDown();
-      }
-
-      @Override
-      public void onFailure(@NonNull Exception exception) {
-
-      }
-    };
-
-
     for (LocationEngineProxy engineProxy : engines) {
+      final CountDownLatch latch = new CountDownLatch(1);
+
+      LocationEngineCallback<LocationEngineResult> engineCallback = new LocationEngineCallback<LocationEngineResult>() {
+        @Override
+        public void onSuccess(LocationEngineResult result) {
+          List<Location> list = result.getLocations();
+          assertEquals(1, list.size());
+          assertEquals(1.0, list.get(0).getLatitude(), 0);
+          assertEquals(2.0, list.get(0).getLongitude(), 0);
+          latch.countDown();
+        }
+
+        @Override
+        public void onFailure(@NonNull Exception exception) {
+
+        }
+      };
       engineProxy.requestLocationUpdates(getRequest(INTERVAL, LocationEngineRequest.PRIORITY_HIGH_ACCURACY),
         engineCallback, mock(Looper.class));
 
@@ -144,6 +145,47 @@ public class MapboxFusedLocationEngineImplAdditionalTest2 {
       assertNotNull(engineProxy.removeListener(engineCallback));
     }
 
+  }
+
+  @Test
+  public void checkRequestAndIgnoreBadUpdates() throws InterruptedException {
+    doAnswer(new Answer<Object>() {
+      @Override
+      public Object answer(InvocationOnMock invocation) {
+        LocationListener listener = (LocationListener) invocation.getArguments()[3];
+        listener.onProviderEnabled(PROVIDER);
+        listener.onStatusChanged(PROVIDER, LocationProvider.AVAILABLE, null);
+        listener.onLocationChanged(location);
+        listener.onLocationChanged(location); // duplicate update
+        listener.onProviderDisabled(PROVIDER);
+        return null;
+      }
+    }).when(mockLocationManager)
+      .requestLocationUpdates(
+        eq(LocationManager.GPS_PROVIDER), anyLong(), anyFloat(), any(LocationListener.class), any(Looper.class));
+
+    final CountDownLatch latch = new CountDownLatch(1);
+
+    LocationEngineProxy fusedProxy = new LocationEngineProxy<>(new MapboxFusedLocationEngineImpl(mockContext));
+    LocationEngineCallback<LocationEngineResult> engineCallback = new LocationEngineCallback<LocationEngineResult>() {
+      @Override
+      public void onSuccess(LocationEngineResult result) {
+
+      }
+
+      @Override
+      public void onFailure(@NonNull Exception exception) {
+        assertEquals(
+          "New location is significantly worse than the last one, skipping update.",
+          exception.getLocalizedMessage()
+        );
+        latch.countDown();
+      }
+    };
+    fusedProxy.requestLocationUpdates(getRequest(INTERVAL, LocationEngineRequest.PRIORITY_HIGH_ACCURACY),
+      engineCallback, mock(Looper.class));
+
+    assertTrue(latch.await(1, TimeUnit.SECONDS));
   }
 
   private static LocationEngineRequest getRequest(long interval, int priority) {
