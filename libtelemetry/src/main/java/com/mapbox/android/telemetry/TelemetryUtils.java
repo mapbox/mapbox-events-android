@@ -174,7 +174,7 @@ public class TelemetryUtils {
       } catch (SecurityException se) {
         // Developer did not add READ_PHONE_STATE permission to their app
         // or user did not accept the permission.
-        Log.e(TAG, se.toString());
+        Log.w(TAG, se.toString());
       }
     } else {
       output = telephonyManager.getNetworkType();
