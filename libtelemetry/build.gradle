@@ -65,3 +65,5 @@ dependencies {
     androidTestImplementation dependenciesList.testRunner
     androidTestImplementation dependenciesList.testRules
 }
+
+apply from: "${rootDir}/gradle/sdk-registry.gradle"

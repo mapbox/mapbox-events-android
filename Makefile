@@ -38,6 +38,18 @@ publish-local-telem-lite:
 	# This publishes to ~/.m2/repository/com/mapbox/mapboxsdk
 	export IS_LOCAL_DEVELOPMENT=true; export IS_LITE_RELEASE=true; ./gradlew :libtelemetry:uploadArchives
 
+.PHONY: publish-core-to-sdk-registry
+publish-core-to-sdk-registry:
+	./gradlew :libcore:mapboxSDKRegistryUpload;
+
+.PHONY: publish-telemetry-to-sdk-registry
+publish-telemetry-to-sdk-registry:
+	./gradlew :libtelemetry:mapboxSDKRegistryUpload;
+
+.PHONY: publish-all-to-sdk-registry
+publish-all-to-sdk-registry:
+	./gradlew mapboxSDKRegistryUpload;
+
 graphs:
 	./gradlew :libcore:generateDependencyGraphMapboxLibraries
 	./gradlew :libtelemetry:generateDependencyGraphMapboxLibraries
