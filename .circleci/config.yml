@@ -93,16 +93,16 @@ jobs:
       IS_LOCAL_DEVELOPMENT: false
     steps:
       - checkout
-      # - run:
-      #     name: Generate Maven credentials
-      #     shell: /bin/bash -euo pipefail
-      #     command: |
-      #       aws s3 cp s3://mapbox/android/signing-credentials/secring.gpg secring.gpg
-      #       echo "NEXUS_USERNAME=$PUBLISH_NEXUS_USERNAME
-      #       NEXUS_PASSWORD=$PUBLISH_NEXUS_PASSWORD
-      #       signing.keyId=$SIGNING_KEYID
-      #       signing.password=$SIGNING_PASSWORD
-      #       signing.secretKeyRingFile=../secring.gpg" >> gradle.properties
+      - run:
+          name: Generate Maven credentials
+          shell: /bin/bash -euo pipefail
+          command: |
+            aws s3 cp s3://mapbox/android/signing-credentials/secring.gpg secring.gpg
+            echo "NEXUS_USERNAME=$PUBLISH_NEXUS_USERNAME
+            NEXUS_PASSWORD=$PUBLISH_NEXUS_PASSWORD
+            signing.keyId=$SIGNING_KEYID
+            signing.password=$SIGNING_PASSWORD
+            signing.secretKeyRingFile=../secring.gpg" >> gradle.properties
       - run:
           name: Update version name
           command: |
@@ -117,15 +117,20 @@ jobs:
           name: Build libraries
           command: make release
       - deploy:
-          name: Publish to Maven Central
+          name: Publish to Maven Central and Mapbox SDK Registry
           command: |
             if [[ $CIRCLE_BRANCH == master ]]; then
               make publish-core ;
               make publish-telem ;
+              make publish-all-to-sdk-registry ;
+            elif [[ $CIRCLE_TAG == telem-*-core-* ]]; then
+              make publish-all-to-sdk-registry ;
             elif [[ $CIRCLE_TAG == telem-* ]]; then
               make publish-telem ;
+              make publish-telemetry-to-sdk-registry ;
             elif [[ $CIRCLE_TAG == core-* ]]; then
               make publish-core ;
+              make publish-core-to-sdk-registry ;
             else
               echo "Skip, not a release branch"
             fi

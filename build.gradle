@@ -3,11 +3,27 @@ buildscript {
     repositories {
         google()
         jcenter()
+        maven {
+            url 'https://api.mapbox.com/downloads/v2/releases/maven'
+            authentication {
+                basic(BasicAuthentication)
+            }
+            credentials {
+                username = "mapbox"
+                password = project.hasProperty('SDK_REGISTRY_TOKEN') ? project.property('SDK_REGISTRY_TOKEN') : System.getenv('SDK_REGISTRY_TOKEN')
+            }
+        }
     }
 
     dependencies {
         classpath pluginDependencies.gradle
         classpath pluginDependencies.mapboxSdkVersions
+        if (SDK_REGISTRY == 'true') {
+            println 'SDK_REGISTRY=true'
+            classpath pluginDependencies.mapboxSdkRegistry
+        } else {
+            println 'SDK_REGISTRY=false'
+        }
     }
 }
 
