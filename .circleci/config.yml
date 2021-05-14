@@ -50,37 +50,37 @@ jobs:
       - run:
           name: Build all the test APK
           command: ./gradlew assembleAndroidTest
-      - run:
-          name: Log in to Google Cloud Platform
-          shell: /bin/bash -euo pipefail
-          command: |
-            echo "${GCLOUD_SERVICE_ACCOUNT_JSON}" > secret.json
-            gcloud auth activate-service-account --key-file secret.json --project mapbox-events-android
-            rm secret.json
-      - run:
-          name: Run libcore instrumentation tests on Firebase
-          no_output_timeout: 20m
-          command: |
-            build_dir="libcore/build"
-            test_apk_path="outputs/apk/androidTest/debug/libcore-debug-androidTest.apk"
-            ./cloud_test.sh $build_dir $test_apk_path $CIRCLE_BUILD_NUM
-      - run:
-          name: Run libtelemetry instrumentation tests on Firebase
-          no_output_timeout: 20m
-          command: |
-            build_dir="libtelemetry/build"
-            test_apk_path="outputs/apk/androidTest/full/debug/libtelemetry-full-debug-androidTest.apk"
-            ./cloud_test.sh $build_dir $test_apk_path $CIRCLE_BUILD_NUM
-      - run:
-          name: Post code coverage report to Codecov.io
-          command: |
-            make test-coverage
-            pip install --user codecov && /root/.local/bin/codecov
-      - store_artifacts:
-          path: app/build/reports
-          destination: reports
-      - store_test_results:
-          path: app/build/test-results
+      # - run:
+      #     name: Log in to Google Cloud Platform
+      #     shell: /bin/bash -euo pipefail
+      #     command: |
+      #       echo "${GCLOUD_SERVICE_ACCOUNT_JSON}" > secret.json
+      #       gcloud auth activate-service-account --key-file secret.json --project mapbox-events-android
+      #       rm secret.json
+      # - run:
+      #     name: Run libcore instrumentation tests on Firebase
+      #     no_output_timeout: 20m
+      #     command: |
+      #       build_dir="libcore/build"
+      #       test_apk_path="outputs/apk/androidTest/debug/libcore-debug-androidTest.apk"
+      #       ./cloud_test.sh $build_dir $test_apk_path $CIRCLE_BUILD_NUM
+      # - run:
+      #     name: Run libtelemetry instrumentation tests on Firebase
+      #     no_output_timeout: 20m
+      #     command: |
+      #       build_dir="libtelemetry/build"
+      #       test_apk_path="outputs/apk/androidTest/full/debug/libtelemetry-full-debug-androidTest.apk"
+      #       ./cloud_test.sh $build_dir $test_apk_path $CIRCLE_BUILD_NUM
+      # - run:
+      #     name: Post code coverage report to Codecov.io
+      #     command: |
+      #       make test-coverage
+      #       pip install --user codecov && /root/.local/bin/codecov
+      # - store_artifacts:
+      #     path: app/build/reports
+      #     destination: reports
+      # - store_test_results:
+      #     path: app/build/test-results
 
 
 # ------------------------------------------------------------------------------
@@ -93,16 +93,16 @@ jobs:
       IS_LOCAL_DEVELOPMENT: false
     steps:
       - checkout
-      - run:
-          name: Generate Maven credentials
-          shell: /bin/bash -euo pipefail
-          command: |
-            aws s3 cp s3://mapbox/android/signing-credentials/secring.gpg secring.gpg
-            echo "NEXUS_USERNAME=$PUBLISH_NEXUS_USERNAME
-            NEXUS_PASSWORD=$PUBLISH_NEXUS_PASSWORD
-            signing.keyId=$SIGNING_KEYID
-            signing.password=$SIGNING_PASSWORD
-            signing.secretKeyRingFile=../secring.gpg" >> gradle.properties
+      # - run:
+      #     name: Generate Maven credentials
+      #     shell: /bin/bash -euo pipefail
+      #     command: |
+      #       aws s3 cp s3://mapbox/android/signing-credentials/secring.gpg secring.gpg
+      #       echo "NEXUS_USERNAME=$PUBLISH_NEXUS_USERNAME
+      #       NEXUS_PASSWORD=$PUBLISH_NEXUS_PASSWORD
+      #       signing.keyId=$SIGNING_KEYID
+      #       signing.password=$SIGNING_PASSWORD
+      #       signing.secretKeyRingFile=../secring.gpg" >> gradle.properties
       - run:
           name: Update version name
           command: |
@@ -141,12 +141,12 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
             - ./node_modules
-      - run:
-          name: Check & Publish Binary Size
-          command: |
-            binary_path="libtelemetry/build/outputs/aar/libtelemetry-full-release.aar"
-            if [[ $CIRCLE_BRANCH == master ]] || [[ $CIRCLE_BRANCH == release-* ]]; then
-              ./scripts/capture_binary_size_for_aws.sh $binary_path "mapbox-events-android"
-            else
-              ./scripts/check_binary_size.sh $binary_path "Telemetry-AAR"
-            fi
+      # - run:
+      #     name: Check & Publish Binary Size
+      #     command: |
+      #       binary_path="libtelemetry/build/outputs/aar/libtelemetry-full-release.aar"
+      #       if [[ $CIRCLE_BRANCH == master ]] || [[ $CIRCLE_BRANCH == release-* ]]; then
+      #         ./scripts/capture_binary_size_for_aws.sh $binary_path "mapbox-events-android"
+      #       else
+      #         ./scripts/check_binary_size.sh $binary_path "Telemetry-AAR"
+      #       fi
