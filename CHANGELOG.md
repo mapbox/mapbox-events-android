@@ -4,6 +4,13 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v7.0.2
+- Add 5 new pins for the staging endpoint [#519](https://github.com/mapbox/mapbox-events-android/pull/519)
+
+### v7.0.1
+
+- [telemetry] Downgrade getDataNetworkType() error to warning [#521](https://github.com/mapbox/mapbox-events-android/pull/521)
+
 ### v7.0.0
 
 - Add custom data support for reporting non-fatal errors and crashes [#516](https://github.com/mapbox/mapbox-events-android/pull/516)
@@ -280,6 +287,9 @@ Mapbox welcomes participation and contributions from everyone.
 
 
 ## Mapbox Android Core
+
+### v4.0.1
+- skip a location update that was determined as worse than the last one [#520](https://github.com/mapbox/mapbox-events-android/pull/520)
 
 ### v4.0.0
 
