@@ -123,8 +123,6 @@ jobs:
               make publish-core ;
               make publish-telem ;
               make publish-all-to-sdk-registry ;
-            elif [[ $CIRCLE_TAG == telem-*-core-* ]]; then
-              make publish-all-to-sdk-registry ;
             elif [[ $CIRCLE_TAG == telem-* ]]; then
               make publish-telem ;
               make publish-telemetry-to-sdk-registry ;
