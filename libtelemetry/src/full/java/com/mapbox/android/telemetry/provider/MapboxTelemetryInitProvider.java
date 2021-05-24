@@ -35,8 +35,12 @@ public class MapboxTelemetryInitProvider extends ContentProvider {
   private final ServiceConnection telemetryServiceConnection = new ServiceConnection() {
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
-      MapboxTelemetryService.Binder binder = (MapboxTelemetryService.Binder) service;
-      telemetryService = binder.getService();
+      if (service instanceof MapboxTelemetryService.Binder) {
+        MapboxTelemetryService.Binder binder = (MapboxTelemetryService.Binder) service;
+        telemetryService = binder.getService();
+      } else {
+        Log.w(TAG, "Invalid type of MapboxTelemetryService.Binder=" + service);
+      }
     }
 
     @Override

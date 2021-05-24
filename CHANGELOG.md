@@ -4,7 +4,12 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v7.0.3
+
+- [telemetry] Workaround for MapboxTelemetryService crash. [#531](https://github.com/mapbox/mapbox-events-android/pull/531)
+
 ### v7.0.2
+
 - Add 5 new pins for the staging endpoint [#519](https://github.com/mapbox/mapbox-events-android/pull/519)
 
 ### v7.0.1
