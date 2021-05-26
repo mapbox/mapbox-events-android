@@ -4,6 +4,10 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v7.0.4
+
+- [telemetry] Android 12 compartibility fixes. 
+
 ### v7.0.3
 
 - [telemetry] Workaround for MapboxTelemetryService crash. [#531](https://github.com/mapbox/mapbox-events-android/pull/531)

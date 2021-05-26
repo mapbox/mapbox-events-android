@@ -9,6 +9,8 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.core.os.BuildCompat;
+
 import android.util.Log;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineRequest;
@@ -85,7 +87,11 @@ class LocationEngineControllerImpl implements LocationEngineController {
   private PendingIntent getPendingIntent() {
     // Implicit intent is required here to work with registering receiver via context
     Intent intent = new Intent(LocationUpdatesBroadcastReceiver.ACTION_LOCATION_UPDATED);
-    return PendingIntent.getBroadcast(applicationContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+    if (BuildCompat.isAtLeastS()) {
+      flags |= 33554432; //TODO: replace with PendingIntent.FLAG_MUTABLE after Android 12 release
+    }
+    return PendingIntent.getBroadcast(applicationContext, 0, intent, flags);
   }
 
   private boolean isPermissionGranted(String permission) {
