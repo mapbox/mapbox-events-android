@@ -47,6 +47,7 @@ android {
 }
 
 dependencies {
+    implementation dependenciesList.androidCore
     implementation dependenciesList.okhttp3
     implementation dependenciesList.gson
     implementation dependenciesList.supportAnnotation
