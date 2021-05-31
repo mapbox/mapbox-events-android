@@ -29,6 +29,18 @@ public class PermissionsManager {
 
   private PermissionsListener listener;
 
+  /**
+   * Type of accuracy granted by a user to the app.
+   */
+  public enum AccuracyAuthorization {
+    /** No location permission granted. */
+    NONE,
+    /** Provides the location accuracy that the ACCESS_FINE_LOCATION permission provides. */
+    PRECISE,
+    /** Provides the location accuracy that the ACCESS_COARSE_LOCATION permission provides. */
+    APPROXIMATE,
+  }
+
   public PermissionsManager(PermissionsListener listener) {
     this.listener = listener;
   }
@@ -148,5 +160,23 @@ public class PermissionsManager {
       default:
         // Ignored
     }
+  }
+
+  /**
+   * Returns the type of accuracy given by a user
+   * to the application.
+   *
+   * @param context the application context
+   * @return the type of accuracy authorization
+   * @see AccuracyAuthorization
+   */
+  public static AccuracyAuthorization accuracyAuthorization(Context context) {
+    if (isFineLocationPermissionGranted(context)) {
+      return AccuracyAuthorization.PRECISE;
+    }
+    if (isCoarseLocationPermissionGranted(context)) {
+      return AccuracyAuthorization.APPROXIMATE;
+    }
+    return AccuracyAuthorization.NONE;
   }
 }

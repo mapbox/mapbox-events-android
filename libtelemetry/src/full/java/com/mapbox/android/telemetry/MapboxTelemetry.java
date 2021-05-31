@@ -9,6 +9,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 
+import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.android.telemetry.errors.ErrorReporterEngine;
 
 import java.io.IOException;
@@ -100,7 +101,25 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     unregisterTelemetry();
   }
 
+  private void addAccuracyAuthorization(AppUserTurnstile appUserTurnstile) {
+    PermissionsManager.AccuracyAuthorization authorization =
+            PermissionsManager.accuracyAuthorization(applicationContext);
+    switch (authorization) {
+      case PRECISE:
+        appUserTurnstile.setAccuracyAuthorization("full");
+        break;
+      case APPROXIMATE:
+        appUserTurnstile.setAccuracyAuthorization("reduced");
+        break;
+      default:
+    }
+  }
+
   public boolean push(Event event) {
+    if (event instanceof AppUserTurnstile) {
+      addAccuracyAuthorization((AppUserTurnstile) event);
+    }
+
     if (sendEventIfWhitelisted(event)) {
       return true;
     }

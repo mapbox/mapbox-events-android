@@ -57,6 +57,20 @@ public class AppUserTurnstileTest {
     assertEquals(randomSkuId, anAppUserTurnstileEvent.getSkuId());
   }
 
+  @Test
+  public void verifyDefaultAccuracyAuthentication() {
+    AppUserTurnstile anAppUserTurnstileEvent = (AppUserTurnstile)obtainAnAppUserTurnstileEvent();
+    assertNull(anAppUserTurnstileEvent.getAccuracyAuthorization());
+  }
+
+  @Test
+  public void verifyEmptySetAccuracyAuthorization() {
+    AppUserTurnstile anAppUserTurnstileEvent = (AppUserTurnstile)obtainAnAppUserTurnstileEvent();
+    String full = "full";
+    anAppUserTurnstileEvent.setAccuracyAuthorization(full);
+    assertEquals(full, anAppUserTurnstileEvent.getAccuracyAuthorization());
+  }
+
   private Event obtainAnAppUserTurnstileEvent() {
     Context mockedContext = mock(Context.class);
     SharedPreferences mockedSharedPreferences = mock(SharedPreferences.class);

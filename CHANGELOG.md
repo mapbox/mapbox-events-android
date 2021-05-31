@@ -7,6 +7,7 @@ Mapbox welcomes participation and contributions from everyone.
 ### v7.0.4
 
 - [telemetry] Android 12 compartibility fixes. 
+- [telemetry] Send accuracy authorization with AppUserTurnstile event.
 
 ### v7.0.3
 
