@@ -38,7 +38,7 @@ public class SchemaTest {
    **/
   private String[] additionalLocationProperties =
     {"speed", "course", "floor", "speedAccuracy", "courseAccuracy", "verticalAccuracy", "config",
-     "approximate", "accuracyAuthorization", "version"};
+     "approximate", "version"};
 
   /**
    * Properties in Vision Schema that are added in backend

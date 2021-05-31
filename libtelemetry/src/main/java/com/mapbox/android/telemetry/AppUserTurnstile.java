@@ -39,6 +39,8 @@ public class AppUserTurnstile extends Event implements Parcelable {
   private final String operatingSystem;
   @SerializedName("skuId")
   private String skuId;
+  @SerializedName("accuracyAuthorization")
+  private String accuracyAuthorization;
 
   public AppUserTurnstile(String sdkIdentifier, String sdkVersion) {
     this(sdkIdentifier, sdkVersion, true);
@@ -68,6 +70,15 @@ public class AppUserTurnstile extends Event implements Parcelable {
       return;
     }
     this.skuId = skuId;
+  }
+
+  @Nullable
+  public String getAccuracyAuthorization() {
+    return this.accuracyAuthorization;
+  }
+
+  public void setAccuracyAuthorization(@NonNull String fullOrReduced) {
+    this.accuracyAuthorization = fullOrReduced;
   }
 
   @Override

@@ -23,6 +23,7 @@ public class TelemetryClientAppUserTurnstileEventTest extends MockWebServerTest 
     TelemetryClient telemetryClient = obtainATelemetryClient("anyAccessToken", anyUserAgent,
       anyUserAgent , mockedContext);
     Event anAppUserTurnstile = new AppUserTurnstile("anySdkIdentifier", "anySdkVersion", false);
+    ((AppUserTurnstile)anAppUserTurnstile).setAccuracyAuthorization("full");
     List<Event> theAppUserTurnstile = obtainEvents(anAppUserTurnstile);
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
