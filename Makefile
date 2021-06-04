@@ -7,7 +7,6 @@ test:
 
 test-coverage:
 	./gradlew testDebugUnitTestCoverage
-	./gradlew testFullDebugUnitTestCoverage
 
 release:
 	./gradlew :libcore:assembleRelease
@@ -15,16 +14,13 @@ release:
 
 javadoc:
 	./gradlew :libcore:javadocrelease
-	./gradlew :libtelemetry:javadocFullRelease
+	./gradlew :libtelemetry:javadocRelease
 
 publish-core:
 	export IS_LOCAL_DEVELOPMENT=false; ./gradlew :libcore:uploadArchives
 
 publish-telem:
 	export IS_LOCAL_DEVELOPMENT=false; ./gradlew :libtelemetry:uploadArchives
-
-publish-telem-lite:
-	export IS_LOCAL_DEVELOPMENT=false; export IS_LITE_RELEASE=true; ./gradlew :libtelemetry:uploadArchives
 
 publish-local-core:
 	# This publishes to ~/.m2/repository/com/mapbox/mapboxsdk
@@ -33,10 +29,6 @@ publish-local-core:
 publish-local-telem:
 	# This publishes to ~/.m2/repository/com/mapbox/mapboxsdk
 	export IS_LOCAL_DEVELOPMENT=true; ./gradlew :libtelemetry:uploadArchives
-
-publish-local-telem-lite:
-	# This publishes to ~/.m2/repository/com/mapbox/mapboxsdk
-	export IS_LOCAL_DEVELOPMENT=true; export IS_LITE_RELEASE=true; ./gradlew :libtelemetry:uploadArchives
 
 .PHONY: publish-core-to-sdk-registry
 publish-core-to-sdk-registry:

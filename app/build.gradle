@@ -20,18 +20,6 @@ android {
             minifyEnabled true
         }
     }
-
-    flavorDimensions "version"
-    productFlavors {
-        full {
-            dimension "version"
-        }
-
-        lite {
-            dimension "version"
-            versionNameSuffix "-lite"
-        }
-    }
 }
 
 dependencies {
