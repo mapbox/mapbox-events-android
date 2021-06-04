@@ -7,7 +7,7 @@ test_apk_path="$2"
 results_dir="$3"
 gcloud firebase test android models list
 gcloud firebase test android run --type instrumentation \
-    --app app/build/outputs/apk/debug/app-debug.apk \
+    --app app/build/outputs/apk/okhttp4/debug/app-okhttp4-debug.apk \
     --test "${build_dir}/${test_apk_path}" \
     --results-dir="$results_dir" \
     --device model=hammerhead,version=21,locale=en,orientation=portrait  \

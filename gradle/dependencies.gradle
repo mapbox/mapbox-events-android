@@ -15,6 +15,7 @@ ext {
             mockito             : '2.11.0',
             testRunnerVersion   : '1.1.1',
             okhttp3             : '3.12.0',
+            okhttp4             : '4.9.0',
             gson                : '2.8.5',
             espressoVersion     : '3.1.0',
             archLifecycleVersion: "1.1.0",
@@ -35,10 +36,16 @@ ext {
             // play services
             gmsLocation            : "com.google.android.gms:play-services-location:${version.gmsLocation}",
 
-            // okhttp
+            // okhttp v3.x
             okhttp3                : "com.squareup.okhttp3:okhttp:${version.okhttp3}",
             okhttp3Mockwebserver   : "com.squareup.okhttp3:mockwebserver:${version.okhttp3}",
-            okhttpTls             : "com.squareup.okhttp3:okhttp-tls:${version.okhttp3}",
+            okhttp3Tls             : "com.squareup.okhttp3:okhttp-tls:${version.okhttp3}",
+
+            // okhttp v4.x
+            okhttp4                : "com.squareup.okhttp3:okhttp:${version.okhttp4}",
+            okhttp4Mockwebserver   : "com.squareup.okhttp3:mockwebserver:${version.okhttp4}",
+            okhttp4Tls             : "com.squareup.okhttp3:okhttp-tls:${version.okhttp4}",
+
             // gson
             gson                   : "com.google.code.gson:gson:${version.gson}",
 

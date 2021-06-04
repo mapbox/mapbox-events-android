@@ -69,7 +69,7 @@ jobs:
           no_output_timeout: 20m
           command: |
             build_dir="libtelemetry/build"
-            test_apk_path="outputs/apk/androidTest/debug/libtelemetry-debug-androidTest.apk"
+            test_apk_path="outputs/apk/androidTest/okhttp4/debug/libtelemetry-okhttp4-debug-androidTest.apk"
             ./cloud_test.sh $build_dir $test_apk_path $CIRCLE_BUILD_NUM
       - run:
           name: Post code coverage report to Codecov.io
