@@ -1,5 +1,6 @@
 package com.mapbox.android.telemetry;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -9,6 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public class AppStateUtils {
   private static final String TAG = "AppStateUtils";
@@ -78,12 +81,20 @@ public class AppStateUtils {
 
   public static String PREFERENCE_FILENAME = "mb_app_state_utils";
   public static String KEY_LAST_KNOWN_ACTIVITY_STATE = "mb_telemetry_last_know_activity_state";
+  private static final ScheduledThreadPoolExecutor ioExecutor =
+          (ScheduledThreadPoolExecutor)Executors.newScheduledThreadPool(1);
 
-  public static void saveActivityState(@NonNull Context context, @NonNull ActivityState state) {
-    final SharedPreferences preferences =
-        context.getSharedPreferences(PREFERENCE_FILENAME, Context.MODE_PRIVATE);
-    final SharedPreferences.Editor editor = preferences.edit();
-    editor.putInt(KEY_LAST_KNOWN_ACTIVITY_STATE, state.getCode()).apply();
+  public static void saveActivityState(@NonNull final Context context, @NonNull final ActivityState state) {
+    ioExecutor.execute(new Runnable() {
+      @SuppressLint("ApplySharedPref")
+      @Override
+      public void run() {
+        final SharedPreferences preferences =
+                context.getSharedPreferences(PREFERENCE_FILENAME, Context.MODE_PRIVATE);
+        final SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(KEY_LAST_KNOWN_ACTIVITY_STATE, state.getCode()).commit();
+      }
+    });
   }
 
   public static ActivityState getLastKnownActivityState(@NonNull Context context) {
@@ -154,7 +165,6 @@ public class AppStateUtils {
     AppState state = AppState.BACKGROUND;
     List<ActivityManager.AppTask> tasks = activityManager.getAppTasks();
     for (ActivityManager.AppTask task : tasks) {
-      //noinspection deprecation
       if (task.getTaskInfo().id != -1) {
         state = AppState.FOREGROUND;
       }
@@ -196,11 +206,20 @@ public class AppStateUtils {
     return stateFromActivityManager;
   }
 
-  public static AppState getAppState(@NonNull Context context) {
-    LogUtils.v(TAG, "Getting app state...");
-    final AppState state = arbitrage(getAppStateFromActivityManager(context),
-        getLastKnownActivityState(context));
-    LogUtils.v(TAG, "getAppState() returns " + state);
-    return state;
+  public interface GetAppStateCallback {
+    void onReady(AppState state);
+  }
+
+  public static void getAppState(@NonNull final Context context, final GetAppStateCallback callback) {
+    ioExecutor.execute(new Runnable() {
+      @Override
+      public void run() {
+        LogUtils.v(TAG, "Getting app state...");
+        final AppState state = arbitrage(getAppStateFromActivityManager(context),
+                getLastKnownActivityState(context));
+        LogUtils.v(TAG,"getAppState() returns " + state);
+        callback.onReady(state);
+      }
+    });
   }
 }

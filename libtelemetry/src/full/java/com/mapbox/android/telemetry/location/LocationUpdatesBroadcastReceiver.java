@@ -39,16 +39,21 @@ public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
       }
 
       LocationCollectionClient collectionClient =  LocationCollectionClient.getInstance();
-      MapboxTelemetry telemetry = collectionClient.getTelemetry();
-      String sessionId = collectionClient.getSessionId();
-      List<Location> locations = result.getLocations();
-      for (Location location : locations) {
-        if (isThereAnyNaN(location) || isThereAnyInfinite(location)) {
-          continue;
+      final MapboxTelemetry telemetry = collectionClient.getTelemetry();
+      final String sessionId = collectionClient.getSessionId();
+      final List<Location> locations = result.getLocations();
+      AppStateUtils.getAppState(context, new AppStateUtils.GetAppStateCallback() {
+        @Override
+        public void onReady(AppStateUtils.AppState state) {
+          for (final Location location : locations) {
+            if (isThereAnyNaN(location) || isThereAnyInfinite(location)) {
+              continue;
+            }
+            telemetry.push(LocationMapper.create(location, state.toString(), sessionId));
+          }
         }
-        final String appState = AppStateUtils.getAppState(context).toString();
-        telemetry.push(LocationMapper.create(location, appState, sessionId));
-      }
+      });
+
     } catch (Throwable throwable) {
       // TODO: log silent crash
       Log.e(TAG, throwable.toString());
