@@ -32,11 +32,25 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
     }
+
+    flavorDimensions "version"
+    productFlavors {
+        okhttp4 {
+            dimension "version"
+            minSdkVersion 21
+        }
+
+        okhttp3 {
+            dimension "version"
+            versionNameSuffix "-okhttp3"
+        }
+    }
 }
 
 dependencies {
     implementation dependenciesList.androidCore
-    implementation dependenciesList.okhttp3
+    okhttp3Implementation dependenciesList.okhttp3
+    okhttp4Implementation dependenciesList.okhttp4
     implementation dependenciesList.gson
     implementation dependenciesList.supportAnnotation
     implementation project(':libcore')
@@ -45,8 +59,13 @@ dependencies {
 
     testImplementation dependenciesList.junit
     testImplementation dependenciesList.mockito
-    testImplementation dependenciesList.okhttp3Mockwebserver
-    testImplementation dependenciesList.okhttpTls
+
+    testOkhttp3Implementation dependenciesList.okhttp3Mockwebserver
+    testOkhttp3Implementation dependenciesList.okhttp3Tls
+
+    testOkhttp4Implementation dependenciesList.okhttp4Mockwebserver
+    testOkhttp4Implementation dependenciesList.okhttp4Tls
+
     testImplementation dependenciesList.commonsIO
     testImplementation dependenciesList.assertJ
 
@@ -55,4 +74,39 @@ dependencies {
     androidTestImplementation dependenciesList.testRules
 }
 
-apply from: "${rootDir}/gradle/sdk-registry.gradle"
+apply plugin: 'maven-publish'
+apply plugin: 'com.mapbox.sdkRegistry'
+apply from: file('../gradle/artifact-settings.gradle')
+
+version = project.ext.versionName
+group = project.ext.mapboxArtifactGroupId
+
+afterEvaluate {
+    publishing {
+            publications {
+                okhttp4Release(MavenPublication) {
+                    from components.okhttp4Release
+                    groupId this.group
+                    artifactId project.ext.mapboxArtifactId
+                    version this.version
+                }
+
+                okhttp3Release(MavenPublication) {
+                    from components.okhttp3Release
+                    groupId this.group
+                    artifactId project.ext.mapboxArtifactId + "-okhttp3"
+                    version this.version
+                }
+            }
+    }
+}
+
+registry {
+    sdkName = project.ext.mapboxRegistrySdkName
+    production = true
+    snapshot = project.ext.versionName.endsWith("-SNAPSHOT")
+    override = snapshot ? true : false
+    dryRun = false
+    publish = true
+    publications = ["okhttp4Release", "okhttp3Release"]
+}

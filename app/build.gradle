@@ -20,6 +20,18 @@ android {
             minifyEnabled true
         }
     }
+
+    flavorDimensions "version"
+    productFlavors {
+        okhttp4 {
+            dimension "version"
+            minSdkVersion 21
+        }
+
+        okhttp3 {
+            dimension "version"
+        }
+    }
 }
 
 dependencies {

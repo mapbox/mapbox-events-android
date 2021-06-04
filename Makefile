@@ -14,7 +14,7 @@ release:
 
 javadoc:
 	./gradlew :libcore:javadocrelease
-	./gradlew :libtelemetry:javadocRelease
+	./gradlew :libtelemetry:javadocokhttp4Release
 
 publish-core:
 	export IS_LOCAL_DEVELOPMENT=false; ./gradlew :libcore:uploadArchives
