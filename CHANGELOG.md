@@ -11,6 +11,7 @@ Mapbox welcomes participation and contributions from everyone.
 - [telemetry] Save and read application state on a background thread.
 - [telemetry] Android 12 compartibility fixes. 
 - [telemetry] Send accuracy authorization with AppUserTurnstile event.
+- [build] Fix maven publication script
 
 ### v7.0.3
 
