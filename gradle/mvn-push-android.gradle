@@ -50,10 +50,6 @@ def getRepositoryPassword() {
     return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
 }
 
-def isTelem() {
-    return project.toString() == "project ':libtelemetry'"
-}
-
 afterEvaluate { project ->
     uploadArchives {
         repositories {
@@ -103,7 +99,7 @@ afterEvaluate { project ->
                     }
 
                     // Hacking with telem pom due to bug in gradle uploadArchives task
-                    if (isTelem()) {
+                    if (project.name == "libtelemetry") {
                         def allDependencies = configurations.implementation.allDependencies
 
                         dependencies {
@@ -151,8 +147,8 @@ afterEvaluate { project ->
         def sources = android.sourceSets.main.collect {
             it.javaDirectories
         }
-        if (isTelem()) {
-            sources += android.sourceSets.collect {
+        if (project.name == "libtelemetry") {
+            sources += android.sourceSets.okhttp4.collect {
                 it.javaDirectories
             }
         }
@@ -171,8 +167,8 @@ afterEvaluate { project ->
             it.javaDirectories
         }
 
-        if (isTelem()) {
-            sources += android.sourceSets.collect {
+        if (project.name == "libtelemetry") {
+            sources += android.sourceSets.okhttp4.collect {
                 it.javaDirectories
             }
         }
@@ -181,9 +177,9 @@ afterEvaluate { project ->
 
     artifacts {
         // Hacking with telem artifacts due to bug in gradle uploadArchives task
-        if (isTelem()) {
+        if (project.name == "libtelemetry") {
             def artifactsDir = "${project.buildDir}/outputs/aar/"
-            archives file: new File("${artifactsDir}/libtelemetry-release.aar")
+            archives file: new File("${artifactsDir}/libtelemetry-okhttp4-release.aar")
         }
         archives androidSourcesJar
         archives androidJavadocsJar
