@@ -105,7 +105,7 @@ registry {
     sdkName = project.ext.mapboxRegistrySdkName
     production = true
     snapshot = project.ext.versionName.endsWith("-SNAPSHOT")
-    override = snapshot ? true : false
+    override = true
     dryRun = false
     publish = true
     publications = ["okhttp4Release", "okhttp3Release"]
