@@ -12,6 +12,7 @@ Mapbox welcomes participation and contributions from everyone.
 - [telemetry] Android 12 compartibility fixes. 
 - [telemetry] Send accuracy authorization with AppUserTurnstile event.
 - [build] Fix maven publication script
+- [build] Allow artifacts to be overridden for SDK Registry publications.
  
 ### v7.0.3
 
