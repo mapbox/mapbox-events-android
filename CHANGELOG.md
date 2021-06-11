@@ -12,7 +12,7 @@ Mapbox welcomes participation and contributions from everyone.
 - [telemetry] Android 12 compartibility fixes. 
 - [telemetry] Send accuracy authorization with AppUserTurnstile event.
 - [build] Fix maven publication script
-
+ 
 ### v7.0.3
 
 - [telemetry] Workaround for MapboxTelemetryService crash. [#531](https://github.com/mapbox/mapbox-events-android/pull/531)
