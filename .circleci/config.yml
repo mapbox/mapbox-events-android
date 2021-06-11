@@ -134,7 +134,7 @@ jobs:
       - deploy:
           name: Publish to Maven Central and Mapbox SDK Registry
           command: |
-            if [[ $CIRCLE_BRANCH == master ]]; then
+            if [[ $CIRCLE_BRANCH == main ]]; then
               make publish-core ;
               make publish-telem ;
               make publish-all-to-sdk-registry ;
