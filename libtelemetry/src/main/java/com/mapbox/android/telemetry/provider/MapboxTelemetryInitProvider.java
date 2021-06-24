@@ -21,6 +21,7 @@ import com.mapbox.android.telemetry.errors.TokenChangeBroadcastReceiver;
 import com.mapbox.android.telemetry.location.LocationCollectionClient;
 
 import java.util.concurrent.TimeUnit;
+import com.mapbox.android.telemetry.TelemetryEnabler;
 
 import static com.mapbox.android.telemetry.MapboxTelemetryConstants.MAPBOX_TELEMETRY_PACKAGE;
 import static com.mapbox.android.telemetry.location.LocationCollectionClient.DEFAULT_SESSION_ROTATION_INTERVAL_HOURS;
@@ -56,6 +57,11 @@ public class MapboxTelemetryInitProvider extends ContentProvider {
 
       if (context == null) {
         Log.e(TAG, "Failed to initialize: context is null");
+        return false;
+      }
+
+      if (!TelemetryEnabler.isEventsEnabled(context)) {
+        Log.i(TAG, "telemetry is disabled, skip initialization.");
         return false;
       }
 
