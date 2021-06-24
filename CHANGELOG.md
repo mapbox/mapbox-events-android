@@ -4,6 +4,10 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v8.0.1
+
+- [telemetry] Disable `MapboxTelemetryInitProvider` if the telemetry is disabled via app's manifest.
+
 ### v8.0.0
 
 - [telemetry] Added build flavours for OkHttp v3.x and v4.x

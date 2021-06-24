@@ -84,7 +84,7 @@ public class TelemetryEnabler {
     return currentTelemetryState;
   }
 
-  static boolean isEventsEnabled(Context context) {
+  public static boolean isEventsEnabled(Context context) {
     try {
       ApplicationInfo appInformation = context.getPackageManager().getApplicationInfo(
         context.getPackageName(), PackageManager.GET_META_DATA);
