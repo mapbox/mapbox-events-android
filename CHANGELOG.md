@@ -4,7 +4,7 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
-### v8.0.1
+### v8.1.0
 
 - [telemetry] Disable `MapboxTelemetryInitProvider` if the telemetry is disabled via app's manifest.
 
