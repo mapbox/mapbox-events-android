@@ -1,0 +1,29 @@
+apply plugin: 'maven-publish'
+apply plugin: 'com.mapbox.sdkRegistry'
+apply from: file('../gradle/artifact-settings.gradle')
+
+version = project.ext.versionName
+group = project.ext.mapboxArtifactGroupId
+
+ext.attachBasePomInfo = { pom ->
+    pom.withXml {
+        final mainNode = asNode()
+        mainNode.appendNode('name', project.property('mapboxArtifactTitle'))
+        mainNode.appendNode('description', project.property('mapboxArtifactDescription'))
+        mainNode.appendNode('url', project.property('mapboxArtifactUrl'))
+
+        final licenseNode = mainNode.appendNode('licenses').appendNode('license')
+        licenseNode.appendNode('name', project.property('mapboxArtifactLicenseName'))
+        licenseNode.appendNode('url', project.property('mapboxArtifactLicenseUrl'))
+        licenseNode.appendNode('distribution', "repo")
+
+        final developerNode = mainNode.appendNode('developers').appendNode('developer')
+        developerNode.appendNode('id', project.property('mapboxDeveloperId'))
+        developerNode.appendNode('name', project.property('mapboxDeveloperName'))
+
+        final scmNode = mainNode.appendNode("scm")
+        scmNode.appendNode("connection", project.property('mapboxArtifactScmUrl'))
+        scmNode.appendNode("developerConnection", project.property('mapboxArtifactScmUrl'))
+        scmNode.appendNode("url", project.property('mapboxArtifactUrl'))
+    }
+}
