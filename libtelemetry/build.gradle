@@ -74,12 +74,8 @@ dependencies {
     androidTestImplementation dependenciesList.testRules
 }
 
-apply plugin: 'maven-publish'
-apply plugin: 'com.mapbox.sdkRegistry'
-apply from: file('../gradle/artifact-settings.gradle')
 
-version = project.ext.versionName
-group = project.ext.mapboxArtifactGroupId
+apply from: file('../gradle/publish.gradle')
 
 afterEvaluate {
     publishing {
@@ -89,6 +85,11 @@ afterEvaluate {
                     groupId this.group
                     artifactId project.ext.mapboxArtifactId
                     version this.version
+
+                    artifact(androidJavadocsJar)
+                    artifact(androidSourcesJar)
+
+                    attachBasePomInfo(pom)
                 }
 
                 okhttp3Release(MavenPublication) {
@@ -96,6 +97,11 @@ afterEvaluate {
                     groupId this.group
                     artifactId project.ext.mapboxArtifactId + "-okhttp3"
                     version this.version
+
+                    artifact(androidJavadocsJar)
+                    artifact(androidSourcesJar)
+
+                    attachBasePomInfo(pom)
                 }
             }
     }

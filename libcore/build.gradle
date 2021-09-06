@@ -52,12 +52,7 @@ dependencies {
 }
 
 
-apply plugin: 'maven-publish'
-apply plugin: 'com.mapbox.sdkRegistry'
-apply from: file('../gradle/artifact-settings.gradle')
-
-version = project.ext.versionName
-group = project.ext.mapboxArtifactGroupId
+apply from: file('../gradle/publish.gradle')
 
 afterEvaluate {
     publishing {
@@ -67,6 +62,11 @@ afterEvaluate {
                 groupId this.group
                 artifactId project.ext.mapboxArtifactId
                 version this.version
+
+                artifact(androidJavadocsJar)
+                artifact(androidSourcesJar)
+
+                attachBasePomInfo(pom)
             }
         }
     }
