@@ -96,10 +96,8 @@ public class PermissionsManager {
         boolean backgroundLocPermission = permissionList.contains(BACKGROUND_LOCATION_PERMISSION);
 
         // Request location permissions
-        if (fineLocPermission) {
-          requestLocationPermissions(activity, true, backgroundLocPermission);
-        } else if (coarseLocPermission) {
-          requestLocationPermissions(activity, false, backgroundLocPermission);
+        if (fineLocPermission || coarseLocPermission) {
+          requestLocationPermissions(activity, fineLocPermission, coarseLocPermission, backgroundLocPermission);
         } else {
           Log.w(LOG_TAG, "Location permissions are missing");
         }
@@ -109,12 +107,21 @@ public class PermissionsManager {
     }
   }
 
-  private void requestLocationPermissions(Activity activity, boolean requestFineLocation,
+  private void requestLocationPermissions(Activity activity, boolean requestFineLocation, boolean requestCoarseLocation,
                                           boolean requestBackgroundLocation) {
     List<String> permissions = new ArrayList<>();
     if (requestFineLocation) {
       permissions.add(FINE_LOCATION_PERMISSION);
-    } else  {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        if (requestCoarseLocation) {
+          permissions.add(COARSE_LOCATION_PERMISSION);
+        } else {
+          Log.w(LOG_TAG, "ACCESS_FINE_LOCATION must be requested with " +
+                  "ACCESS_COARSE_LOCATION, but developer did not add COARSE_LOCATION_PERMISSION" +
+                  " permission to their app.");
+        }
+      }
+    } else if (requestCoarseLocation) {
       permissions.add(COARSE_LOCATION_PERMISSION);
     }
 
