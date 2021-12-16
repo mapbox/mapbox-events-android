@@ -179,7 +179,11 @@ public class TelemetryUtils {
     } else {
       output = telephonyManager.getNetworkType();
     }
-    return NETWORKS.get(output);
+    String foundTelemetryType = NETWORKS.get(output);
+    if (foundTelemetryType == null) {
+      return UNKNOWN;
+    }
+    return foundTelemetryType;
   }
 
   public static String obtainCurrentDate() {
