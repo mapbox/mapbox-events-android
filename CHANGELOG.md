@@ -4,6 +4,12 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v8.1.1
+
+- [telemetry] Fix crash when using obtainCellularNetworkType [#555](https://github.com/mapbox/mapbox-events-android/pull/555)
+- [ci] Update Firebase test matrix [#553](https://github.com/mapbox/mapbox-events-android/pull/553)
+- [build] Attach more info to Maven publications uploaded [#552](https://github.com/mapbox/mapbox-events-android/pull/552)
+
 ### v8.1.0
 
 - [telemetry] Disable `MapboxTelemetryInitProvider` if the telemetry is disabled via app's manifest.
@@ -303,6 +309,10 @@ Mapbox welcomes participation and contributions from everyone.
 
 
 ## Mapbox Android Core
+
+### v5.0.1
+
+- [build] Attach more info to Maven publications uploaded [#552](https://github.com/mapbox/mapbox-events-android/pull/552)
 
 ### v5.0.0
 
