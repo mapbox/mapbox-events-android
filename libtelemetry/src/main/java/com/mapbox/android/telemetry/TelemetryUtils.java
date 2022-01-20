@@ -1,7 +1,6 @@
 package com.mapbox.android.telemetry;
 
 import android.annotation.SuppressLint;
-import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -25,7 +24,6 @@ import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -120,21 +118,9 @@ public class TelemetryUtils {
     return universalUniqueIdentifier;
   }
 
-  public static String obtainApplicationState(Context context) {
-    ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-    List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
-    if (appProcesses == null) {
-      return NO_STATE;
-    }
-
-    String packageName = context.getPackageName();
-    for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
-      if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
-        && appProcess.processName.equals(packageName)) {
-        return FOREGROUND;
-      }
-    }
-    return BACKGROUND;
+  public static String obtainApplicationState(@NonNull Context context) {
+    final AppStateUtils.AppState state = AppStateUtils.getAppStateFromActivityManager(context);
+    return state == AppStateUtils.AppState.UNKNOWN ? NO_STATE : state.toString();
   }
 
   public static int obtainBatteryLevel(Context context) {

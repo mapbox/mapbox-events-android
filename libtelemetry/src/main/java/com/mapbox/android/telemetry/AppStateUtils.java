@@ -172,7 +172,7 @@ public class AppStateUtils {
     return state;
   }
 
-  private static AppState getAppStateFromActivityManager(@NonNull Context context) {
+  static AppState getAppStateFromActivityManager(@NonNull Context context) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
       return getAppStateQAndHigher(context);
     }
