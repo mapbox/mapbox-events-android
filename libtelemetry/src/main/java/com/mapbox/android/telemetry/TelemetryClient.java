@@ -1,5 +1,7 @@
 package com.mapbox.android.telemetry;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -65,6 +67,7 @@ class TelemetryClient {
   }
 
   void sendEvents(List<Event> events, Callback callback, boolean serializeNulls) {
+    Log.w(LOG_TAG, "SendEvents!!!!!");
     sendBatch(Collections.unmodifiableList(events), callback, serializeNulls);
   }
 
@@ -97,10 +100,12 @@ class TelemetryClient {
       .addQueryParameter(ACCESS_TOKEN_QUERY_PARAMETER, accessToken)
       .build();
 
-    if (isExtraDebuggingNeeded()) {
-      logger.debug(LOG_TAG, String.format(Locale.US, EXTRA_DEBUGGING_LOG, requestUrl, visionAttachments.size(),
+    //if (isExtraDebuggingNeeded()) {
+      Log.d(LOG_TAG, String.format(Locale.US, EXTRA_DEBUGGING_LOG, requestUrl, visionAttachments.size(),
         userAgent, metadataList));
-    }
+
+      Log.d(LOG_TAG, "Reformed UA" + reformedUserAgent);
+    //}
 
     Request request = new Request.Builder()
       .url(requestUrl)
@@ -150,9 +155,10 @@ class TelemetryClient {
     HttpUrl url = baseUrl.newBuilder(EVENTS_ENDPOINT)
       .addQueryParameter(ACCESS_TOKEN_QUERY_PARAMETER, accessToken).build();
 
-    if (isExtraDebuggingNeeded()) {
-      logger.debug(LOG_TAG, String.format(Locale.US, EXTRA_DEBUGGING_LOG, url, batch.size(), userAgent, payload));
-    }
+    //if (isExtraDebuggingNeeded()) {
+      Log.d(LOG_TAG, String.format(Locale.US, EXTRA_DEBUGGING_LOG, url, batch.size(), userAgent, payload));
+    Log.d(LOG_TAG, "Reformed UA" + reformedUserAgent);
+    //}
 
     Request request = new Request.Builder()
       .url(url)

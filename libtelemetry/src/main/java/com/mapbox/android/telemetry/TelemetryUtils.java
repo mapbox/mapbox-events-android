@@ -194,19 +194,24 @@ public class TelemetryUtils {
     return dateFormat.format(date);
   }
 
-  static String createFullUserAgent(String userAgent, Context context) {
+  public static String createFullUserAgent(String userAgent, Context context) {
     String appIdentifier = TelemetryUtils.obtainApplicationIdentifier(context);
     String newUserAgent = toHumanReadableAscii(String.format(DEFAULT_LOCALE, TWO_STRING_FORMAT, appIdentifier,
       userAgent));
     String fullUserAgent = TextUtils.isEmpty(appIdentifier) ? userAgent : newUserAgent;
 
+    Log.w(TAG, "Full UA:" + fullUserAgent);
     return fullUserAgent;
   }
 
-  static String createReformedFullUserAgent(Context context) {
+  public static String createReformedFullUserAgent(Context context) {
     String appIdentifier = TelemetryUtils.obtainApplicationIdentifierForReformedUserAgent(context);
     String reformedUserAgent = toHumanReadableAscii(String.format(DEFAULT_LOCALE, TWO_STRING_FORMAT, appIdentifier,
       MapboxSdkInfoForUserAgentGenerator.getInstance(context.getAssets()).getSdkInfoForUserAgent()));
+
+    Log.w(TAG, "reformedUserAgent :" + TextUtils.isEmpty(reformedUserAgent));
+    Log.w(TAG, "App Identifier:" + appIdentifier);
+    Log.w(TAG, "reformedUserAgent UA:" + reformedUserAgent);
     return TextUtils.isEmpty(reformedUserAgent) ? appIdentifier : reformedUserAgent;
   }
 
