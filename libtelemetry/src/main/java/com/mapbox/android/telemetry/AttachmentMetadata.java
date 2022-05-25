@@ -1,5 +1,8 @@
 package com.mapbox.android.telemetry;
 
+import androidx.annotation.Keep;
+
+@Keep
 public class AttachmentMetadata {
 
   private String name;
