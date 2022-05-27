@@ -16,7 +16,7 @@ public class LocationMapperTest {
   public void checksLocationEventNameMapping() throws Exception {
     Location mockedLocation = mock(Location.class);
     LocationMapper obtainLocationEvent = new LocationMapper();
-    LocationEvent actualLocationEvent = obtainLocationEvent.from(mockedLocation, "");
+    LocationEvent actualLocationEvent = obtainLocationEvent.from(mockedLocation, "", "");
     assertEquals("location", actualLocationEvent.getEvent());
   }
 
@@ -24,7 +24,7 @@ public class LocationMapperTest {
   public void checksLocationEventSourceMapping() throws Exception {
     Location mockedLocation = mock(Location.class);
     LocationMapper obtainLocationEvent = new LocationMapper();
-    LocationEvent actualLocationEvent = obtainLocationEvent.from(mockedLocation,"");
+    LocationEvent actualLocationEvent = obtainLocationEvent.from(mockedLocation,"", "");
     assertEquals("mapbox", actualLocationEvent.getSource());
   }
 
@@ -33,7 +33,7 @@ public class LocationMapperTest {
     Location mockedLocation = mock(Location.class);
     when(mockedLocation.getLatitude()).thenReturn(51.39430732403739);
     LocationMapper obtainLocationEvent = new LocationMapper();
-    LocationEvent actualLocationEvent = obtainLocationEvent.from(mockedLocation, "");
+    LocationEvent actualLocationEvent = obtainLocationEvent.from(mockedLocation, "","");
     assertEquals(51.3943073, actualLocationEvent.getLatitude(), 0);
   }
 
@@ -42,7 +42,7 @@ public class LocationMapperTest {
     Location mockedLocation = mock(Location.class);
     when(mockedLocation.getLongitude()).thenReturn(-147.73225836990392);
     LocationMapper obtainLocationEvent = new LocationMapper();
-    LocationEvent actualLocationEvent = obtainLocationEvent.from(mockedLocation, "");
+    LocationEvent actualLocationEvent = obtainLocationEvent.from(mockedLocation, "","");
     assertEquals(-147.7322583, actualLocationEvent.getLongitude(), 0);
   }
 
@@ -50,7 +50,7 @@ public class LocationMapperTest {
   public void checksLocationEventOperatingSystemMapping() throws Exception {
     Location mockedLocation = mock(Location.class);
     LocationMapper obtainLocationEvent = new LocationMapper();
-    LocationEvent actualLocationEvent = obtainLocationEvent.from(mockedLocation,"");
+    LocationEvent actualLocationEvent = obtainLocationEvent.from(mockedLocation,"","");
     assertTrue(actualLocationEvent.getOperatingSystem().startsWith("Android - "));
   }
 
@@ -60,7 +60,7 @@ public class LocationMapperTest {
     when(mockedLocation.hasAltitude()).thenReturn(true);
     when(mockedLocation.getAltitude()).thenReturn(23.43);
     LocationMapper obtainLocationEvent = new LocationMapper();
-    LocationEvent actualLocationEvent = obtainLocationEvent.from(mockedLocation, "");
+    LocationEvent actualLocationEvent = obtainLocationEvent.from(mockedLocation, "","");
     assertEquals(23.0, actualLocationEvent.getAltitude(), 0);
   }
 
@@ -70,7 +70,7 @@ public class LocationMapperTest {
     when(mockedLocation.hasAccuracy()).thenReturn(true);
     when(mockedLocation.getAccuracy()).thenReturn(1.9f);
     LocationMapper obtainLocationEvent = new LocationMapper();
-    LocationEvent actualLocationEvent = obtainLocationEvent.from(mockedLocation, "");
+    LocationEvent actualLocationEvent = obtainLocationEvent.from(mockedLocation, "","");
     assertEquals(2.0, actualLocationEvent.getAccuracy(), 0);
   }
 
@@ -79,7 +79,7 @@ public class LocationMapperTest {
     Location mockedLocation = mock(Location.class);
     when(mockedLocation.getLongitude()).thenReturn(187.73225836990392);
     LocationMapper obtainLocationEvent = new LocationMapper();
-    LocationEvent actualLocationEvent = obtainLocationEvent.from(mockedLocation,"");
+    LocationEvent actualLocationEvent = obtainLocationEvent.from(mockedLocation,"","");
     assertEquals(-172.2677417, actualLocationEvent.getLongitude(), 0);
   }
 
@@ -88,7 +88,7 @@ public class LocationMapperTest {
     Location mockedLocation = mock(Location.class);
     when(mockedLocation.getLongitude()).thenReturn(-187.73225836990392);
     LocationMapper obtainLocationEvent = new LocationMapper();
-    LocationEvent actualLocationEvent = obtainLocationEvent.from(mockedLocation, "");
+    LocationEvent actualLocationEvent = obtainLocationEvent.from(mockedLocation, "","");
     assertEquals(172.2677417, actualLocationEvent.getLongitude(), 0);
   }
 }

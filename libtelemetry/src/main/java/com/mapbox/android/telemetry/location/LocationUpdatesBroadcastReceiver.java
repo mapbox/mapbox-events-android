@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.util.Log;
 import com.mapbox.android.core.location.LocationEngineResult;
+import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.android.telemetry.AppStateUtils;
 import com.mapbox.android.telemetry.MapboxTelemetry;
 import java.util.List;
@@ -42,6 +43,9 @@ public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
       final MapboxTelemetry telemetry = collectionClient.getTelemetry();
       final String sessionId = collectionClient.getSessionId();
       final List<Location> locations = result.getLocations();
+      // TODO: if the following context access is becoming a performance problem then
+      // consider moving it into the separate executor call
+      final String permissionStatus = getPermissionStatus(context);
       AppStateUtils.getAppState(context, new AppStateUtils.GetAppStateCallback() {
         @Override
         public void onReady(AppStateUtils.AppState state) {
@@ -49,7 +53,7 @@ public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
             if (isThereAnyNaN(location) || isThereAnyInfinite(location)) {
               continue;
             }
-            telemetry.push(LocationMapper.create(location, state.toString(), sessionId));
+            telemetry.push(LocationMapper.create(location, state.toString(), sessionId, permissionStatus));
           }
         }
       });
@@ -58,6 +62,11 @@ public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
       // TODO: log silent crash
       Log.e(TAG, throwable.toString());
     }
+  }
+
+  private static String getPermissionStatus(Context context) {
+    final boolean backgroundPermissionGranted = PermissionsManager.isBackgroundLocationPermissionGranted(context);
+    return backgroundPermissionGranted ? "AllowAlways" : "AllowWhenInUse";
   }
 
   private static boolean isThereAnyNaN(Location location) {

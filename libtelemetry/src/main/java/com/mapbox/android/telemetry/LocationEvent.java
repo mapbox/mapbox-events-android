@@ -35,8 +35,11 @@ public class LocationEvent extends Event implements Parcelable {
   private String applicationState;
   @SerializedName("horizontalAccuracy")
   private Float accuracy = null;
+  @SerializedName("permissionStatus")
+  private final String permissionStatus;
 
-  public LocationEvent(String sessionId, double latitude, double longitude, String applicationState) {
+  public LocationEvent(String sessionId, double latitude, double longitude,
+                       String applicationState, String permissionStatus) {
     this.event = LOCATION;
     this.created = TelemetryUtils.obtainCurrentDate();
     this.source = SOURCE_MAPBOX;
@@ -45,6 +48,7 @@ public class LocationEvent extends Event implements Parcelable {
     this.longitude = longitude;
     this.operatingSystem = OPERATING_SYSTEM;
     this.applicationState = applicationState;
+    this.permissionStatus = permissionStatus;
   }
 
   @Override
@@ -99,6 +103,7 @@ public class LocationEvent extends Event implements Parcelable {
     operatingSystem = in.readString();
     applicationState = in.readString();
     accuracy = in.readByte() == 0x00 ? null : in.readFloat();
+    permissionStatus = in.readString();
   }
 
   @Override
@@ -128,6 +133,7 @@ public class LocationEvent extends Event implements Parcelable {
       dest.writeByte((byte) (0x01));
       dest.writeFloat(accuracy);
     }
+    dest.writeString(permissionStatus);
   }
 
   @SuppressWarnings("unused")

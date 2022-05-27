@@ -16,26 +16,30 @@ public class LocationMapper {
 
   @Deprecated
   public static LocationEvent create(Location location, String sessionId) {
-    return createLocationEvent(location, "unknown", sessionId);
+    return createLocationEvent(location, "unknown", sessionId, "Allow");
   }
 
-  public static LocationEvent create(Location location, String applicationState, String sessionId) {
-    return createLocationEvent(location, applicationState, sessionId);
+  public static LocationEvent create(Location location, String applicationState,
+                                     String sessionId, String permissionStatus) {
+    return createLocationEvent(location, applicationState, sessionId, permissionStatus);
   }
 
-  public LocationEvent from(Location location, String applicationState) {
-    return createLocationEvent(location, applicationState, sessionIdentifier.getSessionId());
+  public LocationEvent from(Location location, String applicationState, String permissionStatus) {
+    return createLocationEvent(location, applicationState,
+            sessionIdentifier.getSessionId(), permissionStatus);
   }
 
   public void updateSessionIdentifier(SessionIdentifier sessionIdentifier) {
     this.sessionIdentifier = sessionIdentifier;
   }
 
-  private static LocationEvent createLocationEvent(Location location, String applicationState, String sessionId) {
+  private static LocationEvent createLocationEvent(Location location, String applicationState,
+                                                   String sessionId, String permissionStatus) {
     double latitudeScaled = round(location.getLatitude());
     double longitudeScaled = round(location.getLongitude());
     double longitudeWrapped = wrapLongitude(longitudeScaled);
-    LocationEvent locationEvent = new LocationEvent(sessionId, latitudeScaled, longitudeWrapped, applicationState);
+    LocationEvent locationEvent = new LocationEvent(sessionId, latitudeScaled, longitudeWrapped,
+            applicationState, permissionStatus);
     addAltitudeIfPresent(location, locationEvent);
     addAccuracyIfPresent(location, locationEvent);
     return locationEvent;

@@ -20,6 +20,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
@@ -84,6 +85,15 @@ public class SchemaTest {
     }
     List<Field> fields = grabClassFields(LocationEvent.class);
 
+    // temporary solution until backend gets support for the "permissionStatus" field
+    Iterator<Field> iterator = fields.iterator();
+    while (iterator.hasNext()) {
+      Field p = iterator.next();
+      if (p.getName().equals("permissionStatus")) {
+        iterator.remove();
+      }
+    }
+
     assertEquals(schema.size(), fields.size());
   }
 
@@ -91,6 +101,15 @@ public class SchemaTest {
   public void checkLocationEventFields() throws Exception {
     JsonObject schema = grabSchema(LOCATION);
     List<Field> fields = grabClassFields(LocationEvent.class);
+
+    // temporary solution until backend gets support for the "permissionStatus" field
+    Iterator<Field> iterator = fields.iterator();
+    while (iterator.hasNext()) {
+      Field p = iterator.next();
+      if (p.getName().equals("permissionStatus")) {
+        iterator.remove();
+      }
+    }
 
     schemaContainsFields(schema, fields);
   }
