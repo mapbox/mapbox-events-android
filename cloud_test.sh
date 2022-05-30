@@ -19,6 +19,6 @@ gcloud firebase test android run --type instrumentation \
     --timeout 20m
 
 bucket="test-lab-r47d1tyt8h0hm-iku3c1i8kjrux"
-artifacts_path="hammerhead-23-en-landscape/artifacts"
+artifacts_path="hammerhead-23-en-landscape/artifacts/sdcard"
 covfile_path="gs://${bucket}/${results_dir}/${artifacts_path}/${module}_coverage.ec"
 gsutil cp $covfile_path "${build_dir}/jacoco"
