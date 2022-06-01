@@ -63,7 +63,8 @@ public class MainActivity extends AppCompatActivity implements PermissionsListen
       public void onClick(View v) {
         for (int i = 0; i < 180; i++) {
           mapboxTelemetry.push(
-            new LocationEvent("testSessionId", 0.0, 0.0, "testAppState", "testPermissionStatus"))
+            new LocationEvent("testSessionId", 0.0, 0.0,
+                    System.currentTimeMillis(), "testAppState", "testPermissionStatus"))
           ;
         }
       }

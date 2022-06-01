@@ -32,7 +32,7 @@ public class LocationEventTest {
   private Event obtainALocationEvent() {
     float aLatitude = 40.416775f;
     float aLongitude = -3.703790f;
-    return new LocationEvent("anySessionId", aLatitude, aLongitude, "", "");
+    return new LocationEvent("anySessionId", aLatitude, aLongitude, System.currentTimeMillis(), "", "");
   }
 
   private void setupMockedContext() {
