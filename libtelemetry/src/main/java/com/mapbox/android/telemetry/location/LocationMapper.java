@@ -38,7 +38,7 @@ public class LocationMapper {
     double latitudeScaled = round(location.getLatitude());
     double longitudeScaled = round(location.getLongitude());
     double longitudeWrapped = wrapLongitude(longitudeScaled);
-    LocationEvent locationEvent = new LocationEvent(sessionId, latitudeScaled, longitudeWrapped,
+    LocationEvent locationEvent = new LocationEvent(sessionId, latitudeScaled, longitudeWrapped, location.getTime(),
             applicationState, permissionStatus);
     addAltitudeIfPresent(location, locationEvent);
     addAccuracyIfPresent(location, locationEvent);

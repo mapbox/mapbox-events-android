@@ -38,10 +38,10 @@ public class LocationEvent extends Event implements Parcelable {
   @SerializedName("permissionStatus")
   private final String permissionStatus;
 
-  public LocationEvent(String sessionId, double latitude, double longitude,
+  public LocationEvent(String sessionId, double latitude, double longitude, long timestampUtcMs,
                        String applicationState, String permissionStatus) {
     this.event = LOCATION;
-    this.created = TelemetryUtils.obtainCurrentDate();
+    this.created = TelemetryUtils.obtainCurrentDate(timestampUtcMs);
     this.source = SOURCE_MAPBOX;
     this.sessionId = sessionId;
     this.latitude = latitude;
@@ -49,6 +49,12 @@ public class LocationEvent extends Event implements Parcelable {
     this.operatingSystem = OPERATING_SYSTEM;
     this.applicationState = applicationState;
     this.permissionStatus = permissionStatus;
+  }
+
+  @Deprecated
+  public LocationEvent(String sessionId, double latitude, double longitude,
+                       String applicationState, String permissionStatus) {
+    this(sessionId, latitude, longitude, System.currentTimeMillis(), applicationState, permissionStatus);
   }
 
   @Override

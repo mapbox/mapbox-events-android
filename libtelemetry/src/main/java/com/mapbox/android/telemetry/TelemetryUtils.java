@@ -172,6 +172,10 @@ public class TelemetryUtils {
     return foundTelemetryType;
   }
 
+  public static String obtainCurrentDate(long timeMsUtc) {
+    return dateFormat.format(new Date(timeMsUtc));
+  }
+
   public static String obtainCurrentDate() {
     return dateFormat.format(new Date());
   }

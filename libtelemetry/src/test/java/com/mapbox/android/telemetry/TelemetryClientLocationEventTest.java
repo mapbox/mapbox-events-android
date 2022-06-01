@@ -29,7 +29,7 @@ public class TelemetryClientLocationEventTest extends MockWebServerTest {
       "reformedUserAgent", mockedContext);
     double aLatitude = 40.416775;
     double aLongitude = -3.703790;
-    Event aLocationEvent = new LocationEvent("aSessionId", aLatitude, aLongitude, "", "");
+    Event aLocationEvent = new LocationEvent("aSessionId", aLatitude, aLongitude, System.currentTimeMillis(), "", "");
     List<Event> theLocationEvent = obtainEvents(aLocationEvent);
     Callback mockedCallback = mock(Callback.class);
     enqueueMockResponse();
