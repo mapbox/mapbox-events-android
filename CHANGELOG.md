@@ -4,6 +4,12 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v8.1.2
+
+- [libtelemetry] Fix LocationEvent timestamp [#567](https://github.com/mapbox/mapbox-events-android/pull/567)
+- [ibtelemetry] Add @Keep annotation to the AttachmentMetadata [#565](https://github.com/mapbox/mapbox-events-android/pull/565)
+- Fix TelemetryUtils.obtainApplicationState() method [#559](https://github.com/mapbox/mapbox-events-android/pull/559)
+
 ### v8.1.1
 
 - [telemetry] Fix crash when using obtainCellularNetworkType [#555](https://github.com/mapbox/mapbox-events-android/pull/555)
@@ -309,6 +315,10 @@ Mapbox welcomes participation and contributions from everyone.
 
 
 ## Mapbox Android Core
+
+### v5.0.2
+
+- [location] Add new field permissionStatus to location events [#566](https://github.com/mapbox/mapbox-events-android/pull/566)
 
 ### v5.0.1
 
