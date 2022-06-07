@@ -57,6 +57,12 @@ public class LocationEvent extends Event implements Parcelable {
     this(sessionId, latitude, longitude, System.currentTimeMillis(), applicationState, permissionStatus);
   }
 
+  @Deprecated
+  public LocationEvent(String sessionId, double latitude, double longitude, long timestampUtcMs,
+                       String applicationState) {
+    this(sessionId, latitude, longitude, timestampUtcMs, applicationState, "unknown");
+  }
+
   @Override
   Type obtainType() {
     return Type.LOCATION;
