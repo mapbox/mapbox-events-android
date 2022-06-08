@@ -4,10 +4,14 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v8.1.3
+
+- [libtelemetry] Add LocationEvent constructor that doesn't accept permissionStatus [#569](https://github.com/mapbox/mapbox-events-android/pull/569)
+
 ### v8.1.2
 
 - [libtelemetry] Fix LocationEvent timestamp [#567](https://github.com/mapbox/mapbox-events-android/pull/567)
-- [ibtelemetry] Add @Keep annotation to the AttachmentMetadata [#565](https://github.com/mapbox/mapbox-events-android/pull/565)
+- [libtelemetry] Add @Keep annotation to the AttachmentMetadata [#565](https://github.com/mapbox/mapbox-events-android/pull/565)
 - Fix TelemetryUtils.obtainApplicationState() method [#559](https://github.com/mapbox/mapbox-events-android/pull/559)
 
 ### v8.1.1
