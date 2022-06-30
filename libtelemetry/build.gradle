@@ -49,6 +49,7 @@ android {
 
 dependencies {
     implementation dependenciesList.androidCore
+    implementation dependenciesList.workManager
     okhttp3Implementation dependenciesList.okhttp3
     okhttp4Implementation dependenciesList.okhttp4
     implementation dependenciesList.gson
