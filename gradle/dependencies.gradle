@@ -21,7 +21,7 @@ ext {
             archLifecycleVersion: "1.1.0",
             assertJ             : "3.11.1",
             leakCanaryVersion   : "1.6.3",
-            workManagerVersion  : "2.6.0",
+            workManagerVersion  : "2.7.1",
     ]
 
     pluginVersion = [
