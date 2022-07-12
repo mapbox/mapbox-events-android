@@ -4,9 +4,13 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## Mapbox Android Telemetry
 
+### v8.1.5
+
+- [libtelemetry] Bump workManagerVersion to 2.7.1, add JavaVersion.VERSION_1_8 to compileOptions [#573](https://github.com/mapbox/mapbox-events-android/pull/573)
+
 ### v8.1.4
 
-- [libtelemetry] Remove WAKE_LOCK permission. Replace JobIntentService with Worker and WorkManager.
+- [libtelemetry] Remove WAKE_LOCK permission. Replace JobIntentService with Worker and WorkManager. [#571](https://github.com/mapbox/mapbox-events-android/pull/571)
 
 ### v8.1.3
 
