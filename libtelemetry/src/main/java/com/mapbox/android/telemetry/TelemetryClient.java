@@ -166,7 +166,7 @@ class TelemetryClient {
   }
 
   private boolean isExtraDebuggingNeeded() {
-    return setting.isDebugLoggingEnabled() || setting.getEnvironment().equals(Environment.STAGING);
+    return true;
   }
 
   private RequestBody reverseMultiForm(MultipartBody.Builder builder) {

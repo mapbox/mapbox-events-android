@@ -1,5 +1,8 @@
 package com.mapbox.android.telemetry;
 
+import static com.mapbox.android.telemetry.MapboxTelemetryConstants.LOCATION_COLLECTOR_ENABLED;
+import static com.mapbox.android.telemetry.MapboxTelemetryConstants.SESSION_ROTATION_INTERVAL_MILLIS;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
@@ -31,9 +34,6 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-
-import static com.mapbox.android.telemetry.MapboxTelemetryConstants.LOCATION_COLLECTOR_ENABLED;
-import static com.mapbox.android.telemetry.MapboxTelemetryConstants.SESSION_ROTATION_INTERVAL_MILLIS;
 
 public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
   private static final String LOG_TAG = "MapboxTelemetry";
@@ -472,6 +472,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
     return new Callback() {
       @Override
       public void onFailure(Call call, IOException e) {
+        Log.e("TelemetryCallback", "onFailure", e);
         for (TelemetryListener telemetryListener : listeners) {
           telemetryListener.onHttpFailure(e.getMessage());
         }
@@ -479,6 +480,7 @@ public class MapboxTelemetry implements FullQueueCallback, ServiceTaskCallback {
 
       @Override
       public void onResponse(Call call, Response response) throws IOException {
+        Log.e("TelemetryCallback", "onResponse: " + response.toString());
         ResponseBody body = response.body();
         if (body != null) {
           body.close();
