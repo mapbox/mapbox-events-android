@@ -108,16 +108,16 @@ jobs:
             command: |
                 echo "export AWS_SDK_LOAD_CONFIG=1" >> $BASH_ENV
                 ./mbx-ci aws setup
-      - run:
-          name: Generate Maven credentials
-          shell: /bin/bash -euo pipefail
-          command: |
-            aws s3 cp s3://mapbox/android/signing-credentials/secring.gpg secring.gpg
-            echo "NEXUS_USERNAME=$PUBLISH_NEXUS_USERNAME
-            NEXUS_PASSWORD=$PUBLISH_NEXUS_PASSWORD
-            signing.keyId=$SIGNING_KEYID
-            signing.password=$SIGNING_PASSWORD
-            signing.secretKeyRingFile=../secring.gpg" >> gradle.properties
+      #- run:
+      #    name: Generate Maven credentials
+      #    shell: /bin/bash -euo pipefail
+      #    command: |
+      #      aws s3 cp s3://mapbox/android/signing-credentials/secring.gpg secring.gpg
+      #      echo "NEXUS_USERNAME=$PUBLISH_NEXUS_USERNAME
+      #      NEXUS_PASSWORD=$PUBLISH_NEXUS_PASSWORD
+      #      signing.keyId=$SIGNING_KEYID
+      #      signing.password=$SIGNING_PASSWORD
+      #      signing.secretKeyRingFile=../secring.gpg" >> gradle.properties
       - run:
           name: Update version name
           command: |
