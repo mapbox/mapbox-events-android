@@ -16,19 +16,13 @@ javadoc:
 	./gradlew :libcore:javadocrelease
 	./gradlew :libtelemetry:javadocokhttp4Release
 
-publish-core:
-	export IS_LOCAL_DEVELOPMENT=false; ./gradlew :libcore:uploadArchives
-
-publish-telem:
-	export IS_LOCAL_DEVELOPMENT=false; ./gradlew :libtelemetry:uploadArchives
-
 publish-local-core:
 	# This publishes to ~/.m2/repository/com/mapbox/mapboxsdk
-	export IS_LOCAL_DEVELOPMENT=true; ./gradlew :libcore:uploadArchives
+	./gradlew :libcore:uploadArchives
 
 publish-local-telem:
 	# This publishes to ~/.m2/repository/com/mapbox/mapboxsdk
-	export IS_LOCAL_DEVELOPMENT=true; ./gradlew :libtelemetry:uploadArchives
+	./gradlew :libtelemetry:uploadArchives
 
 .PHONY: publish-core-to-sdk-registry
 publish-core-to-sdk-registry:
