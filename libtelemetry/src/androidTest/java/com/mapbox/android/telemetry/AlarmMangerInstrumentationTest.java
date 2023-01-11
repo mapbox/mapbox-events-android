@@ -3,6 +3,7 @@ package com.mapbox.android.telemetry;
 import android.app.AlarmManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import org.junit.Assert;
@@ -19,6 +20,11 @@ public class AlarmMangerInstrumentationTest {
 
   @Test
   public void checksAlarmCancelledProperly() throws InterruptedException {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+      // AlarmSchedulerFlusher does not support SDK versions < KitKat.
+      return;
+    }
+
     final CountDownLatch latch = new CountDownLatch(2);
     final AtomicReference<Integer> broadcastTrack = new AtomicReference<>();
 
