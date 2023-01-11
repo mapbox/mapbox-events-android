@@ -122,17 +122,13 @@ jobs:
           name: Build libraries
           command: make release
       - deploy:
-          name: Publish to Maven Central and Mapbox SDK Registry
+          name: Publish to Mapbox SDK Registry
           command: |
             if [[ $CIRCLE_BRANCH == main ]]; then
-              make publish-core ;
-              make publish-telem ;
               make publish-all-to-sdk-registry ;
             elif [[ $CIRCLE_TAG == telem-* ]]; then
-              make publish-telem ;
               make publish-telemetry-to-sdk-registry ;
             elif [[ $CIRCLE_TAG == core-* ]]; then
-              make publish-core ;
               make publish-core-to-sdk-registry ;
             else
               echo "Skip, not a release branch"
